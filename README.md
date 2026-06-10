@@ -6,8 +6,19 @@ Demo app for the Allworth Financial executive pitch (June 22, 2026): an AI-nativ
 
 ## Quick start
 
+One command runs everything — backend and iOS app:
+
 ```bash
-./run.sh                # starts the FastAPI backend on :3000 (needs uv; deps sync automatically)
+./demo.sh               # FastAPI backend on :3000 + app on the iOS simulator
+./demo.sh --release     # demo-day mode: Release build, no Metro needed
+```
+
+Prereqs: [uv](https://docs.astral.sh/uv/), Node, and Xcode. Ctrl-C stops everything the script started.
+
+To run the pieces separately:
+
+```bash
+./run.sh                # backend only (FastAPI on :3000; deps sync automatically)
 cd app/AllworthCompanionRN
 npm install
 npx expo run:ios        # native build + launch on the iOS simulator
