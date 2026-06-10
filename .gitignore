@@ -1,0 +1,13 @@
+.venv/
+node_modules/
+apps/mobile/node_modules/
+.expo/
+dist/
+build/
+coverage/
+__pycache__/
+.pytest_cache/
+.env
+.env.local
+*.pyc
+

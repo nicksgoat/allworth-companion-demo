@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Allworth Planning",
+    "slug": "allworth-planning",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "allworthplanning",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#f7f4ef"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}
