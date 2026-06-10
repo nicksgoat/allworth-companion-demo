@@ -42,6 +42,11 @@ export class ApiClient {
     return this.get(`/api/advisors/${advisorId}/clients/${clientId}/brief`);
   }
 
+  async forgetFact(clientId: string, factId: string): Promise<void> {
+    const res = await fetch(`${this.baseURL}/api/clients/${clientId}/facts/${factId}`, { method: "DELETE" });
+    if (!res.ok) throw new Error(`DELETE fact → ${res.status}`);
+  }
+
   async resetDemo(clientId: string): Promise<void> {
     await fetch(this.baseURL + "/api/demo/reset", {
       method: "POST",

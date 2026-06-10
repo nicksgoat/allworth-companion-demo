@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DisclaimerFooter, HairlineDivider, LearnedFactRow, SectionHeader } from "../components/Rows";
 import { useApp } from "../state";
 import { colors } from "../theme";
 import type { LearnedFact } from "../types";
+import { FactDetailSheet } from "./FactDetailSheet";
 
 const CATEGORY_LABELS: Record<string, string> = {
   goals: "Your goals",
@@ -20,6 +21,7 @@ export function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const [facts, setFacts] = useState<LearnedFact[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedFact, setSelectedFact] = useState<LearnedFact | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -30,6 +32,13 @@ export function ProfileScreen() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (app.demoScreen === "fact" && facts.length) {
+      setSelectedFact(facts[0]);
+      app.clearDemoScreen();
+    }
+  }, [app.demoScreen, facts]);
 
   const refresh = async () => {
     setRefreshing(true);
@@ -48,7 +57,8 @@ export function ProfileScreen() {
       <View style={{ gap: 6 }}>
         <Text style={styles.title}>What I've learned</Text>
         <Text style={styles.subtitle}>
-          Every fact has a source, a timestamp, and an audit trail. Nothing here came from anywhere but you.
+          Every fact has a source, a timestamp, and an audit trail. Nothing here came from anywhere but you. Tap any
+          fact to see why I know it — or to remove it.
         </Text>
       </View>
 
@@ -60,9 +70,11 @@ export function ProfileScreen() {
           {facts
             .filter((f) => f.category === category)
             .map((fact, i) => (
-              <React.Fragment key={fact.fact}>
+              <React.Fragment key={fact.id}>
                 {i > 0 ? <HairlineDivider /> : null}
-                <LearnedFactRow fact={fact} />
+                <Pressable onPress={() => setSelectedFact(fact)} style={({ pressed }) => pressed && { opacity: 0.6 }}>
+                  <LearnedFactRow fact={fact} />
+                </Pressable>
               </React.Fragment>
             ))}
         </View>
@@ -73,6 +85,16 @@ export function ProfileScreen() {
       <View style={{ paddingVertical: 8 }}>
         <DisclaimerFooter />
       </View>
+
+      <FactDetailSheet
+        fact={selectedFact}
+        categoryLabel={selectedFact ? (CATEGORY_LABELS[selectedFact.category] ?? selectedFact.category) : ""}
+        onClose={() => setSelectedFact(null)}
+        onForgotten={() => {
+          setSelectedFact(null);
+          load();
+        }}
+      />
     </ScrollView>
   );
 }

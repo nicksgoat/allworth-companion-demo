@@ -3,7 +3,7 @@
 import express from "express";
 import { seed, fmtUSD, accountsFor, spendingSummary, portfolioFor } from "./lib/data.js";
 import { nudgesFor } from "./lib/nudges.js";
-import { activeFacts, resetProfile, episodesFor } from "./lib/memory.js";
+import { activeFacts, forgetFact, resetProfile, episodesFor } from "./lib/memory.js";
 import { runTool } from "./lib/tools.js";
 import { streamChat } from "./lib/chat.js";
 
@@ -48,6 +48,13 @@ app.get("/api/clients/:id/portfolio", (_req, res) => res.json(portfolioFor()));
 
 app.get("/api/clients/:id/profile", (req, res) => {
   res.json({ clientId: req.params.id, facts: activeFacts(req.params.id) });
+});
+
+// Governed memory: "Forget this detail" — marks the fact deleted, never erases it.
+app.delete("/api/clients/:id/facts/:factId", (req, res) => {
+  const fact = forgetFact(req.params.id, req.params.factId);
+  if (!fact) return res.status(404).json({ error: "fact not found or not active" });
+  res.json({ ok: true, fact });
 });
 
 // Proactive greeting for the chat screen — deterministic so Beat 4 never flakes.

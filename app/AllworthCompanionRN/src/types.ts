@@ -79,6 +79,7 @@ export interface SpendingDetail {
 }
 
 export interface LearnedFact {
+  id: string;
   fact: string;
   category: string;
   source_quote: string;

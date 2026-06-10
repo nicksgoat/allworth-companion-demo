@@ -8,16 +8,24 @@ const seedPath = (id) => join(BACKEND_DIR, "memory", `${id}.seed.json`);
 const runtimePath = (id) => join(BACKEND_DIR, "memory", `${id}.runtime.json`);
 
 export function loadProfile(clientId) {
-  if (existsSync(runtimePath(clientId)))
-    return JSON.parse(readFileSync(runtimePath(clientId), "utf8"));
-  if (existsSync(seedPath(clientId))) {
-    const profile = JSON.parse(readFileSync(seedPath(clientId), "utf8"));
-    save(clientId, profile);
-    return profile;
+  let profile;
+  if (existsSync(runtimePath(clientId))) {
+    profile = JSON.parse(readFileSync(runtimePath(clientId), "utf8"));
+  } else if (existsSync(seedPath(clientId))) {
+    profile = JSON.parse(readFileSync(seedPath(clientId), "utf8"));
+  } else {
+    profile = { clientId, facts: [], episodes: [] };
   }
-  const empty = { clientId, facts: [], episodes: [] };
-  save(clientId, empty);
-  return empty;
+  // Seed facts predate fact ids; assign stable ids on first load.
+  let assigned = false;
+  profile.facts.forEach((f, i) => {
+    if (!f.id) {
+      f.id = `fact_seed_${i}`;
+      assigned = true;
+    }
+  });
+  if (assigned || !existsSync(runtimePath(clientId))) save(clientId, profile);
+  return profile;
 }
 
 function save(clientId, profile) {
@@ -37,9 +45,18 @@ export function addFacts(clientId, facts, episodeId) {
   const added = [];
   for (const f of facts) {
     if (!f.fact || !f.category) continue;
-    const dupe = profile.facts.find((x) => x.status === "active" && similar(x.fact, f.fact));
-    if (dupe) continue;
+    const existing = profile.facts.find((x) => x.status === "active" && similar(x.fact, f.fact));
+    // Identical restatement: keep the original (provenance points at first mention).
+    if (existing && existing.fact === f.fact) continue;
+    // Similar but different wording in the same category: newer fact supersedes.
+    if (existing && existing.category === f.category) {
+      existing.status = "superseded";
+      existing.superseded_at = new Date().toISOString();
+    } else if (existing) {
+      continue;
+    }
     const entry = {
+      id: `fact_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
       fact: f.fact,
       category: f.category,
       source_episode_id: episodeId ?? null,
@@ -53,6 +70,17 @@ export function addFacts(clientId, facts, episodeId) {
   }
   if (added.length) save(clientId, profile);
   return added;
+}
+
+// Governed deletion: facts are never removed, only marked deleted (append-only audit).
+export function forgetFact(clientId, factId) {
+  const profile = loadProfile(clientId);
+  const fact = profile.facts.find((f) => f.id === factId && f.status === "active");
+  if (!fact) return null;
+  fact.status = "deleted";
+  fact.deleted_at = new Date().toISOString();
+  save(clientId, profile);
+  return fact;
 }
 
 export function appendEpisode(clientId, { session, role, content }) {
