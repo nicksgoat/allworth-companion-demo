@@ -1,70 +1,84 @@
-# Allworth Mobile Planning App
+# Allworth Companion — AI Demo
 
-Mobile-first financial planning assistant built around a chat interface, structured planning inputs, portfolio review cards, and a Python API that can run in demo mode or delegate to the existing Allworth plugin tools.
+Demo app for the Allworth Financial executive pitch (June 22, 2026): an AI-native client engagement platform. React Native (Expo) iOS app backed by a Python/FastAPI server with an Anthropic tool-use loop. (The original SwiftUI app in `app/AllworthCompanion` and the original Node/Express backend in `app/backend` are kept as reference.)
 
-## What Is Included
+> **Synthetic data only.** No real client information anywhere in this repo. The assistant never gives directive advice — every answer hands off to the advisor.
 
-- Expo React Native mobile app in `apps/mobile`
-- FastAPI backend in `services/api`
-- Deterministic planning, portfolio, tax, and Social Security demo engines
-- Adapter layer for future integration with `/home/stevenluong/Allworth_Plugin`
-- Unit and API tests
-- One-command setup and test scripts
-
-## Design Docs
-
-- [Documentation index](docs/README.md): full map of product, frontend, backend, LLM, MCP, testing, and governance docs.
-- [App design](docs/APP_DESIGN.md): screen map, file responsibilities, data flow, LLM integration plan, testing plan, and production roadmap.
-- [Product brief](docs/PRODUCT_BRIEF.md): product thesis, users, jobs, principles, risks, and success criteria.
-- [Frontend](docs/FRONTEND.md): Expo app structure, screen responsibilities, state flow, styling approach, and refactor plan.
-- [Backend API](docs/BACKEND_API.md): FastAPI routes, orchestration, tool adapter, endpoint behavior, and service boundaries.
-- [Data contracts](docs/DATA_CONTRACTS.md): mobile/backend payloads, response types, and versioning guidance.
-- [LLM chat plan](docs/LLM_CHAT_PLAN.md): hybrid LLM architecture, model modes, safety, prompts, and rollout steps.
-- [MCP and plugin integration](docs/MCP_INTEGRATION.md): sanctioned MCP connector boundary, previous module integration, and plugin path.
-- [Client intelligence layer](docs/CLIENT_INTELLIGENCE_LAYER.md): governed memory, learning loops, fact atoms, and advisor briefs.
-- [Safety and compliance](docs/SAFETY_COMPLIANCE.md): safety boundaries, audit trail, advice limits, and demo hygiene.
-- [Testing and operations](docs/TESTING_OPERATIONS.md): setup, run commands, preview modes, and test plan.
-- [Roadmap](docs/ROADMAP.md): phased delivery plan from prototype to production.
-- [Architecture](docs/ARCHITECTURE.md): high-level frontend/backend/tool-adapter architecture.
-
-## Quick Start
+## Quick start
 
 ```bash
-./scripts/setup.sh
-./scripts/test.sh
-./scripts/dev-api.sh
+./run.sh                # starts the FastAPI backend on :3000 (needs uv; deps sync automatically)
+cd app/AllworthCompanionRN
+npm install
+npx expo run:ios        # native build + launch on the iOS simulator
 ```
 
-In a second terminal:
+The app talks to `http://localhost:3000`.
+
+**Live chat (optional):** put an Anthropic key in `services/api/.env`:
+
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+Without a key, chat streams cached fallback responses — the demo works fully offline by design and never dies on stage.
+
+## Layout
+
+```
+app/AllworthCompanionRN/ React Native app (Expo SDK 56 + TypeScript)
+  src/api.ts             REST + SSE chat (expo/fetch streaming)
+  src/state.tsx          app context + deep-link demo overrides
+  src/components/        hero number, sparkline, nudge/handoff cards, chat
+  src/screens/           dashboard, chat, profile, advisor, vision, controls
+app/AllworthCompanion/   original SwiftUI implementation (reference)
+services/api/            Python + FastAPI backend (uv-managed)
+  tools.py               8 financial tools (accounts, portfolio, tax sim, brief…)
+  chat.py                streaming tool-use loop + fallback selection (SSE)
+  memory.py              provenance memory (fact, source quote, timestamp)
+  mcp_server.py          MCP server (stdio, read-only, household-scoped)
+  fallbacks/             cached responses for the scripted demo beats
+  data/seed.json         deterministic synthetic data
+app/backend/             original Node/Express backend (reference)
+run.sh                   one-command backend startup
+allworth-ai-demo-handoff.md   full spec — all decisions trace to it
+docs/                    vision + production roadmap (design docs)
+```
+
+## Vision & roadmap
+
+The `docs/` directory holds the platform design docs — product brief, [Client Intelligence Layer](docs/CLIENT_INTELLIGENCE_LAYER.md) (governed memory, fact atoms, learning loops), safety/compliance boundaries, and the [phased roadmap](docs/ROADMAP.md) from this demo to production (LLM chat → MCP/real data → advisor briefs → governed memory → production readiness). The demo's vision screen (Beat 6) presents this path.
+
+## MCP server (Phase 3 preview)
+
+`services/api/mcp_server.py` exposes the backend's tool layer over the Model Context Protocol (stdio), implementing the connector rules in [docs/MCP_INTEGRATION.md](docs/MCP_INTEGRATION.md): backend-only, **read-only** (writes like `update_client_profile` are excluded pending approval/audit design), entitlement-scoped to one household (`ALLWORTH_CLIENT_ID`, never a tool parameter), and every result wrapped in a provenance envelope (`source`, `tool`, `clientId`, `retrieved_at`, `read_only`). The repo's `.mcp.json` registers it, so Claude Code/Desktop pointed at this repo can query the same governed data the app uses:
+
+```sh
+# 7 read-only tools: accounts, portfolio, plan, spending, profile, tax sim, advisor brief
+claude mcp list   # → allworth-client-intelligence
+```
+
+## Demo script
+
+Six beats, all driven from the app:
+
+1. **Dashboard** — Maya's net worth across Allworth and held-away accounts
+2. **Nudge** — spending running 18% over plan, with monthly breakdown
+3. **Grounded chat** — "$200K SpaceX IPO" question answered via live tool calls (visible tool chips → sources)
+4. **Memory** — return Wednesday, the assistant picks up the IPO thread unprompted, with provenance
+5. **Advisor view** — Dana's book, $611K held-away detected, auto-prepared meeting brief
+6. **Vision** — the Client Intelligence Layer platform story
+
+Demo controls: triple-tap the Allworth wordmark (switch client/advisor/vision, Monday/Wednesday session, backend host, reset).
+
+For automated verification, deep-link to a screen:
 
 ```bash
-./scripts/dev-mobile.sh
+xcrun simctl openurl booted "allworthdemo://demo/{chat|profile|fact|advisor|advisor_detail|vision|nudge|controls}"
 ```
 
-The API defaults to `http://127.0.0.1:8000`. For physical devices, set `EXPO_PUBLIC_API_URL` to your machine LAN IP before starting Expo.
+(The SwiftUI app uses `SIMCTL_CHILD_DEMO_SCREEN=<screen>` at launch instead.)
 
-## Product Shape
+---
 
-The app is intentionally not a raw tool catalog. Users interact through:
-
-- **Chat**: ask planning, tax, and portfolio questions
-- **Plan**: edit household assumptions
-- **Portfolio**: review allocation, drift, risk, and tax opportunities
-- **Actions**: advisor-ready next steps
-
-## Backend Modes
-
-The backend currently runs deterministic demo tools so it works immediately.
-
-Later, set:
-
-```bash
-export ALLWORTH_PLUGIN_ROOT=/home/stevenluong/Allworth_Plugin
-export MOBILEAPP_TOOL_MODE=plugin
-```
-
-Then replace the adapter calls in `services/api/app/tool_adapter.py` with direct calls into the public facade once the production API contract is finalized.
-
-## Safety
-
-The app is designed for planning assistance, scenario comparison, and advisor preparation. It should not place trades, send tax instructions, or make final legal/tax recommendations without advisor review.
+*Educational information, not investment advice. Allworth Financial demo — synthetic data.*

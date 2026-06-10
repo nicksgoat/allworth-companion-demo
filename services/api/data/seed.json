@@ -1,0 +1,1818 @@
+{
+  "generatedAt": "deterministic",
+  "disclaimer": "SYNTHETIC DATA — Allworth Financial demo. All personas, accounts, balances and transactions are fabricated.",
+  "months": [
+    "2025-07",
+    "2025-08",
+    "2025-09",
+    "2025-10",
+    "2025-11",
+    "2025-12",
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06"
+  ],
+  "personas": {
+    "clients": [
+      {
+        "id": "maya",
+        "name": "Maya Tran",
+        "age": 58,
+        "city": "Plano, TX",
+        "advisorId": "dana",
+        "bio": "Recently semi-retired consultant; lives partly off portfolio income.",
+        "avatarInitials": "MT"
+      }
+    ],
+    "advisors": [
+      {
+        "id": "dana",
+        "name": "Dana Whitfield",
+        "title": "Senior Financial Advisor, CFP®",
+        "avatarInitials": "DW"
+      }
+    ]
+  },
+  "accounts": [
+    {
+      "id": "acct_trust",
+      "name": "Trust Brokerage",
+      "institution": "Allworth (Schwab)",
+      "group": "allworth",
+      "type": "taxable",
+      "balance": 1420000,
+      "history": [
+        1389789,
+        1417446,
+        1447237,
+        1483023,
+        1425710,
+        1446846,
+        1440313,
+        1433783,
+        1410881,
+        1409720,
+        1437561,
+        1420000
+      ]
+    },
+    {
+      "id": "acct_ira",
+      "name": "Rollover IRA",
+      "institution": "Allworth (Schwab)",
+      "group": "allworth",
+      "type": "ira",
+      "balance": 880000,
+      "history": [
+        814858,
+        833714,
+        852041,
+        880518,
+        851456,
+        863905,
+        862187,
+        860934,
+        854126,
+        856572,
+        875133,
+        880000
+      ]
+    },
+    {
+      "id": "acct_roth",
+      "name": "Roth IRA",
+      "institution": "Allworth (Schwab)",
+      "group": "allworth",
+      "type": "roth",
+      "balance": 145000,
+      "history": [
+        132692,
+        136248,
+        140047,
+        144986,
+        139737,
+        143035,
+        142800,
+        143698,
+        142374,
+        142888,
+        145554,
+        145000
+      ]
+    },
+    {
+      "id": "acct_401k",
+      "name": "401(k) — Former Employer",
+      "institution": "Fidelity",
+      "group": "outside",
+      "type": "401k",
+      "balance": 385000,
+      "history": [
+        357663,
+        367416,
+        374458,
+        385627,
+        371111,
+        378803,
+        378122,
+        377976,
+        374846,
+        375687,
+        383755,
+        385000
+      ]
+    },
+    {
+      "id": "acct_rh",
+      "name": "Brokerage",
+      "institution": "Robinhood",
+      "group": "outside",
+      "type": "taxable",
+      "balance": 96000,
+      "history": [
+        89836,
+        91795,
+        93471,
+        96848,
+        94034,
+        95228,
+        94893,
+        94792,
+        94104,
+        93719,
+        96404,
+        96000
+      ]
+    },
+    {
+      "id": "acct_chk",
+      "name": "Checking",
+      "institution": "Chase",
+      "group": "outside",
+      "type": "cash",
+      "balance": 28000,
+      "history": [
+        17063,
+        16800,
+        16800,
+        18590,
+        19586,
+        21646,
+        23029,
+        24762,
+        25950,
+        26740,
+        27198,
+        28000
+      ]
+    },
+    {
+      "id": "acct_sav",
+      "name": "Savings",
+      "institution": "Chase",
+      "group": "outside",
+      "type": "cash",
+      "balance": 102000,
+      "history": [
+        91644,
+        94408,
+        96983,
+        94996,
+        97901,
+        92193,
+        95030,
+        91673,
+        93530,
+        96637,
+        99615,
+        102000
+      ]
+    },
+    {
+      "id": "acct_mtg",
+      "name": "Mortgage",
+      "institution": "Chase",
+      "group": "outside",
+      "type": "liability",
+      "balance": -310000,
+      "history": [
+        -325950,
+        -324500,
+        -323050,
+        -321600,
+        -320150,
+        -318700,
+        -317250,
+        -315800,
+        -314350,
+        -312900,
+        -311450,
+        -310000
+      ]
+    }
+  ],
+  "netWorthHistory": [
+    {
+      "month": "2025-07",
+      "value": 2567595
+    },
+    {
+      "month": "2025-08",
+      "value": 2633327
+    },
+    {
+      "month": "2025-09",
+      "value": 2697987
+    },
+    {
+      "month": "2025-10",
+      "value": 2782988
+    },
+    {
+      "month": "2025-11",
+      "value": 2679385
+    },
+    {
+      "month": "2025-12",
+      "value": 2722956
+    },
+    {
+      "month": "2026-01",
+      "value": 2719124
+    },
+    {
+      "month": "2026-02",
+      "value": 2711818
+    },
+    {
+      "month": "2026-03",
+      "value": 2681461
+    },
+    {
+      "month": "2026-04",
+      "value": 2689063
+    },
+    {
+      "month": "2026-05",
+      "value": 2753770
+    },
+    {
+      "month": "2026-06",
+      "value": 2746000
+    }
+  ],
+  "positions": [
+    {
+      "accountId": "acct_trust",
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "qty": 800,
+      "price": 213,
+      "assetClass": "us_equity",
+      "value": 170400
+    },
+    {
+      "accountId": "acct_trust",
+      "symbol": "VTI",
+      "name": "Vanguard Total Stock Market ETF",
+      "qty": 1640,
+      "price": 295,
+      "assetClass": "us_equity",
+      "value": 483800
+    },
+    {
+      "accountId": "acct_trust",
+      "symbol": "VXUS",
+      "name": "Vanguard Total Intl Stock ETF",
+      "qty": 2520,
+      "price": 64.5,
+      "assetClass": "intl_equity",
+      "value": 162540
+    },
+    {
+      "accountId": "acct_trust",
+      "symbol": "VTEB",
+      "name": "Vanguard Tax-Exempt Bond ETF",
+      "qty": 6470,
+      "price": 51.2,
+      "assetClass": "muni_bond",
+      "value": 331264
+    },
+    {
+      "accountId": "acct_trust",
+      "symbol": "BND",
+      "name": "Vanguard Total Bond Market ETF",
+      "qty": 2280,
+      "price": 73.4,
+      "assetClass": "bond",
+      "value": 167352
+    },
+    {
+      "accountId": "acct_trust",
+      "symbol": "CASH",
+      "name": "Money Market Sweep",
+      "qty": 1,
+      "price": 104644,
+      "assetClass": "cash",
+      "value": 104644
+    },
+    {
+      "accountId": "acct_ira",
+      "symbol": "VTI",
+      "name": "Vanguard Total Stock Market ETF",
+      "qty": 1490,
+      "price": 295,
+      "assetClass": "us_equity",
+      "value": 439550
+    },
+    {
+      "accountId": "acct_ira",
+      "symbol": "BND",
+      "name": "Vanguard Total Bond Market ETF",
+      "qty": 4720,
+      "price": 73.4,
+      "assetClass": "bond",
+      "value": 346448
+    },
+    {
+      "accountId": "acct_ira",
+      "symbol": "VXUS",
+      "name": "Vanguard Total Intl Stock ETF",
+      "qty": 1450,
+      "price": 64.5,
+      "assetClass": "intl_equity",
+      "value": 93525
+    },
+    {
+      "accountId": "acct_roth",
+      "symbol": "VTI",
+      "name": "Vanguard Total Stock Market ETF",
+      "qty": 491,
+      "price": 295,
+      "assetClass": "us_equity",
+      "value": 144845
+    },
+    {
+      "accountId": "acct_401k",
+      "symbol": "FXAIX",
+      "name": "Fidelity 500 Index Fund",
+      "qty": 1530,
+      "price": 215,
+      "assetClass": "us_equity",
+      "value": 328950
+    },
+    {
+      "accountId": "acct_401k",
+      "symbol": "FXNAX",
+      "name": "Fidelity US Bond Index Fund",
+      "qty": 5310,
+      "price": 10.55,
+      "assetClass": "bond",
+      "value": 56021
+    },
+    {
+      "accountId": "acct_rh",
+      "symbol": "NVDA",
+      "name": "NVIDIA Corp.",
+      "qty": 310,
+      "price": 168,
+      "assetClass": "us_equity",
+      "value": 52080
+    },
+    {
+      "accountId": "acct_rh",
+      "symbol": "TSLA",
+      "name": "Tesla Inc.",
+      "qty": 95,
+      "price": 262,
+      "assetClass": "us_equity",
+      "value": 24890
+    },
+    {
+      "accountId": "acct_rh",
+      "symbol": "PLTR",
+      "name": "Palantir Technologies",
+      "qty": 152,
+      "price": 124,
+      "assetClass": "us_equity",
+      "value": 18848
+    },
+    {
+      "accountId": "acct_rh",
+      "symbol": "CASH",
+      "name": "Cash",
+      "qty": 1,
+      "price": 182,
+      "assetClass": "cash",
+      "value": 182
+    }
+  ],
+  "taxLots": [
+    {
+      "id": "lot_aapl_a",
+      "accountId": "acct_trust",
+      "symbol": "AAPL",
+      "qty": 400,
+      "costPerShare": 27.4,
+      "acquired": "2015-03-12",
+      "term": "long"
+    },
+    {
+      "id": "lot_aapl_b",
+      "accountId": "acct_trust",
+      "symbol": "AAPL",
+      "qty": 250,
+      "costPerShare": 132.05,
+      "acquired": "2021-09-08",
+      "term": "long"
+    },
+    {
+      "id": "lot_aapl_c",
+      "accountId": "acct_trust",
+      "symbol": "AAPL",
+      "qty": 150,
+      "costPerShare": 187.9,
+      "acquired": "2024-11-21",
+      "term": "long"
+    },
+    {
+      "id": "lot_vti_t1",
+      "accountId": "acct_trust",
+      "symbol": "VTI",
+      "qty": 1100,
+      "costPerShare": 201.3,
+      "acquired": "2019-06-14",
+      "term": "long"
+    },
+    {
+      "id": "lot_vti_t2",
+      "accountId": "acct_trust",
+      "symbol": "VTI",
+      "qty": 540,
+      "costPerShare": 262.75,
+      "acquired": "2024-02-09",
+      "term": "long"
+    },
+    {
+      "id": "lot_vxus_t",
+      "accountId": "acct_trust",
+      "symbol": "VXUS",
+      "qty": 2520,
+      "costPerShare": 55.1,
+      "acquired": "2020-10-02",
+      "term": "long"
+    },
+    {
+      "id": "lot_vteb_t",
+      "accountId": "acct_trust",
+      "symbol": "VTEB",
+      "qty": 6470,
+      "costPerShare": 49.85,
+      "acquired": "2021-04-16",
+      "term": "long"
+    },
+    {
+      "id": "lot_bnd_t",
+      "accountId": "acct_trust",
+      "symbol": "BND",
+      "qty": 2280,
+      "costPerShare": 74.95,
+      "acquired": "2022-01-20",
+      "term": "long"
+    },
+    {
+      "id": "lot_nvda_1",
+      "accountId": "acct_rh",
+      "symbol": "NVDA",
+      "qty": 240,
+      "costPerShare": 21.6,
+      "acquired": "2019-08-05",
+      "term": "long"
+    },
+    {
+      "id": "lot_nvda_2",
+      "accountId": "acct_rh",
+      "symbol": "NVDA",
+      "qty": 70,
+      "costPerShare": 118.4,
+      "acquired": "2025-10-12",
+      "term": "short"
+    },
+    {
+      "id": "lot_tsla_1",
+      "accountId": "acct_rh",
+      "symbol": "TSLA",
+      "qty": 95,
+      "costPerShare": 58.2,
+      "acquired": "2019-12-18",
+      "term": "long"
+    },
+    {
+      "id": "lot_pltr_1",
+      "accountId": "acct_rh",
+      "symbol": "PLTR",
+      "qty": 152,
+      "costPerShare": 9.85,
+      "acquired": "2020-10-01",
+      "term": "long"
+    }
+  ],
+  "plan": {
+    "clientId": "maya",
+    "riskTarget": "60/40 growth & income",
+    "spendingAssumptionMonthly": 14000,
+    "portfolioIncomeMonthly": 9000,
+    "otherIncomeMonthly": 4500,
+    "filingStatus": "single",
+    "state": "TX",
+    "estFederalBracket": 0.24,
+    "capGainsRate": 0.15,
+    "niitApplies": true,
+    "goals": [
+      {
+        "id": "goal_lake",
+        "label": "Lake house",
+        "target": 350000,
+        "horizonYears": 4,
+        "funded": 0.32
+      },
+      {
+        "id": "goal_529",
+        "label": "Grandkids' 529s",
+        "target": 120000,
+        "horizonYears": 10,
+        "funded": 0.18
+      },
+      {
+        "id": "goal_income",
+        "label": "Retirement income",
+        "target": null,
+        "detail": "$9,000/mo from portfolio through age 95"
+      }
+    ]
+  },
+  "spending": [
+    {
+      "month": "2025-07",
+      "total": 13189,
+      "planned": 14000,
+      "categories": {
+        "Housing": 3890,
+        "Travel": 1384,
+        "Dining": 1061,
+        "Health": 1026,
+        "Auto": 826,
+        "Gifts/Family": 839,
+        "Everything else": 4163
+      }
+    },
+    {
+      "month": "2025-08",
+      "total": 12868,
+      "planned": 14000,
+      "categories": {
+        "Housing": 3724,
+        "Travel": 1373,
+        "Dining": 1055,
+        "Health": 954,
+        "Auto": 833,
+        "Gifts/Family": 807,
+        "Everything else": 4122
+      }
+    },
+    {
+      "month": "2025-09",
+      "total": 13379,
+      "planned": 14000,
+      "categories": {
+        "Housing": 3793,
+        "Travel": 1283,
+        "Dining": 1042,
+        "Health": 959,
+        "Auto": 704,
+        "Gifts/Family": 811,
+        "Everything else": 4787
+      }
+    },
+    {
+      "month": "2025-10",
+      "total": 13123,
+      "planned": 14000,
+      "categories": {
+        "Housing": 3892,
+        "Travel": 1421,
+        "Dining": 1036,
+        "Health": 910,
+        "Auto": 816,
+        "Gifts/Family": 875,
+        "Everything else": 4173
+      }
+    },
+    {
+      "month": "2025-11",
+      "total": 13239,
+      "planned": 14000,
+      "categories": {
+        "Housing": 3867,
+        "Travel": 1252,
+        "Dining": 1190,
+        "Health": 984,
+        "Auto": 784,
+        "Gifts/Family": 923,
+        "Everything else": 4239
+      }
+    },
+    {
+      "month": "2025-12",
+      "total": 13266,
+      "planned": 14000,
+      "categories": {
+        "Housing": 4053,
+        "Travel": 1281,
+        "Dining": 1057,
+        "Health": 965,
+        "Auto": 831,
+        "Gifts/Family": 836,
+        "Everything else": 4243
+      }
+    },
+    {
+      "month": "2026-01",
+      "total": 13328,
+      "planned": 14000,
+      "categories": {
+        "Housing": 3894,
+        "Travel": 1246,
+        "Dining": 1165,
+        "Health": 833,
+        "Auto": 740,
+        "Gifts/Family": 864,
+        "Everything else": 4586
+      }
+    },
+    {
+      "month": "2026-02",
+      "total": 13815,
+      "planned": 14000,
+      "categories": {
+        "Housing": 3841,
+        "Travel": 1311,
+        "Dining": 1239,
+        "Health": 861,
+        "Auto": 841,
+        "Gifts/Family": 925,
+        "Everything else": 4797
+      }
+    },
+    {
+      "month": "2026-03",
+      "total": 12118,
+      "planned": 14000,
+      "categories": {
+        "Housing": 3419,
+        "Travel": 1254,
+        "Dining": 1002,
+        "Health": 963,
+        "Auto": 703,
+        "Gifts/Family": 779,
+        "Everything else": 3998
+      }
+    },
+    {
+      "month": "2026-04",
+      "total": 16100,
+      "planned": 14000,
+      "categories": {
+        "Housing": 4310,
+        "Travel": 2879,
+        "Dining": 1247,
+        "Health": 921,
+        "Auto": 817,
+        "Gifts/Family": 1389,
+        "Everything else": 4537
+      }
+    },
+    {
+      "month": "2026-05",
+      "total": 16901,
+      "planned": 14000,
+      "categories": {
+        "Housing": 4521,
+        "Travel": 2856,
+        "Dining": 1304,
+        "Health": 967,
+        "Auto": 960,
+        "Gifts/Family": 1439,
+        "Everything else": 4854
+      }
+    },
+    {
+      "month": "2026-06",
+      "total": 16500,
+      "planned": 14000,
+      "categories": {
+        "Housing": 4162,
+        "Travel": 2738,
+        "Dining": 1141,
+        "Health": 945,
+        "Auto": 861,
+        "Gifts/Family": 1419,
+        "Everything else": 5234
+      }
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx_1102",
+      "accountId": "acct_chk",
+      "date": "2026-06-26",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -196
+    },
+    {
+      "id": "tx_1096",
+      "accountId": "acct_chk",
+      "date": "2026-06-25",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -154
+    },
+    {
+      "id": "tx_1127",
+      "accountId": "acct_chk",
+      "date": "2026-06-23",
+      "merchant": "Transfer from Allworth Trust",
+      "category": "Transfer",
+      "amount": 9000
+    },
+    {
+      "id": "tx_1101",
+      "accountId": "acct_chk",
+      "date": "2026-06-21",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -203
+    },
+    {
+      "id": "tx_1105",
+      "accountId": "acct_chk",
+      "date": "2026-06-21",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -204
+    },
+    {
+      "id": "tx_1121",
+      "accountId": "acct_chk",
+      "date": "2026-06-21",
+      "merchant": "Sixty Vines Plano",
+      "category": "Dining",
+      "amount": -104
+    },
+    {
+      "id": "tx_1126",
+      "accountId": "acct_trust",
+      "date": "2026-06-20",
+      "merchant": "Monthly distribution to checking",
+      "category": "Transfer",
+      "amount": -9000
+    },
+    {
+      "id": "tx_1123",
+      "accountId": "acct_chk",
+      "date": "2026-06-19",
+      "merchant": "Delta Air Lines",
+      "category": "Travel",
+      "amount": -608
+    },
+    {
+      "id": "tx_1109",
+      "accountId": "acct_chk",
+      "date": "2026-06-18",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -158
+    },
+    {
+      "id": "tx_1115",
+      "accountId": "acct_chk",
+      "date": "2026-06-17",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -53
+    },
+    {
+      "id": "tx_1116",
+      "accountId": "acct_chk",
+      "date": "2026-06-16",
+      "merchant": "Legacy Med Group",
+      "category": "Health",
+      "amount": -257
+    },
+    {
+      "id": "tx_1099",
+      "accountId": "acct_chk",
+      "date": "2026-06-15",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -181
+    },
+    {
+      "id": "tx_1107",
+      "accountId": "acct_chk",
+      "date": "2026-06-15",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -196
+    },
+    {
+      "id": "tx_1110",
+      "accountId": "acct_chk",
+      "date": "2026-06-15",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -69
+    },
+    {
+      "id": "tx_1119",
+      "accountId": "acct_chk",
+      "date": "2026-06-15",
+      "merchant": "City of Plano Utilities",
+      "category": "Utilities",
+      "amount": -278
+    },
+    {
+      "id": "tx_1117",
+      "accountId": "acct_chk",
+      "date": "2026-06-14",
+      "merchant": "Legacy Med Group",
+      "category": "Health",
+      "amount": -237
+    },
+    {
+      "id": "tx_1120",
+      "accountId": "acct_chk",
+      "date": "2026-06-14",
+      "merchant": "Sixty Vines Plano",
+      "category": "Dining",
+      "amount": -141
+    },
+    {
+      "id": "tx_1098",
+      "accountId": "acct_chk",
+      "date": "2026-06-11",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -209
+    },
+    {
+      "id": "tx_1104",
+      "accountId": "acct_chk",
+      "date": "2026-06-11",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -206
+    },
+    {
+      "id": "tx_1114",
+      "accountId": "acct_chk",
+      "date": "2026-06-11",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -69
+    },
+    {
+      "id": "tx_1103",
+      "accountId": "acct_chk",
+      "date": "2026-06-10",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -182
+    },
+    {
+      "id": "tx_1106",
+      "accountId": "acct_chk",
+      "date": "2026-06-10",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -175
+    },
+    {
+      "id": "tx_1124",
+      "accountId": "acct_chk",
+      "date": "2026-06-10",
+      "merchant": "Mortgage Payment — Chase",
+      "category": "Housing",
+      "amount": -2870
+    },
+    {
+      "id": "tx_1128",
+      "accountId": "acct_trust",
+      "date": "2026-06-10",
+      "merchant": "Quarterly dividend distribution",
+      "category": "Income",
+      "amount": 12400
+    },
+    {
+      "id": "tx_1118",
+      "accountId": "acct_chk",
+      "date": "2026-06-09",
+      "merchant": "AT&T",
+      "category": "Utilities",
+      "amount": -153
+    },
+    {
+      "id": "tx_1097",
+      "accountId": "acct_chk",
+      "date": "2026-06-08",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -150
+    },
+    {
+      "id": "tx_1113",
+      "accountId": "acct_chk",
+      "date": "2026-06-08",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -66
+    },
+    {
+      "id": "tx_1100",
+      "accountId": "acct_chk",
+      "date": "2026-06-07",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -163
+    },
+    {
+      "id": "tx_1125",
+      "accountId": "acct_chk",
+      "date": "2026-06-06",
+      "merchant": "Consulting Income — Meridian Health",
+      "category": "Income",
+      "amount": 4500
+    },
+    {
+      "id": "tx_1108",
+      "accountId": "acct_chk",
+      "date": "2026-06-05",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -189
+    },
+    {
+      "id": "tx_1111",
+      "accountId": "acct_chk",
+      "date": "2026-06-05",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -69
+    },
+    {
+      "id": "tx_1112",
+      "accountId": "acct_chk",
+      "date": "2026-06-05",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -57
+    },
+    {
+      "id": "tx_1129",
+      "accountId": "acct_sav",
+      "date": "2026-06-04",
+      "merchant": "Lake Cities Realty — earnest deposit refund",
+      "category": "Housing",
+      "amount": 5000
+    },
+    {
+      "id": "tx_1122",
+      "accountId": "acct_chk",
+      "date": "2026-06-01",
+      "merchant": "Sixty Vines Plano",
+      "category": "Dining",
+      "amount": -125
+    },
+    {
+      "id": "tx_1064",
+      "accountId": "acct_chk",
+      "date": "2026-05-27",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -188
+    },
+    {
+      "id": "tx_1072",
+      "accountId": "acct_chk",
+      "date": "2026-05-27",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -191
+    },
+    {
+      "id": "tx_1070",
+      "accountId": "acct_chk",
+      "date": "2026-05-26",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -170
+    },
+    {
+      "id": "tx_1091",
+      "accountId": "acct_chk",
+      "date": "2026-05-26",
+      "merchant": "Delta Air Lines",
+      "category": "Travel",
+      "amount": -729
+    },
+    {
+      "id": "tx_1092",
+      "accountId": "acct_chk",
+      "date": "2026-05-25",
+      "merchant": "Mortgage Payment — Chase",
+      "category": "Housing",
+      "amount": -2870
+    },
+    {
+      "id": "tx_1095",
+      "accountId": "acct_chk",
+      "date": "2026-05-25",
+      "merchant": "Transfer from Allworth Trust",
+      "category": "Transfer",
+      "amount": 9000
+    },
+    {
+      "id": "tx_1075",
+      "accountId": "acct_chk",
+      "date": "2026-05-23",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -200
+    },
+    {
+      "id": "tx_1085",
+      "accountId": "acct_chk",
+      "date": "2026-05-23",
+      "merchant": "Legacy Med Group",
+      "category": "Health",
+      "amount": -202
+    },
+    {
+      "id": "tx_1089",
+      "accountId": "acct_chk",
+      "date": "2026-05-23",
+      "merchant": "Sixty Vines Plano",
+      "category": "Dining",
+      "amount": -125
+    },
+    {
+      "id": "tx_1077",
+      "accountId": "acct_chk",
+      "date": "2026-05-22",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -167
+    },
+    {
+      "id": "tx_1069",
+      "accountId": "acct_chk",
+      "date": "2026-05-21",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -153
+    },
+    {
+      "id": "tx_1088",
+      "accountId": "acct_chk",
+      "date": "2026-05-21",
+      "merchant": "Sixty Vines Plano",
+      "category": "Dining",
+      "amount": -102
+    },
+    {
+      "id": "tx_1084",
+      "accountId": "acct_chk",
+      "date": "2026-05-20",
+      "merchant": "Legacy Med Group",
+      "category": "Health",
+      "amount": -231
+    },
+    {
+      "id": "tx_1094",
+      "accountId": "acct_trust",
+      "date": "2026-05-19",
+      "merchant": "Monthly distribution to checking",
+      "category": "Transfer",
+      "amount": -9000
+    },
+    {
+      "id": "tx_1078",
+      "accountId": "acct_chk",
+      "date": "2026-05-18",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -68
+    },
+    {
+      "id": "tx_1074",
+      "accountId": "acct_chk",
+      "date": "2026-05-17",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -171
+    },
+    {
+      "id": "tx_1080",
+      "accountId": "acct_chk",
+      "date": "2026-05-16",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -54
+    },
+    {
+      "id": "tx_1066",
+      "accountId": "acct_chk",
+      "date": "2026-05-15",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -168
+    },
+    {
+      "id": "tx_1076",
+      "accountId": "acct_chk",
+      "date": "2026-05-13",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -164
+    },
+    {
+      "id": "tx_1081",
+      "accountId": "acct_chk",
+      "date": "2026-05-12",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -69
+    },
+    {
+      "id": "tx_1067",
+      "accountId": "acct_chk",
+      "date": "2026-05-11",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -187
+    },
+    {
+      "id": "tx_1082",
+      "accountId": "acct_chk",
+      "date": "2026-05-11",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -67
+    },
+    {
+      "id": "tx_1090",
+      "accountId": "acct_chk",
+      "date": "2026-05-10",
+      "merchant": "Sixty Vines Plano",
+      "category": "Dining",
+      "amount": -114
+    },
+    {
+      "id": "tx_1079",
+      "accountId": "acct_chk",
+      "date": "2026-05-09",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -60
+    },
+    {
+      "id": "tx_1086",
+      "accountId": "acct_chk",
+      "date": "2026-05-09",
+      "merchant": "AT&T",
+      "category": "Utilities",
+      "amount": -154
+    },
+    {
+      "id": "tx_1065",
+      "accountId": "acct_chk",
+      "date": "2026-05-07",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -209
+    },
+    {
+      "id": "tx_1068",
+      "accountId": "acct_chk",
+      "date": "2026-05-07",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -152
+    },
+    {
+      "id": "tx_1083",
+      "accountId": "acct_chk",
+      "date": "2026-05-07",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -63
+    },
+    {
+      "id": "tx_1073",
+      "accountId": "acct_chk",
+      "date": "2026-05-06",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -191
+    },
+    {
+      "id": "tx_1093",
+      "accountId": "acct_chk",
+      "date": "2026-05-04",
+      "merchant": "Consulting Income — Meridian Health",
+      "category": "Income",
+      "amount": 4500
+    },
+    {
+      "id": "tx_1071",
+      "accountId": "acct_chk",
+      "date": "2026-05-03",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -175
+    },
+    {
+      "id": "tx_1087",
+      "accountId": "acct_chk",
+      "date": "2026-05-01",
+      "merchant": "City of Plano Utilities",
+      "category": "Utilities",
+      "amount": -326
+    },
+    {
+      "id": "tx_1043",
+      "accountId": "acct_chk",
+      "date": "2026-04-26",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -165
+    },
+    {
+      "id": "tx_1038",
+      "accountId": "acct_chk",
+      "date": "2026-04-25",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -149
+    },
+    {
+      "id": "tx_1032",
+      "accountId": "acct_chk",
+      "date": "2026-04-22",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -153
+    },
+    {
+      "id": "tx_1051",
+      "accountId": "acct_chk",
+      "date": "2026-04-22",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -57
+    },
+    {
+      "id": "tx_1054",
+      "accountId": "acct_chk",
+      "date": "2026-04-22",
+      "merchant": "AT&T",
+      "category": "Utilities",
+      "amount": -141
+    },
+    {
+      "id": "tx_1058",
+      "accountId": "acct_chk",
+      "date": "2026-04-22",
+      "merchant": "Sixty Vines Plano",
+      "category": "Dining",
+      "amount": -129
+    },
+    {
+      "id": "tx_1056",
+      "accountId": "acct_chk",
+      "date": "2026-04-21",
+      "merchant": "Sixty Vines Plano",
+      "category": "Dining",
+      "amount": -130
+    },
+    {
+      "id": "tx_1034",
+      "accountId": "acct_chk",
+      "date": "2026-04-20",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -199
+    },
+    {
+      "id": "tx_1047",
+      "accountId": "acct_chk",
+      "date": "2026-04-18",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -53
+    },
+    {
+      "id": "tx_1041",
+      "accountId": "acct_chk",
+      "date": "2026-04-16",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -160
+    },
+    {
+      "id": "tx_1039",
+      "accountId": "acct_chk",
+      "date": "2026-04-15",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -170
+    },
+    {
+      "id": "tx_1059",
+      "accountId": "acct_chk",
+      "date": "2026-04-15",
+      "merchant": "Delta Air Lines",
+      "category": "Travel",
+      "amount": -628
+    },
+    {
+      "id": "tx_1046",
+      "accountId": "acct_chk",
+      "date": "2026-04-14",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -61
+    },
+    {
+      "id": "tx_1045",
+      "accountId": "acct_chk",
+      "date": "2026-04-12",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -201
+    },
+    {
+      "id": "tx_1055",
+      "accountId": "acct_chk",
+      "date": "2026-04-12",
+      "merchant": "City of Plano Utilities",
+      "category": "Utilities",
+      "amount": -260
+    },
+    {
+      "id": "tx_1049",
+      "accountId": "acct_chk",
+      "date": "2026-04-11",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -70
+    },
+    {
+      "id": "tx_1062",
+      "accountId": "acct_trust",
+      "date": "2026-04-11",
+      "merchant": "Monthly distribution to checking",
+      "category": "Transfer",
+      "amount": -9000
+    },
+    {
+      "id": "tx_1042",
+      "accountId": "acct_chk",
+      "date": "2026-04-10",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -153
+    },
+    {
+      "id": "tx_1061",
+      "accountId": "acct_chk",
+      "date": "2026-04-10",
+      "merchant": "Consulting Income — Meridian Health",
+      "category": "Income",
+      "amount": 4500
+    },
+    {
+      "id": "tx_1035",
+      "accountId": "acct_chk",
+      "date": "2026-04-09",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -193
+    },
+    {
+      "id": "tx_1052",
+      "accountId": "acct_chk",
+      "date": "2026-04-09",
+      "merchant": "Legacy Med Group",
+      "category": "Health",
+      "amount": -204
+    },
+    {
+      "id": "tx_1050",
+      "accountId": "acct_chk",
+      "date": "2026-04-08",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -70
+    },
+    {
+      "id": "tx_1063",
+      "accountId": "acct_chk",
+      "date": "2026-04-07",
+      "merchant": "Transfer from Allworth Trust",
+      "category": "Transfer",
+      "amount": 9000
+    },
+    {
+      "id": "tx_1036",
+      "accountId": "acct_chk",
+      "date": "2026-04-05",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -196
+    },
+    {
+      "id": "tx_1044",
+      "accountId": "acct_chk",
+      "date": "2026-04-04",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -150
+    },
+    {
+      "id": "tx_1048",
+      "accountId": "acct_chk",
+      "date": "2026-04-04",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -66
+    },
+    {
+      "id": "tx_1040",
+      "accountId": "acct_chk",
+      "date": "2026-04-03",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -205
+    },
+    {
+      "id": "tx_1053",
+      "accountId": "acct_chk",
+      "date": "2026-04-03",
+      "merchant": "Legacy Med Group",
+      "category": "Health",
+      "amount": -218
+    },
+    {
+      "id": "tx_1057",
+      "accountId": "acct_chk",
+      "date": "2026-04-03",
+      "merchant": "Sixty Vines Plano",
+      "category": "Dining",
+      "amount": -100
+    },
+    {
+      "id": "tx_1033",
+      "accountId": "acct_chk",
+      "date": "2026-04-02",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -190
+    },
+    {
+      "id": "tx_1037",
+      "accountId": "acct_chk",
+      "date": "2026-04-02",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -212
+    },
+    {
+      "id": "tx_1060",
+      "accountId": "acct_chk",
+      "date": "2026-04-02",
+      "merchant": "Mortgage Payment — Chase",
+      "category": "Housing",
+      "amount": -2870
+    },
+    {
+      "id": "tx_1019",
+      "accountId": "acct_chk",
+      "date": "2026-03-25",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -68
+    },
+    {
+      "id": "tx_1005",
+      "accountId": "acct_chk",
+      "date": "2026-03-24",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -186
+    },
+    {
+      "id": "tx_1027",
+      "accountId": "acct_chk",
+      "date": "2026-03-24",
+      "merchant": "Delta Air Lines",
+      "category": "Travel",
+      "amount": -631
+    },
+    {
+      "id": "tx_1006",
+      "accountId": "acct_chk",
+      "date": "2026-03-23",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -164
+    },
+    {
+      "id": "tx_1030",
+      "accountId": "acct_trust",
+      "date": "2026-03-23",
+      "merchant": "Monthly distribution to checking",
+      "category": "Transfer",
+      "amount": -9000
+    },
+    {
+      "id": "tx_1022",
+      "accountId": "acct_chk",
+      "date": "2026-03-22",
+      "merchant": "AT&T",
+      "category": "Utilities",
+      "amount": -155
+    },
+    {
+      "id": "tx_1007",
+      "accountId": "acct_chk",
+      "date": "2026-03-19",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -152
+    },
+    {
+      "id": "tx_1024",
+      "accountId": "acct_chk",
+      "date": "2026-03-18",
+      "merchant": "Sixty Vines Plano",
+      "category": "Dining",
+      "amount": -107
+    },
+    {
+      "id": "tx_1011",
+      "accountId": "acct_chk",
+      "date": "2026-03-17",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -178
+    },
+    {
+      "id": "tx_1012",
+      "accountId": "acct_chk",
+      "date": "2026-03-17",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -208
+    },
+    {
+      "id": "tx_1020",
+      "accountId": "acct_chk",
+      "date": "2026-03-17",
+      "merchant": "Legacy Med Group",
+      "category": "Health",
+      "amount": -217
+    },
+    {
+      "id": "tx_1029",
+      "accountId": "acct_chk",
+      "date": "2026-03-16",
+      "merchant": "Consulting Income — Meridian Health",
+      "category": "Income",
+      "amount": 4500
+    },
+    {
+      "id": "tx_1031",
+      "accountId": "acct_chk",
+      "date": "2026-03-16",
+      "merchant": "Transfer from Allworth Trust",
+      "category": "Transfer",
+      "amount": 9000
+    },
+    {
+      "id": "tx_1009",
+      "accountId": "acct_chk",
+      "date": "2026-03-14",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -178
+    },
+    {
+      "id": "tx_1010",
+      "accountId": "acct_chk",
+      "date": "2026-03-14",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -204
+    },
+    {
+      "id": "tx_1025",
+      "accountId": "acct_chk",
+      "date": "2026-03-13",
+      "merchant": "Sixty Vines Plano",
+      "category": "Dining",
+      "amount": -111
+    },
+    {
+      "id": "tx_1000",
+      "accountId": "acct_chk",
+      "date": "2026-03-12",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -174
+    },
+    {
+      "id": "tx_1028",
+      "accountId": "acct_chk",
+      "date": "2026-03-12",
+      "merchant": "Mortgage Payment — Chase",
+      "category": "Housing",
+      "amount": -2870
+    },
+    {
+      "id": "tx_1014",
+      "accountId": "acct_chk",
+      "date": "2026-03-10",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -54
+    },
+    {
+      "id": "tx_1017",
+      "accountId": "acct_chk",
+      "date": "2026-03-10",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -70
+    },
+    {
+      "id": "tx_1021",
+      "accountId": "acct_chk",
+      "date": "2026-03-10",
+      "merchant": "Legacy Med Group",
+      "category": "Health",
+      "amount": -256
+    },
+    {
+      "id": "tx_1016",
+      "accountId": "acct_chk",
+      "date": "2026-03-08",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -53
+    },
+    {
+      "id": "tx_1026",
+      "accountId": "acct_chk",
+      "date": "2026-03-08",
+      "merchant": "Sixty Vines Plano",
+      "category": "Dining",
+      "amount": -138
+    },
+    {
+      "id": "tx_1001",
+      "accountId": "acct_chk",
+      "date": "2026-03-07",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -186
+    },
+    {
+      "id": "tx_1015",
+      "accountId": "acct_chk",
+      "date": "2026-03-07",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -60
+    },
+    {
+      "id": "tx_1013",
+      "accountId": "acct_chk",
+      "date": "2026-03-06",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -176
+    },
+    {
+      "id": "tx_1002",
+      "accountId": "acct_chk",
+      "date": "2026-03-05",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -170
+    },
+    {
+      "id": "tx_1004",
+      "accountId": "acct_chk",
+      "date": "2026-03-04",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -168
+    },
+    {
+      "id": "tx_1003",
+      "accountId": "acct_chk",
+      "date": "2026-03-02",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -200
+    },
+    {
+      "id": "tx_1008",
+      "accountId": "acct_chk",
+      "date": "2026-03-02",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -203
+    },
+    {
+      "id": "tx_1023",
+      "accountId": "acct_chk",
+      "date": "2026-03-02",
+      "merchant": "City of Plano Utilities",
+      "category": "Utilities",
+      "amount": -343
+    },
+    {
+      "id": "tx_1018",
+      "accountId": "acct_chk",
+      "date": "2026-03-01",
+      "merchant": "Shell Oil",
+      "category": "Auto",
+      "amount": -67
+    }
+  ],
+  "book": [
+    {
+      "clientId": "maya",
+      "name": "Maya Tran",
+      "managedAssets": 2445000,
+      "heldAwayDetected": 611000,
+      "openNudges": 1,
+      "lastContact": "2026-05-21",
+      "highlight": true
+    },
+    {
+      "clientId": "hh_castillo",
+      "name": "Robert & Elaine Castillo",
+      "managedAssets": 3120000,
+      "heldAwayDetected": 188000,
+      "openNudges": 0,
+      "lastContact": "2026-06-02"
+    },
+    {
+      "clientId": "hh_raman",
+      "name": "Priya Raman",
+      "managedAssets": 1870000,
+      "heldAwayDetected": 0,
+      "openNudges": 1,
+      "lastContact": "2026-05-28"
+    },
+    {
+      "clientId": "hh_beckett",
+      "name": "Tom Beckett",
+      "managedAssets": 2410000,
+      "heldAwayDetected": 452000,
+      "openNudges": 0,
+      "lastContact": "2026-04-30"
+    },
+    {
+      "clientId": "hh_lindqvist",
+      "name": "Susan & Gary Lindqvist",
+      "managedAssets": 5230000,
+      "heldAwayDetected": 74000,
+      "openNudges": 0,
+      "lastContact": "2026-06-05"
+    }
+  ],
+  "liquidityEvent": {
+    "label": "SpaceX IPO allocation",
+    "amount": 200000,
+    "deadline": "2026-06-15",
+    "note": "Maya was offered access to a SpaceX IPO allocation through a former client; deciding whether to fund $200K."
+  }
+}

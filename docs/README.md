@@ -2,6 +2,8 @@
 
 This folder is the working handbook for the Allworth mobile planning application.
 
+> **Note:** These docs describe the target platform design and roadmap. The June 22 demo implementation lives in `app/` (React Native client + Node backend); references to `apps/mobile` and `services/api` describe the prototype these docs were authored against.
+
 ## Product And App
 
 - [App Design](APP_DESIGN.md): current app map, UX principles, screen requirements, local development, and production roadmap.

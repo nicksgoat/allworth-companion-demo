@@ -1,13 +1,1 @@
-.venv/
-node_modules/
-apps/mobile/node_modules/
-.expo/
-dist/
-build/
-coverage/
-__pycache__/
-.pytest_cache/
-.env
-.env.local
-*.pyc
-
+﻿.venv/node_modules/apps/mobile/node_modules/.expo/dist/build/coverage/__pycache__/.pytest_cache/.env.env.local*.pycnode_modules/.env.DS_Store*.xcuserstatexcuserdata/DerivedData/app/backend/memory/*.runtime.jsonservices/api/memory/*.runtime.jsonservices/api/.venv/__pycache__/build/
