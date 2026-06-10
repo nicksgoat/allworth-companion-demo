@@ -63,7 +63,7 @@ Demo controls: triple-tap the Allworth wordmark (switch client/advisor/vision, M
 For automated verification, deep-link to a screen:
 
 ```bash
-xcrun simctl openurl booted "allworthdemo://demo/{chat|profile|advisor|advisor_detail|vision|nudge|controls}"
+xcrun simctl openurl booted "allworthdemo://demo/{chat|profile|fact|advisor|advisor_detail|vision|nudge|controls}"
 ```
 
 (The SwiftUI app uses `SIMCTL_CHILD_DEMO_SCREEN=<screen>` at launch instead.)
