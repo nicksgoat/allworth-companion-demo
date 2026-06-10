@@ -40,7 +40,12 @@ app/backend/             Node + Express, Anthropic SDK
   data/seed.json         deterministic synthetic data
 run.sh                   one-command backend startup
 allworth-ai-demo-handoff.md   full spec — all decisions trace to it
+docs/                    vision + production roadmap (design docs)
 ```
+
+## Vision & roadmap
+
+The `docs/` directory holds the platform design docs — product brief, [Client Intelligence Layer](docs/CLIENT_INTELLIGENCE_LAYER.md) (governed memory, fact atoms, learning loops), safety/compliance boundaries, and the [phased roadmap](docs/ROADMAP.md) from this demo to production (LLM chat → MCP/real data → advisor briefs → governed memory → production readiness). The demo's vision screen (Beat 6) presents this path.
 
 ## Demo script
 

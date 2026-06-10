@@ -41,6 +41,18 @@ export function VisionScreen() {
         <Callout marker="✓" title="Provenance" detail="Every fact has a source, a timestamp, and an audit trail" />
       </View>
 
+      <View style={styles.roadmap}>
+        <Text style={styles.roadmapHeader}>PATH TO PRODUCTION</Text>
+        <View style={styles.roadmapRow}>
+          <RoadmapStep label="Demo" today />
+          <RoadmapStep label="LLM chat" />
+          <RoadmapStep label="Real data" />
+          <RoadmapStep label="Briefs" />
+          <RoadmapStep label="Memory" />
+          <RoadmapStep label="Production" last />
+        </View>
+      </View>
+
       <Text style={styles.closing}>Models are rented. This memory is owned — and it compounds.</Text>
     </View>
   );
@@ -56,6 +68,17 @@ function LoopNode({ number, angle }: { number: string; angle: number }) {
       ]}
     >
       <Text style={styles.loopNodeText}>{number}</Text>
+    </View>
+  );
+}
+
+function RoadmapStep({ label, today, last }: { label: string; today?: boolean; last?: boolean }) {
+  return (
+    <View style={styles.roadmapStep}>
+      <View style={[styles.roadmapChip, today && styles.roadmapChipToday]}>
+        <Text style={[styles.roadmapChipText, today && styles.roadmapChipTextToday]}>{label}</Text>
+      </View>
+      {!last ? <Ionicons name="chevron-forward" size={10} color="rgba(255,255,255,0.35)" /> : null}
     </View>
   );
 }
@@ -109,6 +132,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   loopNodeText: { fontSize: 15, fontWeight: "700", color: colors.allworthNavy },
+  roadmap: { paddingHorizontal: 24, gap: 8, alignItems: "center" },
+  roadmapHeader: { fontSize: 10, fontWeight: "700", letterSpacing: 1.2, color: "rgba(255,255,255,0.45)" },
+  roadmapRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", flexWrap: "wrap" },
+  roadmapStep: { flexDirection: "row", alignItems: "center", gap: 2, marginRight: 2 },
+  roadmapChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.25)",
+  },
+  roadmapChipToday: { backgroundColor: "#fff", borderColor: "#fff" },
+  roadmapChipText: { fontSize: 11, fontWeight: "600", color: "rgba(255,255,255,0.75)" },
+  roadmapChipTextToday: { color: colors.allworthNavy },
   callouts: { paddingHorizontal: 32, gap: 16 },
   callout: { flexDirection: "row", gap: 12, alignItems: "flex-start" },
   calloutMarker: {
