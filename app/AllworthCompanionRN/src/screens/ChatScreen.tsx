@@ -124,6 +124,13 @@ export function ChatScreen() {
         contentContainerStyle={{ padding: 20, paddingTop: insets.top + 8, gap: 24 }}
         keyboardDismissMode="interactive"
       >
+        <View style={styles.sessionHeader}>
+          <View style={styles.sessionLine} />
+          <Text style={styles.sessionText}>
+            {app.session === "wednesday" ? "Wednesday, June 10" : "Monday, June 8"}
+          </Text>
+          <View style={styles.sessionLine} />
+        </View>
         {app.chatMessages.map((message) => (
           <ChatMessageView key={message.id} message={message} />
         ))}
@@ -180,6 +187,9 @@ function SuggestionChips({
 }
 
 const styles = StyleSheet.create({
+  sessionHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: -8 },
+  sessionLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: colors.hairline },
+  sessionText: { fontSize: 12, fontWeight: "600", color: colors.inkTertiary, letterSpacing: 0.4 },
   inputArea: { paddingHorizontal: 20, paddingTop: 6, paddingBottom: 10, gap: 8 },
   suggestRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: -8 },
   suggestChip: {

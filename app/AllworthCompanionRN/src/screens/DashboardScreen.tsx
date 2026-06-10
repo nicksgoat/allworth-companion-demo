@@ -54,12 +54,19 @@ export function DashboardScreen() {
   );
 }
 
+function greetingForNow() {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+}
+
 function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) => void }) {
   const firstName = d.client?.name.split(" ")[0] ?? "Maya";
   return (
     <View style={{ gap: 24 }}>
       <View style={styles.headerRow}>
-        <Text style={styles.greeting}>Good evening, {firstName}</Text>
+        <Text style={styles.greeting}>{greetingForNow()}, {firstName}</Text>
         <AllworthWordmark />
       </View>
 

@@ -52,6 +52,17 @@ function MarkdownText({ text, streaming }: { text: string; streaming: boolean })
   );
 }
 
+function AssistantIdentity() {
+  return (
+    <View style={styles.identityRow}>
+      <View style={styles.avatar}>
+        <Text style={styles.avatarText}>A</Text>
+      </View>
+      <Text style={styles.identityName}>Allworth Assistant</Text>
+    </View>
+  );
+}
+
 export function ChatMessageView({ message }: { message: ChatMessage }) {
   if (message.role === "user") {
     return (
@@ -64,6 +75,7 @@ export function ChatMessageView({ message }: { message: ChatMessage }) {
   }
   return (
     <View style={{ gap: 10 }}>
+      <AssistantIdentity />
       <ToolChipRow chips={message.chips} sources={message.sources} collapsed={!message.isStreaming} />
       {message.text ? <MarkdownText text={message.text} streaming={message.isStreaming} /> : null}
       {!message.isStreaming && message.sources.length > 0 ? (
@@ -98,4 +110,15 @@ const styles = StyleSheet.create({
   },
   userText: { fontSize: 17, color: colors.inkPrimary },
   assistantText: { fontSize: 17, color: colors.inkPrimary, lineHeight: 24 },
+  identityRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  avatar: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.allworthNavy,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarText: { fontSize: 12, fontWeight: "700", color: "#FFFFFF" },
+  identityName: { fontSize: 13, fontWeight: "600", color: colors.inkSecondary },
 });
