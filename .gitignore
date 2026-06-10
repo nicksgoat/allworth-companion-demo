@@ -5,4 +5,7 @@ node_modules/
 xcuserdata/
 DerivedData/
 app/backend/memory/*.runtime.json
+services/api/memory/*.runtime.json
+services/api/.venv/
+__pycache__/
 build/

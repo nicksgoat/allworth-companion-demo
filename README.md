@@ -1,13 +1,13 @@
 # Allworth Companion — AI Demo
 
-Demo app for the Allworth Financial executive pitch (June 22, 2026): an AI-native client engagement platform. React Native (Expo) iOS app backed by a Node/Express server with an Anthropic tool-use loop. (The original SwiftUI implementation lives in `app/AllworthCompanion` as reference.)
+Demo app for the Allworth Financial executive pitch (June 22, 2026): an AI-native client engagement platform. React Native (Expo) iOS app backed by a Python/FastAPI server with an Anthropic tool-use loop. (The original SwiftUI app in `app/AllworthCompanion` and the original Node/Express backend in `app/backend` are kept as reference.)
 
 > **Synthetic data only.** No real client information anywhere in this repo. The assistant never gives directive advice — every answer hands off to the advisor.
 
 ## Quick start
 
 ```bash
-./run.sh                # installs deps if needed, starts backend on :3000
+./run.sh                # starts the FastAPI backend on :3000 (needs uv; deps sync automatically)
 cd app/AllworthCompanionRN
 npm install
 npx expo run:ios        # native build + launch on the iOS simulator
@@ -15,7 +15,7 @@ npx expo run:ios        # native build + launch on the iOS simulator
 
 The app talks to `http://localhost:3000`.
 
-**Live chat (optional):** put an Anthropic key in `app/backend/.env`:
+**Live chat (optional):** put an Anthropic key in `services/api/.env`:
 
 ```
 ANTHROPIC_API_KEY=sk-ant-...
@@ -32,12 +32,14 @@ app/AllworthCompanionRN/ React Native app (Expo SDK 56 + TypeScript)
   src/components/        hero number, sparkline, nudge/handoff cards, chat
   src/screens/           dashboard, chat, profile, advisor, vision, controls
 app/AllworthCompanion/   original SwiftUI implementation (reference)
-app/backend/             Node + Express, Anthropic SDK
-  lib/tools.js           8 financial tools (accounts, portfolio, tax sim, brief…)
-  lib/chat.js            streaming tool-use loop + fallback selection
-  lib/memory.js          provenance memory (fact, source quote, timestamp)
+services/api/            Python + FastAPI backend (uv-managed)
+  tools.py               8 financial tools (accounts, portfolio, tax sim, brief…)
+  chat.py                streaming tool-use loop + fallback selection (SSE)
+  memory.py              provenance memory (fact, source quote, timestamp)
+  mcp_server.py          MCP server (stdio, read-only, household-scoped)
   fallbacks/             cached responses for the scripted demo beats
   data/seed.json         deterministic synthetic data
+app/backend/             original Node/Express backend (reference)
 run.sh                   one-command backend startup
 allworth-ai-demo-handoff.md   full spec — all decisions trace to it
 docs/                    vision + production roadmap (design docs)
@@ -49,7 +51,7 @@ The `docs/` directory holds the platform design docs — product brief, [Client 
 
 ## MCP server (Phase 3 preview)
 
-`app/backend/mcp/server.js` exposes the backend's tool layer over the Model Context Protocol (stdio), implementing the connector rules in [docs/MCP_INTEGRATION.md](docs/MCP_INTEGRATION.md): backend-only, **read-only** (writes like `update_client_profile` are excluded pending approval/audit design), entitlement-scoped to one household (`ALLWORTH_CLIENT_ID`, never a tool parameter), and every result wrapped in a provenance envelope (`source`, `tool`, `clientId`, `retrieved_at`, `read_only`). The repo's `.mcp.json` registers it, so Claude Code/Desktop pointed at this repo can query the same governed data the app uses:
+`services/api/mcp_server.py` exposes the backend's tool layer over the Model Context Protocol (stdio), implementing the connector rules in [docs/MCP_INTEGRATION.md](docs/MCP_INTEGRATION.md): backend-only, **read-only** (writes like `update_client_profile` are excluded pending approval/audit design), entitlement-scoped to one household (`ALLWORTH_CLIENT_ID`, never a tool parameter), and every result wrapped in a provenance envelope (`source`, `tool`, `clientId`, `retrieved_at`, `read_only`). The repo's `.mcp.json` registers it, so Claude Code/Desktop pointed at this repo can query the same governed data the app uses:
 
 ```sh
 # 7 read-only tools: accounts, portfolio, plan, spending, profile, tax sim, advisor brief

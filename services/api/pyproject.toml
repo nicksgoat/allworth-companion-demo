@@ -1,0 +1,12 @@
+[project]
+name = "allworth-demo-api"
+version = "0.1.0"
+description = "Allworth Companion demo backend (FastAPI)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.34",
+    "anthropic>=0.104",
+    "mcp>=1.9",
+    "python-dotenv>=1.0",
+]

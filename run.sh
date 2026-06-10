@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Allworth demo backend — one-command startup.
+# Allworth demo backend — one-command startup (FastAPI).
 set -euo pipefail
-cd "$(dirname "$0")/app/backend"
+cd "$(dirname "$0")/services/api"
 
-if [ ! -d node_modules ]; then
-  echo "Installing backend dependencies..."
-  npm install --no-audit --no-fund
+if ! command -v uv >/dev/null 2>&1; then
+  echo "ERROR: uv is required (https://docs.astral.sh/uv/). Install: curl -LsSf https://astral.sh/uv/install.sh | sh"
+  exit 1
 fi
 
 if [ -f .env ]; then
@@ -13,9 +13,9 @@ if [ -f .env ]; then
 fi
 
 if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
-  echo "WARNING: ANTHROPIC_API_KEY not set (app/backend/.env). Chat will use cached fallback responses."
+  echo "WARNING: ANTHROPIC_API_KEY not set (services/api/.env). Chat will use cached fallback responses."
 fi
 
 LAN_IP=$(ipconfig getifaddr en0 2>/dev/null || echo "unknown")
 echo "Backend starting on http://localhost:3000  (LAN: http://${LAN_IP}:3000)"
-exec node server.js
+exec uv run uvicorn main:app --host 0.0.0.0 --port "${PORT:-3000}"
