@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "allworth-client-intelligence": {
+      "command": "node",
+      "args": ["app/backend/mcp/server.js"],
+      "env": {
+        "ALLWORTH_CLIENT_ID": "maya"
+      }
+    }
+  }
+}

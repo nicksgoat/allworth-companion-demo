@@ -18,6 +18,14 @@ export const colors = {
   attention: "#C77B17",
 };
 
+// Brand typography — Lato (body) + Playfair Display (display), per allworthfinancial.com
+export const fonts = {
+  display: "PlayfairDisplay_700Bold",
+  displayMedium: "PlayfairDisplay_600SemiBold",
+  sans: "Lato_400Regular",
+  sansBold: "Lato_700Bold",
+} as const;
+
 export const cardRadius = 16;
 
 export const card = {

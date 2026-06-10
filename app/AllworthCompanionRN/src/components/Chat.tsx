@@ -4,6 +4,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { colors } from "../theme";
 import type { ChatMessage, ToolChip } from "../types";
 import { AdvisorHandoffCard } from "./AdvisorHandoffCard";
+import { AllworthMark } from "./Wordmark";
 
 export function ToolChipRow({ chips, sources, collapsed }: { chips: ToolChip[]; sources: string[]; collapsed: boolean }) {
   if (collapsed && sources.length > 0) {
@@ -56,7 +57,7 @@ function AssistantIdentity() {
   return (
     <View style={styles.identityRow}>
       <View style={styles.avatar}>
-        <Text style={styles.avatarText}>A</Text>
+        <AllworthMark size={14} color="#FFFFFF" />
       </View>
       <Text style={styles.identityName}>Allworth Assistant</Text>
     </View>

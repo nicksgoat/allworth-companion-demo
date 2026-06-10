@@ -47,6 +47,15 @@ docs/                    vision + production roadmap (design docs)
 
 The `docs/` directory holds the platform design docs — product brief, [Client Intelligence Layer](docs/CLIENT_INTELLIGENCE_LAYER.md) (governed memory, fact atoms, learning loops), safety/compliance boundaries, and the [phased roadmap](docs/ROADMAP.md) from this demo to production (LLM chat → MCP/real data → advisor briefs → governed memory → production readiness). The demo's vision screen (Beat 6) presents this path.
 
+## MCP server (Phase 3 preview)
+
+`app/backend/mcp/server.js` exposes the backend's tool layer over the Model Context Protocol (stdio), implementing the connector rules in [docs/MCP_INTEGRATION.md](docs/MCP_INTEGRATION.md): backend-only, **read-only** (writes like `update_client_profile` are excluded pending approval/audit design), entitlement-scoped to one household (`ALLWORTH_CLIENT_ID`, never a tool parameter), and every result wrapped in a provenance envelope (`source`, `tool`, `clientId`, `retrieved_at`, `read_only`). The repo's `.mcp.json` registers it, so Claude Code/Desktop pointed at this repo can query the same governed data the app uses:
+
+```sh
+# 7 read-only tools: accounts, portfolio, plan, spending, profile, tax sim, advisor brief
+claude mcp list   # → allworth-client-intelligence
+```
+
 ## Demo script
 
 Six beats, all driven from the app:

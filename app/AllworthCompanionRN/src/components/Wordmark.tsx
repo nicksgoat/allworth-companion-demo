@@ -1,9 +1,34 @@
 import React, { useRef } from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable } from "react-native";
+import Svg, { Path } from "react-native-svg";
 import { colors } from "../theme";
 import { useApp } from "../state";
+import { ACCENT_PATHS, LOGO_VIEWBOX, MARK_VIEWBOX, NAVY_PATHS } from "./logoPaths";
 
-// The Allworth wordmark — triple-tap opens the hidden demo control sheet.
+export function AllworthLogo({ width = 104, light }: { width?: number; light?: boolean }) {
+  return (
+    <Svg width={width} height={(width * 100) / 414} viewBox={LOGO_VIEWBOX}>
+      {NAVY_PATHS.map((d, i) => (
+        <Path key={`n${i}`} d={d} fill={light ? "#FFFFFF" : colors.allworthNavy} />
+      ))}
+      {ACCENT_PATHS.map((d, i) => (
+        <Path key={`a${i}`} d={d} fill={light ? "#FFFFFF" : colors.allworthAccent} />
+      ))}
+    </Svg>
+  );
+}
+
+export function AllworthMark({ size = 28, color = colors.allworthAccent }: { size?: number; color?: string }) {
+  return (
+    <Svg width={size} height={size} viewBox={MARK_VIEWBOX}>
+      {ACCENT_PATHS.map((d, i) => (
+        <Path key={i} d={d} fill={color} />
+      ))}
+    </Svg>
+  );
+}
+
+// The Allworth logo — triple-tap opens the hidden demo control sheet.
 export function AllworthWordmark({ light }: { light?: boolean }) {
   const app = useApp();
   const taps = useRef<number[]>([]);
@@ -19,11 +44,7 @@ export function AllworthWordmark({ light }: { light?: boolean }) {
 
   return (
     <Pressable onPress={onPress} hitSlop={8}>
-      <Text style={[styles.wordmark, light && { color: "#fff" }]}>ALLWORTH</Text>
+      <AllworthLogo light={light} />
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  wordmark: { fontSize: 13, fontWeight: "700", letterSpacing: 2.5, color: colors.allworthNavy },
-});

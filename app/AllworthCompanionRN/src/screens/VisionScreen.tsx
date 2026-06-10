@@ -3,7 +3,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AllworthWordmark } from "../components/Wordmark";
-import { colors } from "../theme";
+import { colors, fonts } from "../theme";
 
 // Beat 6 — static vision screen: "What the funded platform becomes."
 export function VisionScreen() {

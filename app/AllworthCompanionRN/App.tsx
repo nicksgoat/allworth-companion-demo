@@ -1,6 +1,9 @@
+import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
+import { PlayfairDisplay_600SemiBold, PlayfairDisplay_700Bold } from "@expo-google-fonts/playfair-display";
 import { Ionicons } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
+import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
@@ -15,6 +18,13 @@ import { ProfileScreen } from "./src/screens/ProfileScreen";
 import { VisionScreen } from "./src/screens/VisionScreen";
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Lato_400Regular,
+    Lato_700Bold,
+    PlayfairDisplay_600SemiBold,
+    PlayfairDisplay_700Bold,
+  });
+  if (!fontsLoaded) return null;
   return (
     <SafeAreaProvider>
       <AppProvider>

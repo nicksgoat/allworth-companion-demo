@@ -8,7 +8,7 @@ import { AccountRow, DisclaimerFooter, HairlineDivider, SectionHeader } from "..
 import { Sparkline } from "../components/Sparkline";
 import { AllworthWordmark } from "../components/Wordmark";
 import { useApp } from "../state";
-import { colors, usd } from "../theme";
+import { colors, fonts, usd } from "../theme";
 import type { Account, Dashboard, Nudge } from "../types";
 import { NudgeDetailSheet } from "./NudgeDetailSheet";
 
@@ -66,7 +66,9 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
   return (
     <View style={{ gap: 24 }}>
       <View style={styles.headerRow}>
-        <Text style={styles.greeting}>{greetingForNow()}, {firstName}</Text>
+        <Text style={styles.greeting} numberOfLines={1} adjustsFontSizeToFit>
+          {greetingForNow()}, {firstName}
+        </Text>
         <AllworthWordmark />
       </View>
 
@@ -140,8 +142,8 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 }
 
 const styles = StyleSheet.create({
-  headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  greeting: { fontSize: 28, fontWeight: "600", color: colors.inkPrimary },
+  headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
+  greeting: { fontSize: 28, fontFamily: fonts.display, color: colors.inkPrimary, flexShrink: 1 },
   sectionRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingBottom: 4 },
   sectionCaption: { fontSize: 13, color: colors.inkSecondary, fontVariant: ["tabular-nums"] },
   skeletonBlock: { height: 72, borderRadius: 12, backgroundColor: colors.inkFaint },
