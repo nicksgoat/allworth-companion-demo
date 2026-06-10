@@ -1,0 +1,13 @@
+{
+  "name": "allworth-demo-backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node data/generate.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
+    "express": "^4.21.0"
+  }
+}
