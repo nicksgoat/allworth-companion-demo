@@ -6,6 +6,7 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Text,
   TextInput,
   View,
 } from "react-native";
@@ -44,13 +45,16 @@ export function ChatScreen() {
   const loadProactive = async () => {
     if (app.chatMessages.length > 0) return;
     let greeting = "Hi Maya — I can help you understand your accounts, spending, or plan. What's on your mind?";
+    let suggested: string[] = [];
     try {
-      greeting = (await app.api.proactive(app.clientId, app.session)).message;
+      const res = await app.api.proactive(app.clientId, app.session);
+      greeting = res.message;
+      suggested = res.suggested ?? [];
     } catch {}
     app.setChatMessages((msgs) =>
       msgs.length > 0
         ? msgs
-        : [newMessage({ role: "assistant", text: greeting, chips: [], sources: [], isStreaming: false })]
+        : [newMessage({ role: "assistant", text: greeting, chips: [], sources: [], isStreaming: false, suggested })]
     );
   };
 
@@ -73,6 +77,7 @@ export function ChatScreen() {
           break;
         case "done":
           updated.sources = event.sources;
+          updated.suggested = event.suggested;
           updated.isStreaming = false;
           break;
         case "error":
@@ -84,9 +89,9 @@ export function ChatScreen() {
     });
   };
 
-  const send = async () => {
-    if (!canSend) return;
-    const text = draft.trim();
+  const send = async (textArg?: string) => {
+    const text = (textArg ?? draft).trim();
+    if (!text || sending) return;
     setDraft("");
     setSending(true);
     app.setChatMessages((msgs) => [
@@ -122,6 +127,7 @@ export function ChatScreen() {
         {app.chatMessages.map((message) => (
           <ChatMessageView key={message.id} message={message} />
         ))}
+        <SuggestionChips messages={app.chatMessages} sending={sending} onPick={send} />
       </ScrollView>
 
       <View style={styles.inputArea}>
@@ -134,9 +140,9 @@ export function ChatScreen() {
             value={draft}
             onChangeText={setDraft}
             multiline
-            onSubmitEditing={send}
+            onSubmitEditing={() => send()}
           />
-          <Pressable onPress={send} disabled={!canSend} style={{ paddingRight: 6 }}>
+          <Pressable onPress={() => send()} disabled={!canSend} style={{ paddingRight: 6 }}>
             <Ionicons name="arrow-up-circle" size={30} color={canSend ? colors.allworthAccent : colors.inkTertiary} />
           </Pressable>
         </View>
@@ -145,8 +151,45 @@ export function ChatScreen() {
   );
 }
 
+function SuggestionChips({
+  messages,
+  sending,
+  onPick,
+}: {
+  messages: ChatMessage[];
+  sending: boolean;
+  onPick: (text: string) => void;
+}) {
+  const last = messages[messages.length - 1];
+  if (sending || !last || last.role !== "assistant" || last.isStreaming) return null;
+  const suggested = last.suggested ?? [];
+  if (!suggested.length) return null;
+  return (
+    <View style={styles.suggestRow}>
+      {suggested.map((s) => (
+        <Pressable
+          key={s}
+          onPress={() => onPick(s)}
+          style={({ pressed }) => [styles.suggestChip, pressed && { opacity: 0.7 }]}
+        >
+          <Text style={styles.suggestText}>{s}</Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   inputArea: { paddingHorizontal: 20, paddingTop: 6, paddingBottom: 10, gap: 8 },
+  suggestRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: -8 },
+  suggestChip: {
+    borderWidth: 1,
+    borderColor: colors.allworthAccent,
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  suggestText: { fontSize: 14, fontWeight: "500", color: colors.allworthAccent },
   inputBar: { ...card, flexDirection: "row", alignItems: "center" },
   input: {
     flex: 1,

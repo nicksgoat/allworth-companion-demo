@@ -5,7 +5,7 @@ import { seed, fmtUSD, accountsFor, spendingSummary, portfolioFor } from "./lib/
 import { nudgesFor } from "./lib/nudges.js";
 import { activeFacts, forgetFact, resetProfile, episodesFor } from "./lib/memory.js";
 import { runTool } from "./lib/tools.js";
-import { streamChat } from "./lib/chat.js";
+import { streamChat, suggestedFor } from "./lib/chat.js";
 
 const app = express();
 app.use(express.json());
@@ -68,12 +68,14 @@ app.get("/api/clients/:id/proactive", (req, res) => {
         message:
           "Welcome back, Maya. Last time you were weighing $200K into the SpaceX IPO — your deadline is Sunday, June 15. Want to pick up where we left off, or look at something else?",
         basedOn: { fact: ipo.fact, source_quote: ipo.source_quote, learned_at: ipo.learned_at },
+        suggested: suggestedFor(session),
       });
     }
   }
   res.json({
     message: "Hi Maya — I can help you understand your accounts, spending, plan, or anything you're weighing. What's on your mind?",
     basedOn: null,
+    suggested: suggestedFor(session),
   });
 });
 

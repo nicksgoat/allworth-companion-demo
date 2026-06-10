@@ -118,7 +118,7 @@ function parseEvent(event: string, json: string): ChatEvent | null {
     case "text":
       return { kind: "text", delta: obj.delta ?? "" };
     case "done":
-      return { kind: "done", sources: obj.sources ?? [], fallback: obj.fallback ?? false };
+      return { kind: "done", sources: obj.sources ?? [], fallback: obj.fallback ?? false, suggested: obj.suggested ?? [] };
     case "error":
       return { kind: "error", message: obj.message ?? "Something went wrong." };
     default:

@@ -95,6 +95,7 @@ export interface ProfileResponse {
 
 export interface ProactiveResponse {
   message: string;
+  suggested?: string[];
 }
 
 export interface Household {
@@ -139,11 +140,12 @@ export interface ChatMessage {
   chips: ToolChip[];
   sources: string[];
   isStreaming: boolean;
+  suggested?: string[];
 }
 
 export type ChatEvent =
   | { kind: "tool_start"; name: string; label: string }
   | { kind: "tool_end"; name: string }
   | { kind: "text"; delta: string }
-  | { kind: "done"; sources: string[]; fallback: boolean }
+  | { kind: "done"; sources: string[]; fallback: boolean; suggested: string[] }
   | { kind: "error"; message: string };

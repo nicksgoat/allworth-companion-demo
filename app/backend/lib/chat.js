@@ -33,7 +33,9 @@ function pickFallback(userText, session) {
   const text = userText.toLowerCase();
   const beat3 = loadFallback("beat3");
   const beat4 = loadFallback("beat4");
-  // Wednesday session asking about the decision again → memory beat.
+  const changed = loadFallback("whats_changed");
+  // Wednesday: "what changed?" beats the memory beat, which beats everything else.
+  if (session === "wednesday" && changed.match.some((m) => text.includes(m))) return changed;
   if (session === "wednesday" && beat4.match.some((m) => text.includes(m))) return beat4;
   if (beat3.match.some((m) => text.includes(m))) return beat3;
   return session === "wednesday" ? beat4 : beat3;
@@ -54,7 +56,7 @@ async function streamFallback({ userText, session, send }) {
     send("text", { delta: words.slice(i, i + 6).join(" ") + " " });
     await sleep(40);
   }
-  send("done", { sources: fb.sources, fallback: true });
+  send("done", { sources: fb.sources, fallback: true, suggested: fb.suggested ?? [] });
   return fb.text;
 }
 
@@ -140,9 +142,14 @@ async function streamLive({ clientId, session, messages, send }) {
     convo.push({ role: "user", content: results });
   }
 
-  send("done", { sources: [...sources], fallback: false });
+  send("done", { sources: [...sources], fallback: false, suggested: suggestedFor(session) });
   return fullText;
 }
+
+export const suggestedFor = (session) =>
+  session === "wednesday"
+    ? ["What changed since I was last here?", "Where did we land on the SpaceX IPO?"]
+    : ["What would $200K into the SpaceX IPO mean for me?"];
 
 function mondayRecap(clientId) {
   const eps = episodesFor(clientId, "monday");
