@@ -21,7 +21,9 @@ STABLE_SYSTEM = """You are Allworth Companion, the AI assistant inside Allworth 
 - Don't repeat the full balance sheet unless asked; answer the question."""
 
 
-def volatile_context(client_id, session, profile_context, prior_session_summary=None):
+def volatile_context(
+    client_id: str, session: str, profile_context: str, prior_session_summary: str | None = None
+) -> str:
     session_day = "Monday, June 8, 2026" if session == "monday" else "Wednesday, June 10, 2026"
     ctx = (
         f"\n\n## Current session\nClient: Maya Tran (clientId: {client_id}). Today is {session_day}."

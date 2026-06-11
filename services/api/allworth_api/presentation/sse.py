@@ -4,5 +4,5 @@ byte-level API contract — do not touch."""
 import json
 
 
-def sse(event, data):
+def sse(event: str, data: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(data, separators=(',', ':'), ensure_ascii=False)}\n\n"

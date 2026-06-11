@@ -4,6 +4,7 @@ import asyncio
 import json
 import re
 import sys
+from collections.abc import AsyncIterator
 
 from allworth_api.application.memory_service import (
     add_facts,
@@ -35,11 +36,11 @@ conversations: dict[str, list] = {}
 _bg_tasks: set[asyncio.Task] = set()
 
 
-def reset_conversations():
+def reset_conversations() -> None:
     conversations.clear()
 
 
-def suggested_for(session):
+def suggested_for(session: str) -> list[str]:
     if session == "wednesday":
         return ["What changed since I was last here?", "Where did we land on the SpaceX IPO?"]
     return ["What would $200K into the SpaceX IPO mean for me?"]
@@ -120,7 +121,7 @@ async def _stream_live(client_id, session, messages, out):
     out["text"] = full_text
 
 
-async def stream_chat(client_id, session, message):
+async def stream_chat(client_id: str, session: str, message: str) -> AsyncIterator[tuple[str, dict]]:
     """Async generator of (event, data) tuples for one chat turn. Owns conversation state."""
     key = f"{client_id}:{session}"
     history = conversations.get(key, [])

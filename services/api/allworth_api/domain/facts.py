@@ -3,12 +3,12 @@
 import re
 
 
-def tokens(s):
+def tokens(s: str) -> set[str]:
     cleaned = re.sub(r"[^a-z0-9$ ]", "", s.lower())
     return {w for w in cleaned.split() if len(w) > 2}
 
 
-def similar(a, b):
+def similar(a: str, b: str) -> bool:
     ta, tb = tokens(a), tokens(b)
     denom = min(len(ta), len(tb) or 1)
     if denom == 0:

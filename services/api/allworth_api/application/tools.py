@@ -119,7 +119,7 @@ def _strip_history(acct):
     return {k: v for k, v in acct.items() if k != "history"}
 
 
-def run_tool(name, tool_input, client_id):
+def run_tool(name: str, tool_input: dict | None, client_id: str) -> dict:
     tool_input = tool_input or {}
     if name == "get_accounts":
         a = accounts_for()

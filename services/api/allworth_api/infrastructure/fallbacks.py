@@ -5,11 +5,11 @@ import json
 from allworth_api.config import FALLBACKS_DIR
 
 
-def load_fallback(name):
+def load_fallback(name: str) -> dict:
     return json.loads((FALLBACKS_DIR / f"{name}.json").read_text())
 
 
-def pick_fallback(user_text, session):
+def pick_fallback(user_text: str, session: str) -> dict:
     text = user_text.lower()
     beat3 = load_fallback("beat3")
     beat4 = load_fallback("beat4")

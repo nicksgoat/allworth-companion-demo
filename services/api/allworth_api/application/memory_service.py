@@ -10,7 +10,7 @@ from allworth_api.infrastructure.profile_store import (
 )
 
 
-def add_facts(client_id, facts, episode_id=None):
+def add_facts(client_id: str, facts: list[dict], episode_id: str | None = None) -> list[dict]:
     profile = load_profile(client_id)
     added = []
     for f in facts:
@@ -47,7 +47,7 @@ def add_facts(client_id, facts, episode_id=None):
 
 
 # Governed deletion: facts are never removed, only marked deleted (append-only audit).
-def forget_fact(client_id, fact_id):
+def forget_fact(client_id: str, fact_id: str) -> dict | None:
     profile = load_profile(client_id)
     fact = next((f for f in profile["facts"] if f["id"] == fact_id and f["status"] == "active"), None)
     if not fact:
@@ -58,7 +58,7 @@ def forget_fact(client_id, fact_id):
     return fact
 
 
-def append_episode(client_id, session, role, content):
+def append_episode(client_id: str, session: str, role: str, content: str) -> dict:
     profile = load_profile(client_id)
     ep = {"id": new_id("ep"), "session": session, "role": role, "content": content, "timestamp": iso_now()}
     profile["episodes"].append(ep)
@@ -66,22 +66,22 @@ def append_episode(client_id, session, role, content):
     return ep
 
 
-def episodes_for(client_id, session):
+def episodes_for(client_id: str, session: str) -> list[dict]:
     return [e for e in load_profile(client_id)["episodes"] if e["session"] == session]
 
 
-def active_facts(client_id):
+def active_facts(client_id: str) -> list[dict]:
     return [f for f in load_profile(client_id)["facts"] if f["status"] == "active"]
 
 
-def reset_profile(client_id):
+def reset_profile(client_id: str) -> dict:
     runtime = runtime_path(client_id)
     if runtime.exists():
         runtime.unlink()
     return load_profile(client_id)  # re-seeds from .seed.json
 
 
-def profile_as_context(client_id):
+def profile_as_context(client_id: str) -> str:
     facts = active_facts(client_id)
     if not facts:
         return "No profile facts learned yet."

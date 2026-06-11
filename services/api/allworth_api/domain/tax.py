@@ -6,7 +6,14 @@ LT_RATE = 0.15 + 0.038  # cap gains + NIIT
 ST_RATE = 0.24 + 0.038  # ordinary bracket + NIIT
 
 
-def simulate_tax_impact(amount, account_id, symbol=None, *, positions, tax_lots):
+def simulate_tax_impact(
+    amount: float,
+    account_id: str,
+    symbol: str | None = None,
+    *,
+    positions: list[dict],
+    tax_lots: list[dict],
+) -> dict:
     prices = {f"{p['accountId']}:{p['symbol']}": p["price"] for p in positions}
     lots = [lot for lot in tax_lots if lot["accountId"] == account_id]
     if symbol:

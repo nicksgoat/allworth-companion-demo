@@ -6,7 +6,7 @@ from allworth_api.domain.formatting import fmt_usd, js_round
 FUNDS = {"VTI", "VXUS", "VTEB", "BND", "FXAIX", "FSPSX", "FXNAX", "SPAXX"}
 
 
-def build_nudges(spending, positions, accounts):
+def build_nudges(spending: dict, positions: list[dict], accounts: list[dict]) -> list[dict]:
     nudges = []
 
     s = spending

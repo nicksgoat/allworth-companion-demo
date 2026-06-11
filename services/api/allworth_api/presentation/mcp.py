@@ -59,7 +59,7 @@ async def call_tool(name: str, arguments: dict | None) -> types.CallToolResult:
     )
 
 
-async def main():
+async def main() -> None:
     async with stdio_server() as (read, write):
         print(
             f"[mcp] allworth-client-intelligence ready "

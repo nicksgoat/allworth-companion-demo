@@ -30,7 +30,7 @@ def brief(advisor_id: str, client_id: str):
     return {**data, "narrative": brief_narrative(data)}
 
 
-def brief_narrative(d):
+def brief_narrative(d: dict) -> str:
     nudge = d["openNudges"][0] if d["openNudges"] else None
     lines = [
         (
