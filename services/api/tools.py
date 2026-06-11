@@ -18,70 +18,96 @@ TOOL_LABELS = {
 TOOL_DEFINITIONS = [
     {
         "name": "get_accounts",
-        "description": "All of the client's accounts — Allworth-managed and outside (held-away) — with balances, 12-month history, and net worth totals.",
+        "description": "All of the client's accounts — Allworth-managed and outside (held-away) — "
+        "with balances, 12-month history, and net worth totals.",
         "input_schema": {"type": "object", "properties": {}, "required": []},
     },
     {
         "name": "get_portfolio",
-        "description": "Holdings across all accounts: positions with quantities, prices, values, asset classes, plus tax lots with cost basis and holding term.",
+        "description": "Holdings across all accounts: positions with quantities, prices, values, "
+        "asset classes, plus tax lots with cost basis and holding term.",
         "input_schema": {"type": "object", "properties": {}, "required": []},
     },
     {
         "name": "get_financial_plan",
-        "description": "The client's financial plan: spending assumption, income plan, tax profile, and goals (lake house, 529s, retirement income).",
+        "description": "The client's financial plan: spending assumption, income plan, tax profile, "
+        "and goals (lake house, 529s, retirement income).",
         "input_schema": {"type": "object", "properties": {}, "required": []},
     },
     {
         "name": "get_spending",
-        "description": "Monthly spending by category vs. plan, including the recent 3-month average and how far it runs over plan.",
+        "description": "Monthly spending by category vs. plan, including the recent 3-month average "
+        "and how far it runs over plan.",
         "input_schema": {
             "type": "object",
             "properties": {
-                "months": {"type": "integer", "description": "How many recent months to summarize (default 3)"},
+                "months": {
+                    "type": "integer",
+                    "description": "How many recent months to summarize (default 3)",
+                },
             },
             "required": [],
         },
     },
     {
         "name": "get_client_profile",
-        "description": "What the assistant has learned about this client over time: goals, preferences, concerns, liquidity events — each with provenance.",
+        "description": "What the assistant has learned about this client over time: goals, "
+        "preferences, concerns, liquidity events — each with provenance.",
         "input_schema": {"type": "object", "properties": {}, "required": []},
     },
     {
         "name": "update_client_profile",
-        "description": "Save a newly learned fact about the client (goal, preference, concern, liquidity event, or outside asset mentioned).",
+        "description": "Save a newly learned fact about the client (goal, preference, concern, "
+        "liquidity event, or outside asset mentioned).",
         "input_schema": {
             "type": "object",
             "properties": {
                 "fact": {"type": "string", "description": "The fact, stated plainly"},
                 "category": {
                     "type": "string",
-                    "enum": ["goals", "preferences", "concerns", "liquidity_events", "outside_assets_mentioned", "life_events"],
+                    "enum": [
+                        "goals",
+                        "preferences",
+                        "concerns",
+                        "liquidity_events",
+                        "outside_assets_mentioned",
+                        "life_events",
+                    ],
                 },
-                "source_quote": {"type": "string", "description": "Short verbatim quote from the client that supports the fact"},
+                "source_quote": {
+                    "type": "string",
+                    "description": "Short verbatim quote from the client that supports the fact",
+                },
             },
             "required": ["fact", "category"],
         },
     },
     {
         "name": "simulate_tax_impact",
-        "description": "Estimate capital-gains tax for raising a dollar amount by selling from a given account, using real tax lots (highest-basis-first). Returns proceeds, realized gain, estimated tax, and effective drag.",
+        "description": "Estimate capital-gains tax for raising a dollar amount by selling from a "
+        "given account, using real tax lots (highest-basis-first). Returns proceeds, realized gain, "
+        "estimated tax, and effective drag.",
         "input_schema": {
             "type": "object",
             "properties": {
                 "amount": {"type": "number", "description": "Dollar amount to raise"},
                 "accountId": {
                     "type": "string",
-                    "description": "Account to sell from: acct_trust (taxable trust) or acct_rh (Robinhood). Cash accounts need no simulation.",
+                    "description": "Account to sell from: acct_trust (taxable trust) or acct_rh "
+                    "(Robinhood). Cash accounts need no simulation.",
                 },
-                "symbol": {"type": "string", "description": "Optional: restrict the sale to one holding (e.g. AAPL)"},
+                "symbol": {
+                    "type": "string",
+                    "description": "Optional: restrict the sale to one holding (e.g. AAPL)",
+                },
             },
             "required": ["amount", "accountId"],
         },
     },
     {
         "name": "get_advisor_brief",
-        "description": "Advisor-facing brief for a client: held-away assets detected, open nudges, learned profile, and suggested talking points.",
+        "description": "Advisor-facing brief for a client: held-away assets detected, open nudges, "
+        "learned profile, and suggested talking points.",
         "input_schema": {"type": "object", "properties": {}, "required": []},
     },
 ]
@@ -94,8 +120,8 @@ def _strip_history(acct):
     return {k: v for k, v in acct.items() if k != "history"}
 
 
-def run_tool(name, input, client_id):
-    input = input or {}
+def run_tool(name, tool_input, client_id):
+    tool_input = tool_input or {}
     if name == "get_accounts":
         a = accounts_for()
         return {
@@ -109,7 +135,9 @@ def run_tool(name, input, client_id):
     if name == "get_portfolio":
         p = portfolio_for()
         trust_value = sum(x["value"] for x in p["positions"] if x["accountId"] == "acct_trust")
-        aapl = next((x for x in p["positions"] if x["accountId"] == "acct_trust" and x["symbol"] == "AAPL"), None)
+        aapl = next(
+            (x for x in p["positions"] if x["accountId"] == "acct_trust" and x["symbol"] == "AAPL"), None
+        )
         return {
             "positions": p["positions"],
             "taxLots": p["taxLots"],
@@ -120,7 +148,7 @@ def run_tool(name, input, client_id):
     if name == "get_financial_plan":
         return {"plan": seed["plan"], "liquidityEvent": seed["liquidityEvent"]}
     if name == "get_spending":
-        s = spending_summary(input.get("months") or 3)
+        s = spending_summary(tool_input.get("months") or 3)
         return {
             "recentMonths": s["months"],
             "avg3mo": s["avg3mo"],
@@ -132,14 +160,20 @@ def run_tool(name, input, client_id):
             ),
         }
     if name == "get_client_profile":
-        return {"clientId": client_id, "facts": active_facts(client_id), "summary": profile_as_context(client_id)}
+        return {
+            "clientId": client_id,
+            "facts": active_facts(client_id),
+            "summary": profile_as_context(client_id),
+        }
     if name == "update_client_profile":
-        added = add_facts(client_id, [input], None)
+        added = add_facts(client_id, [tool_input], None)
         if added:
             return {"saved": True, "fact": added[0]}
         return {"saved": False, "reason": "Similar fact already on file."}
     if name == "simulate_tax_impact":
-        return simulate_tax_impact(input.get("amount"), input.get("accountId"), input.get("symbol"))
+        return simulate_tax_impact(
+            tool_input.get("amount"), tool_input.get("accountId"), tool_input.get("symbol")
+        )
     if name == "get_advisor_brief":
         a = accounts_for()
         return {
@@ -157,9 +191,9 @@ def run_tool(name, input, client_id):
 
 def simulate_tax_impact(amount, account_id, symbol=None):
     prices = {f"{p['accountId']}:{p['symbol']}": p["price"] for p in seed["positions"]}
-    lots = [l for l in seed["taxLots"] if l["accountId"] == account_id]
+    lots = [lot for lot in seed["taxLots"] if lot["accountId"] == account_id]
     if symbol:
-        lots = [l for l in lots if l["symbol"] == symbol.upper()]
+        lots = [lot for lot in lots if lot["symbol"] == symbol.upper()]
     if not lots:
         return {
             "error": (
@@ -169,7 +203,7 @@ def simulate_tax_impact(amount, account_id, symbol=None):
         }
 
     # Sell highest basis first (most tax-efficient ordering).
-    ordered = sorted(lots, key=lambda l: l["costPerShare"], reverse=True)
+    ordered = sorted(lots, key=lambda lot: lot["costPerShare"], reverse=True)
     remaining = amount
     proceeds = lt_gain = st_gain = 0
     sales = []
@@ -189,17 +223,19 @@ def simulate_tax_impact(amount, account_id, symbol=None):
             lt_gain += gain
         proceeds += sell_value
         remaining -= sell_value
-        sales.append({
-            "lotId": lot["id"],
-            "symbol": lot["symbol"],
-            "qtySold": js_round(sell_qty * 100) / 100,
-            "costPerShare": lot["costPerShare"],
-            "price": price,
-            "proceeds": js_round(sell_value),
-            "gain": js_round(gain),
-            "term": lot["term"],
-            "acquired": lot["acquired"],
-        })
+        sales.append(
+            {
+                "lotId": lot["id"],
+                "symbol": lot["symbol"],
+                "qtySold": js_round(sell_qty * 100) / 100,
+                "costPerShare": lot["costPerShare"],
+                "price": price,
+                "proceeds": js_round(sell_value),
+                "gain": js_round(gain),
+                "term": lot["term"],
+                "acquired": lot["acquired"],
+            }
+        )
     est_tax = js_round(lt_gain * LT_RATE + st_gain * ST_RATE)
     return {
         "requested": amount,
@@ -211,7 +247,8 @@ def simulate_tax_impact(amount, account_id, symbol=None):
         "effectiveTaxDragPct": js_round(est_tax / proceeds * 1000) / 10 if proceeds > 0 else 0,
         "assumptions": (
             f"Long-term gains at {LT_RATE * 100:.1f}% (15% cap gains + 3.8% NIIT), short-term at "
-            f"{ST_RATE * 100:.1f}%. Lots sold highest-basis-first. Estimates only — Dana can run exact numbers."
+            f"{ST_RATE * 100:.1f}%. Lots sold highest-basis-first. Estimates only — Dana can run "
+            f"exact numbers."
         ),
         "sales": sales,
     }

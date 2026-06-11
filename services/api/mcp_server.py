@@ -38,7 +38,11 @@ async def list_tools() -> list[types.Tool]:
 async def call_tool(name: str, arguments: dict | None) -> types.CallToolResult:
     if not any(t["name"] == name for t in READ_ONLY_TOOLS):
         return types.CallToolResult(
-            content=[types.TextContent(type="text", text=f"Tool not available over MCP (read-only boundary): {name}")],
+            content=[
+                types.TextContent(
+                    type="text", text=f"Tool not available over MCP (read-only boundary): {name}"
+                )
+            ],
             isError=True,
         )
     data = run_tool(name, arguments or {}, CLIENT_ID)
@@ -59,7 +63,8 @@ async def call_tool(name: str, arguments: dict | None) -> types.CallToolResult:
 async def main():
     async with stdio_server() as (read, write):
         print(
-            f"[mcp] allworth-client-intelligence ready (client: {CLIENT_ID}, {len(READ_ONLY_TOOLS)} read-only tools)",
+            f"[mcp] allworth-client-intelligence ready "
+            f"(client: {CLIENT_ID}, {len(READ_ONLY_TOOLS)} read-only tools)",
             file=sys.stderr,
         )
         await server.run(read, write, server.create_initialization_options())

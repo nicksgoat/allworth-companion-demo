@@ -85,11 +85,16 @@ def proactive(client_id: str, session: str = "wednesday"):
                     "your deadline is Sunday, June 15. Want to pick up where we left off, or look "
                     "at something else?"
                 ),
-                "basedOn": {"fact": ipo["fact"], "source_quote": ipo["source_quote"], "learned_at": ipo["learned_at"]},
+                "basedOn": {
+                    "fact": ipo["fact"],
+                    "source_quote": ipo["source_quote"],
+                    "learned_at": ipo["learned_at"],
+                },
                 "suggested": chat.suggested_for(session),
             }
     return {
-        "message": "Hi Maya — I can help you understand your accounts, spending, plan, or anything you're weighing. What's on your mind?",
+        "message": "Hi Maya — I can help you understand your accounts, spending, plan, or anything "
+        "you're weighing. What's on your mind?",
         "basedOn": None,
         "suggested": chat.suggested_for(session),
     }
@@ -170,4 +175,4 @@ def brief_narrative(d):
         f"Open nudge: {nudge['title'].lower()} ({nudge['headline']})." if nudge else None,
         "She prefers plain-English explanations and is tax-sensitive about her 2015 Apple shares.",
     ]
-    return "\n".join(l for l in lines if l)
+    return "\n".join(line for line in lines if line)

@@ -10,3 +10,23 @@ dependencies = [
     "mcp>=1.9",
     "python-dotenv>=1.0",
 ]
+
+[dependency-groups]
+dev = ["ruff>=0.11"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF"]
+ignore = ["SIM108"]
+
+[tool.ruff.lint.per-file-ignores]
+# main.py: load_dotenv must run before chat imports read ANTHROPIC_API_KEY.
+"main.py" = ["E402"]
+# prompts.py: line breaks inside the system prompt are part of the cached string.
+"prompts.py" = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["allworth_api"]

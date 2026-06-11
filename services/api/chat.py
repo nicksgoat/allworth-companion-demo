@@ -132,11 +132,13 @@ async def _stream_live(client_id, session, messages, out):
             result = run_tool(block.name, block.input, client_id)
             sources.add(SOURCE_NAMES.get(block.name, block.name))
             yield sse("tool_end", {"name": block.name})
-            results.append({
-                "type": "tool_result",
-                "tool_use_id": block.id,
-                "content": json.dumps(result),
-            })
+            results.append(
+                {
+                    "type": "tool_result",
+                    "tool_use_id": block.id,
+                    "content": json.dumps(result),
+                }
+            )
         convo.append({"role": "user", "content": results})
 
     yield sse("done", {"sources": sorted(sources), "fallback": False, "suggested": suggested_for(session)})
@@ -147,7 +149,7 @@ async def stream_chat(client_id, session, message):
     """Async generator of SSE strings for one chat turn. Owns conversation state."""
     key = f"{client_id}:{session}"
     history = conversations.get(key, [])
-    messages = history + [{"role": "user", "content": message}]
+    messages = [*history, {"role": "user", "content": message}]
     user_text = _last_user_text(messages)
     out = {"text": ""}
 
@@ -169,7 +171,7 @@ async def stream_chat(client_id, session, message):
         yield sse("error", {"message": "Something went wrong. Please try again."})
         return
 
-    conversations[key] = messages + [{"role": "assistant", "content": out["text"]}]
+    conversations[key] = [*messages, {"role": "assistant", "content": out["text"]}]
 
     # Persist the turn and extract facts in the background (never blocks the response).
     append_episode(client_id, session, "user", user_text)

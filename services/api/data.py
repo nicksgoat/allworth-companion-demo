@@ -1,6 +1,6 @@
 import json
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 API_DIR = Path(__file__).resolve().parent
@@ -13,7 +13,7 @@ def js_round(x: float) -> int:
 
 
 def iso_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
 def fmt_usd(n: float) -> str:
@@ -23,7 +23,10 @@ def fmt_usd(n: float) -> str:
 def accounts_for() -> dict:
     allworth = [a for a in seed["accounts"] if a["group"] == "allworth"]
     outside = [a for a in seed["accounts"] if a["group"] == "outside"]
-    total = lambda xs: sum(a["balance"] for a in xs)
+
+    def total(xs):
+        return sum(a["balance"] for a in xs)
+
     return {
         "allworth": allworth,
         "outside": outside,
