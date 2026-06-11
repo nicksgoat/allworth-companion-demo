@@ -47,7 +47,9 @@ export class ApiClient {
   }
 
   async forgetFact(clientId: string, factId: string): Promise<void> {
-    const res = await fetch(`${this.baseURL}/api/clients/${clientId}/facts/${factId}`, { method: "DELETE" });
+    const res = await fetch(`${this.baseURL}/api/clients/${clientId}/facts/${factId}`, {
+      method: "DELETE",
+    });
     if (!res.ok) throw new Error(`DELETE fact → ${res.status}`);
   }
 
@@ -122,7 +124,12 @@ function parseEvent(event: string, json: string): ChatEvent | null {
     case "text":
       return { kind: "text", delta: obj.delta ?? "" };
     case "done":
-      return { kind: "done", sources: obj.sources ?? [], fallback: obj.fallback ?? false, suggested: obj.suggested ?? [] };
+      return {
+        kind: "done",
+        sources: obj.sources ?? [],
+        fallback: obj.fallback ?? false,
+        suggested: obj.suggested ?? [],
+      };
     case "error":
       return { kind: "error", message: obj.message ?? "Something went wrong." };
     default:

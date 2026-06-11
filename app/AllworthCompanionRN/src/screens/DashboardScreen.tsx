@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
 import { HeroNumber } from "../components/HeroNumber";
 import { NudgeCard } from "../components/NudgeCard";
 import { AccountRow, DisclaimerFooter, HairlineDivider, SectionHeader } from "../components/Rows";
@@ -95,7 +94,15 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
   );
 }
 
-function AccountSection({ header, accounts, caption }: { header: string; accounts: Account[]; caption?: string }) {
+function AccountSection({
+  header,
+  accounts,
+  caption,
+}: {
+  header: string;
+  accounts: Account[];
+  caption?: string;
+}) {
   return (
     <View>
       <View style={styles.sectionRow}>
@@ -142,9 +149,19 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 }
 
 const styles = StyleSheet.create({
-  headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
   greeting: { fontSize: 28, fontFamily: fonts.display, color: colors.inkPrimary, flexShrink: 1 },
-  sectionRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingBottom: 4 },
+  sectionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: 4,
+  },
   sectionCaption: { fontSize: 13, color: colors.inkSecondary, fontVariant: ["tabular-nums"] },
   skeletonBlock: { height: 72, borderRadius: 12, backgroundColor: colors.inkFaint },
   errorBox: { alignItems: "center", paddingTop: 120, gap: 10, paddingHorizontal: 20 },

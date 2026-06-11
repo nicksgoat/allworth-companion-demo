@@ -1,5 +1,5 @@
 import * as Linking from "expo-linking";
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { ApiClient, DEFAULT_HOST } from "./api";
 import type { ChatMessage, Dashboard } from "./types";
 
@@ -39,8 +39,11 @@ export function useApp(): AppState {
   return ctx;
 }
 
+// Module-level singleton: AppProvider mounts once, and demo controls mutate
+// api.baseURL directly (not allowed on useRef/useState values by lint rules).
+const api = new ApiClient();
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const api = useRef(new ApiClient()).current;
   const clientId = "maya";
 
   const [session, setSessionRaw] = useState("wednesday");
@@ -113,7 +116,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setDashboard(await api.dashboard(clientId));
         setDashboardError(null);
       } catch {
-        setDashboardError(`Can't reach the backend at http://${backendHost}:3000 — run ./run.sh first.`);
+        setDashboardError(
+          `Can't reach the backend at http://${backendHost}:3000 — run ./run.sh first.`,
+        );
       }
     };
     const resetDemo = async () => {
@@ -147,7 +152,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       demoScreen,
       clearDemoScreen: () => setDemoScreen(null),
     };
-  }, [api, session, mode, selectedTab, showDemoControls, chatPrefill, backendHost, dashboard, dashboardError, chatMessages, demoScreen]);
+  }, [
+    session,
+    mode,
+    selectedTab,
+    showDemoControls,
+    chatPrefill,
+    backendHost,
+    dashboard,
+    dashboardError,
+    chatMessages,
+    demoScreen,
+  ]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

@@ -1,5 +1,8 @@
 import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
-import { PlayfairDisplay_600SemiBold, PlayfairDisplay_700Bold } from "@expo-google-fonts/playfair-display";
+import {
+  PlayfairDisplay_600SemiBold,
+  PlayfairDisplay_700Bold,
+} from "@expo-google-fonts/playfair-display";
 import { Ionicons } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
@@ -41,13 +44,24 @@ function Root() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
       <StatusBar style={app.mode === "vision" ? "light" : "dark"} />
-      {app.mode === "client" ? <ClientTabs /> : app.mode === "advisor" ? <AdvisorNavigator /> : <VisionScreen />}
+      {app.mode === "client" ? (
+        <ClientTabs />
+      ) : app.mode === "advisor" ? (
+        <AdvisorNavigator />
+      ) : (
+        <VisionScreen />
+      )}
       <DemoControlSheet />
     </View>
   );
 }
 
-const TABS: { tab: ClientTab; label: string; icon: keyof typeof Ionicons.glyphMap; iconActive: keyof typeof Ionicons.glyphMap }[] = [
+const TABS: {
+  tab: ClientTab;
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  iconActive: keyof typeof Ionicons.glyphMap;
+}[] = [
   { tab: "home", label: "Home", icon: "home-outline", iconActive: "home" },
   { tab: "chat", label: "Chat", icon: "chatbubbles-outline", iconActive: "chatbubbles" },
   { tab: "profile", label: "Profile", icon: "person-outline", iconActive: "person" },
@@ -60,7 +74,13 @@ function ClientTabs() {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
-        {app.selectedTab === "home" ? <DashboardScreen /> : app.selectedTab === "chat" ? <ChatScreen /> : <ProfileScreen />}
+        {app.selectedTab === "home" ? (
+          <DashboardScreen />
+        ) : app.selectedTab === "chat" ? (
+          <ChatScreen />
+        ) : (
+          <ProfileScreen />
+        )}
       </View>
       <View style={[styles.tabBar, { paddingBottom: insets.bottom }]}>
         {TABS.map(({ tab, label, icon, iconActive }) => {
@@ -74,8 +94,19 @@ function ClientTabs() {
                 app.setSelectedTab(tab);
               }}
             >
-              <Ionicons name={active ? iconActive : icon} size={24} color={active ? colors.allworthNavy : colors.inkTertiary} />
-              <Text style={[styles.tabLabel, { color: active ? colors.allworthNavy : colors.inkTertiary }]}>{label}</Text>
+              <Ionicons
+                name={active ? iconActive : icon}
+                size={24}
+                color={active ? colors.allworthNavy : colors.inkTertiary}
+              />
+              <Text
+                style={[
+                  styles.tabLabel,
+                  { color: active ? colors.allworthNavy : colors.inkTertiary },
+                ]}
+              >
+                {label}
+              </Text>
             </Pressable>
           );
         })}

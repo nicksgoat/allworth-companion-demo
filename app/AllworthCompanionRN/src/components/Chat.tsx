@@ -6,7 +6,15 @@ import type { ChatMessage, ToolChip } from "../types";
 import { AdvisorHandoffCard } from "./AdvisorHandoffCard";
 import { AllworthMark } from "./Wordmark";
 
-export function ToolChipRow({ chips, sources, collapsed }: { chips: ToolChip[]; sources: string[]; collapsed: boolean }) {
+export function ToolChipRow({
+  chips,
+  sources,
+  collapsed,
+}: {
+  chips: ToolChip[];
+  sources: string[];
+  collapsed: boolean;
+}) {
   if (collapsed && sources.length > 0) {
     return (
       <View style={styles.sourcesRow}>
@@ -21,7 +29,11 @@ export function ToolChipRow({ chips, sources, collapsed }: { chips: ToolChip[]; 
         {chips.map((chip) => (
           <View key={chip.name} style={styles.chip}>
             {chip.running ? (
-              <ActivityIndicator size="small" color={colors.inkSecondary} style={{ transform: [{ scale: 0.7 }] }} />
+              <ActivityIndicator
+                size="small"
+                color={colors.inkSecondary}
+                style={{ transform: [{ scale: 0.7 }] }}
+              />
             ) : (
               <Ionicons name="checkmark" size={11} color={colors.allworthAccent} />
             )}
@@ -46,7 +58,7 @@ function MarkdownText({ text, streaming }: { text: string; streaming: boolean })
           </Text>
         ) : (
           <Text key={i}>{part}</Text>
-        )
+        ),
       )}
       {streaming ? <Text style={{ color: colors.inkTertiary }}> ▍</Text> : null}
     </Text>
@@ -77,7 +89,11 @@ export function ChatMessageView({ message }: { message: ChatMessage }) {
   return (
     <View style={{ gap: 10 }}>
       <AssistantIdentity />
-      <ToolChipRow chips={message.chips} sources={message.sources} collapsed={!message.isStreaming} />
+      <ToolChipRow
+        chips={message.chips}
+        sources={message.sources}
+        collapsed={!message.isStreaming}
+      />
       {message.text ? <MarkdownText text={message.text} streaming={message.isStreaming} /> : null}
       {!message.isStreaming && message.sources.length > 0 ? (
         <View style={{ paddingTop: 4 }}>

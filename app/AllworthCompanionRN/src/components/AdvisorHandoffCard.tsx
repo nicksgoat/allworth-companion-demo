@@ -48,7 +48,15 @@ export function AdvisorHandoffCard({
   );
 }
 
-function HandoffButton({ label, filled, onPress }: { label: string; filled?: boolean; onPress: () => void }) {
+function HandoffButton({
+  label,
+  filled,
+  onPress,
+}: {
+  label: string;
+  filled?: boolean;
+  onPress: () => void;
+}) {
   return (
     <Pressable
       onPress={onPress}
@@ -58,7 +66,9 @@ function HandoffButton({ label, filled, onPress }: { label: string; filled?: boo
         pressed && { opacity: 0.85 },
       ]}
     >
-      <Text style={[styles.buttonText, { color: filled ? "#fff" : colors.allworthAccent }]}>{label}</Text>
+      <Text style={[styles.buttonText, { color: filled ? "#fff" : colors.allworthAccent }]}>
+        {label}
+      </Text>
     </Pressable>
   );
 }

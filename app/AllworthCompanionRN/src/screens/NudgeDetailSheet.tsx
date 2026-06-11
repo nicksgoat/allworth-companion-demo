@@ -9,7 +9,12 @@ import type { Nudge, SpendingDetail } from "../types";
 
 export function NudgeDetailSheet({ nudge, onClose }: { nudge: Nudge | null; onClose: () => void }) {
   return (
-    <Modal visible={nudge != null} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+    <Modal
+      visible={nudge != null}
+      animationType="slide"
+      presentationStyle="pageSheet"
+      onRequestClose={onClose}
+    >
       {nudge ? <NudgeDetailContent nudge={nudge} onClose={onClose} /> : null}
     </Modal>
   );
@@ -21,7 +26,10 @@ function NudgeDetailContent({ nudge, onClose }: { nudge: Nudge; onClose: () => v
 
   useEffect(() => {
     if (nudge.type === "spending") {
-      app.api.spending(app.clientId).then(setSpending).catch(() => {});
+      app.api
+        .spending(app.clientId)
+        .then(setSpending)
+        .catch(() => {});
     }
   }, [nudge]);
 
@@ -39,7 +47,10 @@ function NudgeDetailContent({ nudge, onClose }: { nudge: Nudge; onClose: () => v
   };
 
   return (
-    <ScrollView style={{ backgroundColor: colors.surfacePrimary }} contentContainerStyle={{ padding: 20, gap: 20 }}>
+    <ScrollView
+      style={{ backgroundColor: colors.surfacePrimary }}
+      contentContainerStyle={{ padding: 20, gap: 20 }}
+    >
       <View style={{ gap: 6, paddingTop: 24 }}>
         <SectionHeader>{nudge.title}</SectionHeader>
         <Text style={styles.headline}>{nudge.headline}</Text>
@@ -49,7 +60,10 @@ function NudgeDetailContent({ nudge, onClose }: { nudge: Nudge; onClose: () => v
 
       {nudge.type === "spending" && spending ? <SpendingBars s={spending} /> : null}
 
-      <Pressable onPress={askAssistant} style={({ pressed }) => [styles.cta, pressed && { opacity: 0.85 }]}>
+      <Pressable
+        onPress={askAssistant}
+        style={({ pressed }) => [styles.cta, pressed && { opacity: 0.85 }]}
+      >
         <Ionicons name="chatbubbles-outline" size={18} color="#fff" />
         <Text style={styles.ctaText}>{nudge.cta}</Text>
       </Pressable>
@@ -74,7 +88,10 @@ function SpendingBars({ s }: { s: SpendingDetail }) {
               <View
                 style={[
                   styles.barFill,
-                  { width: `${ratio * 100}%`, backgroundColor: over ? colors.attention : colors.allworthNavy },
+                  {
+                    width: `${ratio * 100}%`,
+                    backgroundColor: over ? colors.attention : colors.allworthNavy,
+                  },
                 ]}
               />
             </View>
@@ -90,7 +107,12 @@ function SpendingBars({ s }: { s: SpendingDetail }) {
 }
 
 const styles = StyleSheet.create({
-  headline: { fontSize: 44, fontWeight: "600", color: colors.attention, fontVariant: ["tabular-nums"] },
+  headline: {
+    fontSize: 44,
+    fontWeight: "600",
+    color: colors.attention,
+    fontVariant: ["tabular-nums"],
+  },
   body: { fontSize: 17, lineHeight: 24, color: colors.inkPrimary },
   cta: {
     flexDirection: "row",
@@ -104,8 +126,20 @@ const styles = StyleSheet.create({
   ctaText: { color: "#fff", fontSize: 17, fontWeight: "600" },
   barRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   barMonth: { width: 30, fontSize: 13, color: colors.inkTertiary, fontVariant: ["tabular-nums"] },
-  barTrack: { flex: 1, height: 8, borderRadius: 4, backgroundColor: colors.inkFaint, overflow: "hidden" },
+  barTrack: {
+    flex: 1,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.inkFaint,
+    overflow: "hidden",
+  },
   barFill: { height: 8, borderRadius: 4 },
-  barValue: { width: 64, textAlign: "right", fontSize: 13, color: colors.inkSecondary, fontVariant: ["tabular-nums"] },
+  barValue: {
+    width: 64,
+    textAlign: "right",
+    fontSize: 13,
+    color: colors.inkSecondary,
+    fontVariant: ["tabular-nums"],
+  },
   planCaption: { fontSize: 13, color: colors.inkTertiary },
 });

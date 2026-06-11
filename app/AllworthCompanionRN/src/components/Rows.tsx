@@ -35,7 +35,9 @@ export function LearnedFactRow({ fact }: { fact: LearnedFact }) {
           <Text style={styles.quoteText}>“{fact.source_quote}”</Text>
         </View>
       ) : null}
-      <Text style={styles.factMeta}>Learned {shortDate(fact.learned_at)} · from your conversation</Text>
+      <Text style={styles.factMeta}>
+        Learned {shortDate(fact.learned_at)} · from your conversation
+      </Text>
     </View>
   );
 }
@@ -54,12 +56,23 @@ const styles = StyleSheet.create({
   accountRow: { flexDirection: "row", alignItems: "center", paddingVertical: 12, gap: 12 },
   accountName: { fontSize: 17, color: colors.inkPrimary },
   accountInstitution: { fontSize: 13, color: colors.inkTertiary, marginTop: 2 },
-  accountBalance: { fontSize: 17, fontWeight: "500", color: colors.inkPrimary, fontVariant: ["tabular-nums"] },
+  accountBalance: {
+    fontSize: 17,
+    fontWeight: "500",
+    color: colors.inkPrimary,
+    fontVariant: ["tabular-nums"],
+  },
   factRow: { paddingVertical: 12, gap: 8 },
   factText: { fontSize: 17, color: colors.inkPrimary, lineHeight: 23 },
   quoteRow: { flexDirection: "row", gap: 8 },
   quoteBar: { width: 2, borderRadius: 1, backgroundColor: colors.hairline },
-  quoteText: { flex: 1, fontSize: 15, fontStyle: "italic", color: colors.inkSecondary, lineHeight: 21 },
+  quoteText: {
+    flex: 1,
+    fontSize: 15,
+    fontStyle: "italic",
+    color: colors.inkSecondary,
+    lineHeight: 21,
+  },
   factMeta: { fontSize: 13, color: colors.inkTertiary },
   disclaimer: { fontSize: 11, color: colors.inkTertiary, textAlign: "center" },
 });

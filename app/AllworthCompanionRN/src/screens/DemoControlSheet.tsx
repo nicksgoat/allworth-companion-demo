@@ -63,7 +63,9 @@ export function DemoControlSheet() {
               style={({ pressed }) => [styles.resetButton, pressed && { opacity: 0.8 }]}
             >
               <Text style={styles.resetText}>Reset demo</Text>
-              {resetDone ? <Ionicons name="checkmark-circle" size={18} color={colors.gainGreen} /> : null}
+              {resetDone ? (
+                <Ionicons name="checkmark-circle" size={18} color={colors.gainGreen} />
+              ) : null}
             </Pressable>
           </Section>
         </ScrollView>
@@ -72,7 +74,15 @@ export function DemoControlSheet() {
   );
 }
 
-function Section({ header, footer, children }: { header?: string; footer?: string; children: React.ReactNode }) {
+function Section({
+  header,
+  footer,
+  children,
+}: {
+  header?: string;
+  footer?: string;
+  children: React.ReactNode;
+}) {
   return (
     <View style={{ gap: 8 }}>
       {header ? <SectionHeader>{header}</SectionHeader> : null}
@@ -99,7 +109,10 @@ function Segmented({
           onPress={() => onChange(opt.value)}
           style={[styles.segment, value === opt.value && styles.segmentActive]}
         >
-          <Text style={[styles.segmentText, value === opt.value && styles.segmentTextActive]} numberOfLines={1}>
+          <Text
+            style={[styles.segmentText, value === opt.value && styles.segmentTextActive]}
+            numberOfLines={1}
+          >
             {opt.label}
           </Text>
         </Pressable>
@@ -119,12 +132,31 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 17, fontWeight: "600", color: colors.inkPrimary },
   done: { fontSize: 17, fontWeight: "600", color: colors.allworthAccent },
-  segmented: { flexDirection: "row", backgroundColor: colors.inkFaint, borderRadius: 9, padding: 2 },
+  segmented: {
+    flexDirection: "row",
+    backgroundColor: colors.inkFaint,
+    borderRadius: 9,
+    padding: 2,
+  },
   segment: { flex: 1, paddingVertical: 7, borderRadius: 7, alignItems: "center" },
-  segmentActive: { backgroundColor: "#fff", ...{ shadowColor: "#000", shadowOpacity: 0.08, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } } },
+  segmentActive: {
+    backgroundColor: "#fff",
+    ...{
+      shadowColor: "#000",
+      shadowOpacity: 0.08,
+      shadowRadius: 4,
+      shadowOffset: { width: 0, height: 1 },
+    },
+  },
   segmentText: { fontSize: 13, color: colors.inkSecondary },
   segmentTextActive: { color: colors.inkPrimary, fontWeight: "600" },
-  hostInput: { ...card, fontSize: 17, color: colors.inkPrimary, paddingHorizontal: 14, paddingVertical: 12 },
+  hostInput: {
+    ...card,
+    fontSize: 17,
+    color: colors.inkPrimary,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
   resetButton: {
     ...card,
     flexDirection: "row",

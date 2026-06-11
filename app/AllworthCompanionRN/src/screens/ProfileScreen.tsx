@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { DisclaimerFooter, HairlineDivider, LearnedFactRow, SectionHeader } from "../components/Rows";
+import {
+  DisclaimerFooter,
+  HairlineDivider,
+  LearnedFactRow,
+  SectionHeader,
+} from "../components/Rows";
 import { useApp } from "../state";
 import { colors } from "../theme";
 import type { LearnedFact } from "../types";
@@ -46,7 +51,10 @@ export function ProfileScreen() {
     setRefreshing(false);
   };
 
-  const categories = facts.reduce<string[]>((seen, f) => (seen.includes(f.category) ? seen : [...seen, f.category]), []);
+  const categories = facts.reduce<string[]>(
+    (seen, f) => (seen.includes(f.category) ? seen : [...seen, f.category]),
+    [],
+  );
 
   return (
     <ScrollView
@@ -55,10 +63,10 @@ export function ProfileScreen() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
     >
       <View style={{ gap: 6 }}>
-        <Text style={styles.title}>What I've learned</Text>
+        <Text style={styles.title}>What I{"'"}ve learned</Text>
         <Text style={styles.subtitle}>
-          Every fact has a source, a timestamp, and an audit trail. Nothing here came from anywhere but you. Tap any
-          fact to see why I know it — or to remove it.
+          Every fact has a source, a timestamp, and an audit trail. Nothing here came from anywhere
+          but you. Tap any fact to see why I know it — or to remove it.
         </Text>
       </View>
 
@@ -72,7 +80,10 @@ export function ProfileScreen() {
             .map((fact, i) => (
               <React.Fragment key={fact.id}>
                 {i > 0 ? <HairlineDivider /> : null}
-                <Pressable onPress={() => setSelectedFact(fact)} style={({ pressed }) => pressed && { opacity: 0.6 }}>
+                <Pressable
+                  onPress={() => setSelectedFact(fact)}
+                  style={({ pressed }) => pressed && { opacity: 0.6 }}
+                >
                   <LearnedFactRow fact={fact} />
                 </Pressable>
               </React.Fragment>
@@ -80,7 +91,9 @@ export function ProfileScreen() {
         </View>
       ))}
 
-      {facts.length === 0 ? <Text style={styles.empty}>Nothing learned yet — start a conversation.</Text> : null}
+      {facts.length === 0 ? (
+        <Text style={styles.empty}>Nothing learned yet — start a conversation.</Text>
+      ) : null}
 
       <View style={{ paddingVertical: 8 }}>
         <DisclaimerFooter />
@@ -88,7 +101,9 @@ export function ProfileScreen() {
 
       <FactDetailSheet
         fact={selectedFact}
-        categoryLabel={selectedFact ? (CATEGORY_LABELS[selectedFact.category] ?? selectedFact.category) : ""}
+        categoryLabel={
+          selectedFact ? (CATEGORY_LABELS[selectedFact.category] ?? selectedFact.category) : ""
+        }
         onClose={() => setSelectedFact(null)}
         onForgotten={() => {
           setSelectedFact(null);

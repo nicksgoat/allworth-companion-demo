@@ -42,6 +42,11 @@ export function HeroNumber({ label, value, delta }: Props) {
 }
 
 const styles = StyleSheet.create({
-  hero: { fontSize: 48, fontWeight: "600", color: colors.inkPrimary, fontVariant: ["tabular-nums"] },
+  hero: {
+    fontSize: 48,
+    fontWeight: "600",
+    color: colors.inkPrimary,
+    fontVariant: ["tabular-nums"],
+  },
   delta: { fontSize: 15, fontWeight: "500", fontVariant: ["tabular-nums"] },
 });

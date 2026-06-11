@@ -3,7 +3,7 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AllworthWordmark } from "../components/Wordmark";
-import { colors, fonts } from "../theme";
+import { colors } from "../theme";
 
 // Beat 6 — static vision screen: "What the funded platform becomes."
 export function VisionScreen() {
@@ -31,14 +31,22 @@ export function VisionScreen() {
       </View>
 
       <View style={styles.callouts}>
-        <Callout marker="1" title="Per-client learning" detail="Knows every client better every day" />
+        <Callout
+          marker="1"
+          title="Per-client learning"
+          detail="Knows every client better every day"
+        />
         <Callout
           marker="2"
           title="Cross-client patterns"
           detail="Every client benefits from patterns across the book — fully anonymized"
         />
         <Callout marker="3" title="System outcomes" detail="Measurably better every week it runs" />
-        <Callout marker="✓" title="Provenance" detail="Every fact has a source, a timestamp, and an audit trail" />
+        <Callout
+          marker="✓"
+          title="Provenance"
+          detail="Every fact has a source, a timestamp, and an audit trail"
+        />
       </View>
 
       <View style={styles.roadmap}>
@@ -53,7 +61,9 @@ export function VisionScreen() {
         </View>
       </View>
 
-      <Text style={styles.closing}>Models are rented. This memory is owned — and it compounds.</Text>
+      <Text style={styles.closing}>
+        Models are rented. This memory is owned — and it compounds.
+      </Text>
     </View>
   );
 }
@@ -64,7 +74,12 @@ function LoopNode({ number, angle }: { number: string; angle: number }) {
     <View
       style={[
         styles.loopNode,
-        { transform: [{ translateX: 130 * Math.cos(radians) }, { translateY: 130 * Math.sin(radians) }] },
+        {
+          transform: [
+            { translateX: 130 * Math.cos(radians) },
+            { translateY: 130 * Math.sin(radians) },
+          ],
+        },
       ]}
     >
       <Text style={styles.loopNodeText}>{number}</Text>
@@ -133,8 +148,18 @@ const styles = StyleSheet.create({
   },
   loopNodeText: { fontSize: 15, fontWeight: "700", color: colors.allworthNavy },
   roadmap: { paddingHorizontal: 24, gap: 8, alignItems: "center" },
-  roadmapHeader: { fontSize: 10, fontWeight: "700", letterSpacing: 1.2, color: "rgba(255,255,255,0.45)" },
-  roadmapRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", flexWrap: "wrap" },
+  roadmapHeader: {
+    fontSize: 10,
+    fontWeight: "700",
+    letterSpacing: 1.2,
+    color: "rgba(255,255,255,0.45)",
+  },
+  roadmapRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    flexWrap: "wrap",
+  },
   roadmapStep: { flexDirection: "row", alignItems: "center", gap: 2, marginRight: 2 },
   roadmapChip: {
     paddingHorizontal: 8,
