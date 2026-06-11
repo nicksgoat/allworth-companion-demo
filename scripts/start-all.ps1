@@ -126,9 +126,21 @@ for ($i = 0; $i -lt 120; $i++) {
 }
 
 if (-not $ok) {
+  $uvicornReadyInLog = $false
+  if (Test-Path $backendErrLog) {
+    $uvicornReadyInLog = [bool](Select-String -Path $backendErrLog -Pattern "Uvicorn running on http://0.0.0.0:3000" -Quiet)
+  }
+
+  if ((Get-ListeningPidsOnPort -Port 3000).Count -gt 0 -and $uvicornReadyInLog) {
+    Write-Host "==> Backend reported ready in logs and port 3000 is listening; proceeding."
+    $ok = $true
+  }
+}
+
+if (-not $ok) {
   if (Get-ListeningPidsOnPort -Port 3000) {
     Write-Host "==> Port 3000 is still occupied. Try running this once, then retry:"
-    Write-Host "    Get-NetTCPConnection -LocalPort 3000 -State Listen | Select-Object -Expand OwningProcess | %{ Stop-Process -Id $_ -Force }"
+    Write-Host "    Get-NetTCPConnection -LocalPort 3000 -State Listen | Select-Object -Expand OwningProcess | %{ Stop-Process -Id `$_ -Force }"
   }
   if (Test-Path $backendErrLog) {
     Write-Host "==> Backend stderr (last 40 lines):"
@@ -146,6 +158,13 @@ Write-Host "==> Backend is reachable on :3000"
 Write-Host "==> Starting web app (Expo)"
 Write-Host "Backend: http://localhost:3000"
 Write-Host "Web: http://localhost:8081"
+
+$webListeners = @(Get-ListeningPidsOnPort -Port 8081) + @(Get-ListeningPidsOnPort -Port 8082)
+if ($webListeners.Count -gt 0) {
+  Write-Host "==> Clearing stale web listener(s) on 8081/8082"
+  Stop-ListeningPidsOnPort -Port 8081
+  Stop-ListeningPidsOnPort -Port 8082
+}
 
 Set-Location $rnDir
 # Prevent Expo from resolving modules from workspace root (which can pull a stale Expo install).
