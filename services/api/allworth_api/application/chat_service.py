@@ -1,15 +1,20 @@
-# Streaming chat: Anthropic tool-use loop over SSE, with cached fallback
-# responses so the demo never dies on stage.
+# Streaming chat: Anthropic tool-use loop yielding (event, data) tuples, with
+# cached fallback responses so the demo never dies on stage.
 import asyncio
 import json
 import re
 import sys
 
+from allworth_api.application.memory_service import (
+    add_facts,
+    append_episode,
+    episodes_for,
+    profile_as_context,
+)
+from allworth_api.application.prompts import STABLE_SYSTEM, volatile_context
+from allworth_api.application.tools import TOOL_DEFINITIONS, TOOL_LABELS, run_tool
 from allworth_api.infrastructure.anthropic_client import CHAT_MODEL, EXTRACT_MODEL, client
 from allworth_api.infrastructure.fallbacks import pick_fallback
-from memory import add_facts, append_episode, episodes_for, profile_as_context
-from prompts import STABLE_SYSTEM, volatile_context
-from tools import TOOL_DEFINITIONS, TOOL_LABELS, run_tool
 
 MAX_TOOL_ROUNDS = 8
 
@@ -34,10 +39,6 @@ def reset_conversations():
     conversations.clear()
 
 
-def sse(event, data):
-    return f"event: {event}\ndata: {json.dumps(data, separators=(',', ':'), ensure_ascii=False)}\n\n"
-
-
 def suggested_for(session):
     if session == "wednesday":
         return ["What changed since I was last here?", "Where did we land on the SpaceX IPO?"]
@@ -47,15 +48,15 @@ def suggested_for(session):
 async def _stream_fallback(user_text, session, out):
     fb = pick_fallback(user_text, session)
     for tool in fb["tools"]:
-        yield sse("tool_start", {"name": tool, "label": TOOL_LABELS.get(tool, tool)})
+        yield "tool_start", {"name": tool, "label": TOOL_LABELS.get(tool, tool)}
         await asyncio.sleep(0.45)
-        yield sse("tool_end", {"name": tool})
+        yield "tool_end", {"name": tool}
     # Stream the cached text in word chunks so it feels live.
     words = fb["text"].split(" ")
     for i in range(0, len(words), 6):
-        yield sse("text", {"delta": " ".join(words[i : i + 6]) + " "})
+        yield "text", {"delta": " ".join(words[i : i + 6]) + " "}
         await asyncio.sleep(0.04)
-    yield sse("done", {"sources": fb["sources"], "fallback": True, "suggested": fb.get("suggested", [])})
+    yield "done", {"sources": fb["sources"], "fallback": True, "suggested": fb.get("suggested", [])}
     out["text"] = fb["text"]
 
 
@@ -88,10 +89,10 @@ async def _stream_live(client_id, session, messages, out):
             async for event in stream:
                 if event.type == "content_block_start" and event.content_block.type == "tool_use":
                     name = event.content_block.name
-                    yield sse("tool_start", {"name": name, "label": TOOL_LABELS.get(name, name)})
+                    yield "tool_start", {"name": name, "label": TOOL_LABELS.get(name, name)}
                 elif event.type == "text":
                     full_text += event.text
-                    yield sse("text", {"delta": event.text})
+                    yield "text", {"delta": event.text}
             response = await stream.get_final_message()
 
         convo.append({"role": "assistant", "content": response.content})
@@ -105,7 +106,7 @@ async def _stream_live(client_id, session, messages, out):
                 continue
             result = run_tool(block.name, block.input, client_id)
             sources.add(SOURCE_NAMES.get(block.name, block.name))
-            yield sse("tool_end", {"name": block.name})
+            yield "tool_end", {"name": block.name}
             results.append(
                 {
                     "type": "tool_result",
@@ -115,12 +116,12 @@ async def _stream_live(client_id, session, messages, out):
             )
         convo.append({"role": "user", "content": results})
 
-    yield sse("done", {"sources": sorted(sources), "fallback": False, "suggested": suggested_for(session)})
+    yield "done", {"sources": sorted(sources), "fallback": False, "suggested": suggested_for(session)}
     out["text"] = full_text
 
 
 async def stream_chat(client_id, session, message):
-    """Async generator of SSE strings for one chat turn. Owns conversation state."""
+    """Async generator of (event, data) tuples for one chat turn. Owns conversation state."""
     key = f"{client_id}:{session}"
     history = conversations.get(key, [])
     messages = [*history, {"role": "user", "content": message}]
@@ -137,12 +138,12 @@ async def stream_chat(client_id, session, message):
                     yield chunk
             except Exception as err:
                 print(f"[chat] live stream failed, using fallback: {err}", file=sys.stderr)
-                yield sse("text", {"delta": "\n"})
+                yield "text", {"delta": "\n"}
                 async for chunk in _stream_fallback(user_text, session, out):
                     yield chunk
     except Exception as err:
         print(f"[chat] unrecoverable: {err}", file=sys.stderr)
-        yield sse("error", {"message": "Something went wrong. Please try again."})
+        yield "error", {"message": "Something went wrong. Please try again."}
         return
 
     conversations[key] = [*messages, {"role": "assistant", "content": out["text"]}]

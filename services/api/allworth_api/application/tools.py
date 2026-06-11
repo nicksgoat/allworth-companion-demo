@@ -1,8 +1,9 @@
 # The 8 demo tools: Anthropic tool definitions + local implementations over seed data.
+from allworth_api.application.insights import nudges_for
+from allworth_api.application.memory_service import active_facts, add_facts, profile_as_context
+from allworth_api.domain.formatting import fmt_usd
 from allworth_api.domain.tax import simulate_tax_impact
-from data import accounts_for, fmt_usd, portfolio_for, seed, spending_summary
-from memory import active_facts, add_facts, profile_as_context
-from nudges import nudges_for
+from allworth_api.infrastructure.seed import accounts_for, portfolio_for, seed, spending_summary
 
 # Labels drive the tool chips in the iOS chat UI.
 TOOL_LABELS = {
