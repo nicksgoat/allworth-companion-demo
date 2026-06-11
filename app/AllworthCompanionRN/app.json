@@ -12,8 +12,9 @@
       "bundleIdentifier": "com.anonymous.AllworthCompanionRN"
     },
     "android": {
+      "package": "com.anonymous.AllworthCompanionRN",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#173D67",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"

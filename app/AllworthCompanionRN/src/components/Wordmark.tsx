@@ -18,7 +18,13 @@ export function AllworthLogo({ width = 104, light }: { width?: number; light?: b
   );
 }
 
-export function AllworthMark({ size = 28, color = colors.allworthAccent }: { size?: number; color?: string }) {
+export function AllworthMark({
+  size = 28,
+  color = colors.allworthAccent,
+}: {
+  size?: number;
+  color?: string;
+}) {
   return (
     <Svg width={size} height={size} viewBox={MARK_VIEWBOX}>
       {ACCENT_PATHS.map((d, i) => (

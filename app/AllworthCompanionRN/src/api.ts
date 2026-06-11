@@ -1,16 +1,21 @@
 import { fetch as expoFetch } from "expo/fetch";
+import { Platform } from "react-native";
 import type {
   AdvisorBrief,
   BookResponse,
   ChatEvent,
   Dashboard,
+  Portfolio,
   ProactiveResponse,
   ProfileResponse,
   SpendingDetail,
 } from "./types";
 
+// Android emulators reach the host machine at 10.0.2.2, not localhost.
+export const DEFAULT_HOST = Platform.OS === "android" ? "10.0.2.2" : "localhost";
+
 export class ApiClient {
-  baseURL = "http://localhost:3000";
+  baseURL = `http://${DEFAULT_HOST}:3000`;
 
   private async get<T>(path: string): Promise<T> {
     const res = await fetch(this.baseURL + path);
@@ -20,6 +25,10 @@ export class ApiClient {
 
   dashboard(clientId: string): Promise<Dashboard> {
     return this.get(`/api/clients/${clientId}/dashboard`);
+  }
+
+  portfolio(clientId: string): Promise<Portfolio> {
+    return this.get(`/api/clients/${clientId}/portfolio`);
   }
 
   spending(clientId: string): Promise<SpendingDetail> {
@@ -43,7 +52,9 @@ export class ApiClient {
   }
 
   async forgetFact(clientId: string, factId: string): Promise<void> {
-    const res = await fetch(`${this.baseURL}/api/clients/${clientId}/facts/${factId}`, { method: "DELETE" });
+    const res = await fetch(`${this.baseURL}/api/clients/${clientId}/facts/${factId}`, {
+      method: "DELETE",
+    });
     if (!res.ok) throw new Error(`DELETE fact → ${res.status}`);
   }
 
@@ -118,7 +129,12 @@ function parseEvent(event: string, json: string): ChatEvent | null {
     case "text":
       return { kind: "text", delta: obj.delta ?? "" };
     case "done":
-      return { kind: "done", sources: obj.sources ?? [], fallback: obj.fallback ?? false, suggested: obj.suggested ?? [] };
+      return {
+        kind: "done",
+        sources: obj.sources ?? [],
+        fallback: obj.fallback ?? false,
+        suggested: obj.suggested ?? [],
+      };
     case "error":
       return { kind: "error", message: obj.message ?? "Something went wrong." };
     default:

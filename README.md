@@ -26,41 +26,40 @@ npx expo run:ios        # native build + launch on the iOS simulator
 
 The app talks to `http://localhost:3000`.
 
-### Run anywhere in the browser (Windows / Linux / no Xcode)
+### Agent startup (cross-platform)
 
-`demo.sh` is macOS-only (requires `xcrun` + the iOS simulator). On any other OS — or when you just want to bring it up quickly without a simulator — run the backend and Expo's web target in two terminals. **Agents: this is the path to use on Windows.**
+Use this section when an agent needs to start the app reliably from a cold workspace.
 
-**Prereqs:** [uv](https://docs.astral.sh/uv/), Node 20+.
-
-**Terminal 1 — backend (FastAPI on :3000):**
+On macOS with Xcode, use the one-command iOS flow:
 
 ```bash
-# bash / WSL / macOS
-cd services/api && uv run python -m uvicorn main:app --host 0.0.0.0 --port 3000
+./demo.sh
 ```
 
-```powershell
-# Windows PowerShell — avoid `uvicorn.exe` shim (AV blocks it); run as a module.
-# The combined `--project` + `--directory` flags keep it working even if the
-# terminal strips a leading `cd` (VS Code's persistent shell sometimes does).
+On Windows/Linux (or when iOS simulator is unavailable), run backend + web in two terminals:
+
+```bash
+# Terminal 1: backend
 uv --project services/api run --directory services/api python -m uvicorn main:app --host 0.0.0.0 --port 3000
 ```
 
-Verify: `curl http://localhost:3000/api/health` → `{"ok":true,...}`. CORS is wide-open (`allow_origins=["*"]`) so the browser app can reach it.
-
-**Terminal 2 — Expo web (React Native app at http://localhost:8081):**
-
 ```bash
+# Terminal 2: frontend web
 cd app/AllworthCompanionRN
 npm install
-# First time on web only — install the web peers (pin react-dom to react's version):
 npm install react-dom@19.2.3 react-native-web @expo/metro-runtime
 npm run web
 ```
 
-Open <http://localhost:8081>. The app calls `http://localhost:3000` by default; no host override needed when backend and browser are on the same machine.
+Open `http://localhost:8081` in a browser.
 
-> **Native iOS still requires macOS.** On Windows/Linux, web is the supported path; Android via Expo Go works too (`npm start`, scan the QR with Expo Go on the same Wi-Fi, then open the in-app Controls and set backend host to your PC's LAN IP).
+Health check:
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+Expected response includes `{"ok": true, ...}`.
 
 **Live chat (optional):** put an Anthropic key in `services/api/.env`:
 

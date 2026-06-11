@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Mode, useApp } from "../state";
-import { card, colors } from "../theme";
+import { card, colors, fonts } from "../theme";
 import { SectionHeader } from "../components/Rows";
 
 const MODES: { value: Mode; label: string }[] = [
@@ -63,7 +63,9 @@ export function DemoControlSheet() {
               style={({ pressed }) => [styles.resetButton, pressed && { opacity: 0.8 }]}
             >
               <Text style={styles.resetText}>Reset demo</Text>
-              {resetDone ? <Ionicons name="checkmark-circle" size={18} color={colors.gainGreen} /> : null}
+              {resetDone ? (
+                <Ionicons name="checkmark-circle" size={18} color={colors.gain} />
+              ) : null}
             </Pressable>
           </Section>
         </ScrollView>
@@ -72,7 +74,15 @@ export function DemoControlSheet() {
   );
 }
 
-function Section({ header, footer, children }: { header?: string; footer?: string; children: React.ReactNode }) {
+function Section({
+  header,
+  footer,
+  children,
+}: {
+  header?: string;
+  footer?: string;
+  children: React.ReactNode;
+}) {
   return (
     <View style={{ gap: 8 }}>
       {header ? <SectionHeader>{header}</SectionHeader> : null}
@@ -99,7 +109,10 @@ function Segmented({
           onPress={() => onChange(opt.value)}
           style={[styles.segment, value === opt.value && styles.segmentActive]}
         >
-          <Text style={[styles.segmentText, value === opt.value && styles.segmentTextActive]} numberOfLines={1}>
+          <Text
+            style={[styles.segmentText, value === opt.value && styles.segmentTextActive]}
+            numberOfLines={1}
+          >
             {opt.label}
           </Text>
         </Pressable>
@@ -117,14 +130,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 18,
   },
-  title: { fontSize: 17, fontWeight: "600", color: colors.inkPrimary },
-  done: { fontSize: 17, fontWeight: "600", color: colors.allworthAccent },
-  segmented: { flexDirection: "row", backgroundColor: colors.inkFaint, borderRadius: 9, padding: 2 },
+  title: { fontSize: 17, fontFamily: fonts.sansBold, color: colors.inkPrimary },
+  done: { fontSize: 17, fontFamily: fonts.sansBold, color: colors.allworthAccent },
+  segmented: {
+    flexDirection: "row",
+    backgroundColor: colors.inkFaint,
+    borderRadius: 9,
+    padding: 2,
+  },
   segment: { flex: 1, paddingVertical: 7, borderRadius: 7, alignItems: "center" },
-  segmentActive: { backgroundColor: "#fff", ...{ shadowColor: "#000", shadowOpacity: 0.08, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } } },
-  segmentText: { fontSize: 13, color: colors.inkSecondary },
-  segmentTextActive: { color: colors.inkPrimary, fontWeight: "600" },
-  hostInput: { ...card, fontSize: 17, color: colors.inkPrimary, paddingHorizontal: 14, paddingVertical: 12 },
+  segmentActive: {
+    backgroundColor: "#fff",
+    ...{
+      shadowColor: "#000",
+      shadowOpacity: 0.08,
+      shadowRadius: 4,
+      shadowOffset: { width: 0, height: 1 },
+    },
+  },
+  segmentText: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary },
+  segmentTextActive: { color: colors.inkPrimary, fontFamily: fonts.sansBold },
+  hostInput: {
+    ...card,
+    fontSize: 17,
+    fontFamily: fonts.sans,
+    color: colors.inkPrimary,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
   resetButton: {
     ...card,
     flexDirection: "row",
@@ -133,6 +166,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 13,
   },
-  resetText: { fontSize: 17, color: colors.lossRed },
-  footerText: { fontSize: 13, color: colors.inkTertiary },
+  resetText: { fontSize: 17, fontFamily: fonts.sans, color: colors.loss },
+  footerText: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkTertiary },
 });

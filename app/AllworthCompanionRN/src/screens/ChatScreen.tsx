@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChatMessageView } from "../components/Chat";
 import { DisclaimerFooter } from "../components/Rows";
 import { useApp } from "../state";
-import { card, colors } from "../theme";
+import { card, colors, fonts } from "../theme";
 import type { ChatEvent, ChatMessage } from "../types";
 
 let nextId = 1;
@@ -26,6 +26,32 @@ export function ChatScreen() {
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+
+  const loadProactive = async () => {
+    if (app.chatMessages.length > 0) return;
+    let greeting =
+      "Hi Maya — I can help you understand your accounts, spending, or plan. What's on your mind?";
+    let suggested: string[] = [];
+    try {
+      const res = await app.api.proactive(app.clientId, app.session);
+      greeting = res.message;
+      suggested = res.suggested ?? [];
+    } catch {}
+    app.setChatMessages((msgs) =>
+      msgs.length > 0
+        ? msgs
+        : [
+            newMessage({
+              role: "assistant",
+              text: greeting,
+              chips: [],
+              sources: [],
+              isStreaming: false,
+              suggested,
+            }),
+          ],
+    );
+  };
 
   useEffect(() => {
     loadProactive();
@@ -42,22 +68,6 @@ export function ChatScreen() {
     scrollRef.current?.scrollToEnd({ animated: true });
   }, [app.chatMessages]);
 
-  const loadProactive = async () => {
-    if (app.chatMessages.length > 0) return;
-    let greeting = "Hi Maya — I can help you understand your accounts, spending, or plan. What's on your mind?";
-    let suggested: string[] = [];
-    try {
-      const res = await app.api.proactive(app.clientId, app.session);
-      greeting = res.message;
-      suggested = res.suggested ?? [];
-    } catch {}
-    app.setChatMessages((msgs) =>
-      msgs.length > 0
-        ? msgs
-        : [newMessage({ role: "assistant", text: greeting, chips: [], sources: [], isStreaming: false, suggested })]
-    );
-  };
-
   const canSend = draft.trim().length > 0 && !sending;
 
   const applyEvent = (event: ChatEvent) => {
@@ -67,10 +77,15 @@ export function ChatScreen() {
       const updated = { ...last };
       switch (event.kind) {
         case "tool_start":
-          updated.chips = [...updated.chips, { name: event.name, label: event.label, running: true }];
+          updated.chips = [
+            ...updated.chips,
+            { name: event.name, label: event.label, running: true },
+          ];
           break;
         case "tool_end":
-          updated.chips = updated.chips.map((c) => (c.name === event.name ? { ...c, running: false } : c));
+          updated.chips = updated.chips.map((c) =>
+            c.name === event.name ? { ...c, running: false } : c,
+          );
           break;
         case "text":
           updated.text += event.delta;
@@ -150,7 +165,11 @@ export function ChatScreen() {
             onSubmitEditing={() => send()}
           />
           <Pressable onPress={() => send()} disabled={!canSend} style={{ paddingRight: 6 }}>
-            <Ionicons name="arrow-up-circle" size={30} color={canSend ? colors.allworthAccent : colors.inkTertiary} />
+            <Ionicons
+              name="arrow-up-circle"
+              size={30}
+              color={canSend ? colors.allworthAccent : colors.inkTertiary}
+            />
           </Pressable>
         </View>
       </View>
@@ -189,7 +208,12 @@ function SuggestionChips({
 const styles = StyleSheet.create({
   sessionHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: -8 },
   sessionLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: colors.hairline },
-  sessionText: { fontSize: 12, fontWeight: "600", color: colors.inkTertiary, letterSpacing: 0.4 },
+  sessionText: {
+    fontSize: 12,
+    fontFamily: fonts.sansBold,
+    color: colors.inkTertiary,
+    letterSpacing: 0.4,
+  },
   inputArea: { paddingHorizontal: 20, paddingTop: 6, paddingBottom: 10, gap: 8 },
   suggestRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: -8 },
   suggestChip: {
@@ -199,11 +223,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
-  suggestText: { fontSize: 14, fontWeight: "500", color: colors.allworthAccent },
+  suggestText: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.allworthAccent },
   inputBar: { ...card, flexDirection: "row", alignItems: "center" },
   input: {
     flex: 1,
     fontSize: 17,
+    fontFamily: fonts.sans,
     color: colors.inkPrimary,
     paddingHorizontal: 14,
     paddingVertical: 10,

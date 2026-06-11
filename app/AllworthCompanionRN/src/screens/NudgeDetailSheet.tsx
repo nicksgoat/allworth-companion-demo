@@ -2,14 +2,19 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
-import { DisclaimerFooter, SectionHeader } from "../components/Rows";
+import { DisclaimerFooter, SectionHeader, SheetHeader } from "../components/Rows";
 import { useApp } from "../state";
-import { colors, monthName, usd } from "../theme";
+import { colors, fonts, monthName, usd } from "../theme";
 import type { Nudge, SpendingDetail } from "../types";
 
 export function NudgeDetailSheet({ nudge, onClose }: { nudge: Nudge | null; onClose: () => void }) {
   return (
-    <Modal visible={nudge != null} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
+    <Modal
+      visible={nudge != null}
+      animationType="slide"
+      presentationStyle="pageSheet"
+      onRequestClose={onClose}
+    >
       {nudge ? <NudgeDetailContent nudge={nudge} onClose={onClose} /> : null}
     </Modal>
   );
@@ -21,7 +26,10 @@ function NudgeDetailContent({ nudge, onClose }: { nudge: Nudge; onClose: () => v
 
   useEffect(() => {
     if (nudge.type === "spending") {
-      app.api.spending(app.clientId).then(setSpending).catch(() => {});
+      app.api
+        .spending(app.clientId)
+        .then(setSpending)
+        .catch(() => {});
     }
   }, [nudge]);
 
@@ -39,9 +47,12 @@ function NudgeDetailContent({ nudge, onClose }: { nudge: Nudge; onClose: () => v
   };
 
   return (
-    <ScrollView style={{ backgroundColor: colors.surfacePrimary }} contentContainerStyle={{ padding: 20, gap: 20 }}>
+    <ScrollView
+      style={{ backgroundColor: colors.surfacePrimary }}
+      contentContainerStyle={{ padding: 20, gap: 20 }}
+    >
       <View style={{ gap: 6, paddingTop: 24 }}>
-        <SectionHeader>{nudge.title}</SectionHeader>
+        <SheetHeader title={nudge.title} onClose={onClose} />
         <Text style={styles.headline}>{nudge.headline}</Text>
       </View>
 
@@ -49,7 +60,10 @@ function NudgeDetailContent({ nudge, onClose }: { nudge: Nudge; onClose: () => v
 
       {nudge.type === "spending" && spending ? <SpendingBars s={spending} /> : null}
 
-      <Pressable onPress={askAssistant} style={({ pressed }) => [styles.cta, pressed && { opacity: 0.85 }]}>
+      <Pressable
+        onPress={askAssistant}
+        style={({ pressed }) => [styles.cta, pressed && { opacity: 0.85 }]}
+      >
         <Ionicons name="chatbubbles-outline" size={18} color="#fff" />
         <Text style={styles.ctaText}>{nudge.cta}</Text>
       </Pressable>
@@ -74,7 +88,10 @@ function SpendingBars({ s }: { s: SpendingDetail }) {
               <View
                 style={[
                   styles.barFill,
-                  { width: `${ratio * 100}%`, backgroundColor: over ? colors.attention : colors.allworthNavy },
+                  {
+                    width: `${ratio * 100}%`,
+                    backgroundColor: over ? colors.attention : colors.allworthNavy,
+                  },
                 ]}
               />
             </View>
@@ -90,8 +107,14 @@ function SpendingBars({ s }: { s: SpendingDetail }) {
 }
 
 const styles = StyleSheet.create({
-  headline: { fontSize: 44, fontWeight: "600", color: colors.attention, fontVariant: ["tabular-nums"] },
-  body: { fontSize: 17, lineHeight: 24, color: colors.inkPrimary },
+  // Large stats render in Playfair Display with tabular lining figures (brand deck p.6)
+  headline: {
+    fontSize: 44,
+    fontFamily: fonts.displayMedium,
+    color: colors.attention,
+    fontVariant: ["tabular-nums"],
+  },
+  body: { fontSize: 17, fontFamily: fonts.sans, lineHeight: 24, color: colors.inkPrimary },
   cta: {
     flexDirection: "row",
     gap: 8,
@@ -101,11 +124,30 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 14,
   },
-  ctaText: { color: "#fff", fontSize: 17, fontWeight: "600" },
+  ctaText: { color: "#fff", fontSize: 17, fontFamily: fonts.sansBold },
   barRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  barMonth: { width: 30, fontSize: 13, color: colors.inkTertiary, fontVariant: ["tabular-nums"] },
-  barTrack: { flex: 1, height: 8, borderRadius: 4, backgroundColor: colors.inkFaint, overflow: "hidden" },
+  barMonth: {
+    width: 30,
+    fontSize: 13,
+    fontFamily: fonts.sans,
+    color: colors.inkTertiary,
+    fontVariant: ["tabular-nums"],
+  },
+  barTrack: {
+    flex: 1,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.inkFaint,
+    overflow: "hidden",
+  },
   barFill: { height: 8, borderRadius: 4 },
-  barValue: { width: 64, textAlign: "right", fontSize: 13, color: colors.inkSecondary, fontVariant: ["tabular-nums"] },
-  planCaption: { fontSize: 13, color: colors.inkTertiary },
+  barValue: {
+    width: 64,
+    textAlign: "right",
+    fontSize: 13,
+    fontFamily: fonts.sans,
+    color: colors.inkSecondary,
+    fontVariant: ["tabular-nums"],
+  },
+  planCaption: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkTertiary },
 });

@@ -2,12 +2,18 @@ import * as Haptics from "expo-haptics";
 import React, { useMemo, useState } from "react";
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, Defs, LinearGradient, Path, Stop } from "react-native-svg";
-import { colors, monthLabel, usd } from "../theme";
+import { colors, fonts, monthLabel, usd } from "../theme";
 import type { MonthValue } from "../types";
 
 const HEIGHT = 88;
 
-export function Sparkline({ points, lineColor = colors.allworthNavy }: { points: MonthValue[]; lineColor?: string }) {
+export function Sparkline({
+  points,
+  lineColor = colors.allworthNavy,
+}: {
+  points: MonthValue[];
+  lineColor?: string;
+}) {
   const [width, setWidth] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
 
@@ -73,13 +79,18 @@ export function Sparkline({ points, lineColor = colors.allworthNavy }: { points:
           <Path d={geom.area} fill="url(#sparkfill)" />
           <Path d={geom.line} stroke={lineColor} strokeWidth={2} fill="none" />
           {selected != null ? (
-            <Circle cx={geom.coords[selected].x} cy={geom.coords[selected].y} r={4} fill={lineColor} />
+            <Circle
+              cx={geom.coords[selected].x}
+              cy={geom.coords[selected].y}
+              r={4}
+              fill={lineColor}
+            />
           ) : null}
         </Svg>
       ) : null}
       {selected != null ? (
         <Text style={styles.scrubLabel}>
-          {usd(points[selected].value)}  ·  {monthLabel(points[selected].month)}
+          {usd(points[selected].value)} · {monthLabel(points[selected].month)}
         </Text>
       ) : null}
     </View>
@@ -93,7 +104,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     fontSize: 13,
-    fontWeight: "500",
+    fontFamily: fonts.sansBold,
     color: colors.inkSecondary,
     fontVariant: ["tabular-nums"],
   },

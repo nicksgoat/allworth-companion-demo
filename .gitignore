@@ -1,36 +1,13 @@
-﻿# Python
-.venv/
-__pycache__/
-*.pyc
-.pytest_cache/
-build/
-dist/
-
-# Node / Expo / React Native
 node_modules/
-.expo/
-.expo-shared/
-coverage/
-
-# Env
 .env
-.env.local
-.env.*.local
-
-# macOS / Xcode
 .DS_Store
 *.xcuserstate
 xcuserdata/
 DerivedData/
-
-# Runtime memory snapshots
 app/backend/memory/*.runtime.json
 services/api/memory/*.runtime.json
-
-# Editor / OS
-.vscode/*.log
-Thumbs.db
-
-# Local runtime / agent logs
+services/api/.venv/
+__pycache__/
+build/
 .codex-run/
 *.log

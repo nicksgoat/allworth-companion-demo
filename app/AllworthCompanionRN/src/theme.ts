@@ -1,28 +1,46 @@
-// Brand — verified 2026-06-09 from allworth-financial-logo-color.svg
+// All values from ALW001_01_Brand_Dashboard_DEC2024.pdf (the brand source of truth)
 export const colors = {
-  allworthNavy: "#173D67",
-  allworthAccent: "#3E71B7",
+  // Primary palette (p.7)
+  allworthNavy: "#173D67", // Indigo Blue / PMS 295C — wordmark
+  allworthAccent: "#3E71B7", // Cerulean Blue / PMS 2144C — Iris symbol
 
-  surfacePrimary: "#FAFAF8",
+  // Neutrals (p.7) — backgrounds, text boxes, table fields
+  surfacePrimary: "#F3F4F4", // Feather Gray
   surfaceCard: "#FFFFFF",
+  beige: "#EBE9DD",
+  linen: "#F3F2E5",
+  ice: "#EDF2F7",
 
-  inkPrimary: "#0B1220",
-  inkSecondary: "rgba(11,18,32,0.60)",
-  inkTertiary: "rgba(11,18,32,0.38)",
-  hairline: "rgba(11,18,32,0.08)",
-  inkFaint: "rgba(11,18,32,0.05)",
+  // Monotone (p.7) — black + dark gray for copy and stats
+  inkPrimary: "#000000",
+  inkSecondary: "#595959", // Dark Gray
+  inkTertiary: "#828282", // Medium Gray
+  hairline: "#E6E6E6", // Pale Gray
+  inkFaint: "#E6E6E6", // Pale Gray — faint fills (chips, tracks, skeletons)
 
-  // Semantic only — money movement, never decorative
-  gainGreen: "#00C805",
-  lossRed: "#CF3A4A",
-  attention: "#C77B17",
+  // Semantic money movement — mapped onto the secondary palette
+  gain: "#436434", // Evergreen
+  loss: "#D26D37", // Pumpkin
+  attention: "#D26D37", // Pumpkin
+
+  // Secondary palette — designated for infographics/charts/accents only (p.7)
+  chartNightBlue: "#0C2E4E",
+  chartSky: "#289FDA",
+  chartEvergreen: "#436434",
+  chartGold: "#A99C6C",
+  chartPumpkin: "#D26D37",
+  chartLightGray: "#BEBEBE",
 };
 
-// Brand typography — Lato (body) + Playfair Display (display), per allworthfinancial.com
+// Brand typography (p.6) — Playfair Display for headlines and large stats,
+// Lato for body. Custom fonts don't synthesize weights/italics in RN, so
+// every emphasis level needs its own face.
 export const fonts = {
   display: "PlayfairDisplay_700Bold",
   displayMedium: "PlayfairDisplay_600SemiBold",
+  displayItalic: "PlayfairDisplay_600SemiBold_Italic",
   sans: "Lato_400Regular",
+  sansItalic: "Lato_400Regular_Italic",
   sansBold: "Lato_700Bold",
 } as const;
 
@@ -40,7 +58,7 @@ export const card = {
 
 export const sectionHeader = {
   fontSize: 11,
-  fontWeight: "600",
+  fontFamily: fonts.sansBold,
   textTransform: "uppercase",
   letterSpacing: 0.6,
   color: colors.inkTertiary,

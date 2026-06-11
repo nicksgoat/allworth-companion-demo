@@ -1,12 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { colors } from "../theme";
+import { colors, fonts } from "../theme";
 import type { ChatMessage, ToolChip } from "../types";
 import { AdvisorHandoffCard } from "./AdvisorHandoffCard";
 import { AllworthMark } from "./Wordmark";
 
-export function ToolChipRow({ chips, sources, collapsed }: { chips: ToolChip[]; sources: string[]; collapsed: boolean }) {
+export function ToolChipRow({
+  chips,
+  sources,
+  collapsed,
+}: {
+  chips: ToolChip[];
+  sources: string[];
+  collapsed: boolean;
+}) {
   if (collapsed && sources.length > 0) {
     return (
       <View style={styles.sourcesRow}>
@@ -21,7 +29,11 @@ export function ToolChipRow({ chips, sources, collapsed }: { chips: ToolChip[]; 
         {chips.map((chip) => (
           <View key={chip.name} style={styles.chip}>
             {chip.running ? (
-              <ActivityIndicator size="small" color={colors.inkSecondary} style={{ transform: [{ scale: 0.7 }] }} />
+              <ActivityIndicator
+                size="small"
+                color={colors.inkSecondary}
+                style={{ transform: [{ scale: 0.7 }] }}
+              />
             ) : (
               <Ionicons name="checkmark" size={11} color={colors.allworthAccent} />
             )}
@@ -41,12 +53,12 @@ function MarkdownText({ text, streaming }: { text: string; streaming: boolean })
     <Text style={styles.assistantText}>
       {parts.map((part, i) =>
         part.startsWith("**") && part.endsWith("**") ? (
-          <Text key={i} style={{ fontWeight: "600" }}>
+          <Text key={i} style={{ fontFamily: fonts.sansBold }}>
             {part.slice(2, -2)}
           </Text>
         ) : (
           <Text key={i}>{part}</Text>
-        )
+        ),
       )}
       {streaming ? <Text style={{ color: colors.inkTertiary }}> ▍</Text> : null}
     </Text>
@@ -77,7 +89,11 @@ export function ChatMessageView({ message }: { message: ChatMessage }) {
   return (
     <View style={{ gap: 10 }}>
       <AssistantIdentity />
-      <ToolChipRow chips={message.chips} sources={message.sources} collapsed={!message.isStreaming} />
+      <ToolChipRow
+        chips={message.chips}
+        sources={message.sources}
+        collapsed={!message.isStreaming}
+      />
       {message.text ? <MarkdownText text={message.text} streaming={message.isStreaming} /> : null}
       {!message.isStreaming && message.sources.length > 0 ? (
         <View style={{ paddingTop: 4 }}>
@@ -90,7 +106,7 @@ export function ChatMessageView({ message }: { message: ChatMessage }) {
 
 const styles = StyleSheet.create({
   sourcesRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-  sourcesText: { fontSize: 13, color: colors.inkTertiary, flex: 1 },
+  sourcesText: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkTertiary, flex: 1 },
   chipFlow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   chip: {
     flexDirection: "row",
@@ -101,7 +117,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: colors.inkFaint,
   },
-  chipText: { fontSize: 13, color: colors.inkSecondary },
+  chipText: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary },
   userRow: { flexDirection: "row", justifyContent: "flex-end", paddingLeft: 48 },
   userBubble: {
     backgroundColor: colors.inkFaint,
@@ -109,8 +125,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
-  userText: { fontSize: 17, color: colors.inkPrimary },
-  assistantText: { fontSize: 17, color: colors.inkPrimary, lineHeight: 24 },
+  userText: { fontSize: 17, fontFamily: fonts.sans, color: colors.inkPrimary },
+  assistantText: { fontSize: 17, fontFamily: fonts.sans, color: colors.inkPrimary, lineHeight: 24 },
   identityRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   avatar: {
     width: 22,
@@ -120,6 +136,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarText: { fontSize: 12, fontWeight: "700", color: "#FFFFFF" },
-  identityName: { fontSize: 13, fontWeight: "600", color: colors.inkSecondary },
+  avatarText: { fontSize: 12, fontFamily: fonts.sansBold, color: "#FFFFFF" },
+  identityName: { fontSize: 13, fontFamily: fonts.sansBold, color: colors.inkSecondary },
 });
