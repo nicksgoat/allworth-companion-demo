@@ -13,6 +13,7 @@ import { NudgeCard } from "../components/NudgeCard";
 import { RangeChips } from "../components/RangeChips";
 import { RecurringCard } from "../components/RecurringCard";
 import { DisclaimerFooter, SectionHeader } from "../components/Rows";
+import { SegmentedControl } from "../components/SegmentedControl";
 import { Sparkline } from "../components/Sparkline";
 import { AllworthWordmark } from "../components/Wordmark";
 import { useApp } from "../state";
@@ -134,6 +135,7 @@ function InvestContent({
 }) {
   const app = useApp();
   const [range, setRange] = useState("1Y");
+  const [segment, setSegment] = useState("Overview");
 
   const ask = (prompt: string) => {
     app.setChatPrefill(prompt);
@@ -182,60 +184,73 @@ function InvestContent({
       </RiseIn>
 
       <RiseIn delay={60}>
-        <BreakdownCard
-          allworthTotal={d.allworthTotal}
-          heldAwayTotal={d.heldAwayTotal}
-          liabilitiesTotal={d.liabilitiesTotal}
+        <SegmentedControl
+          options={["Overview", "Holdings"]}
+          selected={segment}
+          onSelect={setSegment}
         />
       </RiseIn>
 
-      <RiseIn delay={120}>
-        <CompletePictureCard heldAwayTotal={d.heldAwayTotal} />
-      </RiseIn>
+      {segment === "Overview" ? (
+        <View key="overview" style={{ gap: 24 }}>
+          <RiseIn>
+            <BreakdownCard
+              allworthTotal={d.allworthTotal}
+              heldAwayTotal={d.heldAwayTotal}
+              liabilitiesTotal={d.liabilitiesTotal}
+            />
+          </RiseIn>
 
-      <RiseIn delay={180} style={{ gap: 12 }}>
-        <SectionHeader>Your allocation</SectionHeader>
-        <AllocationCard
-          positions={p.positions}
-          onAskRebalance={askRebalance}
-          onSelectClass={onClass}
-        />
-        <AdvisorHandoffCard />
-      </RiseIn>
+          <RiseIn delay={60}>
+            <CompletePictureCard heldAwayTotal={d.heldAwayTotal} />
+          </RiseIn>
 
-      {concentrationNudges.map((nudge, i) => (
-        <RiseIn key={nudge.id} delay={240 + i * 60}>
-          <NudgeCard nudge={nudge} onPress={() => onNudge(nudge)} />
-        </RiseIn>
-      ))}
+          <RiseIn delay={120} style={{ gap: 12 }}>
+            <SectionHeader>Your allocation</SectionHeader>
+            <AllocationCard
+              positions={p.positions}
+              onAskRebalance={askRebalance}
+              onSelectClass={onClass}
+            />
+            <AdvisorHandoffCard />
+          </RiseIn>
 
-      <RiseIn delay={300} style={{ gap: 12 }}>
-        <SectionHeader>Automatic investing</SectionHeader>
-        <RecurringCard
-          onAsk={() => ask("Could I be investing more each month without hurting my plan?")}
-        />
-      </RiseIn>
+          {concentrationNudges.map((nudge, i) => (
+            <RiseIn key={nudge.id} delay={180 + i * 60}>
+              <NudgeCard nudge={nudge} onPress={() => onNudge(nudge)} />
+            </RiseIn>
+          ))}
 
-      <RiseIn delay={360} style={{ gap: 20 }}>
-        <SectionHeader>Holdings</SectionHeader>
-        {investedAccounts.map((account) => (
-          <AccountHoldingsSection
-            key={account.id}
-            account={account}
-            positions={p.byAccount[account.id]}
-            onSelect={onPosition}
-          />
-        ))}
-      </RiseIn>
+          <RiseIn delay={240} style={{ gap: 12 }}>
+            <SectionHeader>Automatic investing</SectionHeader>
+            <RecurringCard
+              onAsk={() => ask("Could I be investing more each month without hurting my plan?")}
+            />
+          </RiseIn>
+        </View>
+      ) : (
+        <View key="holdings" style={{ gap: 24 }}>
+          <RiseIn style={{ gap: 16 }}>
+            {investedAccounts.map((account) => (
+              <AccountHoldingsSection
+                key={account.id}
+                account={account}
+                positions={p.byAccount[account.id]}
+                onSelect={onPosition}
+              />
+            ))}
+          </RiseIn>
 
-      <RiseIn delay={420} style={{ gap: 12 }}>
-        <SectionHeader>Income</SectionHeader>
-        <IncomeCard
-          positions={p.positions}
-          accounts={accounts}
-          onAsk={() => ask("What income could my portfolio generate in retirement?")}
-        />
-      </RiseIn>
+          <RiseIn delay={60} style={{ gap: 12 }}>
+            <SectionHeader>Income</SectionHeader>
+            <IncomeCard
+              positions={p.positions}
+              accounts={accounts}
+              onAsk={() => ask("What income could my portfolio generate in retirement?")}
+            />
+          </RiseIn>
+        </View>
+      )}
 
       <View style={{ paddingVertical: 8 }}>
         <DisclaimerFooter />
