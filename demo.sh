@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Allworth demo — one command runs everything: FastAPI backend + mobile app.
+# Allworth demo — one command runs everything: FastAPI backend + the app.
 #
+#   ./demo.sh --web      backend + web app in your browser (http://localhost:8081) — demo target
 #   ./demo.sh            backend + iOS app (Debug build, Metro attached)
-#   ./demo.sh --release  backend + iOS app (Release build, no Metro — demo-day mode)
+#   ./demo.sh --release  backend + iOS app (Release build, no Metro)
 #   ./demo.sh --android  backend + Android app (Debug build, Metro attached)
 #
 # Ctrl-C stops everything this script started.
@@ -17,7 +18,8 @@ for arg in "$@"; do
   case "$arg" in
     --release) CONFIG="Release" ;;
     --android) PLATFORM="android" ;;
-    *) echo "Unknown option: $arg (use --release and/or --android)"; exit 1 ;;
+    --web) PLATFORM="web" ;;
+    *) echo "Unknown option: $arg (use --web, --android, and/or --release)"; exit 1 ;;
   esac
 done
 
@@ -25,8 +27,13 @@ command -v uv >/dev/null 2>&1 || { echo "ERROR: uv is required — install: curl
 command -v npm >/dev/null 2>&1 || { echo "ERROR: node/npm is required — https://nodejs.org"; exit 1; }
 
 if [ "$PLATFORM" = "ios" ]; then
-  command -v xcrun >/dev/null 2>&1 || { echo "ERROR: Xcode is required for iOS (Mac App Store); open it once so it installs its components. On a non-Mac, use ./demo.sh --android"; exit 1; }
-else
+  command -v xcrun >/dev/null 2>&1 || { echo "ERROR: Xcode is required for iOS (Mac App Store); open it once so it installs its components. On a non-Mac, use ./demo.sh --web"; exit 1; }
+elif [ "$PLATFORM" = "web" ]; then
+  if [ "$CONFIG" = "Release" ]; then
+    echo "NOTE: --release is iOS-only. The web app runs the Expo dev server."
+    CONFIG="Debug"
+  fi
+elif [ "$PLATFORM" = "android" ]; then
   export ANDROID_HOME="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
   export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"
   if [ -z "${JAVA_HOME:-}" ] && [ -d /opt/homebrew/opt/openjdk@17 ]; then
@@ -69,14 +76,17 @@ else
   echo "Backend up: http://localhost:3000"
 fi
 
-# 2. Mobile app.
+# 2. The app.
 cd "$APP_DIR"
 if [ ! -d node_modules ]; then
   echo "Installing app dependencies…"
   npm install --no-audit --no-fund
 fi
 
-if [ "$PLATFORM" = "android" ]; then
+if [ "$PLATFORM" = "web" ]; then
+  echo "Starting the web app — your browser will open http://localhost:8081…"
+  npx expo start --web --port 8081   # stays attached; Ctrl-C stops it, then the backend
+elif [ "$PLATFORM" = "android" ]; then
   # Boot an emulator if no device/emulator is connected.
   if ! adb devices | awk 'NR>1 && $2=="device"' | grep -q .; then
     AVD="$(emulator -list-avds 2>/dev/null | head -1)"
