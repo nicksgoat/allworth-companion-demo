@@ -1,6 +1,6 @@
 import * as Linking from "expo-linking";
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { ApiClient } from "./api";
+import { ApiClient, DEFAULT_HOST } from "./api";
 import type { ChatMessage, Dashboard } from "./types";
 
 export type Mode = "client" | "advisor" | "vision";
@@ -48,7 +48,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [selectedTab, setSelectedTab] = useState<ClientTab>("home");
   const [showDemoControls, setShowDemoControls] = useState(false);
   const [chatPrefill, setChatPrefill] = useState<string | null>(null);
-  const [backendHost, setBackendHostRaw] = useState("localhost");
+  const [backendHost, setBackendHostRaw] = useState(DEFAULT_HOST);
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);

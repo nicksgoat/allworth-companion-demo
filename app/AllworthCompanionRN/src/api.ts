@@ -1,4 +1,5 @@
 import { fetch as expoFetch } from "expo/fetch";
+import { Platform } from "react-native";
 import type {
   AdvisorBrief,
   BookResponse,
@@ -9,8 +10,11 @@ import type {
   SpendingDetail,
 } from "./types";
 
+// Android emulators reach the host machine at 10.0.2.2, not localhost.
+export const DEFAULT_HOST = Platform.OS === "android" ? "10.0.2.2" : "localhost";
+
 export class ApiClient {
-  baseURL = "http://localhost:3000";
+  baseURL = `http://${DEFAULT_HOST}:3000`;
 
   private async get<T>(path: string): Promise<T> {
     const res = await fetch(this.baseURL + path);
