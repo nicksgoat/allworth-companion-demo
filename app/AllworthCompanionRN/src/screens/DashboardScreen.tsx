@@ -162,11 +162,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingBottom: 4,
   },
-  sectionCaption: { fontSize: 13, color: colors.inkSecondary, fontVariant: ["tabular-nums"] },
+  sectionCaption: {
+    fontSize: 13,
+    fontFamily: fonts.sans,
+    color: colors.inkSecondary,
+    fontVariant: ["tabular-nums"],
+  },
   skeletonBlock: { height: 72, borderRadius: 12, backgroundColor: colors.inkFaint },
   errorBox: { alignItems: "center", paddingTop: 120, gap: 10, paddingHorizontal: 20 },
-  errorTitle: { fontSize: 20, fontWeight: "600", color: colors.inkPrimary },
-  errorMessage: { fontSize: 15, color: colors.inkSecondary, textAlign: "center" },
+  errorTitle: { fontSize: 20, fontFamily: fonts.displayMedium, color: colors.inkPrimary },
+  errorMessage: {
+    fontSize: 15,
+    fontFamily: fonts.sans,
+    color: colors.inkSecondary,
+    textAlign: "center",
+  },
   retryButton: {
     marginTop: 6,
     backgroundColor: colors.allworthAccent,
@@ -174,5 +184,5 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 10,
   },
-  retryText: { color: "#fff", fontSize: 15, fontWeight: "600" },
+  retryText: { color: "#fff", fontSize: 15, fontFamily: fonts.sansBold },
 });

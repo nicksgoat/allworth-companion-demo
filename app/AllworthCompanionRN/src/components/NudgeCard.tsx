@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { card, colors } from "../theme";
+import { card, colors, fonts } from "../theme";
 import type { Nudge } from "../types";
 
 function iconFor(type: string): keyof typeof Ionicons.glyphMap {
@@ -44,12 +44,12 @@ export function NudgeCard({ nudge, onPress }: { nudge: Nudge; onPress: () => voi
 
 const styles = StyleSheet.create({
   card: { ...card, flexDirection: "row", alignItems: "flex-start", gap: 14, padding: 16 },
-  title: { fontSize: 17, fontWeight: "600", color: colors.inkPrimary },
+  title: { fontSize: 17, fontFamily: fonts.sansBold, color: colors.inkPrimary },
   headline: {
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fonts.sansBold,
     color: colors.attention,
     fontVariant: ["tabular-nums"],
   },
-  cta: { fontSize: 15, color: colors.allworthAccent, paddingTop: 2 },
+  cta: { fontSize: 15, fontFamily: fonts.sans, color: colors.allworthAccent, paddingTop: 2 },
 });

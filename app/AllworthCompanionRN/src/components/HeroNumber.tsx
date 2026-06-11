@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { colors, usd } from "../theme";
+import { colors, fonts, usd } from "../theme";
 import { SectionHeader } from "./Rows";
 
 interface Props {
@@ -33,7 +33,7 @@ export function HeroNumber({ label, value, delta }: Props) {
       <SectionHeader>{label}</SectionHeader>
       <Text style={styles.hero}>{usd(displayed)}</Text>
       {delta ? (
-        <Text style={[styles.delta, { color: delta.positive ? colors.gainGreen : colors.lossRed }]}>
+        <Text style={[styles.delta, { color: delta.positive ? colors.gain : colors.loss }]}>
           {delta.text}
         </Text>
       ) : null}
@@ -42,11 +42,12 @@ export function HeroNumber({ label, value, delta }: Props) {
 }
 
 const styles = StyleSheet.create({
+  // Large stats render in Playfair Display with tabular lining figures (brand deck p.6)
   hero: {
     fontSize: 48,
-    fontWeight: "600",
+    fontFamily: fonts.displayMedium,
     color: colors.inkPrimary,
     fontVariant: ["tabular-nums"],
   },
-  delta: { fontSize: 15, fontWeight: "500", fontVariant: ["tabular-nums"] },
+  delta: { fontSize: 15, fontFamily: fonts.sansBold, fontVariant: ["tabular-nums"] },
 });

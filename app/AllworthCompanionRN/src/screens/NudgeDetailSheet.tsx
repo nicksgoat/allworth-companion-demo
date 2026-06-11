@@ -4,7 +4,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
 import { DisclaimerFooter, SectionHeader } from "../components/Rows";
 import { useApp } from "../state";
-import { colors, monthName, usd } from "../theme";
+import { colors, fonts, monthName, usd } from "../theme";
 import type { Nudge, SpendingDetail } from "../types";
 
 export function NudgeDetailSheet({ nudge, onClose }: { nudge: Nudge | null; onClose: () => void }) {
@@ -107,13 +107,14 @@ function SpendingBars({ s }: { s: SpendingDetail }) {
 }
 
 const styles = StyleSheet.create({
+  // Large stats render in Playfair Display with tabular lining figures (brand deck p.6)
   headline: {
     fontSize: 44,
-    fontWeight: "600",
+    fontFamily: fonts.displayMedium,
     color: colors.attention,
     fontVariant: ["tabular-nums"],
   },
-  body: { fontSize: 17, lineHeight: 24, color: colors.inkPrimary },
+  body: { fontSize: 17, fontFamily: fonts.sans, lineHeight: 24, color: colors.inkPrimary },
   cta: {
     flexDirection: "row",
     gap: 8,
@@ -123,9 +124,15 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 14,
   },
-  ctaText: { color: "#fff", fontSize: 17, fontWeight: "600" },
+  ctaText: { color: "#fff", fontSize: 17, fontFamily: fonts.sansBold },
   barRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  barMonth: { width: 30, fontSize: 13, color: colors.inkTertiary, fontVariant: ["tabular-nums"] },
+  barMonth: {
+    width: 30,
+    fontSize: 13,
+    fontFamily: fonts.sans,
+    color: colors.inkTertiary,
+    fontVariant: ["tabular-nums"],
+  },
   barTrack: {
     flex: 1,
     height: 8,
@@ -138,8 +145,9 @@ const styles = StyleSheet.create({
     width: 64,
     textAlign: "right",
     fontSize: 13,
+    fontFamily: fonts.sans,
     color: colors.inkSecondary,
     fontVariant: ["tabular-nums"],
   },
-  planCaption: { fontSize: 13, color: colors.inkTertiary },
+  planCaption: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkTertiary },
 });

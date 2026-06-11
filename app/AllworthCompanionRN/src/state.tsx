@@ -1,10 +1,10 @@
 import * as Linking from "expo-linking";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { ApiClient, DEFAULT_HOST } from "./api";
-import type { ChatMessage, Dashboard } from "./types";
+import type { ChatMessage, Dashboard, Portfolio } from "./types";
 
 export type Mode = "client" | "advisor" | "vision";
-export type ClientTab = "home" | "chat" | "profile";
+export type ClientTab = "home" | "invest" | "chat" | "profile";
 
 interface AppState {
   api: ApiClient;
@@ -24,6 +24,9 @@ interface AppState {
   dashboard: Dashboard | null;
   dashboardError: string | null;
   loadDashboard: () => Promise<void>;
+  portfolio: Portfolio | null;
+  portfolioError: string | null;
+  loadPortfolio: () => Promise<void>;
   chatMessages: ChatMessage[];
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
   resetDemo: () => Promise<void>;
@@ -54,6 +57,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [backendHost, setBackendHostRaw] = useState(DEFAULT_HOST);
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
+  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [portfolioError, setPortfolioError] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [demoScreen, setDemoScreen] = useState<string | null>(null);
 
@@ -67,6 +72,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         case "chat":
           setMode("client");
           setSelectedTab("chat");
+          break;
+        case "invest":
+          setMode("client");
+          setSelectedTab("invest");
           break;
         case "profile":
           setMode("client");
@@ -121,12 +130,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         );
       }
     };
+    const loadPortfolio = async () => {
+      try {
+        setPortfolio(await api.portfolio(clientId));
+        setPortfolioError(null);
+      } catch {
+        setPortfolioError(
+          `Can't reach the backend at http://${backendHost}:3000 — run ./run.sh first.`,
+        );
+      }
+    };
     const resetDemo = async () => {
       try {
         await api.resetDemo(clientId);
       } catch {}
       setChatMessages([]);
-      await loadDashboard();
+      await Promise.all([loadDashboard(), loadPortfolio()]);
     };
     return {
       api,
@@ -146,6 +165,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       dashboard,
       dashboardError,
       loadDashboard,
+      portfolio,
+      portfolioError,
+      loadPortfolio,
       chatMessages,
       setChatMessages,
       resetDemo,
@@ -161,6 +183,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     backendHost,
     dashboard,
     dashboardError,
+    portfolio,
+    portfolioError,
     chatMessages,
     demoScreen,
   ]);

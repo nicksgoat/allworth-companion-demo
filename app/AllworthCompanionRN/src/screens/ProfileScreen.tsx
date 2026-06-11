@@ -8,7 +8,7 @@ import {
   SectionHeader,
 } from "../components/Rows";
 import { useApp } from "../state";
-import { colors } from "../theme";
+import { colors, fonts } from "../theme";
 import type { LearnedFact } from "../types";
 import { FactDetailSheet } from "./FactDetailSheet";
 
@@ -115,7 +115,13 @@ export function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  title: { fontSize: 28, fontWeight: "600", color: colors.inkPrimary },
-  subtitle: { fontSize: 15, lineHeight: 21, color: colors.inkSecondary },
-  empty: { fontSize: 15, color: colors.inkTertiary, textAlign: "center", paddingTop: 40 },
+  title: { fontSize: 28, fontFamily: fonts.display, color: colors.inkPrimary },
+  subtitle: { fontSize: 15, fontFamily: fonts.sans, lineHeight: 21, color: colors.inkSecondary },
+  empty: {
+    fontSize: 15,
+    fontFamily: fonts.sans,
+    color: colors.inkTertiary,
+    textAlign: "center",
+    paddingTop: 40,
+  },
 });

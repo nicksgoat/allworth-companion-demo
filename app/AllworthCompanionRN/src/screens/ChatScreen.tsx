@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChatMessageView } from "../components/Chat";
 import { DisclaimerFooter } from "../components/Rows";
 import { useApp } from "../state";
-import { card, colors } from "../theme";
+import { card, colors, fonts } from "../theme";
 import type { ChatEvent, ChatMessage } from "../types";
 
 let nextId = 1;
@@ -208,7 +208,12 @@ function SuggestionChips({
 const styles = StyleSheet.create({
   sessionHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: -8 },
   sessionLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: colors.hairline },
-  sessionText: { fontSize: 12, fontWeight: "600", color: colors.inkTertiary, letterSpacing: 0.4 },
+  sessionText: {
+    fontSize: 12,
+    fontFamily: fonts.sansBold,
+    color: colors.inkTertiary,
+    letterSpacing: 0.4,
+  },
   inputArea: { paddingHorizontal: 20, paddingTop: 6, paddingBottom: 10, gap: 8 },
   suggestRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: -8 },
   suggestChip: {
@@ -218,11 +223,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
-  suggestText: { fontSize: 14, fontWeight: "500", color: colors.allworthAccent },
+  suggestText: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.allworthAccent },
   inputBar: { ...card, flexDirection: "row", alignItems: "center" },
   input: {
     flex: 1,
     fontSize: 17,
+    fontFamily: fonts.sans,
     color: colors.inkPrimary,
     paddingHorizontal: 14,
     paddingVertical: 10,

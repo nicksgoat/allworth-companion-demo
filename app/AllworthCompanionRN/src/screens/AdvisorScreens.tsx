@@ -14,7 +14,7 @@ import {
 } from "../components/Rows";
 import { AllworthWordmark } from "../components/Wordmark";
 import { useApp } from "../state";
-import { card, colors, usd } from "../theme";
+import { card, colors, fonts, usd } from "../theme";
 import type { AdvisorBrief, BookResponse, Household } from "../types";
 
 type AdvisorStackParams = {
@@ -127,7 +127,7 @@ function HouseholdRow({ household, onPress }: { household: Household; onPress: (
         </Text>
       </View>
       <View style={{ flex: 1, gap: 3 }}>
-        <Text style={[styles.householdName, highlight && { fontWeight: "600" }]}>
+        <Text style={[styles.householdName, highlight && { fontFamily: fonts.sansBold }]}>
           {household.name}
         </Text>
         <View style={{ flexDirection: "row", gap: 8 }}>
@@ -236,8 +236,8 @@ function ClientDetailScreen({ route }: NativeStackScreenProps<AdvisorStackParams
 
 const styles = StyleSheet.create({
   headerRow: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" },
-  title: { fontSize: 28, fontWeight: "600", color: colors.inkPrimary },
-  subtitle: { fontSize: 13, color: colors.inkSecondary },
+  title: { fontSize: 28, fontFamily: fonts.display, color: colors.inkPrimary },
+  subtitle: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary },
   householdRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12 },
   householdAvatar: {
     width: 40,
@@ -246,10 +246,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  householdInitials: { fontSize: 14, fontWeight: "600" },
-  householdName: { fontSize: 17, color: colors.inkPrimary },
-  householdManaged: { fontSize: 13, color: colors.inkTertiary },
-  householdHeldAway: { fontSize: 13, fontWeight: "500", color: colors.allworthAccent },
+  householdInitials: { fontSize: 14, fontFamily: fonts.sansBold },
+  householdName: { fontSize: 17, fontFamily: fonts.sans, color: colors.inkPrimary },
+  householdManaged: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkTertiary },
+  householdHeldAway: { fontSize: 13, fontFamily: fonts.sansBold, color: colors.allworthAccent },
   nudgeBadge: {
     width: 22,
     height: 22,
@@ -258,17 +258,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  nudgeBadgeText: { color: "#fff", fontSize: 13, fontWeight: "600" },
-  managedCaption: { fontSize: 15, color: colors.inkSecondary, fontVariant: ["tabular-nums"] },
+  nudgeBadgeText: { color: "#fff", fontSize: 13, fontFamily: fonts.sansBold },
+  managedCaption: {
+    fontSize: 15,
+    fontFamily: fonts.sans,
+    color: colors.inkSecondary,
+    fontVariant: ["tabular-nums"],
+  },
   briefCard: { ...card, padding: 16, gap: 10 },
   briefHeader: { flexDirection: "row", alignItems: "center", gap: 6 },
-  briefText: { fontSize: 15, lineHeight: 22, color: colors.inkPrimary },
+  briefText: { fontSize: 15, fontFamily: fonts.sans, lineHeight: 22, color: colors.inkPrimary },
   nudgeRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 6 },
   nudgeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.attention },
-  nudgeTitle: { flex: 1, fontSize: 15, color: colors.inkPrimary },
+  nudgeTitle: { flex: 1, fontSize: 15, fontFamily: fonts.sans, color: colors.inkPrimary },
   nudgeHeadline: {
     fontSize: 13,
-    fontWeight: "600",
+    fontFamily: fonts.sansBold,
     color: colors.attention,
     fontVariant: ["tabular-nums"],
   },

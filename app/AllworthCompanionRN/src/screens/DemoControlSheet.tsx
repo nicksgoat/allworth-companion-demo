@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { Mode, useApp } from "../state";
-import { card, colors } from "../theme";
+import { card, colors, fonts } from "../theme";
 import { SectionHeader } from "../components/Rows";
 
 const MODES: { value: Mode; label: string }[] = [
@@ -64,7 +64,7 @@ export function DemoControlSheet() {
             >
               <Text style={styles.resetText}>Reset demo</Text>
               {resetDone ? (
-                <Ionicons name="checkmark-circle" size={18} color={colors.gainGreen} />
+                <Ionicons name="checkmark-circle" size={18} color={colors.gain} />
               ) : null}
             </Pressable>
           </Section>
@@ -130,8 +130,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 18,
   },
-  title: { fontSize: 17, fontWeight: "600", color: colors.inkPrimary },
-  done: { fontSize: 17, fontWeight: "600", color: colors.allworthAccent },
+  title: { fontSize: 17, fontFamily: fonts.sansBold, color: colors.inkPrimary },
+  done: { fontSize: 17, fontFamily: fonts.sansBold, color: colors.allworthAccent },
   segmented: {
     flexDirection: "row",
     backgroundColor: colors.inkFaint,
@@ -148,11 +148,12 @@ const styles = StyleSheet.create({
       shadowOffset: { width: 0, height: 1 },
     },
   },
-  segmentText: { fontSize: 13, color: colors.inkSecondary },
-  segmentTextActive: { color: colors.inkPrimary, fontWeight: "600" },
+  segmentText: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary },
+  segmentTextActive: { color: colors.inkPrimary, fontFamily: fonts.sansBold },
   hostInput: {
     ...card,
     fontSize: 17,
+    fontFamily: fonts.sans,
     color: colors.inkPrimary,
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -165,6 +166,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 13,
   },
-  resetText: { fontSize: 17, color: colors.lossRed },
-  footerText: { fontSize: 13, color: colors.inkTertiary },
+  resetText: { fontSize: 17, fontFamily: fonts.sans, color: colors.loss },
+  footerText: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkTertiary },
 });

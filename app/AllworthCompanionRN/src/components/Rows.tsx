@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { colors, sectionHeader, shortDate, usd } from "../theme";
+import { colors, fonts, sectionHeader, shortDate, usd } from "../theme";
 import type { Account, LearnedFact } from "../types";
 
 export function SectionHeader({ children }: { children: string }) {
@@ -18,7 +18,7 @@ export function AccountRow({ account }: { account: Account }) {
         <Text style={styles.accountName}>{account.name}</Text>
         <Text style={styles.accountInstitution}>{account.institution}</Text>
       </View>
-      <Text style={[styles.accountBalance, account.balance < 0 && { color: colors.lossRed }]}>
+      <Text style={[styles.accountBalance, account.balance < 0 && { color: colors.loss }]}>
         {usd(account.balance)}
       </Text>
     </View>
@@ -54,25 +54,35 @@ const styles = StyleSheet.create({
   sectionHeader: { ...sectionHeader },
   hairline: { height: StyleSheet.hairlineWidth, backgroundColor: colors.hairline },
   accountRow: { flexDirection: "row", alignItems: "center", paddingVertical: 12, gap: 12 },
-  accountName: { fontSize: 17, color: colors.inkPrimary },
-  accountInstitution: { fontSize: 13, color: colors.inkTertiary, marginTop: 2 },
+  accountName: { fontSize: 17, fontFamily: fonts.sans, color: colors.inkPrimary },
+  accountInstitution: {
+    fontSize: 13,
+    fontFamily: fonts.sans,
+    color: colors.inkTertiary,
+    marginTop: 2,
+  },
   accountBalance: {
     fontSize: 17,
-    fontWeight: "500",
+    fontFamily: fonts.sansBold,
     color: colors.inkPrimary,
     fontVariant: ["tabular-nums"],
   },
   factRow: { paddingVertical: 12, gap: 8 },
-  factText: { fontSize: 17, color: colors.inkPrimary, lineHeight: 23 },
+  factText: { fontSize: 17, fontFamily: fonts.sans, color: colors.inkPrimary, lineHeight: 23 },
   quoteRow: { flexDirection: "row", gap: 8 },
   quoteBar: { width: 2, borderRadius: 1, backgroundColor: colors.hairline },
   quoteText: {
     flex: 1,
     fontSize: 15,
-    fontStyle: "italic",
+    fontFamily: fonts.sansItalic,
     color: colors.inkSecondary,
     lineHeight: 21,
   },
-  factMeta: { fontSize: 13, color: colors.inkTertiary },
-  disclaimer: { fontSize: 11, color: colors.inkTertiary, textAlign: "center" },
+  factMeta: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkTertiary },
+  disclaimer: {
+    fontSize: 11,
+    fontFamily: fonts.sans,
+    color: colors.inkTertiary,
+    textAlign: "center",
+  },
 });

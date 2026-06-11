@@ -2,7 +2,7 @@ import * as Haptics from "expo-haptics";
 import React, { useMemo, useState } from "react";
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, Defs, LinearGradient, Path, Stop } from "react-native-svg";
-import { colors, monthLabel, usd } from "../theme";
+import { colors, fonts, monthLabel, usd } from "../theme";
 import type { MonthValue } from "../types";
 
 const HEIGHT = 88;
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     fontSize: 13,
-    fontWeight: "500",
+    fontFamily: fonts.sansBold,
     color: colors.inkSecondary,
     fontVariant: ["tabular-nums"],
   },

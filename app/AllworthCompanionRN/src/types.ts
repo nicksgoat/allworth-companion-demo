@@ -63,6 +63,34 @@ export interface Dashboard {
   disclaimer: string;
 }
 
+export type AssetClass = "us_equity" | "intl_equity" | "bond" | "muni_bond" | "cash";
+
+export interface Position {
+  accountId: string;
+  symbol: string;
+  name: string;
+  qty: number;
+  price: number;
+  value: number;
+  assetClass: AssetClass;
+}
+
+export interface TaxLot {
+  id: string;
+  accountId: string;
+  symbol: string;
+  qty: number;
+  costPerShare: number;
+  acquired: string;
+  term: "long" | "short";
+}
+
+export interface Portfolio {
+  positions: Position[];
+  byAccount: Record<string, Position[]>;
+  taxLots: TaxLot[];
+}
+
 export interface SpendingMonth {
   month: string;
   total: number;

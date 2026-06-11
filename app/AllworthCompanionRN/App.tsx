@@ -1,6 +1,7 @@
-import { Lato_400Regular, Lato_700Bold } from "@expo-google-fonts/lato";
+import { Lato_400Regular, Lato_400Regular_Italic, Lato_700Bold } from "@expo-google-fonts/lato";
 import {
   PlayfairDisplay_600SemiBold,
+  PlayfairDisplay_600SemiBold_Italic,
   PlayfairDisplay_700Bold,
 } from "@expo-google-fonts/playfair-display";
 import { Ionicons } from "@expo/vector-icons";
@@ -12,19 +13,22 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { AppProvider, ClientTab, useApp } from "./src/state";
-import { colors } from "./src/theme";
+import { colors, fonts } from "./src/theme";
 import { AdvisorNavigator } from "./src/screens/AdvisorScreens";
 import { ChatScreen } from "./src/screens/ChatScreen";
 import { DashboardScreen } from "./src/screens/DashboardScreen";
 import { DemoControlSheet } from "./src/screens/DemoControlSheet";
+import { InvestScreen } from "./src/screens/InvestScreen";
 import { ProfileScreen } from "./src/screens/ProfileScreen";
 import { VisionScreen } from "./src/screens/VisionScreen";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
     Lato_400Regular,
+    Lato_400Regular_Italic,
     Lato_700Bold,
     PlayfairDisplay_600SemiBold,
+    PlayfairDisplay_600SemiBold_Italic,
     PlayfairDisplay_700Bold,
   });
   if (!fontsLoaded) return null;
@@ -63,6 +67,7 @@ const TABS: {
   iconActive: keyof typeof Ionicons.glyphMap;
 }[] = [
   { tab: "home", label: "Home", icon: "home-outline", iconActive: "home" },
+  { tab: "invest", label: "Wealth", icon: "pie-chart-outline", iconActive: "pie-chart" },
   { tab: "chat", label: "Chat", icon: "chatbubbles-outline", iconActive: "chatbubbles" },
   { tab: "profile", label: "Profile", icon: "person-outline", iconActive: "person" },
 ];
@@ -76,6 +81,8 @@ function ClientTabs() {
       <View style={{ flex: 1 }}>
         {app.selectedTab === "home" ? (
           <DashboardScreen />
+        ) : app.selectedTab === "invest" ? (
+          <InvestScreen />
         ) : app.selectedTab === "chat" ? (
           <ChatScreen />
         ) : (
@@ -123,5 +130,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   tabItem: { flex: 1, alignItems: "center", paddingTop: 8, gap: 2 },
-  tabLabel: { fontSize: 10, fontWeight: "500" },
+  tabLabel: { fontSize: 10, fontFamily: fonts.sansBold },
 });

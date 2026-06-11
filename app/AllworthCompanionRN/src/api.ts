@@ -5,6 +5,7 @@ import type {
   BookResponse,
   ChatEvent,
   Dashboard,
+  Portfolio,
   ProactiveResponse,
   ProfileResponse,
   SpendingDetail,
@@ -24,6 +25,10 @@ export class ApiClient {
 
   dashboard(clientId: string): Promise<Dashboard> {
     return this.get(`/api/clients/${clientId}/dashboard`);
+  }
+
+  portfolio(clientId: string): Promise<Portfolio> {
+    return this.get(`/api/clients/${clientId}/portfolio`);
   }
 
   spending(clientId: string): Promise<SpendingDetail> {

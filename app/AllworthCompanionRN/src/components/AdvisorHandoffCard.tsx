@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { card, colors } from "../theme";
+import { card, colors, fonts } from "../theme";
 
 // The most important recurring component: every analytical answer and nudge ends here.
 export function AdvisorHandoffCard({
@@ -84,12 +84,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  title: { fontSize: 17, fontWeight: "600", color: colors.inkPrimary },
-  subtitle: { fontSize: 13, color: colors.inkSecondary, marginTop: 2 },
+  avatarText: { color: "#fff", fontSize: 16, fontFamily: fonts.sansBold },
+  title: { fontSize: 17, fontFamily: fonts.sansBold, color: colors.inkPrimary },
+  subtitle: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary, marginTop: 2 },
   buttons: { flexDirection: "row", gap: 10 },
   button: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: "center" },
-  buttonText: { fontSize: 15, fontWeight: "600" },
+  buttonText: { fontSize: 15, fontFamily: fonts.sansBold },
   sentRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-  sentText: { fontSize: 15, color: colors.allworthAccent },
+  sentText: { fontSize: 15, fontFamily: fonts.sans, color: colors.allworthAccent },
 });
