@@ -38,6 +38,20 @@ On macOS with Xcode, use the one-command iOS flow:
 
 On Windows/Linux (or when iOS simulator is unavailable), run backend + web in two terminals:
 
+For Windows, there is now a one-command startup that installs everything and launches both backend and web:
+
+```powershell
+npm run start:all:win
+```
+
+What it does:
+- Runs `uv sync` for `services/api`
+- Runs `npm install` for `app/AllworthCompanionRN`
+- Starts backend in a new PowerShell window on `:3000`
+- Starts Expo web in the current terminal on `:8081`
+
+If you prefer manual startup, use the two-terminal commands below.
+
 ```bash
 # Terminal 1: backend
 uv --project services/api run --directory services/api python -m uvicorn main:app --host 0.0.0.0 --port 3000

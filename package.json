@@ -8,7 +8,8 @@
     "test:api": "cd services/api && ../../.venv/bin/python -m pytest",
     "test:all": "./scripts/test.sh",
     "dev:api": "./scripts/dev-api.sh",
-    "dev:mobile": "./scripts/dev-mobile.sh"
+    "dev:mobile": "./scripts/dev-mobile.sh",
+    "start:all:win": "powershell -ExecutionPolicy Bypass -File ./scripts/start-all.ps1"
   },
   "workspaces": [
     "apps/mobile"
