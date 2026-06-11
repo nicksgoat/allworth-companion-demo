@@ -1,62 +1,13 @@
 # Client intelligence layer: persistent profile store with provenance.
 # Seed file is immutable; runtime file accumulates live facts. Reset = delete runtime.
-import json
-import random
-import re
-import string
-import time
-
-from data import API_DIR, iso_now
-
-BASE36 = string.digits + string.ascii_lowercase
-
-
-def _seed_path(client_id):
-    return API_DIR / "memory" / f"{client_id}.seed.json"
-
-
-def _runtime_path(client_id):
-    return API_DIR / "memory" / f"{client_id}.runtime.json"
-
-
-def _new_id(prefix):
-    return f"{prefix}_{int(time.time() * 1000)}_{''.join(random.choices(BASE36, k=4))}"
-
-
-def load_profile(client_id):
-    runtime, seed_file = _runtime_path(client_id), _seed_path(client_id)
-    if runtime.exists():
-        profile = json.loads(runtime.read_text())
-    elif seed_file.exists():
-        profile = json.loads(seed_file.read_text())
-    else:
-        profile = {"clientId": client_id, "facts": [], "episodes": []}
-    # Seed facts predate fact ids; assign stable ids on first load.
-    assigned = False
-    for i, f in enumerate(profile["facts"]):
-        if not f.get("id"):
-            f["id"] = f"fact_seed_{i}"
-            assigned = True
-    if assigned or not runtime.exists():
-        _save(client_id, profile)
-    return profile
-
-
-def _save(client_id, profile):
-    _runtime_path(client_id).write_text(json.dumps(profile, indent=2))
-
-
-def _tokens(s):
-    cleaned = re.sub(r"[^a-z0-9$ ]", "", s.lower())
-    return {w for w in cleaned.split() if len(w) > 2}
-
-
-def _similar(a, b):
-    ta, tb = _tokens(a), _tokens(b)
-    denom = min(len(ta), len(tb) or 1)
-    if denom == 0:
-        return False
-    return len(ta & tb) / denom > 0.6
+from allworth_api.domain.facts import similar
+from allworth_api.domain.formatting import iso_now
+from allworth_api.infrastructure.profile_store import (
+    load_profile,
+    new_id,
+    runtime_path,
+    save_profile,
+)
 
 
 def add_facts(client_id, facts, episode_id=None):
@@ -66,7 +17,7 @@ def add_facts(client_id, facts, episode_id=None):
         if not f.get("fact") or not f.get("category"):
             continue
         existing = next(
-            (x for x in profile["facts"] if x["status"] == "active" and _similar(x["fact"], f["fact"])),
+            (x for x in profile["facts"] if x["status"] == "active" and similar(x["fact"], f["fact"])),
             None,
         )
         # Identical restatement: keep the original (provenance points at first mention).
@@ -79,7 +30,7 @@ def add_facts(client_id, facts, episode_id=None):
         elif existing:
             continue
         entry = {
-            "id": _new_id("fact"),
+            "id": new_id("fact"),
             "fact": f["fact"],
             "category": f["category"],
             "source_episode_id": episode_id,
@@ -91,7 +42,7 @@ def add_facts(client_id, facts, episode_id=None):
         profile["facts"].append(entry)
         added.append(entry)
     if added:
-        _save(client_id, profile)
+        save_profile(client_id, profile)
     return added
 
 
@@ -103,15 +54,15 @@ def forget_fact(client_id, fact_id):
         return None
     fact["status"] = "deleted"
     fact["deleted_at"] = iso_now()
-    _save(client_id, profile)
+    save_profile(client_id, profile)
     return fact
 
 
 def append_episode(client_id, session, role, content):
     profile = load_profile(client_id)
-    ep = {"id": _new_id("ep"), "session": session, "role": role, "content": content, "timestamp": iso_now()}
+    ep = {"id": new_id("ep"), "session": session, "role": role, "content": content, "timestamp": iso_now()}
     profile["episodes"].append(ep)
-    _save(client_id, profile)
+    save_profile(client_id, profile)
     return ep
 
 
@@ -124,7 +75,7 @@ def active_facts(client_id):
 
 
 def reset_profile(client_id):
-    runtime = _runtime_path(client_id)
+    runtime = runtime_path(client_id)
     if runtime.exists():
         runtime.unlink()
     return load_profile(client_id)  # re-seeds from .seed.json

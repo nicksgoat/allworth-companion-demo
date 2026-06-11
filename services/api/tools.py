@@ -1,5 +1,6 @@
 # The 8 demo tools: Anthropic tool definitions + local implementations over seed data.
-from data import accounts_for, fmt_usd, js_round, portfolio_for, seed, spending_summary
+from allworth_api.domain.tax import simulate_tax_impact
+from data import accounts_for, fmt_usd, portfolio_for, seed, spending_summary
 from memory import active_facts, add_facts, profile_as_context
 from nudges import nudges_for
 
@@ -112,9 +113,6 @@ TOOL_DEFINITIONS = [
     },
 ]
 
-LT_RATE = 0.15 + 0.038  # cap gains + NIIT
-ST_RATE = 0.24 + 0.038  # ordinary bracket + NIIT
-
 
 def _strip_history(acct):
     return {k: v for k, v in acct.items() if k != "history"}
@@ -172,7 +170,11 @@ def run_tool(name, tool_input, client_id):
         return {"saved": False, "reason": "Similar fact already on file."}
     if name == "simulate_tax_impact":
         return simulate_tax_impact(
-            tool_input.get("amount"), tool_input.get("accountId"), tool_input.get("symbol")
+            tool_input.get("amount"),
+            tool_input.get("accountId"),
+            tool_input.get("symbol"),
+            positions=seed["positions"],
+            tax_lots=seed["taxLots"],
         )
     if name == "get_advisor_brief":
         a = accounts_for()
@@ -187,68 +189,3 @@ def run_tool(name, tool_input, client_id):
             "liquidityEvent": seed["liquidityEvent"],
         }
     return {"error": f"Unknown tool: {name}"}
-
-
-def simulate_tax_impact(amount, account_id, symbol=None):
-    prices = {f"{p['accountId']}:{p['symbol']}": p["price"] for p in seed["positions"]}
-    lots = [lot for lot in seed["taxLots"] if lot["accountId"] == account_id]
-    if symbol:
-        lots = [lot for lot in lots if lot["symbol"] == symbol.upper()]
-    if not lots:
-        return {
-            "error": (
-                f"No tax lots found for {account_id}{f' / {symbol}' if symbol else ''}. "
-                f"Cash accounts can be drawn with no capital-gains tax."
-            )
-        }
-
-    # Sell highest basis first (most tax-efficient ordering).
-    ordered = sorted(lots, key=lambda lot: lot["costPerShare"], reverse=True)
-    remaining = amount
-    proceeds = lt_gain = st_gain = 0
-    sales = []
-    for lot in ordered:
-        if remaining <= 0:
-            break
-        price = prices.get(f"{lot['accountId']}:{lot['symbol']}")
-        if not price:
-            continue
-        lot_value = lot["qty"] * price
-        sell_value = min(remaining, lot_value)
-        sell_qty = sell_value / price
-        gain = sell_qty * (price - lot["costPerShare"])
-        if lot["term"] == "short":
-            st_gain += gain
-        else:
-            lt_gain += gain
-        proceeds += sell_value
-        remaining -= sell_value
-        sales.append(
-            {
-                "lotId": lot["id"],
-                "symbol": lot["symbol"],
-                "qtySold": js_round(sell_qty * 100) / 100,
-                "costPerShare": lot["costPerShare"],
-                "price": price,
-                "proceeds": js_round(sell_value),
-                "gain": js_round(gain),
-                "term": lot["term"],
-                "acquired": lot["acquired"],
-            }
-        )
-    est_tax = js_round(lt_gain * LT_RATE + st_gain * ST_RATE)
-    return {
-        "requested": amount,
-        "proceedsAvailable": js_round(proceeds),
-        "shortfall": js_round(remaining) if remaining > 0 else 0,
-        "realizedGainLongTerm": js_round(lt_gain),
-        "realizedGainShortTerm": js_round(st_gain),
-        "estimatedTax": est_tax,
-        "effectiveTaxDragPct": js_round(est_tax / proceeds * 1000) / 10 if proceeds > 0 else 0,
-        "assumptions": (
-            f"Long-term gains at {LT_RATE * 100:.1f}% (15% cap gains + 3.8% NIIT), short-term at "
-            f"{ST_RATE * 100:.1f}%. Lots sold highest-basis-first. Estimates only — Dana can run "
-            f"exact numbers."
-        ),
-        "sales": sales,
-    }

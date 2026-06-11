@@ -2,23 +2,16 @@
 # responses so the demo never dies on stage.
 import asyncio
 import json
-import os
 import re
 import sys
 
-from anthropic import AsyncAnthropic
-
-from data import API_DIR
+from allworth_api.infrastructure.anthropic_client import CHAT_MODEL, EXTRACT_MODEL, client
+from allworth_api.infrastructure.fallbacks import pick_fallback
 from memory import add_facts, append_episode, episodes_for, profile_as_context
 from prompts import STABLE_SYSTEM, volatile_context
 from tools import TOOL_DEFINITIONS, TOOL_LABELS, run_tool
 
-CHAT_MODEL = "claude-opus-4-7"
-EXTRACT_MODEL = "claude-haiku-4-5"
 MAX_TOOL_ROUNDS = 8
-
-api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-client = AsyncAnthropic(api_key=api_key) if api_key else None
 
 SOURCE_NAMES = {
     "get_accounts": "Accounts",
@@ -51,27 +44,8 @@ def suggested_for(session):
     return ["What would $200K into the SpaceX IPO mean for me?"]
 
 
-def _load_fallback(name):
-    return json.loads((API_DIR / "fallbacks" / f"{name}.json").read_text())
-
-
-def _pick_fallback(user_text, session):
-    text = user_text.lower()
-    beat3 = _load_fallback("beat3")
-    beat4 = _load_fallback("beat4")
-    changed = _load_fallback("whats_changed")
-    # Wednesday: "what changed?" beats the memory beat, which beats everything else.
-    if session == "wednesday" and any(m in text for m in changed["match"]):
-        return changed
-    if session == "wednesday" and any(m in text for m in beat4["match"]):
-        return beat4
-    if any(m in text for m in beat3["match"]):
-        return beat3
-    return beat4 if session == "wednesday" else beat3
-
-
 async def _stream_fallback(user_text, session, out):
-    fb = _pick_fallback(user_text, session)
+    fb = pick_fallback(user_text, session)
     for tool in fb["tools"]:
         yield sse("tool_start", {"name": tool, "label": TOOL_LABELS.get(tool, tool)})
         await asyncio.sleep(0.45)
