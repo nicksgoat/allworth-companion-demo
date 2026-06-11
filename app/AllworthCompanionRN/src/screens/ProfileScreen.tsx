@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAnimatedValue } from "../anim";
+import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
 import {
   DisclaimerFooter,
   HairlineDivider,
@@ -27,6 +29,7 @@ export function ProfileScreen() {
   const [facts, setFacts] = useState<LearnedFact[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFact, setSelectedFact] = useState<LearnedFact | null>(null);
+  const scrollY = useAnimatedValue(0);
 
   const load = useCallback(async () => {
     try {
@@ -57,60 +60,72 @@ export function ProfileScreen() {
   );
 
   return (
-    <ScrollView
-      style={{ backgroundColor: colors.surfacePrimary }}
-      contentContainerStyle={{ padding: 20, paddingTop: insets.top + 8, gap: 24 }}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
-    >
-      <View style={{ gap: 6 }}>
-        <Text style={styles.title}>What I{"'"}ve learned</Text>
-        <Text style={styles.subtitle}>
-          Every fact has a source, a timestamp, and an audit trail. Nothing here came from anywhere
-          but you. Tap any fact to see why I know it — or to remove it.
-        </Text>
-      </View>
-
-      {categories.map((category) => (
-        <View key={category}>
-          <View style={{ paddingBottom: 4 }}>
-            <SectionHeader>{CATEGORY_LABELS[category] ?? category}</SectionHeader>
-          </View>
-          {facts
-            .filter((f) => f.category === category)
-            .map((fact, i) => (
-              <React.Fragment key={fact.id}>
-                {i > 0 ? <HairlineDivider /> : null}
-                <Pressable
-                  onPress={() => setSelectedFact(fact)}
-                  style={({ pressed }) => pressed && { opacity: 0.6 }}
-                >
-                  <LearnedFactRow fact={fact} />
-                </Pressable>
-              </React.Fragment>
-            ))}
-        </View>
-      ))}
-
-      {facts.length === 0 ? (
-        <Text style={styles.empty}>Nothing learned yet — start a conversation.</Text>
-      ) : null}
-
-      <View style={{ paddingVertical: 8 }}>
-        <DisclaimerFooter />
-      </View>
-
-      <FactDetailSheet
-        fact={selectedFact}
-        categoryLabel={
-          selectedFact ? (CATEGORY_LABELS[selectedFact.category] ?? selectedFact.category) : ""
-        }
-        onClose={() => setSelectedFact(null)}
-        onForgotten={() => {
-          setSelectedFact(null);
-          load();
+    <>
+      <Animated.ScrollView
+        style={{ backgroundColor: colors.surfacePrimary }}
+        contentContainerStyle={{
+          padding: 20,
+          paddingTop: insets.top + 8,
+          paddingBottom: TAB_BAR_HEIGHT + insets.bottom + 24,
+          gap: 24,
         }}
-      />
-    </ScrollView>
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: false,
+        })}
+        scrollEventThrottle={16}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
+      >
+        <View style={{ gap: 6 }}>
+          <Text style={styles.title}>What I{"'"}ve learned</Text>
+          <Text style={styles.subtitle}>
+            Every fact has a source, a timestamp, and an audit trail. Nothing here came from
+            anywhere but you. Tap any fact to see why I know it — or to remove it.
+          </Text>
+        </View>
+
+        {categories.map((category) => (
+          <View key={category}>
+            <View style={{ paddingBottom: 4 }}>
+              <SectionHeader>{CATEGORY_LABELS[category] ?? category}</SectionHeader>
+            </View>
+            {facts
+              .filter((f) => f.category === category)
+              .map((fact, i) => (
+                <React.Fragment key={fact.id}>
+                  {i > 0 ? <HairlineDivider /> : null}
+                  <Pressable
+                    onPress={() => setSelectedFact(fact)}
+                    style={({ pressed }) => pressed && { opacity: 0.6 }}
+                  >
+                    <LearnedFactRow fact={fact} />
+                  </Pressable>
+                </React.Fragment>
+              ))}
+          </View>
+        ))}
+
+        {facts.length === 0 ? (
+          <Text style={styles.empty}>Nothing learned yet — start a conversation.</Text>
+        ) : null}
+
+        <View style={{ paddingVertical: 8 }}>
+          <DisclaimerFooter />
+        </View>
+
+        <FactDetailSheet
+          fact={selectedFact}
+          categoryLabel={
+            selectedFact ? (CATEGORY_LABELS[selectedFact.category] ?? selectedFact.category) : ""
+          }
+          onClose={() => setSelectedFact(null)}
+          onForgotten={() => {
+            setSelectedFact(null);
+            load();
+          }}
+        />
+      </Animated.ScrollView>
+      <GlassHeader title="What I've learned" scrollY={scrollY} />
+    </>
   );
 }
 

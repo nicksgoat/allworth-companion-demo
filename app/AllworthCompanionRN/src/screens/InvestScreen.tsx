@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { RiseIn, useAnimatedValue } from "../anim";
 import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
+import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
 import { AllocationCard } from "../components/AllocationCard";
 import { HeroNumber } from "../components/HeroNumber";
 import { AccountHoldingsSection } from "../components/Holdings";
@@ -11,6 +13,7 @@ import { NudgeCard } from "../components/NudgeCard";
 import { RangeChips } from "../components/RangeChips";
 import { RecurringCard } from "../components/RecurringCard";
 import { DisclaimerFooter, SectionHeader } from "../components/Rows";
+import { SegmentedControl } from "../components/SegmentedControl";
 import { Sparkline } from "../components/Sparkline";
 import { AllworthWordmark } from "../components/Wordmark";
 import { useApp } from "../state";
@@ -54,11 +57,21 @@ export function InvestScreen() {
   const p = app.portfolio;
   const error = app.dashboardError ?? app.portfolioError;
 
+  const scrollY = useAnimatedValue(0);
+
   return (
     <>
-      <ScrollView
+      <Animated.ScrollView
         style={{ backgroundColor: colors.surfacePrimary }}
-        contentContainerStyle={{ padding: 20, paddingTop: insets.top + 8 }}
+        contentContainerStyle={{
+          padding: 20,
+          paddingTop: insets.top + 8,
+          paddingBottom: TAB_BAR_HEIGHT + insets.bottom + 24,
+        }}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: false,
+        })}
+        scrollEventThrottle={16}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
       >
         {d && p ? (
@@ -74,7 +87,8 @@ export function InvestScreen() {
         ) : (
           <Skeleton />
         )}
-      </ScrollView>
+      </Animated.ScrollView>
+      <GlassHeader title="Your wealth" scrollY={scrollY} />
       <NudgeDetailSheet nudge={selectedNudge} onClose={() => setSelectedNudge(null)} />
       <PositionDetailSheet
         position={selectedPosition}
@@ -121,6 +135,7 @@ function InvestContent({
 }) {
   const app = useApp();
   const [range, setRange] = useState("1Y");
+  const [segment, setSegment] = useState("Overview");
 
   const ask = (prompt: string) => {
     app.setChatPrefill(prompt);
@@ -162,61 +177,80 @@ function InvestContent({
         <AllworthWordmark />
       </View>
 
-      <View style={{ gap: 14 }}>
+      <RiseIn style={{ gap: 14 }}>
         <HeroNumber label="Total net worth" value={d.netWorth} delta={delta} />
         <RangeChips options={RANGES.map((r) => r.label)} selected={range} onSelect={setRange} />
         <Sparkline points={slice} />
-      </View>
+      </RiseIn>
 
-      <BreakdownCard
-        allworthTotal={d.allworthTotal}
-        heldAwayTotal={d.heldAwayTotal}
-        liabilitiesTotal={d.liabilitiesTotal}
-      />
-
-      <CompletePictureCard heldAwayTotal={d.heldAwayTotal} />
-
-      <View style={{ gap: 12 }}>
-        <SectionHeader>Your allocation</SectionHeader>
-        <AllocationCard
-          positions={p.positions}
-          onAskRebalance={askRebalance}
-          onSelectClass={onClass}
+      <RiseIn delay={60}>
+        <SegmentedControl
+          options={["Overview", "Holdings"]}
+          selected={segment}
+          onSelect={setSegment}
         />
-        <AdvisorHandoffCard />
-      </View>
+      </RiseIn>
 
-      {concentrationNudges.map((nudge) => (
-        <NudgeCard key={nudge.id} nudge={nudge} onPress={() => onNudge(nudge)} />
-      ))}
+      {segment === "Overview" ? (
+        <View key="overview" style={{ gap: 24 }}>
+          <RiseIn>
+            <BreakdownCard
+              allworthTotal={d.allworthTotal}
+              heldAwayTotal={d.heldAwayTotal}
+              liabilitiesTotal={d.liabilitiesTotal}
+            />
+          </RiseIn>
 
-      <View style={{ gap: 12 }}>
-        <SectionHeader>Automatic investing</SectionHeader>
-        <RecurringCard
-          onAsk={() => ask("Could I be investing more each month without hurting my plan?")}
-        />
-      </View>
+          <RiseIn delay={60}>
+            <CompletePictureCard heldAwayTotal={d.heldAwayTotal} />
+          </RiseIn>
 
-      <View style={{ gap: 20 }}>
-        <SectionHeader>Holdings</SectionHeader>
-        {investedAccounts.map((account) => (
-          <AccountHoldingsSection
-            key={account.id}
-            account={account}
-            positions={p.byAccount[account.id]}
-            onSelect={onPosition}
-          />
-        ))}
-      </View>
+          <RiseIn delay={120} style={{ gap: 12 }}>
+            <SectionHeader>Your allocation</SectionHeader>
+            <AllocationCard
+              positions={p.positions}
+              onAskRebalance={askRebalance}
+              onSelectClass={onClass}
+            />
+            <AdvisorHandoffCard />
+          </RiseIn>
 
-      <View style={{ gap: 12 }}>
-        <SectionHeader>Income</SectionHeader>
-        <IncomeCard
-          positions={p.positions}
-          accounts={accounts}
-          onAsk={() => ask("What income could my portfolio generate in retirement?")}
-        />
-      </View>
+          {concentrationNudges.map((nudge, i) => (
+            <RiseIn key={nudge.id} delay={180 + i * 60}>
+              <NudgeCard nudge={nudge} onPress={() => onNudge(nudge)} />
+            </RiseIn>
+          ))}
+
+          <RiseIn delay={240} style={{ gap: 12 }}>
+            <SectionHeader>Automatic investing</SectionHeader>
+            <RecurringCard
+              onAsk={() => ask("Could I be investing more each month without hurting my plan?")}
+            />
+          </RiseIn>
+        </View>
+      ) : (
+        <View key="holdings" style={{ gap: 24 }}>
+          <RiseIn style={{ gap: 16 }}>
+            {investedAccounts.map((account) => (
+              <AccountHoldingsSection
+                key={account.id}
+                account={account}
+                positions={p.byAccount[account.id]}
+                onSelect={onPosition}
+              />
+            ))}
+          </RiseIn>
+
+          <RiseIn delay={60} style={{ gap: 12 }}>
+            <SectionHeader>Income</SectionHeader>
+            <IncomeCard
+              positions={p.positions}
+              accounts={accounts}
+              onAsk={() => ask("What income could my portfolio generate in retirement?")}
+            />
+          </RiseIn>
+        </View>
+      )}
 
       <View style={{ paddingVertical: 8 }}>
         <DisclaimerFooter />

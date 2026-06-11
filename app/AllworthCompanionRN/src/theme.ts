@@ -49,11 +49,15 @@ export const cardRadius = 16;
 export const card = {
   backgroundColor: colors.surfaceCard,
   borderRadius: cardRadius,
-  shadowColor: "#000",
-  shadowOpacity: 0.05,
-  shadowRadius: 12,
-  shadowOffset: { width: 0, height: 4 },
-  elevation: 2,
+  // Navy-tinted shadow + faint border so cards keep their edge on web,
+  // where box-shadows render softer than iOS
+  borderWidth: 1,
+  borderColor: "rgba(23,61,103,0.06)",
+  shadowColor: "#0C2E4E",
+  shadowOpacity: 0.08,
+  shadowRadius: 16,
+  shadowOffset: { width: 0, height: 6 },
+  elevation: 3,
 } as const;
 
 export const sectionHeader = {

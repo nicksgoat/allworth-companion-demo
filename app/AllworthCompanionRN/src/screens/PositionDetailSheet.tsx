@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useCountUp } from "../anim";
 import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
 import { RangeChips } from "../components/RangeChips";
 import { DisclaimerFooter, HairlineDivider, SectionHeader, SheetHeader } from "../components/Rows";
@@ -64,6 +65,7 @@ function PositionDetailContent({
 }) {
   const app = useApp();
   const [range, setRange] = useState("1Y");
+  const animatedValue = useCountUp(position.value);
 
   const history = useMemo(() => positionHistory(position), [position]);
   const spec = RANGES.find((r) => r.label === range) ?? RANGES[RANGES.length - 1];
@@ -101,7 +103,7 @@ function PositionDetailContent({
       </View>
 
       <View style={{ gap: 2 }}>
-        <Text style={styles.value}>{usd(position.value)}</Text>
+        <Text style={styles.value}>{usd(animatedValue)}</Text>
         <Text style={styles.caption}>
           {position.qty.toLocaleString("en-US")} shares · {usdExact(position.price)} each
         </Text>

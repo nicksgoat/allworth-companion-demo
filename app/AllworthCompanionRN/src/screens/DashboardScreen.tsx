@@ -1,14 +1,16 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { HeroNumber } from "../components/HeroNumber";
+import { RiseIn, useAnimatedValue, useCountUp } from "../anim";
+import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
 import { NudgeCard } from "../components/NudgeCard";
-import { AccountRow, DisclaimerFooter, HairlineDivider, SectionHeader } from "../components/Rows";
+import { DisclaimerFooter, HairlineDivider, SectionHeader } from "../components/Rows";
 import { Sparkline } from "../components/Sparkline";
 import { AllworthWordmark } from "../components/Wordmark";
 import { useApp } from "../state";
-import { colors, fonts, usd } from "../theme";
-import type { Account, Dashboard, Nudge } from "../types";
+import { card, colors, fonts, usd } from "../theme";
+import type { Dashboard, Nudge } from "../types";
 import { NudgeDetailSheet } from "./NudgeDetailSheet";
 
 export function DashboardScreen() {
@@ -32,12 +34,21 @@ export function DashboardScreen() {
   };
 
   const d = app.dashboard;
+  const scrollY = useAnimatedValue(0);
 
   return (
     <>
-      <ScrollView
+      <Animated.ScrollView
         style={{ backgroundColor: colors.surfacePrimary }}
-        contentContainerStyle={{ padding: 20, paddingTop: insets.top + 8 }}
+        contentContainerStyle={{
+          padding: 20,
+          paddingTop: insets.top + 8,
+          paddingBottom: TAB_BAR_HEIGHT + insets.bottom + 24,
+        }}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: false,
+        })}
+        scrollEventThrottle={16}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
       >
         {d ? (
@@ -47,7 +58,8 @@ export function DashboardScreen() {
         ) : (
           <Skeleton />
         )}
-      </ScrollView>
+      </Animated.ScrollView>
+      <GlassHeader title="Home" scrollY={scrollY} />
       <NudgeDetailSheet nudge={selectedNudge} onClose={() => setSelectedNudge(null)} />
     </>
   );
@@ -71,21 +83,30 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
         <AllworthWordmark />
       </View>
 
-      <View style={{ gap: 14 }}>
-        <HeroNumber label="Net worth" value={d.netWorth} delta={monthDelta(d)} />
-        <Sparkline points={d.netWorthHistory} />
-      </View>
+      <RiseIn>
+        <NetWorthCard d={d} />
+      </RiseIn>
 
-      {d.nudges.slice(0, 2).map((nudge) => (
-        <NudgeCard key={nudge.id} nudge={nudge} onPress={() => onNudge(nudge)} />
-      ))}
+      {d.nudges.length ? (
+        <View style={{ gap: 12 }}>
+          <SectionHeader>Needs your attention</SectionHeader>
+          {d.nudges.slice(0, 2).map((nudge, i) => (
+            <RiseIn key={nudge.id} delay={80 + i * 60}>
+              <NudgeCard nudge={nudge} onPress={() => onNudge(nudge)} />
+            </RiseIn>
+          ))}
+        </View>
+      ) : null}
 
-      <AccountSection header="Allworth accounts" accounts={d.accounts.allworth} />
-      <AccountSection
-        header="Outside accounts we can see"
-        accounts={d.accounts.outside}
-        caption={`${usd(d.heldAwayTotal)} held away`}
-      />
+      <RiseIn delay={220} style={{ gap: 12 }}>
+        <SectionHeader>Quick actions</SectionHeader>
+        <QuickActions />
+      </RiseIn>
+
+      <RiseIn delay={280} style={{ gap: 12 }}>
+        <SectionHeader>Your accounts</SectionHeader>
+        <AccountsSnapshotCard d={d} />
+      </RiseIn>
 
       <View style={{ paddingVertical: 8 }}>
         <DisclaimerFooter />
@@ -94,27 +115,121 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
   );
 }
 
-function AccountSection({
-  header,
-  accounts,
-  caption,
+function NetWorthCard({ d }: { d: Dashboard }) {
+  const app = useApp();
+  const displayed = useCountUp(d.netWorth);
+  const delta = monthDelta(d);
+
+  return (
+    <Pressable
+      onPress={() => app.setSelectedTab("invest")}
+      style={({ pressed }) => [styles.nwCard, pressed && { opacity: 0.85 }]}
+    >
+      <SectionHeader>Net worth</SectionHeader>
+      <Text style={styles.nwValue}>{usd(displayed)}</Text>
+      {delta ? (
+        <Text style={[styles.nwDelta, { color: delta.positive ? colors.gain : colors.loss }]}>
+          {delta.text}
+        </Text>
+      ) : null}
+      <Sparkline points={d.netWorthHistory} />
+      <View style={styles.nwLink}>
+        <Text style={styles.nwLinkText}>View your wealth</Text>
+        <Ionicons name="chevron-forward" size={14} color={colors.allworthAccent} />
+      </View>
+    </Pressable>
+  );
+}
+
+function QuickActions() {
+  const app = useApp();
+
+  const actions: { icon: keyof typeof Ionicons.glyphMap; label: string; onPress: () => void }[] = [
+    {
+      icon: "chatbubbles-outline",
+      label: "Ask anything",
+      onPress: () => app.setSelectedTab("chat"),
+    },
+    {
+      icon: "pie-chart-outline",
+      label: "Your wealth",
+      onPress: () => app.setSelectedTab("invest"),
+    },
+    {
+      icon: "wallet-outline",
+      label: "Spending plan",
+      onPress: () => {
+        app.setChatPrefill("How is my spending tracking against my plan?");
+        app.setSelectedTab("chat");
+      },
+    },
+    {
+      icon: "sparkles-outline",
+      label: "What I've learned",
+      onPress: () => app.setSelectedTab("profile"),
+    },
+  ];
+
+  return (
+    <View style={styles.actionsGrid}>
+      {actions.map((a) => (
+        <Pressable
+          key={a.label}
+          onPress={a.onPress}
+          style={({ pressed }) => [styles.actionCard, pressed && { opacity: 0.7 }]}
+        >
+          <Ionicons name={a.icon} size={20} color={colors.allworthAccent} />
+          <Text style={styles.actionLabel}>{a.label}</Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
+function AccountsSnapshotCard({ d }: { d: Dashboard }) {
+  const app = useApp();
+
+  return (
+    <Pressable
+      onPress={() => app.setSelectedTab("invest")}
+      style={({ pressed }) => [styles.snapshotCard, pressed && { opacity: 0.85 }]}
+    >
+      <SnapshotRow
+        label="Allworth accounts"
+        sublabel={`${d.accounts.allworth.length} accounts managed`}
+        value={usd(d.allworthTotal)}
+      />
+      <HairlineDivider />
+      <SnapshotRow
+        label="Outside accounts we can see"
+        sublabel="Held away — not yet part of your plan"
+        value={usd(d.heldAwayTotal)}
+      />
+      <HairlineDivider />
+      <SnapshotRow label="Liabilities" value={usd(d.liabilitiesTotal)} negative />
+    </Pressable>
+  );
+}
+
+function SnapshotRow({
+  label,
+  sublabel,
+  value,
+  negative,
 }: {
-  header: string;
-  accounts: Account[];
-  caption?: string;
+  label: string;
+  sublabel?: string;
+  value: string;
+  negative?: boolean;
 }) {
   return (
-    <View>
-      <View style={styles.sectionRow}>
-        <SectionHeader>{header}</SectionHeader>
-        {caption ? <Text style={styles.sectionCaption}>{caption}</Text> : null}
+    <View style={styles.snapshotRow}>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.snapshotLabel}>{label}</Text>
+        {sublabel ? <Text style={styles.snapshotSublabel}>{sublabel}</Text> : null}
       </View>
-      {accounts.map((account, i) => (
-        <React.Fragment key={account.id}>
-          {i > 0 ? <HairlineDivider /> : null}
-          <AccountRow account={account} />
-        </React.Fragment>
-      ))}
+      <Text style={[styles.snapshotValue, negative && { color: colors.loss }]}>{value}</Text>
+      <Ionicons name="chevron-forward" size={14} color={colors.inkTertiary} />
     </View>
   );
 }
@@ -156,16 +271,38 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   greeting: { fontSize: 28, fontFamily: fonts.display, color: colors.inkPrimary, flexShrink: 1 },
-  sectionRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingBottom: 4,
+  nwCard: { ...card, padding: 16, gap: 6 },
+  nwValue: {
+    fontSize: 34,
+    fontFamily: fonts.displayMedium,
+    color: colors.inkPrimary,
+    fontVariant: ["tabular-nums"],
   },
-  sectionCaption: {
-    fontSize: 13,
+  nwDelta: { fontSize: 14, fontFamily: fonts.sansBold, fontVariant: ["tabular-nums"] },
+  nwLink: { flexDirection: "row", alignItems: "center", gap: 2, paddingTop: 4 },
+  nwLinkText: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.allworthAccent },
+  actionsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
+  actionCard: {
+    ...card,
+    flexBasis: "46%",
+    flexGrow: 1,
+    padding: 14,
+    gap: 8,
+  },
+  actionLabel: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.inkPrimary },
+  snapshotCard: { ...card, paddingHorizontal: 16, paddingVertical: 6 },
+  snapshotRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 13 },
+  snapshotLabel: { fontSize: 15, fontFamily: fonts.sans, color: colors.inkPrimary },
+  snapshotSublabel: {
+    fontSize: 12,
     fontFamily: fonts.sans,
-    color: colors.inkSecondary,
+    color: colors.inkTertiary,
+    marginTop: 2,
+  },
+  snapshotValue: {
+    fontSize: 15,
+    fontFamily: fonts.sansBold,
+    color: colors.inkPrimary,
     fontVariant: ["tabular-nums"],
   },
   skeletonBlock: { height: 72, borderRadius: 12, backgroundColor: colors.inkFaint },

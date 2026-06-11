@@ -1,7 +1,7 @@
 import * as Haptics from "expo-haptics";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useId, useMemo, useState } from "react";
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
-import Svg, { Circle, Defs, LinearGradient, Path, Stop } from "react-native-svg";
+import Svg, { Circle, ClipPath, Defs, LinearGradient, Path, Rect, Stop } from "react-native-svg";
 import { colors, fonts, monthLabel, usd } from "../theme";
 import type { MonthValue } from "../types";
 
@@ -16,6 +16,28 @@ export function Sparkline({
 }) {
   const [width, setWidth] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
+  const [reveal, setReveal] = useState(0);
+
+  // Unique per instance — sheets and screens can each mount a sparkline,
+  // and duplicate SVG ids resolve to the first match in the document on web.
+  // useId's colons stripped: they don't survive url(#...) references reliably.
+  const uid = useId().replace(/:/g, "");
+  const fillId = `sparkfill-${uid}`;
+  const clipId = `sparkclip-${uid}`;
+
+  // Left-to-right draw-in, re-triggered when the range changes
+  useEffect(() => {
+    const start = Date.now();
+    const duration = 700;
+    let raf = 0;
+    const tick = () => {
+      const t = Math.min(1, (Date.now() - start) / duration);
+      setReveal(1 - Math.pow(1 - t, 3));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [points]);
 
   const geom = useMemo(() => {
     if (!width || points.length < 2) return null;
@@ -71,13 +93,22 @@ export function Sparkline({
       {geom ? (
         <Svg width={width} height={HEIGHT}>
           <Defs>
-            <LinearGradient id="sparkfill" x1="0" y1="0" x2="0" y2="1">
+            <LinearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
               <Stop offset="0" stopColor={lineColor} stopOpacity={0.14} />
               <Stop offset="1" stopColor={lineColor} stopOpacity={0} />
             </LinearGradient>
+            <ClipPath id={clipId}>
+              <Rect x={0} y={0} width={width * reveal} height={HEIGHT} />
+            </ClipPath>
           </Defs>
-          <Path d={geom.area} fill="url(#sparkfill)" />
-          <Path d={geom.line} stroke={lineColor} strokeWidth={2} fill="none" />
+          <Path d={geom.area} fill={`url(#${fillId})`} clipPath={`url(#${clipId})`} />
+          <Path
+            d={geom.line}
+            stroke={lineColor}
+            strokeWidth={2}
+            fill="none"
+            clipPath={`url(#${clipId})`}
+          />
           {selected != null ? (
             <Circle
               cx={geom.coords[selected].x}
