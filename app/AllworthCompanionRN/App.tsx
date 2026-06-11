@@ -12,6 +12,7 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
+import { glassStyle, TAB_BAR_HEIGHT } from "./src/components/Glass";
 import { AppProvider, ClientTab, useApp } from "./src/state";
 import { colors, fonts } from "./src/theme";
 import { AdvisorNavigator } from "./src/screens/AdvisorScreens";
@@ -78,7 +79,14 @@ function ClientTabs() {
 
   return (
     <View style={{ flex: 1 }}>
-      <View style={{ flex: 1 }}>
+      <View
+        style={{
+          flex: 1,
+          // Chat pins its input to the bottom, so it can't run under the bar;
+          // scrolling tabs go full-bleed and pad their own content instead.
+          paddingBottom: app.selectedTab === "chat" ? TAB_BAR_HEIGHT + insets.bottom : 0,
+        }}
+      >
         {app.selectedTab === "home" ? (
           <DashboardScreen />
         ) : app.selectedTab === "invest" ? (
@@ -89,7 +97,13 @@ function ClientTabs() {
           <ProfileScreen />
         )}
       </View>
-      <View style={[styles.tabBar, { paddingBottom: insets.bottom }]}>
+      <View
+        style={[
+          styles.tabBar,
+          glassStyle,
+          { paddingBottom: Math.max(insets.bottom, 6), height: TAB_BAR_HEIGHT + insets.bottom },
+        ]}
+      >
         {TABS.map(({ tab, label, icon, iconActive }) => {
           const active = app.selectedTab === tab;
           return (
@@ -124,10 +138,13 @@ function ClientTabs() {
 
 const styles = StyleSheet.create({
   tabBar: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: "row",
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: colors.hairline,
-    backgroundColor: "#fff",
+    borderTopColor: "rgba(0,0,0,0.12)",
   },
   tabItem: { flex: 1, alignItems: "center", paddingTop: 8, gap: 2 },
   tabLabel: { fontSize: 10, fontFamily: fonts.sansBold },

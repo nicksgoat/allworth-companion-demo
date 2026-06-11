@@ -3,7 +3,7 @@ import { Animated, Easing, ViewStyle } from "react-native";
 
 // useRef(new Animated.Value()).current trips react-hooks/refs; a lazy
 // useState gives the same stable instance without the ref read in render.
-function useAnimatedValue(initial: number): Animated.Value {
+export function useAnimatedValue(initial: number): Animated.Value {
   const [value] = useState(() => new Animated.Value(initial));
   return value;
 }

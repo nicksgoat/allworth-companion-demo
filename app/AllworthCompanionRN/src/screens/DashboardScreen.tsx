@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { RiseIn } from "../anim";
+import { RiseIn, useAnimatedValue } from "../anim";
+import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
 import { HeroNumber } from "../components/HeroNumber";
 import { NudgeCard } from "../components/NudgeCard";
 import { AccountRow, DisclaimerFooter, HairlineDivider, SectionHeader } from "../components/Rows";
@@ -33,12 +34,21 @@ export function DashboardScreen() {
   };
 
   const d = app.dashboard;
+  const scrollY = useAnimatedValue(0);
 
   return (
     <>
-      <ScrollView
+      <Animated.ScrollView
         style={{ backgroundColor: colors.surfacePrimary }}
-        contentContainerStyle={{ padding: 20, paddingTop: insets.top + 8 }}
+        contentContainerStyle={{
+          padding: 20,
+          paddingTop: insets.top + 8,
+          paddingBottom: TAB_BAR_HEIGHT + insets.bottom + 24,
+        }}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: false,
+        })}
+        scrollEventThrottle={16}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
       >
         {d ? (
@@ -48,7 +58,8 @@ export function DashboardScreen() {
         ) : (
           <Skeleton />
         )}
-      </ScrollView>
+      </Animated.ScrollView>
+      <GlassHeader title="Home" scrollY={scrollY} />
       <NudgeDetailSheet nudge={selectedNudge} onClose={() => setSelectedNudge(null)} />
     </>
   );

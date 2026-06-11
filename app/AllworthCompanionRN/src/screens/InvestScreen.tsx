@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { RiseIn } from "../anim";
+import { RiseIn, useAnimatedValue } from "../anim";
 import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
+import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
 import { AllocationCard } from "../components/AllocationCard";
 import { HeroNumber } from "../components/HeroNumber";
 import { AccountHoldingsSection } from "../components/Holdings";
@@ -55,11 +56,21 @@ export function InvestScreen() {
   const p = app.portfolio;
   const error = app.dashboardError ?? app.portfolioError;
 
+  const scrollY = useAnimatedValue(0);
+
   return (
     <>
-      <ScrollView
+      <Animated.ScrollView
         style={{ backgroundColor: colors.surfacePrimary }}
-        contentContainerStyle={{ padding: 20, paddingTop: insets.top + 8 }}
+        contentContainerStyle={{
+          padding: 20,
+          paddingTop: insets.top + 8,
+          paddingBottom: TAB_BAR_HEIGHT + insets.bottom + 24,
+        }}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: false,
+        })}
+        scrollEventThrottle={16}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
       >
         {d && p ? (
@@ -75,7 +86,8 @@ export function InvestScreen() {
         ) : (
           <Skeleton />
         )}
-      </ScrollView>
+      </Animated.ScrollView>
+      <GlassHeader title="Your wealth" scrollY={scrollY} />
       <NudgeDetailSheet nudge={selectedNudge} onClose={() => setSelectedNudge(null)} />
       <PositionDetailSheet
         position={selectedPosition}
