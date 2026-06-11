@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useCountUp } from "../anim";
 import { ALLOCATION_CLASSES, PLAN_TARGET } from "../components/AllocationCard";
 import { DisclaimerFooter, HairlineDivider, SectionHeader, SheetHeader } from "../components/Rows";
 import { useApp } from "../state";
@@ -60,6 +61,7 @@ function ClassDetailContent({
   const classPct = invested ? Math.round((classTotal / invested) * 100) : 0;
   const sorted = [...inClass].sort((x, y) => y.value - x.value);
   const growth = GROWTH_CLASSES.includes(assetClass);
+  const animatedTotal = useCountUp(classTotal);
 
   const ask = () => {
     app.setChatPrefill(`Is my ${meta.label.toLowerCase()} exposure right for my 60/40 plan?`);
@@ -79,7 +81,7 @@ function ClassDetailContent({
           <View style={[styles.dot, { backgroundColor: meta.color }]} />
           <Text style={styles.title}>{meta.label}</Text>
         </View>
-        <Text style={styles.value}>{usd(classTotal)}</Text>
+        <Text style={styles.value}>{usd(animatedTotal)}</Text>
         <Text style={styles.caption}>{classPct}% of your invested portfolio</Text>
       </View>
 

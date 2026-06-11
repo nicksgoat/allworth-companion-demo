@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { RiseIn } from "../anim";
 import { HeroNumber } from "../components/HeroNumber";
 import { NudgeCard } from "../components/NudgeCard";
 import { AccountRow, DisclaimerFooter, HairlineDivider, SectionHeader } from "../components/Rows";
@@ -71,21 +72,27 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
         <AllworthWordmark />
       </View>
 
-      <View style={{ gap: 14 }}>
+      <RiseIn style={{ gap: 14 }}>
         <HeroNumber label="Net worth" value={d.netWorth} delta={monthDelta(d)} />
         <Sparkline points={d.netWorthHistory} />
-      </View>
+      </RiseIn>
 
-      {d.nudges.slice(0, 2).map((nudge) => (
-        <NudgeCard key={nudge.id} nudge={nudge} onPress={() => onNudge(nudge)} />
+      {d.nudges.slice(0, 2).map((nudge, i) => (
+        <RiseIn key={nudge.id} delay={80 + i * 60}>
+          <NudgeCard nudge={nudge} onPress={() => onNudge(nudge)} />
+        </RiseIn>
       ))}
 
-      <AccountSection header="Allworth accounts" accounts={d.accounts.allworth} />
-      <AccountSection
-        header="Outside accounts we can see"
-        accounts={d.accounts.outside}
-        caption={`${usd(d.heldAwayTotal)} held away`}
-      />
+      <RiseIn delay={220}>
+        <AccountSection header="Allworth accounts" accounts={d.accounts.allworth} />
+      </RiseIn>
+      <RiseIn delay={280}>
+        <AccountSection
+          header="Outside accounts we can see"
+          accounts={d.accounts.outside}
+          caption={`${usd(d.heldAwayTotal)} held away`}
+        />
+      </RiseIn>
 
       <View style={{ paddingVertical: 8 }}>
         <DisclaimerFooter />

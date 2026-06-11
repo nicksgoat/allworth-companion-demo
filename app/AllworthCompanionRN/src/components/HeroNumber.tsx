@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+import { useCountUp } from "../anim";
 import { colors, fonts, usd } from "../theme";
 import { SectionHeader } from "./Rows";
 
@@ -10,23 +11,7 @@ interface Props {
 }
 
 export function HeroNumber({ label, value, delta }: Props) {
-  const [displayed, setDisplayed] = useState(Math.round(value * 0.97));
-  const raf = useRef<number>(0);
-
-  useEffect(() => {
-    const from = Math.round(value * 0.97);
-    const start = Date.now();
-    const duration = 550;
-    setDisplayed(from);
-    const tick = () => {
-      const t = Math.min(1, (Date.now() - start) / duration);
-      const eased = 1 - Math.pow(1 - t, 3);
-      setDisplayed(Math.round(from + (value - from) * eased));
-      if (t < 1) raf.current = requestAnimationFrame(tick);
-    };
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [value]);
+  const displayed = useCountUp(value);
 
   return (
     <View style={{ gap: 6 }}>
