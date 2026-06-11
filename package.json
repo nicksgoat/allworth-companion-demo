@@ -9,7 +9,9 @@
     "test:all": "./scripts/test.sh",
     "dev:api": "./scripts/dev-api.sh",
     "dev:mobile": "./scripts/dev-mobile.sh",
-    "start:all:win": "powershell -ExecutionPolicy Bypass -File ./scripts/start-all.ps1"
+    "start:all:win": "powershell -ExecutionPolicy Bypass -File ./scripts/start-all.ps1",
+    "sync:upstream": "powershell -ExecutionPolicy Bypass -File ./scripts/sync-upstream.ps1",
+    "sync:upstream:dry": "powershell -ExecutionPolicy Bypass -File ./scripts/sync-upstream.ps1 -DryRun"
   },
   "workspaces": [
     "apps/mobile"

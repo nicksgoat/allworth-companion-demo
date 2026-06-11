@@ -1,0 +1,76 @@
+name: Sync from upstream (nicksgoat/allworth-companion-demo)
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Fetches the latest commits from the personal GitHub repo's demo-verified
+# branch and merges them into this repo's master branch.
+#
+# Required secrets (set in this repo's Settings → Secrets → Actions):
+#   UPSTREAM_PAT  — GitHub.com PAT with repo:read scope on nicksgoat/allworth-companion-demo
+#   GHE_PAT       — GHE PAT with repo:write scope on AllworthIntelligence/MobileApp
+#                   (needed for the push step; GITHUB_TOKEN works if Actions is
+#                   trusted to push to master on this GHE instance)
+# ──────────────────────────────────────────────────────────────────────────────
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # daily at 06:00 UTC; adjust as needed
+  workflow_dispatch:        # also triggerable manually from the Actions tab
+
+jobs:
+  sync:
+    name: Merge upstream demo-verified → master
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out this repo's master branch with full history.
+      - name: Checkout master
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0          # need full history for a real merge
+          token: ${{ secrets.GHE_PAT || secrets.GITHUB_TOKEN }}
+
+      # 2. Configure git identity for the merge commit.
+      - name: Configure git
+        run: |
+          git config user.name  "allworth-sync-bot"
+          git config user.email "allworth-sync-bot@allworth.ghe.com"
+
+      # 3. Add the personal GitHub repo as a read-only remote.
+      - name: Add upstream remote
+        run: |
+          git remote add upstream \
+            "https://${{ secrets.UPSTREAM_PAT }}@github.com/nicksgoat/allworth-companion-demo.git" \
+            || git remote set-url upstream \
+              "https://${{ secrets.UPSTREAM_PAT }}@github.com/nicksgoat/allworth-companion-demo.git"
+
+      # 4. Fetch only the demo-verified branch (shallow is fine for merge-base check).
+      - name: Fetch upstream demo-verified
+        run: git fetch upstream demo-verified --no-tags
+
+      # 5. Check whether there are actually new commits to merge.
+      - name: Check for new commits
+        id: diff_check
+        run: |
+          COUNT=$(git rev-list --count master..upstream/demo-verified)
+          echo "new_commits=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "Upstream has $COUNT new commit(s) ahead of master."
+
+      # 6. Merge if there is anything new.
+      - name: Merge upstream into master
+        if: steps.diff_check.outputs.new_commits != '0'
+        run: |
+          git merge upstream/demo-verified \
+            --no-edit \
+            -m "chore: sync upstream demo-verified → master [automated]"
+
+      # 7. Push the result back to this GHE repo.
+      - name: Push to master
+        if: steps.diff_check.outputs.new_commits != '0'
+        run: |
+          git push origin master
+
+      # 8. Nothing to do.
+      - name: No changes
+        if: steps.diff_check.outputs.new_commits == '0'
+        run: echo "master is already up to date with upstream/demo-verified."
