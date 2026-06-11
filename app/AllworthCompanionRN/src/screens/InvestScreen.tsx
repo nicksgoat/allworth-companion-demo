@@ -5,16 +5,20 @@ import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
 import { AllocationCard } from "../components/AllocationCard";
 import { HeroNumber } from "../components/HeroNumber";
 import { AccountHoldingsSection } from "../components/Holdings";
+import { IncomeCard } from "../components/IncomeCard";
 import { BreakdownCard, CompletePictureCard } from "../components/NetWorthBreakdown";
 import { NudgeCard } from "../components/NudgeCard";
 import { RangeChips } from "../components/RangeChips";
+import { RecurringCard } from "../components/RecurringCard";
 import { DisclaimerFooter, SectionHeader } from "../components/Rows";
 import { Sparkline } from "../components/Sparkline";
 import { AllworthWordmark } from "../components/Wordmark";
 import { useApp } from "../state";
 import { colors, fonts, usd } from "../theme";
-import type { Dashboard, Nudge, Portfolio } from "../types";
+import type { AssetClass, Dashboard, Nudge, Portfolio, Position } from "../types";
+import { ClassDetailSheet } from "./ClassDetailSheet";
 import { NudgeDetailSheet } from "./NudgeDetailSheet";
+import { PositionDetailSheet } from "./PositionDetailSheet";
 
 const RANGES: { label: string; points: number; deltaSuffix: string }[] = [
   { label: "3M", points: 4, deltaSuffix: "past 3 months" },
@@ -27,6 +31,8 @@ export function InvestScreen() {
   const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedNudge, setSelectedNudge] = useState<Nudge | null>(null);
+  const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
+  const [selectedClass, setSelectedClass] = useState<AssetClass | null>(null);
 
   useEffect(() => {
     if (!app.dashboard) app.loadDashboard();
@@ -56,7 +62,13 @@ export function InvestScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
       >
         {d && p ? (
-          <InvestContent d={d} p={p} onNudge={setSelectedNudge} />
+          <InvestContent
+            d={d}
+            p={p}
+            onNudge={setSelectedNudge}
+            onPosition={setSelectedPosition}
+            onClass={setSelectedClass}
+          />
         ) : error ? (
           <ErrorState message={error} onRetry={retry} />
         ) : (
@@ -64,6 +76,32 @@ export function InvestScreen() {
         )}
       </ScrollView>
       <NudgeDetailSheet nudge={selectedNudge} onClose={() => setSelectedNudge(null)} />
+      <PositionDetailSheet
+        position={selectedPosition}
+        account={
+          selectedPosition && d
+            ? ([...d.accounts.allworth, ...d.accounts.outside].find(
+                (a) => a.id === selectedPosition.accountId,
+              ) ?? null)
+            : null
+        }
+        lots={
+          selectedPosition && p
+            ? p.taxLots.filter(
+                (l) =>
+                  l.accountId === selectedPosition.accountId &&
+                  l.symbol === selectedPosition.symbol,
+              )
+            : []
+        }
+        onClose={() => setSelectedPosition(null)}
+      />
+      <ClassDetailSheet
+        assetClass={selectedClass}
+        positions={p?.positions ?? []}
+        accounts={d ? [...d.accounts.allworth, ...d.accounts.outside] : []}
+        onClose={() => setSelectedClass(null)}
+      />
     </>
   );
 }
@@ -72,13 +110,22 @@ function InvestContent({
   d,
   p,
   onNudge,
+  onPosition,
+  onClass,
 }: {
   d: Dashboard;
   p: Portfolio;
   onNudge: (n: Nudge) => void;
+  onPosition: (pos: Position) => void;
+  onClass: (c: AssetClass) => void;
 }) {
   const app = useApp();
   const [range, setRange] = useState("1Y");
+
+  const ask = (prompt: string) => {
+    app.setChatPrefill(prompt);
+    app.setSelectedTab("chat");
+  };
 
   const { slice, delta } = useMemo(() => {
     const history = d.netWorthHistory;
@@ -131,13 +178,24 @@ function InvestContent({
 
       <View style={{ gap: 12 }}>
         <SectionHeader>Your allocation</SectionHeader>
-        <AllocationCard positions={p.positions} onAskRebalance={askRebalance} />
+        <AllocationCard
+          positions={p.positions}
+          onAskRebalance={askRebalance}
+          onSelectClass={onClass}
+        />
         <AdvisorHandoffCard />
       </View>
 
       {concentrationNudges.map((nudge) => (
         <NudgeCard key={nudge.id} nudge={nudge} onPress={() => onNudge(nudge)} />
       ))}
+
+      <View style={{ gap: 12 }}>
+        <SectionHeader>Automatic investing</SectionHeader>
+        <RecurringCard
+          onAsk={() => ask("Could I be investing more each month without hurting my plan?")}
+        />
+      </View>
 
       <View style={{ gap: 20 }}>
         <SectionHeader>Holdings</SectionHeader>
@@ -146,8 +204,18 @@ function InvestContent({
             key={account.id}
             account={account}
             positions={p.byAccount[account.id]}
+            onSelect={onPosition}
           />
         ))}
+      </View>
+
+      <View style={{ gap: 12 }}>
+        <SectionHeader>Income</SectionHeader>
+        <IncomeCard
+          positions={p.positions}
+          accounts={accounts}
+          onAsk={() => ask("What income could my portfolio generate in retirement?")}
+        />
       </View>
 
       <View style={{ paddingVertical: 8 }}>

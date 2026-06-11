@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
-import { DisclaimerFooter, SectionHeader } from "../components/Rows";
+import { DisclaimerFooter, SectionHeader, SheetHeader } from "../components/Rows";
 import { useApp } from "../state";
 import { colors, fonts, monthName, usd } from "../theme";
 import type { Nudge, SpendingDetail } from "../types";
@@ -52,7 +52,7 @@ function NudgeDetailContent({ nudge, onClose }: { nudge: Nudge; onClose: () => v
       contentContainerStyle={{ padding: 20, gap: 20 }}
     >
       <View style={{ gap: 6, paddingTop: 24 }}>
-        <SectionHeader>{nudge.title}</SectionHeader>
+        <SheetHeader title={nudge.title} onClose={onClose} />
         <Text style={styles.headline}>{nudge.headline}</Text>
       </View>
 

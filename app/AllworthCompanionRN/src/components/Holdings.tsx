@@ -1,5 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors, fonts, usd } from "../theme";
 import type { Account, Position } from "../types";
 import { HairlineDivider, SectionHeader } from "./Rows";
@@ -17,9 +18,11 @@ function isConcentrated(p: Position, accountTotal: number): boolean {
 export function AccountHoldingsSection({
   account,
   positions,
+  onSelect,
 }: {
   account: Account;
   positions: Position[];
+  onSelect?: (p: Position) => void;
 }) {
   const accountTotal = positions.reduce((sum, p) => sum + p.value, 0);
   const sorted = [...positions].sort((x, y) => y.value - x.value);
@@ -33,19 +36,32 @@ export function AccountHoldingsSection({
       {sorted.map((position, i) => (
         <React.Fragment key={`${position.accountId}-${position.symbol}`}>
           {i > 0 ? <HairlineDivider /> : null}
-          <HoldingRow position={position} accountTotal={accountTotal} />
+          <HoldingRow position={position} accountTotal={accountTotal} onSelect={onSelect} />
         </React.Fragment>
       ))}
     </View>
   );
 }
 
-function HoldingRow({ position, accountTotal }: { position: Position; accountTotal: number }) {
+function HoldingRow({
+  position,
+  accountTotal,
+  onSelect,
+}: {
+  position: Position;
+  accountTotal: number;
+  onSelect?: (p: Position) => void;
+}) {
   const weightPct = accountTotal ? Math.round((position.value / accountTotal) * 100) : 0;
   const concentrated = isConcentrated(position, accountTotal);
+  const tappable = onSelect != null && position.assetClass !== "cash";
 
   return (
-    <View style={styles.row}>
+    <Pressable
+      onPress={tappable ? () => onSelect(position) : undefined}
+      disabled={!tappable}
+      style={({ pressed }) => [styles.row, pressed && { opacity: 0.6 }]}
+    >
       <View style={{ flex: 1 }}>
         <View style={styles.symbolRow}>
           <Text style={styles.symbol}>{position.symbol}</Text>
@@ -63,7 +79,8 @@ function HoldingRow({ position, accountTotal }: { position: Position; accountTot
         <Text style={styles.value}>{usd(position.value)}</Text>
         <Text style={styles.weight}>{weightPct}%</Text>
       </View>
-    </View>
+      {tappable ? <Ionicons name="chevron-forward" size={14} color={colors.inkTertiary} /> : null}
+    </Pressable>
   );
 }
 

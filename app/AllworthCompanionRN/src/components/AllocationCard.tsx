@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { card, colors, fonts } from "../theme";
@@ -5,10 +6,10 @@ import type { AssetClass, Position } from "../types";
 
 // Plan risk target ("60/40 growth & income") lives in the advisor plan tool,
 // not exposed over HTTP — hardcoded demo constant per golden API contract.
-const TARGET = { equity: 0.6, income: 0.4 };
+export const PLAN_TARGET = { equity: 0.6, income: 0.4 };
 
 // Charts draw from the brand secondary palette (deck p.7)
-const CLASSES: { key: AssetClass; label: string; color: string }[] = [
+export const ALLOCATION_CLASSES: { key: AssetClass; label: string; color: string }[] = [
   { key: "us_equity", label: "US stocks", color: colors.chartNightBlue },
   { key: "intl_equity", label: "International stocks", color: colors.chartSky },
   { key: "bond", label: "Bonds", color: colors.chartGold },
@@ -19,27 +20,29 @@ const CLASSES: { key: AssetClass; label: string; color: string }[] = [
 export function AllocationCard({
   positions,
   onAskRebalance,
+  onSelectClass,
 }: {
   positions: Position[];
   onAskRebalance: () => void;
+  onSelectClass?: (c: AssetClass) => void;
 }) {
   const a = useMemo(() => {
     const invested = positions.reduce((sum, p) => sum + p.value, 0);
     const byClass = {} as Record<AssetClass, number>;
-    for (const c of CLASSES) byClass[c.key] = 0;
+    for (const c of ALLOCATION_CLASSES) byClass[c.key] = 0;
     for (const p of positions) byClass[p.assetClass] += p.value;
     const pct = (k: AssetClass) => (invested ? byClass[k] / invested : 0);
     const equityPct = pct("us_equity") + pct("intl_equity");
     // Cash counted on the defensive side — consistent with the income sleeve of a 60/40 plan
     const incomePct = pct("bond") + pct("muni_bond") + pct("cash");
-    const driftPts = Math.round((equityPct - TARGET.equity) * 100);
+    const driftPts = Math.round((equityPct - PLAN_TARGET.equity) * 100);
     return { byClass, pct, equityPct, incomePct, driftPts };
   }, [positions]);
 
   return (
     <View style={styles.card}>
       <View style={styles.segmentBar}>
-        {CLASSES.map((c) =>
+        {ALLOCATION_CLASSES.map((c) =>
           a.byClass[c.key] > 0 ? (
             <View key={c.key} style={{ flex: a.byClass[c.key], backgroundColor: c.color }} />
           ) : null,
@@ -47,13 +50,21 @@ export function AllocationCard({
       </View>
 
       <View style={styles.legend}>
-        {CLASSES.map((c) =>
+        {ALLOCATION_CLASSES.map((c) =>
           a.byClass[c.key] > 0 ? (
-            <View key={c.key} style={styles.legendRow}>
+            <Pressable
+              key={c.key}
+              onPress={onSelectClass ? () => onSelectClass(c.key) : undefined}
+              disabled={!onSelectClass}
+              style={({ pressed }) => [styles.legendRow, pressed && { opacity: 0.6 }]}
+            >
               <View style={[styles.legendDot, { backgroundColor: c.color }]} />
               <Text style={styles.legendLabel}>{c.label}</Text>
               <Text style={styles.legendPct}>{Math.round(a.pct(c.key) * 100)}%</Text>
-            </View>
+              {onSelectClass ? (
+                <Ionicons name="chevron-forward" size={14} color={colors.inkTertiary} />
+              ) : null}
+            </Pressable>
           ) : null,
         )}
       </View>
@@ -66,8 +77,8 @@ export function AllocationCard({
         />
         <MixBar
           label="Plan target"
-          equityPct={TARGET.equity}
-          caption={`${Math.round(TARGET.equity * 100)}% · ${Math.round(TARGET.income * 100)}%`}
+          equityPct={PLAN_TARGET.equity}
+          caption={`${Math.round(PLAN_TARGET.equity * 100)}% · ${Math.round(PLAN_TARGET.income * 100)}%`}
         />
       </View>
 

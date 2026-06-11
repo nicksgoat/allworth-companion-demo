@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { DisclaimerFooter, SectionHeader } from "../components/Rows";
+import { DisclaimerFooter, SectionHeader, SheetHeader } from "../components/Rows";
 import { useApp } from "../state";
 import { colors, fonts, shortDate } from "../theme";
 import type { LearnedFact } from "../types";
@@ -79,7 +79,7 @@ function FactDetailContent({
       contentContainerStyle={{ padding: 20, gap: 24 }}
     >
       <View style={{ gap: 6, paddingTop: 24 }}>
-        <SectionHeader>{categoryLabel}</SectionHeader>
+        <SheetHeader title={categoryLabel} onClose={onClose} />
         <Text style={styles.fact}>{fact.fact}</Text>
       </View>
 

@@ -1,10 +1,29 @@
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors, fonts, sectionHeader, shortDate, usd } from "../theme";
 import type { Account, LearnedFact } from "../types";
 
 export function SectionHeader({ children }: { children: string }) {
   return <Text style={styles.sectionHeader}>{children}</Text>;
+}
+
+// Sheets have no swipe-to-dismiss on web, so every sheet needs a visible close.
+export function SheetHeader({ title, onClose }: { title: string; onClose: () => void }) {
+  return (
+    <View style={styles.sheetHeader}>
+      <View style={{ flex: 1 }}>
+        <SectionHeader>{title}</SectionHeader>
+      </View>
+      <Pressable
+        onPress={onClose}
+        hitSlop={8}
+        style={({ pressed }) => [styles.sheetClose, pressed && { opacity: 0.6 }]}
+      >
+        <Ionicons name="close" size={18} color={colors.inkSecondary} />
+      </Pressable>
+    </View>
+  );
 }
 
 export function HairlineDivider() {
@@ -52,6 +71,15 @@ export function DisclaimerFooter() {
 
 const styles = StyleSheet.create({
   sectionHeader: { ...sectionHeader },
+  sheetHeader: { flexDirection: "row", alignItems: "center", gap: 12 },
+  sheetClose: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: colors.inkFaint,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   hairline: { height: StyleSheet.hairlineWidth, backgroundColor: colors.hairline },
   accountRow: { flexDirection: "row", alignItems: "center", paddingVertical: 12, gap: 12 },
   accountName: { fontSize: 17, fontFamily: fonts.sans, color: colors.inkPrimary },
