@@ -1,0 +1,35 @@
+[project]
+name = "allworth-demo-api"
+version = "0.1.0"
+description = "Allworth Companion demo backend (FastAPI)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.34",
+    "anthropic>=0.104",
+    "mcp>=1.9",
+    "python-dotenv>=1.0",
+    "openai>=2.41.1",
+    "pyodbc>=5.3.0",
+    "azure-identity>=1.25.3",
+]
+
+[dependency-groups]
+dev = ["ruff>=0.11"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF"]
+ignore = ["SIM108"]
+
+[tool.ruff.lint.per-file-ignores]
+# main.py: load_dotenv must run before chat imports read ANTHROPIC_API_KEY.
+"main.py" = ["E402"]
+# prompts.py: line breaks inside the system prompt are part of the cached string.
+"prompts.py" = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["allworth_api"]

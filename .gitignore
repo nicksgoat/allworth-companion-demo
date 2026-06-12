@@ -1,0 +1,14 @@
+﻿node_modules/
+.env
+.DS_Store
+*.xcuserstate
+xcuserdata/
+DerivedData/
+.expo/
+backend/memory/*.runtime.json
+backend/.venv/
+__pycache__/
+build/
+.codex-run/
+*.log
+.venv

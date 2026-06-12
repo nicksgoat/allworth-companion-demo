@@ -1,0 +1,18 @@
+{
+  "match": [
+    "what changed",
+    "what's changed",
+    "whats changed",
+    "what's new",
+    "whats new",
+    "catch me up",
+    "since i was",
+    "since last",
+    "miss anything",
+    "did i miss"
+  ],
+  "tools": ["get_client_profile", "get_spending"],
+  "text": "Here's what's changed since Monday:\n\n**Your profile grew.** Monday's conversation taught me four durable things: the $200K SpaceX IPO decision (deadline this Sunday, June 15), the lake house goal — still the big one, about four years out — your preference not to sell the 2015 Apple shares because of the embedded gain, and the outside accounts you mentioned (Fidelity 401(k), Robinhood, Chase). Each one is on your profile with the exact words you used, and you can remove any of them.\n\n**Spending is unchanged — still about 18% over plan** on a three-month average. Nothing unusual has hit this week, so the picture we walked through Monday still holds.\n\n**Dana's brief is up to date.** The open questions we flagged — how a locked-up $200K fits alongside your $9,000/month draw, and what it means for the lake house timeline — are in her prepared summary.\n\nThe one clock ticking is the IPO deadline: five days. Want to pick that thread back up, or look at something else?",
+  "sources": ["Your profile", "Spending"],
+  "suggested": ["Where did we land on the SpaceX IPO?"]
+}

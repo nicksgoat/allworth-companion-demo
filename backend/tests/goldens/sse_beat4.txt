@@ -1,0 +1,102 @@
+event: tool_start
+data: {"name":"get_client_profile","label":"Recalling what I know…"}
+
+event: tool_end
+data: {"name":"get_client_profile"}
+
+event: tool_start
+data: {"name":"get_financial_plan","label":"Reviewing your plan…"}
+
+event: tool_end
+data: {"name":"get_financial_plan"}
+
+event: text
+data: {"delta":"Welcome back, Maya. Last time you "}
+
+event: text
+data: {"delta":"were weighing $200K into the SpaceX "}
+
+event: text
+data: {"delta":"IPO — your deadline is this "}
+
+event: text
+data: {"delta":"Sunday, June 15.\n\nHere's where we left "}
+
+event: text
+data: {"delta":"it on Monday: the cash route "}
+
+event: text
+data: {"delta":"(~$206K available) costs you essentially nothing "}
+
+event: text
+data: {"delta":"in tax but uses your liquidity "}
+
+event: text
+data: {"delta":"cushion. Selling the Apple would run "}
+
+event: text
+data: {"delta":"about $18,500 in tax, though it "}
+
+event: text
+data: {"delta":"would also trim a concentrated position. "}
+
+event: text
+data: {"delta":"The Robinhood shares are the most "}
+
+event: text
+data: {"delta":"expensive to sell tax-wise, about $14,500 "}
+
+event: text
+data: {"delta":"on $96K.\n\nYou also said you hate "}
+
+event: text
+data: {"delta":"the idea of paying tax on "}
+
+event: text
+data: {"delta":"the Apple you bought back in "}
+
+event: text
+data: {"delta":"2015 — so if that's still "}
+
+event: text
+data: {"delta":"true, the cash route or a "}
+
+event: text
+data: {"delta":"partial mix may be the paths "}
+
+event: text
+data: {"delta":"to pressure-test.\n\nThe open questions we flagged "}
+
+event: text
+data: {"delta":"for Dana: how a locked-up $200K "}
+
+event: text
+data: {"delta":"position fits alongside your $9,000/month income "}
+
+event: text
+data: {"delta":"plan, what it means for the "}
+
+event: text
+data: {"delta":"lake house timeline, and whether spending "}
+
+event: text
+data: {"delta":"running above plan changes the math.\n\nWith "}
+
+event: text
+data: {"delta":"five days left, this is the "}
+
+event: text
+data: {"delta":"week to get Dana's eyes on "}
+
+event: text
+data: {"delta":"it. Want me to send her "}
+
+event: text
+data: {"delta":"the summary and request a call "}
+
+event: text
+data: {"delta":"before Friday? "}
+
+event: done
+data: {"sources":["Your profile","Financial plan"],"fallback":true,"suggested":["What changed since I was last here?"]}
+

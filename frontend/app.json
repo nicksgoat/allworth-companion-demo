@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Allworth",
+    "slug": "AllworthCompanionRN",
+    "version": "1.0.0",
+    "scheme": "allworthdemo",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.AllworthCompanionRN"
+    },
+    "android": {
+      "package": "com.anonymous.AllworthCompanionRN",
+      "adaptiveIcon": {
+        "backgroundColor": "#173D67",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}

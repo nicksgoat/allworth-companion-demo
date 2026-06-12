@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "allworth-client-intelligence": {
+      "command": "uv",
+      "args": ["run", "--project", "backend", "python", "backend/mcp_server.py"],
+      "env": {
+        "ALLWORTH_CLIENT_ID": "maya"
+      }
+    }
+  }
+}
