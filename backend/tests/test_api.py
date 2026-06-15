@@ -28,6 +28,18 @@ def test_defaults_to_mock_mode() -> None:
     assert client.get("/api/health").json()["synapse"] is False
 
 
+def test_email_login_works_in_mock_mode() -> None:
+    # The Sign-In screen uses email login — it must resolve against seed in mock
+    # mode (case-insensitive), or the demo can't get past the login screen.
+    r = client.post("/api/auth/login/email", json={"email": "MAYA@example.com"})
+    assert r.status_code == 200
+    body = r.json()
+    assert body["householdId"] == "maya"
+    assert body["contactName"] == "Maya Tran"
+    bad = client.post("/api/auth/login/email", json={"email": "nobody@nowhere.com"})
+    assert bad.status_code == 401
+
+
 # ── Screen data is grounded (and matches what the chat will claim) ───────────
 
 

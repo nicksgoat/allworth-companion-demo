@@ -96,16 +96,31 @@ def authenticate(household_id: str, passcode: str) -> HouseholdSession | None:
     return session
 
 
-def authenticate_email(email: str) -> HouseholdSession | None:
-    """Authenticate by client email address via Synapse lookup.
+def _lookup_email_in_seed(email: str) -> dict[str, Any] | None:
+    """Mock-mode email lookup: resolve a demo email against the seed personas.
 
-    Looks up the email in Contact_Demographic, resolves to a household (AVHHID),
-    and creates a session. No password required for demo — the email itself
-    is the identity proof (in production this would be SSO/Entra validated).
+    Mirrors _lookup_email_in_synapse so the same email login screen works in both
+    mock and live mode — flipping DATA_MODE doesn't change how you sign in.
+    """
+    from allworth_api.data.seed import seed
+
+    target = email.strip().lower()
+    for c in seed["personas"]["clients"]:
+        if (c.get("email") or "").lower() == target:
+            return {"household_id": c["id"], "contact_name": c["name"], "email": c.get("email"), "role": "Primary"}
+    return None
+
+
+def authenticate_email(email: str) -> HouseholdSession | None:
+    """Authenticate by client email address.
+
+    Live mode resolves the email in Synapse Contact_Demographic (AVHHID); mock mode
+    falls back to the seed personas. No password required for demo — the email is the
+    identity proof (in production this would be SSO/Entra validated).
 
     Returns HouseholdSession on success, None if email not found.
     """
-    result = _lookup_email_in_synapse(email)
+    result = _lookup_email_in_synapse(email) or _lookup_email_in_seed(email)
     if not result:
         return None
 

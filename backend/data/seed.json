@@ -20,6 +20,7 @@
       {
         "id": "maya",
         "name": "Maya Tran",
+        "email": "maya@example.com",
         "age": 58,
         "city": "Plano, TX",
         "advisorId": "dana",
