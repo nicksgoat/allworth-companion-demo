@@ -1,0 +1,23 @@
+{
+  "match": [
+    "portfolio",
+    "invested",
+    "how am i invested",
+    "holdings",
+    "allocation",
+    "positions",
+    "asset mix",
+    "stocks i own",
+    "what do i own",
+    "diversified",
+    "how's it invested"
+  ],
+  "tools": ["get_portfolio", "analyze_portfolio_drift"],
+  "text": "Here's how your money is actually invested, in plain English.\n\n**The core — your Allworth accounts** are built around a roughly 60/40 growth-and-income mix: broad U.S. stock funds (VTI), international (VXUS), and a bond sleeve (BND plus tax-exempt VTEB in the taxable trust). That's the steady engine meant to fund your $9,000/month income plan.\n\n**Two things stand out from the broad funds:**\n- **Apple in the trust** — about $170,400, roughly 12% of that account. Notable, but not extreme.\n- **The Robinhood sleeve** — about $96,000 split across NVIDIA, Tesla, and Palantir. That's a concentrated, high-volatility corner that behaves very differently from the rest.\n\nSo the picture is a well-diversified core with a small speculative tail. Whether that tail is sized right for someone drawing income is a good question to put to Dana. Want me to look at the concentration more closely, or check how this lines up with your plan?",
+  "sources": ["Portfolio", "Portfolio analysis"],
+  "suggested": [
+    "Anything too concentrated I should know about?",
+    "How am I tracking to plan?",
+    "What's my net worth?"
+  ]
+}

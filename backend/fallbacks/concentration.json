@@ -1,0 +1,26 @@
+{
+  "match": [
+    "concentrated",
+    "concentration",
+    "options for",
+    "one stock",
+    "single stock",
+    "single position",
+    "too much in",
+    "nvda",
+    "nvidia",
+    "tesla",
+    "tsla",
+    "palantir",
+    "robinhood",
+    "reduce my position",
+    "trim"
+  ],
+  "tools": ["get_portfolio", "simulate_tax_impact"],
+  "text": "Good thing to look at. The position I flagged is in your **Robinhood account**: **NVIDIA is about 54% of that account** (~$52,000), with Tesla another ~26%. So roughly $96,000 is riding on a few volatile tech names — a single bad week there can swing the whole account.\n\nThe wrinkle is taxes: those shares have very low cost basis (your NVIDIA was around $22 a share), so selling to diversify would realize sizable gains. A few ways people in your spot weigh it:\n\n1. **Trim gradually** — sell a slice over time to spread the tax across years rather than taking it all at once.\n2. **Redirect, don't add** — stop reinvesting there and let new money build the diversified core instead.\n3. **Give appreciated shares** — gifting some to the grandkids' 529s or to family can move the position *and* the embedded gain off your return.\n4. **Do nothing** — it's a small share of your overall net worth; concentration risk may be acceptable if you're comfortable with the swings.\n\nEach has a real tax trade-off, and the right mix depends on your other income that year. This is a great one to model with Dana — want me to estimate the tax on trimming it and send her the summary?",
+  "sources": ["Portfolio", "Tax estimate"],
+  "suggested": [
+    "What would the tax be if I trimmed it?",
+    "Flag this for Dana"
+  ]
+}

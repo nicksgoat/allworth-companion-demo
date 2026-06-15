@@ -1,0 +1,23 @@
+{
+  "match": [
+    "net worth",
+    "net-worth",
+    "how much do i have",
+    "how much am i worth",
+    "total worth",
+    "where do i stand",
+    "big picture",
+    "add up",
+    "how am i doing overall",
+    "overall picture",
+    "everything together"
+  ],
+  "tools": ["get_accounts"],
+  "text": "Here's the whole picture, pulled together: your net worth is about **$2,746,000**, up from roughly $2.69M back in April.\n\n**What Allworth manages for you — about $2,445,000:**\n- Trust Brokerage (taxable): $1,420,000\n- Rollover IRA: $880,000\n- Roth IRA: $145,000\n\n**Held away (outside Allworth) — about $611,000 in assets:**\n- 401(k) at Fidelity: $385,000\n- Robinhood brokerage: $96,000\n- Chase checking & savings: $130,000\n\n**And one liability:** your Chase mortgage at about –$310,000.\n\nThe through-line: most of your wealth is in tax-advantaged and managed accounts, with a smaller, more speculative slice at Robinhood. If it'd help to see how it's invested or whether it all supports the lake house plan, I can pull either one up.",
+  "sources": ["Accounts"],
+  "suggested": [
+    "How am I invested?",
+    "Am I on track for the lake house?",
+    "How's my spending?"
+  ]
+}

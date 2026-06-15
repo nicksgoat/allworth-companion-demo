@@ -1,0 +1,25 @@
+{
+  "cli": {
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "production": {
+      "autoIncrement": true,
+      "credentialsSource": "local",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://allworth-demo-api.fly.dev"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleTeamId": "NAK8FFQZBA",
+        "ascApiKeyPath": "/Users/nickmckenzie/allworth/AuthKey_FA9D3PALLA.p8",
+        "ascApiKeyId": "FA9D3PALLA",
+        "ascApiKeyIssuerId": "5f8fb45c-89b4-4215-b080-16dd673ea2a5",
+        "ascAppId": "6779701863"
+      }
+    }
+  }
+}

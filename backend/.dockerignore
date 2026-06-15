@@ -1,0 +1,8 @@
+.env
+.venv
+__pycache__
+**/__pycache__
+.ruff_cache
+tests
+fly.toml
+memory/*.runtime.json

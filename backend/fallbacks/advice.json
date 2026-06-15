@@ -1,0 +1,22 @@
+{
+  "match": [
+    "what should i do",
+    "tell me what to do",
+    "what would you do",
+    "what do you recommend",
+    "your recommendation",
+    "just tell me",
+    "what's the right move",
+    "whats the right move",
+    "make the decision",
+    "what should i pick",
+    "decide for me"
+  ],
+  "tools": [],
+  "text": "I'll be straight about how I work: I'm here to lay out your numbers and the trade-offs clearly — but I don't make the call for you, and I won't tell you to buy, sell, or do any one thing. That's not me being cagey; the *right* move depends on your full picture and your comfort with it, and that's a conversation for **Dana**, your advisor.\n\nWhat I *can* do is make the decision easier to make: show you what each option costs in taxes, what it does to your $9,000/month income plan, and how it touches goals like the lake house — so when you and Dana talk, you're deciding from clarity instead of guesswork.\n\nSo tell me what you're weighing — the SpaceX IPO, trimming the concentrated position, the spending trend — and I'll lay it out plainly. Or I can hand the whole thing to Dana with the context attached. What would help most?",
+  "sources": [],
+  "suggested": [
+    "What would $200K into the SpaceX IPO mean for me?",
+    "Talk it through with Dana"
+  ]
+}

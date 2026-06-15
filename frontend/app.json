@@ -9,7 +9,10 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.AllworthCompanionRN"
+      "bundleIdentifier": "com.allworth.companion",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.anonymous.AllworthCompanionRN",
@@ -26,6 +29,12 @@
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "953c3346-21c1-462c-9464-bbf7204d5237"
+      }
+    },
+    "owner": "nickmck"
   }
 }

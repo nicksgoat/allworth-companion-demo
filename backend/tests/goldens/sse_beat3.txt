@@ -44,7 +44,7 @@ event: text
 data: {"delta":"from.** You have three realistic sources:\n\n1. "}
 
 event: text
-data: {"delta":"**Cash and savings** — about $206,000 "}
+data: {"delta":"**Cash and savings** — about $235,000 "}
 
 event: text
 data: {"delta":"between checking, savings, and the cash "}
@@ -179,5 +179,5 @@ event: text
 data: {"delta":"we just looked at? "}
 
 event: done
-data: {"sources":["Accounts","Financial plan","Portfolio","Tax estimate","Spending"],"fallback":true,"suggested":[]}
+data: {"sources":["Accounts","Financial plan","Portfolio","Tax estimate","Spending"],"fallback":true,"suggested":["What would selling Apple cost me in tax?","Flag this for Dana"]}
 

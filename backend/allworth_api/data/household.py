@@ -7,6 +7,7 @@ queries live data. Otherwise falls back to the static seed data (demo mode).
 from __future__ import annotations
 
 import logging
+import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any
 
@@ -18,16 +19,36 @@ from allworth_api.data.seed import spending_summary as seed_spending_summary
 
 logger = logging.getLogger(__name__)
 
-# Demo household IDs that should always use seed data
-_DEMO_IDS = {"maya", "hh_castillo", "hh_raman"}
+# ── Mock ↔ live data switch ─────────────────────────────────────────────────
+# DATA_MODE=mock (default) serves the synthetic seed data; DATA_MODE=live serves
+# real Synapse data through the exact same response shapes. In live mode the demo
+# client is mapped to the real household named by DEMO_HOUSEHOLD_ID (its AVHHID);
+# a numeric client_id is used as-is. Flipping mock→live is pure config — set
+# DATA_MODE=live, DEMO_HOUSEHOLD_ID, and the SYNAPSE_* connection vars in
+# backend/.env. No code changes.
+_DATA_MODE = os.environ.get("DATA_MODE", "mock").strip().lower()
+_DEMO_HOUSEHOLD_ID = os.environ.get("DEMO_HOUSEHOLD_ID", "").strip()
 
 # Thread pool for parallel Synapse queries
 _executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="synapse")
 
 
+def _resolve_hh(client_id: str) -> int | None:
+    """The Synapse AVHHID to query for this client in live mode, or None for mock.
+
+    Returns None whenever we should serve seed data — i.e. mock mode, or live mode
+    without a reachable Synapse. This is the single point where the switch is read.
+    """
+    if _DATA_MODE != "live" or not synapse.is_available():
+        return None
+    if _DEMO_HOUSEHOLD_ID:
+        return int(_DEMO_HOUSEHOLD_ID)
+    return int(client_id) if client_id.isdigit() else None
+
+
 def _is_synapse_household(household_id: str) -> bool:
-    """Check if this household should be resolved from Synapse (numeric AVHHID)."""
-    return household_id not in _DEMO_IDS and household_id.isdigit() and synapse.is_available()
+    """True when this request should be served from live Synapse data."""
+    return _resolve_hh(household_id) is not None
 
 
 # ── Client persona ────────────────────────────────────────────────────────
@@ -39,7 +60,7 @@ def get_client_persona(household_id: str) -> dict[str, Any] | None:
         return next((c for c in seed["personas"]["clients"] if c["id"] == household_id), None)
 
     try:
-        hh_id = int(household_id)
+        hh_id = _resolve_hh(household_id)
         hh = synapse.resolve_household(household_id=hh_id)
         if not hh:
             return None
@@ -93,7 +114,7 @@ def get_accounts(household_id: str) -> dict[str, Any]:
         return seed_accounts_for()
 
     try:
-        hh_id = int(household_id)
+        hh_id = _resolve_hh(household_id)
         raw = synapse.get_accounts(hh_id)
         if not raw:
             return seed_accounts_for()
@@ -184,7 +205,7 @@ def get_net_worth_history(household_id: str) -> list[dict[str, Any]]:
         return seed["netWorthHistory"]
 
     try:
-        hh_id = int(household_id)
+        hh_id = _resolve_hh(household_id)
         raw = synapse.get_net_worth_history(hh_id)
         if not raw:
             return seed["netWorthHistory"]
@@ -216,7 +237,7 @@ def get_portfolio(household_id: str) -> dict[str, Any]:
         return seed_portfolio_for()
 
     try:
-        hh_id = int(household_id)
+        hh_id = _resolve_hh(household_id)
         raw = synapse.get_holdings(hh_id)
         if not raw:
             return seed_portfolio_for()
@@ -272,7 +293,7 @@ def get_spending(household_id: str, months: int = 3) -> dict[str, Any]:
 
     # Synapse rollforward has cash withdrawal / expenses data
     try:
-        hh_id = int(household_id)
+        hh_id = _resolve_hh(household_id)
         raw = synapse.get_rollforward(hh_id, periods=max(months, 12))
         if not raw:
             return seed_spending_summary(months)

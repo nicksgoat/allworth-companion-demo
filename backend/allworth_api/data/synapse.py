@@ -173,6 +173,25 @@ def resolve_household(household_id: int | None = None, household_name: str | Non
     return None
 
 
+def resolve_household_by_account(account_number: str) -> int | None:
+    """Map an account number (e.g. the corporate account) to its household AVHHID.
+
+    The warehouse is scoped by household, so this is the bridge from an account
+    number to the DEMO_HOUSEHOLD_ID the data layer queries with. Returns None if
+    the account isn't found.
+    """
+    rows = _query(
+        """
+        SELECT TOP 1 a.[Primary Household ID] AS household_id
+        FROM [tav].[All_Custodian_Values] a
+        WHERE a.[Account Number] = ?
+        """,
+        (account_number,),
+    )
+    hh = rows[0].get("household_id") if rows else None
+    return int(hh) if hh is not None else None
+
+
 def get_household_members(household_id: int) -> list[dict[str, Any]]:
     """Fetch contact demographics for a household (primary/secondary members)."""
     # Resolve AVHHID → Salesforce HHID for Contact_Demographic

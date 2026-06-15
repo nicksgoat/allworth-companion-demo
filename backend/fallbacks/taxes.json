@@ -1,0 +1,21 @@
+{
+  "match": [
+    "tax",
+    "taxes",
+    "capital gains",
+    "cap gains",
+    "sell",
+    "selling",
+    "cost basis",
+    "aapl",
+    "apple shares",
+    "what would it cost to sell"
+  ],
+  "tools": ["get_portfolio", "simulate_tax_impact"],
+  "text": "Happy to lay out the tax side, in plain English. You're a single filer in Texas, so no state income tax — but your long-term capital-gains rate runs about **15%**, plus the **3.8% NIIT** surcharge kicks in at your income, so figure closer to ~18.8% on gains.\n\nWhere selling would bite, by source:\n\n- **Cash & savings** — no tax at all. It's your most tax-efficient dollar, but also your liquidity cushion.\n- **Apple in the trust** (~$170,400) — a lot of it is shares from around 2015 at ~$27, so the embedded gain is large. Selling the full position would run roughly **$18,500** in tax.\n- **The Robinhood tech** (~$96,000) — very low basis (NVIDIA ~$22/share), so it's the most expensive per dollar to sell — about **$14,500** to clear it all.\n\nSo the headline is: *which* dollar you raise matters as much as how much. I'm giving you the estimate, not a recommendation — the actual move depends on the full year's income, and that's Dana's wheelhouse. Want me to run the exact tax on a specific amount and flag it for her?",
+  "sources": ["Portfolio", "Tax estimate"],
+  "suggested": [
+    "What would $200K into the SpaceX IPO mean for me?",
+    "Flag this for Dana"
+  ]
+}

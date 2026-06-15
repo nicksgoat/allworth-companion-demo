@@ -1,0 +1,23 @@
+{
+  "match": [
+    "lake house",
+    "lake",
+    "529",
+    "grandkid",
+    "college",
+    "on track for",
+    "goal",
+    "goals",
+    "saving enough",
+    "afford the",
+    "timeline",
+    "house fund"
+  ],
+  "tools": ["get_financial_plan", "analyze_goal_funding"],
+  "text": "Let's look at your goals against where the money actually is.\n\n**The lake house** — your big one. Target is **$350,000**, about **four years out**, and you're roughly **32% funded** today (~$112K earmarked). At a normal growth rate you're making progress, but there's a gap to close — and the recent spending running ~18% over plan is the main thing nibbling at it. Getting fully there on time likely means either steady contributions or easing the overspend; the two are connected.\n\n**The grandkids' 529s** — $120,000 target, longer runway (about 10 years), currently ~18% funded. More time on your side there, so less urgent.\n\n**Retirement income** — the steady $9,000/month from the portfolio through age 95. That's the engine the other goals lean on, which is why spending and the SpaceX decision both ripple into the lake-house math.\n\nNone of this is a verdict — it's the trade-off laid out. The lake-house timeline is a perfect thing to pressure-test with Dana. Want me to show what closes the gap, or flag it for your next session?",
+  "sources": ["Financial plan", "Goal tracker"],
+  "suggested": [
+    "How's my spending affecting this?",
+    "Talk it through with Dana"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "match": [
+    "retire",
+    "retirement",
+    "outlive",
+    "run out",
+    "will the money last",
+    "income last",
+    "sustainable",
+    "enough to live",
+    "afford to retire",
+    "am i okay",
+    "be okay",
+    "tracking to plan",
+    "track to plan",
+    "on track to plan"
+  ],
+  "tools": ["get_financial_plan", "run_retirement_projection", "analyze_income_sustainability"],
+  "text": "The honest, plain-English answer: you're in a solid spot, with one thing worth watching.\n\n**Your income plan** draws **$9,000/month from the portfolio**, alongside about **$4,500/month** from other sources — against spending that's planned at $14,000 but has recently run closer to $16,500. On a $2.7M base with a 60/40 mix, a draw at that level is generally sustainable across a long retirement.\n\n**The variable that matters** is the gap between spending and income. At plan ($14K), the math is comfortable. At the recent pace ($16.5K), you're leaning a little harder on the portfolio — fine for a stretch, worth not making permanent. A full projection would put a probability on funding spending through age 95, and that's exactly the kind of model Dana runs.\n\nI can give you the shape of it, but the real stress-test — inflation, market sequence, the lake house and SpaceX decisions layered in — is a conversation for her. Want me to pull the projection, or get this on her radar for your next session?",
+  "sources": ["Financial plan", "Retirement model", "Income plan"],
+  "suggested": [
+    "Am I saving enough for the lake house?",
+    "What changed recently?"
+  ]
+}

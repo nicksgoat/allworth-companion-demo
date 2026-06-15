@@ -26,7 +26,7 @@ event: text
 data: {"delta":"it on Monday: the cash route "}
 
 event: text
-data: {"delta":"(~$206K available) costs you essentially nothing "}
+data: {"delta":"(~$235K available) costs you essentially nothing "}
 
 event: text
 data: {"delta":"in tax but uses your liquidity "}

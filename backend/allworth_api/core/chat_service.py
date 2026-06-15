@@ -50,8 +50,16 @@ def reset_conversations() -> None:
 
 def suggested_for(session: str) -> list[str]:
     if session == "wednesday":
-        return ["What changed since I was last here?", "Where did we land on the SpaceX IPO?"]
-    return ["What would $200K into the SpaceX IPO mean for me?"]
+        return [
+            "What changed since I was last here?",
+            "Where did we land on the SpaceX IPO?",
+            "Am I on track for the lake house?",
+        ]
+    return [
+        "What's my net worth?",
+        "How's my spending tracking?",
+        "What would $200K into the SpaceX IPO mean for me?",
+    ]
 
 
 async def _stream_fallback(user_text, session, out):

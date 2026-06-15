@@ -1,0 +1,17 @@
+{
+  "match": [
+    "roth",
+    "roth conversion",
+    "convert to roth",
+    "convert my ira",
+    "ira to roth",
+    "conversion"
+  ],
+  "tools": ["get_financial_plan", "run_roth_conversion_analysis"],
+  "text": "A Roth conversion is one of those moves that's smart or premature depending entirely on the year — let me lay out the shape of it for you.\n\n**What it is:** moving some of your **$880,000 Rollover IRA** (pre-tax money) into your Roth, where it then grows tax-free and has no required withdrawals later. The catch: you pay ordinary income tax on whatever you convert, **this year**.\n\n**The trade-off in your case:** you're in the **24% federal bracket**, single, in Texas — so no state tax, which helps. Converting, say, $50K would add roughly that to this year's taxable income, and because you're already in NIIT territory, a large conversion can also nudge the surcharge on your other investment income. The payoff is years of tax-free growth and a smaller taxable IRA down the road; the break-even is usually several years out.\n\n**Where it tends to fit:** a lower-income year — semi-retirement often creates those — or spreading smaller conversions across several years to stay under a bracket line, rather than one big one.\n\nThis is a genuinely do-the-math, year-by-year decision, and exactly the kind Dana models against your full tax picture. Want me to estimate the tax on a specific conversion amount and send it to her?",
+  "sources": ["Financial plan", "Roth analysis"],
+  "suggested": [
+    "What's my retirement income plan?",
+    "Flag this for Dana"
+  ]
+}
