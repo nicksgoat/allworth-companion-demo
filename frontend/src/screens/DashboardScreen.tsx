@@ -7,7 +7,6 @@ import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
 import { NudgeCard } from "../components/NudgeCard";
 import { DisclaimerFooter, HairlineDivider, SectionHeader } from "../components/Rows";
 import { Sparkline } from "../components/Sparkline";
-import { AllworthWordmark } from "../components/Wordmark";
 import { useApp } from "../state";
 import { card, colors, fonts, usd } from "../theme";
 import type { Dashboard, Nudge } from "../types";
@@ -73,14 +72,25 @@ function greetingForNow() {
 }
 
 function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) => void }) {
-  const firstName = d.client?.name.split(" ")[0] ?? "Maya";
+  const app = useApp();
+  const fullName = d.client?.name ?? "Maya Tran";
+  const initials = d.client?.avatarInitials ?? "MT";
   return (
     <View style={{ gap: 24 }}>
       <View style={styles.headerRow}>
-        <Text style={styles.greeting} numberOfLines={1} adjustsFontSizeToFit>
-          {greetingForNow()}, {firstName}
-        </Text>
-        <AllworthWordmark />
+        <View style={styles.greetingBlock}>
+          <Text style={styles.salutation}>{greetingForNow()}</Text>
+          <Text style={styles.clientName} numberOfLines={1} adjustsFontSizeToFit>
+            {fullName}
+          </Text>
+        </View>
+        <Pressable
+          onPress={() => app.setSelectedTab("profile")}
+          hitSlop={8}
+          style={({ pressed }) => [styles.avatar, pressed && { opacity: 0.85 }]}
+        >
+          <Text style={styles.avatarInitials}>{initials}</Text>
+        </Pressable>
       </View>
 
       <RiseIn>
@@ -118,7 +128,7 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
 function NetWorthCard({ d }: { d: Dashboard }) {
   const app = useApp();
   const displayed = useCountUp(d.netWorth);
-  const delta = monthDelta(d);
+  const delta = trajectory(d);
 
   return (
     <Pressable
@@ -234,11 +244,20 @@ function SnapshotRow({
   );
 }
 
-function monthDelta(d: Dashboard): { text: string; positive: boolean } | undefined {
+// Lead with the long-horizon trajectory, not a one-month dip. A client shouldn't
+// log in to "you're down $7k this month" — over the year they're up, which is the
+// frame a good advisor uses. The sparkline still shows the recent shape honestly.
+function trajectory(d: Dashboard): { text: string; positive: boolean } | undefined {
   const h = d.netWorthHistory;
   if (h.length < 2) return undefined;
-  const diff = h[h.length - 1].value - h[h.length - 2].value;
-  return { text: `${diff >= 0 ? "+" : ""}${usd(diff)} this month`, positive: diff >= 0 };
+  const base = h[0].value;
+  const diff = h[h.length - 1].value - base;
+  const pct = base ? (diff / base) * 100 : 0;
+  const sign = diff >= 0 ? "+" : "−";
+  return {
+    text: `${sign}${usd(Math.abs(diff))} (${sign}${Math.abs(pct).toFixed(1)}%) past year`,
+    positive: diff >= 0,
+  };
 }
 
 function Skeleton() {
@@ -270,7 +289,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 12,
   },
-  greeting: { fontSize: 28, fontFamily: fonts.display, color: colors.inkPrimary, flexShrink: 1 },
+  greetingBlock: { flexShrink: 1, gap: 2 },
+  salutation: { fontSize: 14, fontFamily: fonts.sans, color: colors.inkTertiary, letterSpacing: 0.2 },
+  clientName: { fontSize: 27, fontFamily: fonts.displayMedium, color: colors.allworthNavy },
+  avatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: colors.allworthNavy,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarInitials: { fontSize: 16, fontFamily: fonts.sansBold, color: "#FFFFFF", letterSpacing: 0.5 },
   nwCard: { ...card, padding: 16, gap: 6 },
   nwValue: {
     fontSize: 34,

@@ -81,7 +81,7 @@ function PositionDetailContent({
     app.setChatPrefill(
       lots.length
         ? `If I trimmed my ${position.symbol} position, what would the tax impact look like?`
-        : `How does my ${position.symbol} holding fit my plan?`,
+        : `How does my ${position.symbol} holding fit my overall allocation?`,
     );
     app.setSelectedTab("chat");
     onClose();

@@ -11,91 +11,421 @@ event: tool_end
 data: {"name":"get_financial_plan"}
 
 event: text
-data: {"delta":"Welcome back, Maya. Last time you "}
+data: {"delta":"Welcome"}
 
 event: text
-data: {"delta":"were weighing $200K into the SpaceX "}
+data: {"delta":" back, "}
 
 event: text
-data: {"delta":"IPO — your deadline is this "}
+data: {"delta":"Maya. L"}
 
 event: text
-data: {"delta":"Sunday, June 15.\n\nHere's where we left "}
+data: {"delta":"ast tim"}
 
 event: text
-data: {"delta":"it on Monday: the cash route "}
+data: {"delta":"e you w"}
 
 event: text
-data: {"delta":"(~$235K available) costs you essentially nothing "}
+data: {"delta":"ere wei"}
 
 event: text
-data: {"delta":"in tax but uses your liquidity "}
+data: {"delta":"ghing $"}
 
 event: text
-data: {"delta":"cushion. Selling the Apple would run "}
+data: {"delta":"200K in"}
 
 event: text
-data: {"delta":"about $18,500 in tax, though it "}
+data: {"delta":"to the "}
 
 event: text
-data: {"delta":"would also trim a concentrated position. "}
+data: {"delta":"SpaceX "}
 
 event: text
-data: {"delta":"The Robinhood shares are the most "}
+data: {"delta":"IPO — y"}
 
 event: text
-data: {"delta":"expensive to sell tax-wise, about $14,500 "}
+data: {"delta":"our dea"}
 
 event: text
-data: {"delta":"on $96K.\n\nYou also said you hate "}
+data: {"delta":"dline i"}
 
 event: text
-data: {"delta":"the idea of paying tax on "}
+data: {"delta":"s this "}
 
 event: text
-data: {"delta":"the Apple you bought back in "}
+data: {"delta":"Sunday,"}
 
 event: text
-data: {"delta":"2015 — so if that's still "}
+data: {"delta":" June 1"}
 
 event: text
-data: {"delta":"true, the cash route or a "}
+data: {"delta":"5.\n\nHer"}
 
 event: text
-data: {"delta":"partial mix may be the paths "}
+data: {"delta":"e's whe"}
 
 event: text
-data: {"delta":"to pressure-test.\n\nThe open questions we flagged "}
+data: {"delta":"re we l"}
 
 event: text
-data: {"delta":"for Dana: how a locked-up $200K "}
+data: {"delta":"eft it "}
 
 event: text
-data: {"delta":"position fits alongside your $9,000/month income "}
+data: {"delta":"on Mond"}
 
 event: text
-data: {"delta":"plan, what it means for the "}
+data: {"delta":"ay: the"}
 
 event: text
-data: {"delta":"lake house timeline, and whether spending "}
+data: {"delta":" cash r"}
 
 event: text
-data: {"delta":"running above plan changes the math.\n\nWith "}
+data: {"delta":"oute (~"}
 
 event: text
-data: {"delta":"five days left, this is the "}
+data: {"delta":"$235K a"}
 
 event: text
-data: {"delta":"week to get Dana's eyes on "}
+data: {"delta":"vailabl"}
 
 event: text
-data: {"delta":"it. Want me to send her "}
+data: {"delta":"e) cost"}
 
 event: text
-data: {"delta":"the summary and request a call "}
+data: {"delta":"s you e"}
 
 event: text
-data: {"delta":"before Friday? "}
+data: {"delta":"ssentia"}
+
+event: text
+data: {"delta":"lly not"}
+
+event: text
+data: {"delta":"hing in"}
+
+event: text
+data: {"delta":" tax bu"}
+
+event: text
+data: {"delta":"t uses "}
+
+event: text
+data: {"delta":"your li"}
+
+event: text
+data: {"delta":"quidity"}
+
+event: text
+data: {"delta":" cushio"}
+
+event: text
+data: {"delta":"n. Sell"}
+
+event: text
+data: {"delta":"ing the"}
+
+event: text
+data: {"delta":" Apple "}
+
+event: text
+data: {"delta":"would r"}
+
+event: text
+data: {"delta":"un abou"}
+
+event: text
+data: {"delta":"t $18,5"}
+
+event: text
+data: {"delta":"00 in t"}
+
+event: text
+data: {"delta":"ax, tho"}
+
+event: text
+data: {"delta":"ugh it "}
+
+event: text
+data: {"delta":"would a"}
+
+event: text
+data: {"delta":"lso tri"}
+
+event: text
+data: {"delta":"m a con"}
+
+event: text
+data: {"delta":"centrat"}
+
+event: text
+data: {"delta":"ed posi"}
+
+event: text
+data: {"delta":"tion. T"}
+
+event: text
+data: {"delta":"he Robi"}
+
+event: text
+data: {"delta":"nhood s"}
+
+event: text
+data: {"delta":"hares a"}
+
+event: text
+data: {"delta":"re the "}
+
+event: text
+data: {"delta":"most ex"}
+
+event: text
+data: {"delta":"pensive"}
+
+event: text
+data: {"delta":" to sel"}
+
+event: text
+data: {"delta":"l tax-w"}
+
+event: text
+data: {"delta":"ise, ab"}
+
+event: text
+data: {"delta":"out $14"}
+
+event: text
+data: {"delta":",500 on"}
+
+event: text
+data: {"delta":" $96K.\n"}
+
+event: text
+data: {"delta":"\nYou al"}
+
+event: text
+data: {"delta":"so said"}
+
+event: text
+data: {"delta":" you ha"}
+
+event: text
+data: {"delta":"te the "}
+
+event: text
+data: {"delta":"idea of"}
+
+event: text
+data: {"delta":" paying"}
+
+event: text
+data: {"delta":" tax on"}
+
+event: text
+data: {"delta":" the Ap"}
+
+event: text
+data: {"delta":"ple you"}
+
+event: text
+data: {"delta":" bought"}
+
+event: text
+data: {"delta":" back i"}
+
+event: text
+data: {"delta":"n 2015 "}
+
+event: text
+data: {"delta":"— so if"}
+
+event: text
+data: {"delta":" that's"}
+
+event: text
+data: {"delta":" still "}
+
+event: text
+data: {"delta":"true, t"}
+
+event: text
+data: {"delta":"he cash"}
+
+event: text
+data: {"delta":" route "}
+
+event: text
+data: {"delta":"or a pa"}
+
+event: text
+data: {"delta":"rtial m"}
+
+event: text
+data: {"delta":"ix may "}
+
+event: text
+data: {"delta":"be the "}
+
+event: text
+data: {"delta":"paths t"}
+
+event: text
+data: {"delta":"o press"}
+
+event: text
+data: {"delta":"ure-tes"}
+
+event: text
+data: {"delta":"t.\n\nThe"}
+
+event: text
+data: {"delta":" open q"}
+
+event: text
+data: {"delta":"uestion"}
+
+event: text
+data: {"delta":"s we fl"}
+
+event: text
+data: {"delta":"agged f"}
+
+event: text
+data: {"delta":"or Dana"}
+
+event: text
+data: {"delta":": how a"}
+
+event: text
+data: {"delta":" locked"}
+
+event: text
+data: {"delta":"-up $20"}
+
+event: text
+data: {"delta":"0K posi"}
+
+event: text
+data: {"delta":"tion fi"}
+
+event: text
+data: {"delta":"ts alon"}
+
+event: text
+data: {"delta":"gside y"}
+
+event: text
+data: {"delta":"our $9,"}
+
+event: text
+data: {"delta":"000/mon"}
+
+event: text
+data: {"delta":"th inco"}
+
+event: text
+data: {"delta":"me plan"}
+
+event: text
+data: {"delta":", what "}
+
+event: text
+data: {"delta":"it mean"}
+
+event: text
+data: {"delta":"s for t"}
+
+event: text
+data: {"delta":"he lake"}
+
+event: text
+data: {"delta":" house "}
+
+event: text
+data: {"delta":"timelin"}
+
+event: text
+data: {"delta":"e, and "}
+
+event: text
+data: {"delta":"whether"}
+
+event: text
+data: {"delta":" spendi"}
+
+event: text
+data: {"delta":"ng runn"}
+
+event: text
+data: {"delta":"ing abo"}
+
+event: text
+data: {"delta":"ve plan"}
+
+event: text
+data: {"delta":" change"}
+
+event: text
+data: {"delta":"s the m"}
+
+event: text
+data: {"delta":"ath.\n\nW"}
+
+event: text
+data: {"delta":"ith fiv"}
+
+event: text
+data: {"delta":"e days "}
+
+event: text
+data: {"delta":"left, t"}
+
+event: text
+data: {"delta":"his is "}
+
+event: text
+data: {"delta":"the wee"}
+
+event: text
+data: {"delta":"k to ge"}
+
+event: text
+data: {"delta":"t Dana'"}
+
+event: text
+data: {"delta":"s eyes "}
+
+event: text
+data: {"delta":"on it. "}
+
+event: text
+data: {"delta":"Want me"}
+
+event: text
+data: {"delta":" to sen"}
+
+event: text
+data: {"delta":"d her t"}
+
+event: text
+data: {"delta":"he summ"}
+
+event: text
+data: {"delta":"ary and"}
+
+event: text
+data: {"delta":" reques"}
+
+event: text
+data: {"delta":"t a cal"}
+
+event: text
+data: {"delta":"l befor"}
+
+event: text
+data: {"delta":"e Frida"}
+
+event: text
+data: {"delta":"y?"}
 
 event: done
 data: {"sources":["Your profile","Financial plan"],"fallback":true,"suggested":["What changed since I was last here?"]}

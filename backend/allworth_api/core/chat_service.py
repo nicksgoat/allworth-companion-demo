@@ -49,29 +49,41 @@ def reset_conversations() -> None:
 
 
 def suggested_for(session: str) -> list[str]:
+    # Lead with the institutional-analytics capabilities, not the IPO scenario.
     if session == "wednesday":
         return [
-            "What changed since I was last here?",
-            "Where did we land on the SpaceX IPO?",
-            "Am I on track for the lake house?",
+            "Run my retirement projection",
+            "Is my portfolio drifting from target?",
+            "How are my goals tracking?",
         ]
     return [
+        "Run my retirement projection",
+        "Where's my portfolio drifting?",
         "What's my net worth?",
-        "How's my spending tracking?",
-        "What would $200K into the SpaceX IPO mean for me?",
     ]
 
 
 async def _stream_fallback(user_text, session, out):
     fb = pick_fallback(user_text, session)
+    # Pacing is deliberate, not instant: a brief considered beat, then each tool
+    # step resolves one at a time at a readable pace (the UI pulses while it works),
+    # then the answer streams in smoothly.
+    await asyncio.sleep(0.3)
     for tool in fb["tools"]:
         yield "tool_start", {"name": tool, "label": TOOL_LABELS.get(tool, tool)}
-        await asyncio.sleep(0.45)
+        await asyncio.sleep(0.62)
         yield "tool_end", {"name": tool}
-    words = fb["text"].split(" ")
-    for i in range(0, len(words), 6):
-        yield "text", {"delta": " ".join(words[i : i + 6]) + " "}
-        await asyncio.sleep(0.04)
+        await asyncio.sleep(0.1)
+    # Smooth character reveal — paced so the reply reads like it's being typed,
+    # not snapping in. ~1.2–3.5s total regardless of length, in small even steps.
+    text = fb["text"]
+    total = len(text)
+    target_secs = max(1.2, min(3.5, total / 250))
+    steps = max(1, int(target_secs / 0.025))
+    chunk = max(1, (total + steps - 1) // steps)
+    for i in range(0, total, chunk):
+        yield "text", {"delta": text[i : i + chunk]}
+        await asyncio.sleep(0.025)
     yield "done", {"sources": fb["sources"], "fallback": True, "suggested": fb.get("suggested", [])}
     out["text"] = fb["text"]
 

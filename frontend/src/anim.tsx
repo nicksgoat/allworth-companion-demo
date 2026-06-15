@@ -30,6 +30,66 @@ export function useCountUp(value: number, duration = 550): number {
   return displayed;
 }
 
+// Looping opacity pulse — for "thinking" indicators and the typing cursor.
+export function usePulse(min = 0.35, max = 1, duration = 700): Animated.Value {
+  const value = useAnimatedValue(max);
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(value, {
+          toValue: min,
+          duration,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: false,
+        }),
+        Animated.timing(value, {
+          toValue: max,
+          duration,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: false,
+        }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [value, min, max, duration]);
+  return value;
+}
+
+// Soft fade + scale entrance — for tool chips appearing one at a time.
+export function FadeScaleIn({
+  children,
+  style,
+}: {
+  children: React.ReactNode;
+  style?: ViewStyle;
+}) {
+  const progress = useAnimatedValue(0);
+  useEffect(() => {
+    Animated.timing(progress, {
+      toValue: 1,
+      duration: 300,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }, [progress]);
+  return (
+    <Animated.View
+      style={[
+        style,
+        {
+          opacity: progress,
+          transform: [
+            { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [0.9, 1] }) },
+          ],
+        },
+      ]}
+    >
+      {children}
+    </Animated.View>
+  );
+}
+
 export function RiseIn({
   children,
   delay = 0,

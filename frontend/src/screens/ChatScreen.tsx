@@ -58,11 +58,16 @@ export function ChatScreen() {
     loadProactive();
   }, [app.session]);
 
+  // A prefilled prompt (from a nudge, a drill-in, or a quick action) auto-sends,
+  // so every chat button is a real one-tap flow: tap → streamed answer, not just
+  // a filled-in input box the user still has to send.
   useEffect(() => {
-    if (app.chatPrefill) {
-      setDraft(app.chatPrefill);
+    if (app.chatPrefill && !sending) {
+      const prompt = app.chatPrefill;
       app.setChatPrefill(null);
+      send(prompt);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [app.chatPrefill]);
 
   useEffect(() => {

@@ -29,154 +29,415 @@ event: tool_end
 data: {"name":"get_spending"}
 
 event: text
-data: {"delta":"Great question — let's walk through "}
+data: {"delta":"Great questio"}
 
 event: text
-data: {"delta":"what $200K into the SpaceX IPO "}
+data: {"delta":"n — let's wal"}
 
 event: text
-data: {"delta":"would actually mean for you, in "}
+data: {"delta":"k through wha"}
 
 event: text
-data: {"delta":"plain English.\n\n**Where the money could come "}
+data: {"delta":"t $200K into "}
 
 event: text
-data: {"delta":"from.** You have three realistic sources:\n\n1. "}
+data: {"delta":"the SpaceX IP"}
 
 event: text
-data: {"delta":"**Cash and savings** — about $235,000 "}
+data: {"delta":"O would actua"}
 
 event: text
-data: {"delta":"between checking, savings, and the cash "}
+data: {"delta":"lly mean for "}
 
 event: text
-data: {"delta":"sitting in your accounts. Using this "}
+data: {"delta":"you, in plain"}
 
 event: text
-data: {"delta":"means essentially no tax. The trade-off: "}
+data: {"delta":" English.\n\n**"}
 
 event: text
-data: {"delta":"it's your liquidity cushion, and an "}
+data: {"delta":"Where the mon"}
 
 event: text
-data: {"delta":"IPO position can't be turned back "}
+data: {"delta":"ey could come"}
 
 event: text
-data: {"delta":"into cash quickly.\n2. **Selling Apple in "}
+data: {"delta":" from.** You "}
 
 event: text
-data: {"delta":"your trust** — your AAPL is "}
+data: {"delta":"have three re"}
 
 event: text
-data: {"delta":"worth about $170,400, but a lot "}
+data: {"delta":"alistic sourc"}
 
 event: text
-data: {"delta":"of it is shares you bought "}
+data: {"delta":"es:\n\n1. **Cas"}
 
 event: text
-data: {"delta":"back in 2015 at around $27. "}
+data: {"delta":"h and savings"}
 
 event: text
-data: {"delta":"Selling the full position would mean "}
+data: {"delta":"** — about $2"}
 
 event: text
-data: {"delta":"roughly $18,500 in capital-gains tax. The "}
+data: {"delta":"35,000 betwee"}
 
 event: text
-data: {"delta":"silver lining: it would also shrink "}
+data: {"delta":"n checking, s"}
 
 event: text
-data: {"delta":"a position that's about 12% of "}
+data: {"delta":"avings, and t"}
 
 event: text
-data: {"delta":"your trust account.\n3. **Selling the Robinhood "}
+data: {"delta":"he cash sitti"}
 
 event: text
-data: {"delta":"holdings** — about $96,000, but those "}
+data: {"delta":"ng in your ac"}
 
 event: text
-data: {"delta":"are very low-basis tech shares (your "}
+data: {"delta":"counts. Using"}
 
 event: text
-data: {"delta":"NVIDIA cost about $22/share). Selling everything "}
+data: {"delta":" this means e"}
 
 event: text
-data: {"delta":"there would cost an estimated $14,500 "}
+data: {"delta":"ssentially no"}
 
 event: text
-data: {"delta":"in tax — a heavier tax-per-dollar "}
+data: {"delta":" tax. The tra"}
 
 event: text
-data: {"delta":"than the Apple.\n\n**What it does to "}
+data: {"delta":"de-off: it's "}
 
 event: text
-data: {"delta":"your income plan.** Your plan draws "}
+data: {"delta":"your liquidit"}
 
 event: text
-data: {"delta":"$9,000/month from the portfolio. Moving $200K "}
+data: {"delta":"y cushion, an"}
 
 event: text
-data: {"delta":"into a private, illiquid position means "}
+data: {"delta":"d an IPO posi"}
 
 event: text
-data: {"delta":"that money can't help fund those "}
+data: {"delta":"tion can't be"}
 
 event: text
-data: {"delta":"withdrawals — possibly for years. And "}
+data: {"delta":" turned back "}
 
 event: text
-data: {"delta":"your spending has been running about "}
+data: {"delta":"into cash qui"}
 
 event: text
-data: {"delta":"18% above plan lately, which makes "}
+data: {"delta":"ckly.\n2. **Se"}
 
 event: text
-data: {"delta":"the liquidity question matter more, not "}
+data: {"delta":"lling Apple i"}
 
 event: text
-data: {"delta":"less.\n\n**One more thing to weigh:** the "}
+data: {"delta":"n your trust*"}
 
 event: text
-data: {"delta":"lake house goal is about 4 "}
+data: {"delta":"* — your AAPL"}
 
 event: text
-data: {"delta":"years out. An IPO lock-up plus "}
+data: {"delta":" is worth abo"}
 
 event: text
-data: {"delta":"an uncertain exit window could overlap "}
+data: {"delta":"ut $170,400, "}
 
 event: text
-data: {"delta":"exactly when you'd want that money "}
+data: {"delta":"but a lot of "}
 
 event: text
-data: {"delta":"available.\n\nNone of this says yes or "}
+data: {"delta":"it is shares "}
 
 event: text
-data: {"delta":"no — it says the *source* "}
+data: {"delta":"you bought ba"}
 
 event: text
-data: {"delta":"of the $200K matters as much "}
+data: {"delta":"ck in 2015 at"}
 
 event: text
-data: {"delta":"as the decision itself. With your "}
+data: {"delta":" around $27. "}
 
 event: text
-data: {"delta":"June 15 deadline, this is exactly "}
+data: {"delta":"Selling the f"}
 
 event: text
-data: {"delta":"the kind of decision worth walking "}
+data: {"delta":"ull position "}
 
 event: text
-data: {"delta":"through with Dana. Want me to "}
+data: {"delta":"would mean ro"}
 
 event: text
-data: {"delta":"flag it for your session and "}
+data: {"delta":"ughly $18,500"}
 
 event: text
-data: {"delta":"send her a summary of what "}
+data: {"delta":" in capital-g"}
 
 event: text
-data: {"delta":"we just looked at? "}
+data: {"delta":"ains tax. The"}
+
+event: text
+data: {"delta":" silver linin"}
+
+event: text
+data: {"delta":"g: it would a"}
+
+event: text
+data: {"delta":"lso shrink a "}
+
+event: text
+data: {"delta":"position that"}
+
+event: text
+data: {"delta":"'s about 12% "}
+
+event: text
+data: {"delta":"of your trust"}
+
+event: text
+data: {"delta":" account.\n3. "}
+
+event: text
+data: {"delta":"**Selling the"}
+
+event: text
+data: {"delta":" Robinhood ho"}
+
+event: text
+data: {"delta":"ldings** — ab"}
+
+event: text
+data: {"delta":"out $96,000, "}
+
+event: text
+data: {"delta":"but those are"}
+
+event: text
+data: {"delta":" very low-bas"}
+
+event: text
+data: {"delta":"is tech share"}
+
+event: text
+data: {"delta":"s (your NVIDI"}
+
+event: text
+data: {"delta":"A cost about "}
+
+event: text
+data: {"delta":"$22/share). S"}
+
+event: text
+data: {"delta":"elling everyt"}
+
+event: text
+data: {"delta":"hing there wo"}
+
+event: text
+data: {"delta":"uld cost an e"}
+
+event: text
+data: {"delta":"stimated $14,"}
+
+event: text
+data: {"delta":"500 in tax — "}
+
+event: text
+data: {"delta":"a heavier tax"}
+
+event: text
+data: {"delta":"-per-dollar t"}
+
+event: text
+data: {"delta":"han the Apple"}
+
+event: text
+data: {"delta":".\n\n**What it "}
+
+event: text
+data: {"delta":"does to your "}
+
+event: text
+data: {"delta":"income plan.*"}
+
+event: text
+data: {"delta":"* Your plan d"}
+
+event: text
+data: {"delta":"raws $9,000/m"}
+
+event: text
+data: {"delta":"onth from the"}
+
+event: text
+data: {"delta":" portfolio. M"}
+
+event: text
+data: {"delta":"oving $200K i"}
+
+event: text
+data: {"delta":"nto a private"}
+
+event: text
+data: {"delta":", illiquid po"}
+
+event: text
+data: {"delta":"sition means "}
+
+event: text
+data: {"delta":"that money ca"}
+
+event: text
+data: {"delta":"n't help fund"}
+
+event: text
+data: {"delta":" those withdr"}
+
+event: text
+data: {"delta":"awals — possi"}
+
+event: text
+data: {"delta":"bly for years"}
+
+event: text
+data: {"delta":". And your sp"}
+
+event: text
+data: {"delta":"ending has be"}
+
+event: text
+data: {"delta":"en running ab"}
+
+event: text
+data: {"delta":"out 18% above"}
+
+event: text
+data: {"delta":" plan lately,"}
+
+event: text
+data: {"delta":" which makes "}
+
+event: text
+data: {"delta":"the liquidity"}
+
+event: text
+data: {"delta":" question mat"}
+
+event: text
+data: {"delta":"ter more, not"}
+
+event: text
+data: {"delta":" less.\n\n**One"}
+
+event: text
+data: {"delta":" more thing t"}
+
+event: text
+data: {"delta":"o weigh:** th"}
+
+event: text
+data: {"delta":"e lake house "}
+
+event: text
+data: {"delta":"goal is about"}
+
+event: text
+data: {"delta":" 4 years out."}
+
+event: text
+data: {"delta":" An IPO lock-"}
+
+event: text
+data: {"delta":"up plus an un"}
+
+event: text
+data: {"delta":"certain exit "}
+
+event: text
+data: {"delta":"window could "}
+
+event: text
+data: {"delta":"overlap exact"}
+
+event: text
+data: {"delta":"ly when you'd"}
+
+event: text
+data: {"delta":" want that mo"}
+
+event: text
+data: {"delta":"ney available"}
+
+event: text
+data: {"delta":".\n\nNone of th"}
+
+event: text
+data: {"delta":"is says yes o"}
+
+event: text
+data: {"delta":"r no — it say"}
+
+event: text
+data: {"delta":"s the *source"}
+
+event: text
+data: {"delta":"* of the $200"}
+
+event: text
+data: {"delta":"K matters as "}
+
+event: text
+data: {"delta":"much as the d"}
+
+event: text
+data: {"delta":"ecision itsel"}
+
+event: text
+data: {"delta":"f. With your "}
+
+event: text
+data: {"delta":"June 15 deadl"}
+
+event: text
+data: {"delta":"ine, this is "}
+
+event: text
+data: {"delta":"exactly the k"}
+
+event: text
+data: {"delta":"ind of decisi"}
+
+event: text
+data: {"delta":"on worth walk"}
+
+event: text
+data: {"delta":"ing through w"}
+
+event: text
+data: {"delta":"ith Dana. Wan"}
+
+event: text
+data: {"delta":"t me to flag "}
+
+event: text
+data: {"delta":"it for your s"}
+
+event: text
+data: {"delta":"ession and se"}
+
+event: text
+data: {"delta":"nd her a summ"}
+
+event: text
+data: {"delta":"ary of what w"}
+
+event: text
+data: {"delta":"e just looked"}
+
+event: text
+data: {"delta":" at?"}
 
 event: done
 data: {"sources":["Accounts","Financial plan","Portfolio","Tax estimate","Spending"],"fallback":true,"suggested":["What would selling Apple cost me in tax?","Flag this for Dana"]}

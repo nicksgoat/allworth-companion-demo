@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useState } from "react";
 import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -11,7 +12,7 @@ import {
 } from "../components/Rows";
 import { useAuth } from "../auth";
 import { useApp } from "../state";
-import { colors, fonts } from "../theme";
+import { card, colors, fonts } from "../theme";
 import type { LearnedFact } from "../types";
 import { FactDetailSheet } from "./FactDetailSheet";
 
@@ -32,6 +33,12 @@ export function ProfileScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFact, setSelectedFact] = useState<LearnedFact | null>(null);
   const scrollY = useAnimatedValue(0);
+
+  const client = app.dashboard?.client;
+  const advisor = app.dashboard?.advisor;
+  const name = client?.name ?? "Maya Tran";
+  const initials = client?.avatarInitials ?? "MT";
+  const meta = [client?.city, client?.age ? `Age ${client.age}` : null].filter(Boolean).join("  ·  ");
 
   const load = useCallback(async () => {
     try {
@@ -56,6 +63,12 @@ export function ProfileScreen() {
     setRefreshing(false);
   };
 
+  const messageAdvisor = () => {
+    const first = advisor?.name?.split(" ")[0] ?? "Dana";
+    app.setChatPrefill(`Can you have ${first} reach out to me?`);
+    app.setSelectedTab("chat");
+  };
+
   const categories = facts.reduce<string[]>(
     (seen, f) => (seen.includes(f.category) ? seen : [...seen, f.category]),
     [],
@@ -77,50 +90,80 @@ export function ProfileScreen() {
         scrollEventThrottle={16}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
       >
-        <View style={{ gap: 6 }}>
-          <Text style={styles.title}>What I{"'"}ve learned</Text>
-          <Text style={styles.subtitle}>
-            Every fact has a source, a timestamp, and an audit trail. Nothing here came from
-            anywhere but you. Tap any fact to see why I know it — or to remove it.
-          </Text>
+        {/* Identity */}
+        <View style={styles.identity}>
+          <View style={styles.bigAvatar}>
+            <Text style={styles.bigAvatarText}>{initials}</Text>
+          </View>
+          <Text style={styles.name}>{name}</Text>
+          {meta ? <Text style={styles.meta}>{meta}</Text> : null}
         </View>
 
-        {categories.map((category) => (
-          <View key={category}>
-            <View style={{ paddingBottom: 4 }}>
-              <SectionHeader>{CATEGORY_LABELS[category] ?? category}</SectionHeader>
+        {/* Advisor */}
+        {advisor ? (
+          <View style={{ gap: 8 }}>
+            <SectionHeader>Your advisor</SectionHeader>
+            <View style={styles.advisorCard}>
+              <View style={styles.advisorAvatar}>
+                <Text style={styles.advisorAvatarText}>{advisor.avatarInitials}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.advisorName}>{advisor.name}</Text>
+                <Text style={styles.advisorTitle}>{advisor.title}</Text>
+              </View>
+              <Pressable
+                onPress={messageAdvisor}
+                hitSlop={8}
+                style={({ pressed }) => [styles.advisorBtn, pressed && { opacity: 0.8 }]}
+              >
+                <Ionicons name="chatbubble-ellipses" size={18} color={colors.allworthAccent} />
+              </Pressable>
             </View>
-            {facts
-              .filter((f) => f.category === category)
-              .map((fact, i) => (
-                <React.Fragment key={fact.id}>
-                  {i > 0 ? <HairlineDivider /> : null}
-                  <Pressable
-                    onPress={() => setSelectedFact(fact)}
-                    style={({ pressed }) => pressed && { opacity: 0.6 }}
-                  >
-                    <LearnedFactRow fact={fact} />
-                  </Pressable>
-                </React.Fragment>
-              ))}
           </View>
-        ))}
-
-        {facts.length === 0 ? (
-          <Text style={styles.empty}>Nothing learned yet — start a conversation.</Text>
         ) : null}
 
-        <View style={{ paddingVertical: 8 }}>
-          <DisclaimerFooter />
+        {/* What I've learned (the AI's memory) */}
+        <View style={{ gap: 10 }}>
+          <SectionHeader>What I{"'"}ve learned</SectionHeader>
+          <Text style={styles.subtitle}>
+            Everything here came from you — each fact carries a source, a timestamp, and an audit
+            trail. Tap any to see why I know it, or to remove it.
+          </Text>
+
+          {categories.map((category) => (
+            <View key={category} style={styles.factGroup}>
+              <Text style={styles.factGroupLabel}>{CATEGORY_LABELS[category] ?? category}</Text>
+              {facts
+                .filter((f) => f.category === category)
+                .map((fact, i) => (
+                  <React.Fragment key={fact.id}>
+                    {i > 0 ? <HairlineDivider /> : null}
+                    <Pressable
+                      onPress={() => setSelectedFact(fact)}
+                      style={({ pressed }) => pressed && { opacity: 0.6 }}
+                    >
+                      <LearnedFactRow fact={fact} />
+                    </Pressable>
+                  </React.Fragment>
+                ))}
+            </View>
+          ))}
+
+          {facts.length === 0 ? (
+            <Text style={styles.empty}>Nothing learned yet — start a conversation.</Text>
+          ) : null}
         </View>
 
-        {/* Signed-in user info + logout */}
+        <DisclaimerFooter />
+
+        {/* Account */}
         <View style={styles.accountSection}>
-          {authSession?.email && (
-            <Text style={styles.accountEmail}>{authSession.email}</Text>
-          )}
-          <Pressable style={styles.logoutButton} onPress={logout}>
-            <Text style={styles.logoutText}>Sign Out</Text>
+          {authSession?.email ? <Text style={styles.accountEmail}>{authSession.email}</Text> : null}
+          <Pressable
+            style={({ pressed }) => [styles.logoutButton, pressed && { opacity: 0.7 }]}
+            onPress={logout}
+          >
+            <Text style={styles.logoutText}>Sign out</Text>
           </Pressable>
         </View>
 
@@ -136,33 +179,71 @@ export function ProfileScreen() {
           }}
         />
       </Animated.ScrollView>
-      <GlassHeader title="What I've learned" scrollY={scrollY} />
+      <GlassHeader title="Profile" scrollY={scrollY} />
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  title: { fontSize: 28, fontFamily: fonts.display, color: colors.inkPrimary },
+  identity: { alignItems: "center", gap: 10, paddingTop: 4, paddingBottom: 4 },
+  bigAvatar: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    backgroundColor: colors.allworthNavy,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  bigAvatarText: { fontSize: 28, fontFamily: fonts.sansBold, color: "#FFFFFF", letterSpacing: 0.5 },
+  name: { fontSize: 27, fontFamily: fonts.displayMedium, color: colors.allworthNavy },
+  meta: { fontSize: 14, fontFamily: fonts.sans, color: colors.inkTertiary },
+
+  advisorCard: { ...card, flexDirection: "row", alignItems: "center", gap: 12, padding: 14 },
+  advisorAvatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: colors.allworthNavy,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  advisorAvatarText: { fontSize: 15, fontFamily: fonts.sansBold, color: "#FFFFFF", letterSpacing: 0.5 },
+  advisorName: { fontSize: 16, fontFamily: fonts.sansBold, color: colors.inkPrimary },
+  advisorTitle: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary, marginTop: 2 },
+  advisorBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(62,113,183,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   subtitle: { fontSize: 15, fontFamily: fonts.sans, lineHeight: 21, color: colors.inkSecondary },
+  factGroup: { gap: 2 },
+  factGroupLabel: {
+    fontSize: 13,
+    fontFamily: fonts.sansBold,
+    color: colors.inkSecondary,
+    paddingBottom: 2,
+    paddingTop: 6,
+  },
   empty: {
     fontSize: 15,
     fontFamily: fonts.sans,
     color: colors.inkTertiary,
     textAlign: "center",
-    paddingTop: 40,
+    paddingTop: 24,
   },
+
   accountSection: {
     alignItems: "center",
-    paddingVertical: 16,
+    paddingVertical: 8,
     gap: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.hairline,
   },
-  accountEmail: {
-    fontSize: 13,
-    fontFamily: fonts.sans,
-    color: colors.inkTertiary,
-  },
+  accountEmail: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkTertiary },
   logoutButton: {
     paddingHorizontal: 24,
     paddingVertical: 10,
@@ -170,9 +251,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.hairline,
   },
-  logoutText: {
-    fontFamily: fonts.sansBold,
-    fontSize: 14,
-    color: colors.loss,
-  },
+  logoutText: { fontFamily: fonts.sansBold, fontSize: 14, color: colors.loss },
 });

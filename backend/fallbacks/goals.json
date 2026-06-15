@@ -11,13 +11,15 @@
     "saving enough",
     "afford the",
     "timeline",
-    "house fund"
+    "house fund",
+    "goals tracking",
+    "close the gap"
   ],
   "tools": ["get_financial_plan", "analyze_goal_funding"],
-  "text": "Let's look at your goals against where the money actually is.\n\n**The lake house** — your big one. Target is **$350,000**, about **four years out**, and you're roughly **32% funded** today (~$112K earmarked). At a normal growth rate you're making progress, but there's a gap to close — and the recent spending running ~18% over plan is the main thing nibbling at it. Getting fully there on time likely means either steady contributions or easing the overspend; the two are connected.\n\n**The grandkids' 529s** — $120,000 target, longer runway (about 10 years), currently ~18% funded. More time on your side there, so less urgent.\n\n**Retirement income** — the steady $9,000/month from the portfolio through age 95. That's the engine the other goals lean on, which is why spending and the SpaceX decision both ripple into the lake-house math.\n\nNone of this is a verdict — it's the trade-off laid out. The lake-house timeline is a perfect thing to pressure-test with Dana. Want me to show what closes the gap, or flag it for your next session?",
+  "text": "I ran a funding analysis across all three of your goals — here's where each really stands.\n\n**Lake house** — your big one. Target **$350,000**, about four years out. You're **32% funded** (~$112K today), and at a normal growth rate that projects to roughly **$141K by your horizon — about a $209,000 gap.** Closing it on time would take around **$3,856/month**, or easing the timeline. The recent spending running ~18% over plan is the main thing working against it.\n\n**Grandkids' 529s** — $120,000 target, 18% funded, but a 10-year runway, so far less urgent (about $500/month closes it).\n\n**Retirement income** — the $9,000/month draw — is **on track** in the base case.\n\nSo: **1 of 3 goals on track**, with the lake house the one to focus on. None of this is a verdict — it's the math laid out. Want me to show what closes the lake-house gap, or flag it for Dana?",
   "sources": ["Financial plan", "Goal tracker"],
   "suggested": [
     "How's my spending affecting this?",
-    "Talk it through with Dana"
+    "Run my retirement projection"
   ]
 }

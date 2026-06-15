@@ -25,6 +25,7 @@ _TOPIC_INTENTS = [
     "concentration",
     "goals",
     "retirement",
+    "drift",
     "networth",
     "portfolio",
     "advisor",
