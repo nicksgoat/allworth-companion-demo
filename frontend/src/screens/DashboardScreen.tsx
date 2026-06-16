@@ -48,6 +48,7 @@ export function DashboardScreen() {
     <>
       <Animated.ScrollView
         style={{ backgroundColor: colors.surfacePrimary }}
+        directionalLockEnabled
         contentContainerStyle={{
           padding: 20,
           paddingTop: insets.top + 8,

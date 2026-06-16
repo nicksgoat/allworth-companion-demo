@@ -1,5 +1,5 @@
 import * as Haptics from "expo-haptics";
-import React, { useEffect, useId, useMemo, useState } from "react";
+import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, ClipPath, Defs, LinearGradient, Line, Path, Rect, Stop } from "react-native-svg";
 import { densify } from "../chartData";
@@ -77,15 +77,29 @@ export function Sparkline({
 
   const sel = selected != null && geom ? geom.coords[selected] : null;
 
+  // Only capture the gesture once it's clearly a horizontal scrub — otherwise a
+  // vertical drag stays with the page's ScrollView. Without this the chart eats
+  // every touch that starts on it and the page won't scroll.
+  const start = useRef({ x: 0, y: 0 });
+  const claimHorizontal = (e: any) => {
+    const dx = Math.abs(e.nativeEvent.pageX - start.current.x);
+    const dy = Math.abs(e.nativeEvent.pageY - start.current.y);
+    return dx > 8 && dx > dy;
+  };
+
   return (
     <View
       style={styles.container}
       onLayout={onLayout}
-      onStartShouldSetResponder={() => true}
-      onMoveShouldSetResponder={() => true}
+      onStartShouldSetResponder={(e) => {
+        start.current = { x: e.nativeEvent.pageX, y: e.nativeEvent.pageY };
+        return false; // don't grab on touch-down — let the page scroll
+      }}
+      onMoveShouldSetResponder={claimHorizontal}
       onResponderGrant={(e) => select(e.nativeEvent.locationX)}
       onResponderMove={(e) => select(e.nativeEvent.locationX)}
       onResponderRelease={() => setSelected(null)}
+      onResponderTerminate={() => setSelected(null)}
     >
       {geom ? (
         <Svg width={width} height={HEIGHT}>
