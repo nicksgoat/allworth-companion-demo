@@ -50,31 +50,31 @@ function DonutChart({
   }, [segments.length]);
 
   const front = progress * circ; // arc length the sweep has reached
-  let offset = 0;
+  // Precompute each slice's length and start offset purely (no mutated accumulator).
+  const segLens = segments.map((s) => (s.value / total) * circ);
+  const offsets = segLens.map((_, i) => segLens.slice(0, i).reduce((a, b) => a + b, 0));
   return (
     <Svg width={size} height={size}>
       <G rotation={-90} originX={size / 2} originY={size / 2}>
         {segments.map((seg, i) => {
-          const segLen = (seg.value / total) * circ;
+          const segLen = segLens[i];
+          const offset = offsets[i];
           const full = Math.max(0.5, segLen - gap);
           const drawn = Math.max(0, Math.min(full, front - offset)); // reveal up to the sweep front
-          const node =
-            drawn > 0 ? (
-              <Circle
-                key={i}
-                cx={size / 2}
-                cy={size / 2}
-                r={r}
-                stroke={seg.color}
-                strokeWidth={thickness}
-                strokeLinecap="butt"
-                fill="none"
-                strokeDasharray={`${drawn} ${circ - drawn}`}
-                strokeDashoffset={-(offset + gap / 2)}
-              />
-            ) : null;
-          offset += segLen;
-          return node;
+          return drawn > 0 ? (
+            <Circle
+              key={i}
+              cx={size / 2}
+              cy={size / 2}
+              r={r}
+              stroke={seg.color}
+              strokeWidth={thickness}
+              strokeLinecap="butt"
+              fill="none"
+              strokeDasharray={`${drawn} ${circ - drawn}`}
+              strokeDashoffset={-(offset + gap / 2)}
+            />
+          ) : null;
         })}
       </G>
     </Svg>
@@ -161,7 +161,12 @@ export function AllocationCard({
 
 const styles = StyleSheet.create({
   card: { ...card, padding: 16, gap: 14 },
-  donutWrap: { alignSelf: "center", alignItems: "center", justifyContent: "center", paddingVertical: 4 },
+  donutWrap: {
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 4,
+  },
   donutCenter: { position: "absolute", alignItems: "center" },
   donutCenterValue: {
     fontSize: 38,
@@ -169,7 +174,12 @@ const styles = StyleSheet.create({
     color: colors.allworthNavy,
     fontVariant: ["tabular-nums"],
   },
-  donutCenterLabel: { fontSize: 14, fontFamily: fonts.sans, color: colors.inkTertiary, marginTop: -2 },
+  donutCenterLabel: {
+    fontSize: 14,
+    fontFamily: fonts.sans,
+    color: colors.inkTertiary,
+    marginTop: -2,
+  },
 
   list: { gap: 0 },
   row: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12 },

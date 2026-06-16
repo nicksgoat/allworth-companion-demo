@@ -30,8 +30,7 @@ export function ChatScreen() {
   const loadProactive = async () => {
     if (app.chatMessages.length > 0) return;
     const clientFirstName = app.dashboard?.client?.name?.split(",")[0]?.split(" ")[0] ?? "there";
-    let greeting =
-      `Hi ${clientFirstName} — I can help you understand your accounts, spending, or plan. What's on your mind?`;
+    let greeting = `Hi ${clientFirstName} — I can help you understand your accounts, spending, or plan. What's on your mind?`;
     let suggested: string[] = [];
     try {
       const res = await app.api.proactive(app.clientId, app.session);
@@ -65,6 +64,7 @@ export function ChatScreen() {
     if (app.chatPrefill && !sending) {
       const prompt = app.chatPrefill;
       app.setChatPrefill(null);
+      // eslint-disable-next-line react-hooks/immutability -- send() is defined below; this effect runs after mount, so it is available
       send(prompt);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

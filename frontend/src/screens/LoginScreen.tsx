@@ -88,7 +88,12 @@ export function LoginScreen() {
             <Text style={styles.subhead}>Enter the email linked to your account.</Text>
 
             <View style={styles.inputWrapper}>
-              <Ionicons name="mail-outline" size={20} color="rgba(255,255,255,0.55)" style={styles.inputIcon} />
+              <Ionicons
+                name="mail-outline"
+                size={20}
+                color="rgba(255,255,255,0.55)"
+                style={styles.inputIcon}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="your.email@example.com"
@@ -116,7 +121,11 @@ export function LoginScreen() {
             ) : null}
 
             <Pressable
-              style={({ pressed }) => [styles.button, pressed && { opacity: 0.85 }, loading && styles.buttonDisabled]}
+              style={({ pressed }) => [
+                styles.button,
+                pressed && { opacity: 0.85 },
+                loading && styles.buttonDisabled,
+              ]}
               onPress={handleLogin}
               disabled={loading}
             >

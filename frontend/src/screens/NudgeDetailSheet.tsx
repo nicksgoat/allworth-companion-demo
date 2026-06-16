@@ -109,7 +109,9 @@ function ConcentrationBar({
     <View style={{ gap: 10 }}>
       <SectionHeader>Share of the account</SectionHeader>
       <View style={styles.concTrack}>
-        <View style={[styles.concFill, { width: `${Math.min(100, pct)}%`, backgroundColor: color }]} />
+        <View
+          style={[styles.concFill, { width: `${Math.min(100, pct)}%`, backgroundColor: color }]}
+        />
       </View>
       <View style={styles.concLegend}>
         <Text style={[styles.concPct, { color }]}>{headline}</Text>
@@ -161,7 +163,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   heroTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  iconChip: { width: 42, height: 42, borderRadius: 14, alignItems: "center", justifyContent: "center" },
+  iconChip: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   closeBtn: {
     width: 32,
     height: 32,

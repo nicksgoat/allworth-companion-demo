@@ -38,7 +38,9 @@ export function ProfileScreen() {
   const advisor = app.dashboard?.advisor;
   const name = client?.name ?? "Maya Tran";
   const initials = client?.avatarInitials ?? "MT";
-  const meta = [client?.city, client?.age ? `Age ${client.age}` : null].filter(Boolean).join("  ·  ");
+  const meta = [client?.city, client?.age ? `Age ${client.age}` : null]
+    .filter(Boolean)
+    .join("  ·  ");
 
   const load = useCallback(async () => {
     try {
@@ -207,7 +209,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  advisorAvatarText: { fontSize: 15, fontFamily: fonts.sansBold, color: "#FFFFFF", letterSpacing: 0.5 },
+  advisorAvatarText: {
+    fontSize: 15,
+    fontFamily: fonts.sansBold,
+    color: "#FFFFFF",
+    letterSpacing: 0.5,
+  },
   advisorName: { fontSize: 16, fontFamily: fonts.sansBold, color: colors.inkPrimary },
   advisorTitle: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary, marginTop: 2 },
   advisorBtn: {

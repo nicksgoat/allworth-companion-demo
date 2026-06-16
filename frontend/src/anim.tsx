@@ -57,13 +57,7 @@ export function usePulse(min = 0.35, max = 1, duration = 700): Animated.Value {
 }
 
 // Soft fade + scale entrance — for tool chips appearing one at a time.
-export function FadeScaleIn({
-  children,
-  style,
-}: {
-  children: React.ReactNode;
-  style?: ViewStyle;
-}) {
+export function FadeScaleIn({ children, style }: { children: React.ReactNode; style?: ViewStyle }) {
   const progress = useAnimatedValue(0);
   useEffect(() => {
     Animated.timing(progress, {

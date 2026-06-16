@@ -1,7 +1,16 @@
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import { LayoutChangeEvent, StyleSheet, Text, View } from "react-native";
-import Svg, { Circle, ClipPath, Defs, LinearGradient, Line, Path, Rect, Stop } from "react-native-svg";
+import Svg, {
+  Circle,
+  ClipPath,
+  Defs,
+  LinearGradient,
+  Line,
+  Path,
+  Rect,
+  Stop,
+} from "react-native-svg";
 import { densify } from "../chartData";
 import { colors, fonts, monthLabel, usd } from "../theme";
 import type { MonthValue } from "../types";
@@ -143,8 +152,23 @@ export function Sparkline({
           {/* Scrub guide */}
           {sel ? (
             <>
-              <Line x1={sel.x} y1={0} x2={sel.x} y2={HEIGHT} stroke={lineColor} strokeOpacity={0.22} strokeWidth={1} />
-              <Circle cx={sel.x} cy={sel.y} r={5} fill={lineColor} stroke="#FFFFFF" strokeWidth={2} />
+              <Line
+                x1={sel.x}
+                y1={0}
+                x2={sel.x}
+                y2={HEIGHT}
+                stroke={lineColor}
+                strokeOpacity={0.22}
+                strokeWidth={1}
+              />
+              <Circle
+                cx={sel.x}
+                cy={sel.y}
+                r={5}
+                fill={lineColor}
+                stroke="#FFFFFF"
+                strokeWidth={2}
+              />
             </>
           ) : null}
         </Svg>

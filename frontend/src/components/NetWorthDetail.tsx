@@ -50,7 +50,10 @@ function BigChart({ points }: { points: MonthValue[] }) {
 
   const select = (locationX: number) => {
     if (!size.w || dense.length < 2) return;
-    const i = Math.max(0, Math.min(dense.length - 1, Math.round((locationX / size.w) * (dense.length - 1))));
+    const i = Math.max(
+      0,
+      Math.min(dense.length - 1, Math.round((locationX / size.w) * (dense.length - 1))),
+    );
     setSel((prev) => {
       if (prev !== i) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       return i;
@@ -118,7 +121,15 @@ function BigChart({ points }: { points: MonthValue[] }) {
             </>
           ) : (
             <>
-              <Line x1={geom.coords[sel].x} y1={0} x2={geom.coords[sel].x} y2={size.h} stroke="#FFFFFF" strokeOpacity={0.3} strokeWidth={1} />
+              <Line
+                x1={geom.coords[sel].x}
+                y1={0}
+                x2={geom.coords[sel].x}
+                y2={size.h}
+                stroke="#FFFFFF"
+                strokeOpacity={0.3}
+                strokeWidth={1}
+              />
               <Circle cx={geom.coords[sel].x} cy={geom.coords[sel].y} r={6} fill="#FFFFFF" />
             </>
           )}
@@ -157,8 +168,18 @@ export function NetWorthDetail({
   }, [d.netWorthHistory, range]);
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose} presentationStyle="fullScreen">
-      <View style={[styles.container, { paddingTop: insets.top + 6, paddingBottom: insets.bottom + 16 }]}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      onRequestClose={onClose}
+      presentationStyle="fullScreen"
+    >
+      <View
+        style={[
+          styles.container,
+          { paddingTop: insets.top + 6, paddingBottom: insets.bottom + 16 },
+        ]}
+      >
         <View style={styles.topBar}>
           <Pressable onPress={onClose} hitSlop={12}>
             <Ionicons name="close" size={26} color="#FFFFFF" />
@@ -174,7 +195,10 @@ export function NetWorthDetail({
           <Text style={styles.bigValue}>{usd(d.netWorth)}</Text>
           {delta ? (
             <Text
-              style={[styles.delta, { color: delta.positive ? colors.gainOnDark : colors.lossOnDark }]}
+              style={[
+                styles.delta,
+                { color: delta.positive ? colors.gainOnDark : colors.lossOnDark },
+              ]}
             >
               {delta.positive ? "↑" : "↓"} {delta.text}
             </Text>
@@ -187,7 +211,12 @@ export function NetWorthDetail({
           {RANGES.map((r) => {
             const on = r.label === range;
             return (
-              <Pressable key={r.label} onPress={() => setRange(r.label)} hitSlop={8} style={[styles.rangeChip, on && styles.rangeChipOn]}>
+              <Pressable
+                key={r.label}
+                onPress={() => setRange(r.label)}
+                hitSlop={8}
+                style={[styles.rangeChip, on && styles.rangeChipOn]}
+              >
                 <Text style={[styles.rangeText, on && styles.rangeTextOn]}>{r.label}</Text>
               </Pressable>
             );

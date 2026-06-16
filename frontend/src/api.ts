@@ -34,7 +34,7 @@ export const DEFAULT_HOST = Platform.OS === "android" ? "10.0.2.2" : "localhost"
 export class AuthError extends Error {
   constructor(status: number) {
     super(`Authentication failed (${status})`);
-    this.name = 'AuthError';
+    this.name = "AuthError";
   }
 }
 

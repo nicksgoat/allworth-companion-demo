@@ -83,7 +83,10 @@ export function NetWorthHero({
         <Text style={styles.nwValue}>{usd(displayed)}</Text>
         {delta ? (
           <Text
-            style={[styles.nwDelta, { color: delta.positive ? colors.gainOnDark : colors.lossOnDark }]}
+            style={[
+              styles.nwDelta,
+              { color: delta.positive ? colors.gainOnDark : colors.lossOnDark },
+            ]}
           >
             {delta.positive ? "↑" : "↓"} {delta.text}
           </Text>

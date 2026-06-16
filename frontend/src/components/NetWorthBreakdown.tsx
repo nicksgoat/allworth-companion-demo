@@ -79,8 +79,8 @@ export function CompletePictureCard({ heldAwayTotal }: { heldAwayTotal: number }
         <View style={{ flex: 1 }}>
           <Text style={styles.pictureTitle}>Complete your picture</Text>
           <Text style={styles.pictureBody}>
-            We can see {usd(heldAwayTotal)} held away. Linking the rest helps {advisorFirstName} plan around
-            everything you own — taxes, risk, and all.
+            We can see {usd(heldAwayTotal)} held away. Linking the rest helps {advisorFirstName}{" "}
+            plan around everything you own — taxes, risk, and all.
           </Text>
         </View>
       </View>
@@ -88,7 +88,8 @@ export function CompletePictureCard({ heldAwayTotal }: { heldAwayTotal: number }
         <View style={styles.sentRow}>
           <Ionicons name="checkmark-circle" size={17} color={colors.allworthAccent} />
           <Text style={styles.sentText}>
-            {advisorFirstName}'s team will reach out to help you connect accounts
+            {advisorFirstName}
+            {"'"}s team will reach out to help you connect accounts
           </Text>
         </View>
       ) : (

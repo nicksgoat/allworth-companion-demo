@@ -46,7 +46,8 @@ export function NudgeCard({
   const isSpending = nudge.type === "spending";
   // spending: actual is (100+pct)% of plan on a track scaled to 1.5× plan, so the
   // fill visibly crosses the plan mark. concentration/info: fill straight to pct.
-  const barFill = pct == null ? 0 : isSpending ? Math.min(100, (100 + pct) / 1.5) : Math.min(100, pct);
+  const barFill =
+    pct == null ? 0 : isSpending ? Math.min(100, (100 + pct) / 1.5) : Math.min(100, pct);
 
   return (
     <Pressable
@@ -85,7 +86,13 @@ export function NudgeCard({
 const styles = StyleSheet.create({
   card: { ...card, padding: 16, gap: 10 },
   header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  iconChip: { width: 36, height: 36, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  iconChip: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   tag: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
   tagText: { fontSize: 12, fontFamily: fonts.sansBold, letterSpacing: 0.3 },
   metric: {
@@ -102,7 +109,18 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   barFill: { position: "absolute", left: 0, top: 0, bottom: 0, borderRadius: 4 },
-  planMark: { position: "absolute", top: 0, bottom: 0, width: 2, backgroundColor: "rgba(255,255,255,0.85)" },
-  ctaRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 2 },
+  planMark: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    width: 2,
+    backgroundColor: "rgba(255,255,255,0.85)",
+  },
+  ctaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 2,
+  },
   cta: { fontSize: 14.5, fontFamily: fonts.sansBold, color: colors.allworthAccent },
 });

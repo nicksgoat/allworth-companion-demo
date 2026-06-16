@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors, fonts, sectionHeader, shortDate, usd } from "../theme";
 import type { Account, LearnedFact } from "../types";
 
-export function SectionHeader({ children }: { children: string }) {
+export function SectionHeader({ children }: { children: React.ReactNode }) {
   return <Text style={styles.sectionHeader}>{children}</Text>;
 }
 
