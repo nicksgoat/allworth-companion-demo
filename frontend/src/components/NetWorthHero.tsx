@@ -6,6 +6,7 @@ import { useCountUp } from "../anim";
 import { colors, fonts, usd } from "../theme";
 import type { MonthValue } from "../types";
 import { Sparkline } from "./Sparkline";
+import { AllworthLogo } from "./Wordmark";
 
 const POS = "#86C98A"; // light evergreen — readable on the navy field
 const NEG = "#E89B73"; // light pumpkin
@@ -16,25 +17,21 @@ const NEG = "#E89B73"; // light pumpkin
 export function NetWorthHero({
   greeting,
   name,
-  initials,
   netWorth,
   delta,
   history,
   insetsTop,
   scrollPadding = 20,
   onOpenWealth,
-  onAvatarPress,
 }: {
   greeting: string;
   name: string;
-  initials: string;
   netWorth: number;
   delta?: { text: string; positive: boolean };
   history: MonthValue[];
   insetsTop: number;
   scrollPadding?: number;
   onOpenWealth: () => void;
-  onAvatarPress: () => void;
 }) {
   const displayed = useCountUp(netWorth);
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -78,13 +75,7 @@ export function NetWorthHero({
             {name}
           </Text>
         </View>
-        <Pressable
-          onPress={onAvatarPress}
-          hitSlop={8}
-          style={({ pressed }) => [styles.avatar, pressed && { opacity: 0.85 }]}
-        >
-          <Text style={styles.avatarInitials}>{initials}</Text>
-        </Pressable>
+        <AllworthLogo light width={96} />
       </View>
 
       <Pressable
@@ -134,15 +125,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   name: { fontSize: 25, fontFamily: fonts.displayMedium, color: "#FFFFFF" },
-  avatar: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: "rgba(255,255,255,0.16)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarInitials: { fontSize: 16, fontFamily: fonts.sansBold, color: "#FFFFFF", letterSpacing: 0.5 },
 
   nwBlock: { gap: 4, paddingTop: 4 },
   nwLabel: {

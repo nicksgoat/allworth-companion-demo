@@ -86,19 +86,16 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
   const { width: winW } = useWindowDimensions();
   const nudgeW = Math.min(360, winW - 64); // fixed-width slides so the next card peeks
   const fullName = d.client?.name ?? "Maya Tran";
-  const initials = d.client?.avatarInitials ?? "MT";
   return (
     <View style={{ gap: 24 }}>
       <NetWorthHero
         greeting={greetingForNow()}
         name={fullName}
-        initials={initials}
         netWorth={d.netWorth}
         delta={trajectory(d)}
         history={d.netWorthHistory}
         insetsTop={insets.top}
         onOpenWealth={() => app.setSelectedTab("invest")}
-        onAvatarPress={() => app.setSelectedTab("profile")}
       />
 
       {d.nudges.length ? (
