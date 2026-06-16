@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Svg, { Circle, G } from "react-native-svg";
 import { card, colors, fonts, usd } from "../theme";
@@ -33,27 +33,46 @@ function DonutChart({
   const circ = 2 * Math.PI * r;
   const total = segments.reduce((s, x) => s + x.value, 0) || 1;
   const gap = circ * 0.03; // visible gap between slices
+
+  // Clockwise draw-on sweep, matching the line charts' left-to-right reveal.
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    const start = Date.now();
+    const duration = 900;
+    let raf = 0;
+    const tick = () => {
+      const t = Math.min(1, (Date.now() - start) / duration);
+      setProgress(1 - Math.pow(1 - t, 3));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [segments.length]);
+
+  const front = progress * circ; // arc length the sweep has reached
   let offset = 0;
   return (
     <Svg width={size} height={size}>
       <G rotation={-90} originX={size / 2} originY={size / 2}>
         {segments.map((seg, i) => {
           const segLen = (seg.value / total) * circ;
-          const draw = Math.max(0.5, segLen - gap);
-          const node = (
-            <Circle
-              key={i}
-              cx={size / 2}
-              cy={size / 2}
-              r={r}
-              stroke={seg.color}
-              strokeWidth={thickness}
-              strokeLinecap="round"
-              fill="none"
-              strokeDasharray={`${draw} ${circ - draw}`}
-              strokeDashoffset={-(offset + gap / 2)}
-            />
-          );
+          const full = Math.max(0.5, segLen - gap);
+          const drawn = Math.max(0, Math.min(full, front - offset)); // reveal up to the sweep front
+          const node =
+            drawn > 0 ? (
+              <Circle
+                key={i}
+                cx={size / 2}
+                cy={size / 2}
+                r={r}
+                stroke={seg.color}
+                strokeWidth={thickness}
+                strokeLinecap="round"
+                fill="none"
+                strokeDasharray={`${drawn} ${circ - drawn}`}
+                strokeDashoffset={-(offset + gap / 2)}
+              />
+            ) : null;
           offset += segLen;
           return node;
         })}
