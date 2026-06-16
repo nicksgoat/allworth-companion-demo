@@ -2,7 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
-import { DisclaimerFooter, SectionHeader, SheetHeader } from "../components/Rows";
+import { iconFor, leadingPct, severityFor } from "../components/NudgeCard";
+import { DisclaimerFooter, SectionHeader } from "../components/Rows";
 import { useApp } from "../state";
 import { colors, fonts, monthName, usd } from "../theme";
 import type { Nudge, SpendingDetail } from "../types";
@@ -33,6 +34,10 @@ function NudgeDetailContent({ nudge, onClose }: { nudge: Nudge; onClose: () => v
     }
   }, [nudge]);
 
+  const sev = severityFor(nudge.severity);
+  const pct = leadingPct(nudge.headline);
+  const tint = sev.color + "1A";
+
   const chatPrompt =
     nudge.type === "spending"
       ? "I know we've been spending more the last few months — what does that actually mean for my plan?"
@@ -49,28 +54,68 @@ function NudgeDetailContent({ nudge, onClose }: { nudge: Nudge; onClose: () => v
   return (
     <ScrollView
       style={{ backgroundColor: colors.surfacePrimary }}
-      contentContainerStyle={{ padding: 20, gap: 20 }}
+      contentContainerStyle={{ paddingBottom: 32 }}
     >
-      <View style={{ gap: 6, paddingTop: 24 }}>
-        <SheetHeader title={nudge.title} onClose={onClose} />
-        <Text style={styles.headline}>{nudge.headline}</Text>
+      {/* Severity-tinted hero header */}
+      <View style={[styles.hero, { backgroundColor: tint }]}>
+        <View style={styles.heroTop}>
+          <View style={[styles.iconChip, { backgroundColor: sev.color }]}>
+            <Ionicons name={iconFor(nudge.type)} size={20} color="#FFFFFF" />
+          </View>
+          <Pressable onPress={onClose} hitSlop={10} style={styles.closeBtn}>
+            <Ionicons name="close" size={20} color={colors.inkSecondary} />
+          </Pressable>
+        </View>
+        <View style={[styles.tag, { backgroundColor: "rgba(255,255,255,0.6)" }]}>
+          <Text style={[styles.tagText, { color: sev.color }]}>{sev.label}</Text>
+        </View>
+        <Text style={[styles.heroMetric, { color: sev.color }]}>{nudge.headline}</Text>
+        <Text style={styles.heroTitle}>{nudge.title}</Text>
       </View>
 
-      <Text style={styles.body}>{nudge.body}</Text>
+      <View style={styles.bodyWrap}>
+        <Text style={styles.body}>{nudge.body}</Text>
 
-      {nudge.type === "spending" && spending ? <SpendingBars s={spending} /> : null}
+        {nudge.type === "spending" && spending ? <SpendingBars s={spending} /> : null}
+        {nudge.type === "concentration" && pct != null ? (
+          <ConcentrationBar pct={pct} color={sev.color} headline={nudge.headline} />
+        ) : null}
 
-      <Pressable
-        onPress={askAssistant}
-        style={({ pressed }) => [styles.cta, pressed && { opacity: 0.85 }]}
-      >
-        <Ionicons name="chatbubbles-outline" size={18} color="#fff" />
-        <Text style={styles.ctaText}>{nudge.cta}</Text>
-      </Pressable>
+        <Pressable
+          onPress={askAssistant}
+          style={({ pressed }) => [styles.cta, pressed && { opacity: 0.9 }]}
+        >
+          <Ionicons name="chatbubbles-outline" size={18} color="#fff" />
+          <Text style={styles.ctaText}>{nudge.cta}</Text>
+        </Pressable>
 
-      <AdvisorHandoffCard />
-      <DisclaimerFooter />
+        <AdvisorHandoffCard />
+        <DisclaimerFooter />
+      </View>
     </ScrollView>
+  );
+}
+
+function ConcentrationBar({
+  pct,
+  color,
+  headline,
+}: {
+  pct: number;
+  color: string;
+  headline: string;
+}) {
+  return (
+    <View style={{ gap: 10 }}>
+      <SectionHeader>Share of the account</SectionHeader>
+      <View style={styles.concTrack}>
+        <View style={[styles.concFill, { width: `${Math.min(100, pct)}%`, backgroundColor: color }]} />
+      </View>
+      <View style={styles.concLegend}>
+        <Text style={[styles.concPct, { color }]}>{headline}</Text>
+        <Text style={styles.concRest}>{Math.max(0, 100 - Math.round(pct))}% everything else</Text>
+      </View>
+    </View>
   );
 }
 
@@ -107,14 +152,38 @@ function SpendingBars({ s }: { s: SpendingDetail }) {
 }
 
 const styles = StyleSheet.create({
-  // Large stats render in Playfair Display with tabular lining figures (brand deck p.6)
-  headline: {
-    fontSize: 44,
-    fontFamily: fonts.displayMedium,
-    color: colors.attention,
-    fontVariant: ["tabular-nums"],
+  hero: {
+    paddingTop: 22,
+    paddingHorizontal: 20,
+    paddingBottom: 22,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    gap: 10,
   },
+  heroTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  iconChip: { width: 42, height: 42, borderRadius: 14, alignItems: "center", justifyContent: "center" },
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tag: { alignSelf: "flex-start", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
+  tagText: { fontSize: 12, fontFamily: fonts.sansBold, letterSpacing: 0.3 },
+  // Large stats render in Playfair Display with tabular lining figures (brand deck p.6)
+  heroMetric: {
+    fontSize: 40,
+    fontFamily: fonts.displayMedium,
+    fontVariant: ["tabular-nums"],
+    marginTop: 2,
+  },
+  heroTitle: { fontSize: 18, fontFamily: fonts.sans, color: colors.inkPrimary, lineHeight: 24 },
+
+  bodyWrap: { padding: 20, gap: 20 },
   body: { fontSize: 17, fontFamily: fonts.sans, lineHeight: 24, color: colors.inkPrimary },
+
   cta: {
     flexDirection: "row",
     gap: 8,
@@ -122,9 +191,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: colors.allworthAccent,
     borderRadius: 12,
-    paddingVertical: 14,
+    paddingVertical: 15,
   },
   ctaText: { color: "#fff", fontSize: 17, fontFamily: fonts.sansBold },
+
+  concTrack: {
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: colors.inkFaint,
+    overflow: "hidden",
+  },
+  concFill: { position: "absolute", left: 0, top: 0, bottom: 0, borderRadius: 7 },
+  concLegend: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  concPct: { fontSize: 15, fontFamily: fonts.sansBold, fontVariant: ["tabular-nums"] },
+  concRest: { fontSize: 14, fontFamily: fonts.sans, color: colors.inkTertiary },
+
   barRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   barMonth: {
     width: 30,
