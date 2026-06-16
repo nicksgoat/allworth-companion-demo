@@ -15,9 +15,6 @@ const RANGES = [
   { label: "1Y", points: 12, suffix: "past year" },
 ];
 
-const POS = "#86C98A"; // light evergreen — readable on the navy field
-const NEG = "#E89B73"; // light pumpkin
-
 // Full-bleed account-value chart — a bold white line over a navy field, with a
 // dotted baseline at the start-of-range value and drag-to-scrub. (Acorns-style.)
 function BigChart({ points }: { points: MonthValue[] }) {
@@ -176,7 +173,9 @@ export function NetWorthDetail({
         <View style={styles.valueBlock}>
           <Text style={styles.bigValue}>{usd(d.netWorth)}</Text>
           {delta ? (
-            <Text style={[styles.delta, { color: delta.positive ? POS : NEG }]}>
+            <Text
+              style={[styles.delta, { color: delta.positive ? colors.gainOnDark : colors.lossOnDark }]}
+            >
               {delta.positive ? "↑" : "↓"} {delta.text}
             </Text>
           ) : null}
@@ -194,7 +193,6 @@ export function NetWorthDetail({
             );
           })}
         </View>
-        <Text style={styles.caption}>Net worth as of today</Text>
       </View>
     </Modal>
   );
@@ -228,10 +226,4 @@ const styles = StyleSheet.create({
   rangeChipOn: { backgroundColor: "rgba(255,255,255,0.15)" },
   rangeText: { fontSize: 15, fontFamily: fonts.sansBold, color: "rgba(255,255,255,0.55)" },
   rangeTextOn: { color: "#FFFFFF" },
-  caption: {
-    fontSize: 13,
-    fontFamily: fonts.sansItalic,
-    color: "rgba(255,255,255,0.55)",
-    textAlign: "center",
-  },
 });

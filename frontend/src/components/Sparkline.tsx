@@ -166,7 +166,6 @@ const styles = StyleSheet.create({
     left: 0,
     fontSize: 13,
     fontFamily: fonts.sansBold,
-    color: colors.inkSecondary,
     fontVariant: ["tabular-nums"],
   },
 });

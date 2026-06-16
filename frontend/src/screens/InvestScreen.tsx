@@ -151,10 +151,12 @@ function InvestContent({
     const sliced = history.length >= spec.points ? history.slice(-spec.points) : history;
     if (sliced.length < 2) return { slice: sliced, delta: undefined };
     const diff = sliced[sliced.length - 1].value - sliced[0].value;
+    const pct = sliced[0].value ? (diff / sliced[0].value) * 100 : 0;
+    const sign = diff >= 0 ? "+" : "−";
     return {
       slice: sliced,
       delta: {
-        text: `${diff >= 0 ? "+" : ""}${usd(diff)} ${spec.deltaSuffix}`,
+        text: `${sign}${usd(Math.abs(diff))} (${sign}${Math.abs(pct).toFixed(1)}%) ${spec.deltaSuffix}`,
         positive: diff >= 0,
       },
     };
@@ -282,7 +284,7 @@ function Skeleton() {
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <View style={styles.errorBox}>
-      <Text style={styles.errorTitle}>Backend offline</Text>
+      <Text style={styles.errorTitle}>We couldn{"'"}t load your accounts</Text>
       <Text style={styles.errorMessage}>{message}</Text>
       <Pressable onPress={onRetry} style={styles.retryButton}>
         <Text style={styles.retryText}>Retry</Text>

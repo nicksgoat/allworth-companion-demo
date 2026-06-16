@@ -22,6 +22,9 @@ export const colors = {
   gain: "#436434", // Evergreen
   loss: "#D26D37", // Pumpkin
   attention: "#D26D37", // Pumpkin
+  // Lightened variants legible on the navy/gradient hero surfaces
+  gainOnDark: "#86C98A",
+  lossOnDark: "#E89B73",
 
   // Secondary palette — designated for infographics/charts/accents only (p.7)
   chartNightBlue: "#0C2E4E",

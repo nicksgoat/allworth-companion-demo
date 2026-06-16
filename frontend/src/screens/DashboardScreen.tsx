@@ -264,7 +264,7 @@ function Skeleton() {
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <View style={styles.errorBox}>
-      <Text style={styles.errorTitle}>Backend offline</Text>
+      <Text style={styles.errorTitle}>We couldn{"'"}t load your accounts</Text>
       <Text style={styles.errorMessage}>{message}</Text>
       <Pressable onPress={onRetry} style={styles.retryButton}>
         <Text style={styles.retryText}>Retry</Text>

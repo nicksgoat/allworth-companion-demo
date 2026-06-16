@@ -251,5 +251,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.hairline,
   },
-  logoutText: { fontFamily: fonts.sansBold, fontSize: 14, color: colors.loss },
+  logoutText: { fontFamily: fonts.sansBold, fontSize: 14, color: colors.inkSecondary },
 });

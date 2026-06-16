@@ -8,9 +8,6 @@ import type { MonthValue } from "../types";
 import { Sparkline } from "./Sparkline";
 import { AllworthLogo } from "./Wordmark";
 
-const POS = "#86C98A"; // light evergreen — readable on the navy field
-const NEG = "#E89B73"; // light pumpkin
-
 // The net-worth hero — a full-bleed Night Blue → Indigo gradient header (the
 // brand's premium surface) carrying the greeting, net worth, and chart, instead
 // of a light card. Bleeds past the scroll padding to the screen edges.
@@ -85,7 +82,9 @@ export function NetWorthHero({
         <Text style={styles.nwLabel}>Net worth</Text>
         <Text style={styles.nwValue}>{usd(displayed)}</Text>
         {delta ? (
-          <Text style={[styles.nwDelta, { color: delta.positive ? POS : NEG }]}>
+          <Text
+            style={[styles.nwDelta, { color: delta.positive ? colors.gainOnDark : colors.lossOnDark }]}
+          >
             {delta.positive ? "↑" : "↓"} {delta.text}
           </Text>
         ) : null}
