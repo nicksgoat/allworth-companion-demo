@@ -1,6 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import {
+  Animated,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { RiseIn, useAnimatedValue } from "../anim";
 import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
@@ -74,6 +83,8 @@ function greetingForNow() {
 function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) => void }) {
   const app = useApp();
   const insets = useSafeAreaInsets();
+  const { width: winW } = useWindowDimensions();
+  const nudgeW = Math.min(360, winW - 64); // fixed-width slides so the next card peeks
   const fullName = d.client?.name ?? "Maya Tran";
   const initials = d.client?.avatarInitials ?? "MT";
   return (
@@ -91,14 +102,24 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
       />
 
       {d.nudges.length ? (
-        <View style={{ gap: 12 }}>
+        <RiseIn delay={80} style={{ gap: 12 }}>
           <SectionHeader>Needs your attention</SectionHeader>
-          {d.nudges.slice(0, 2).map((nudge, i) => (
-            <RiseIn key={nudge.id} delay={80 + i * 60}>
-              <NudgeCard nudge={nudge} onPress={() => onNudge(nudge)} />
-            </RiseIn>
-          ))}
-        </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.carousel}
+            contentContainerStyle={styles.carouselContent}
+            snapToInterval={nudgeW + 12}
+            snapToAlignment="start"
+            decelerationRate="fast"
+          >
+            {d.nudges.map((nudge) => (
+              <View key={nudge.id} style={{ width: nudgeW }}>
+                <NudgeCard nudge={nudge} onPress={() => onNudge(nudge)} fill />
+              </View>
+            ))}
+          </ScrollView>
+        </RiseIn>
       ) : null}
 
       <RiseIn delay={220} style={{ gap: 12 }}>
@@ -148,18 +169,23 @@ function QuickActions() {
   ];
 
   return (
-    <View style={styles.actionsGrid}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.carousel}
+      contentContainerStyle={styles.pillRow}
+    >
       {actions.map((a) => (
         <Pressable
           key={a.label}
           onPress={a.onPress}
-          style={({ pressed }) => [styles.actionCard, pressed && { opacity: 0.7 }]}
+          style={({ pressed }) => [styles.actionPill, pressed && { opacity: 0.7 }]}
         >
-          <Ionicons name={a.icon} size={20} color={colors.allworthAccent} />
+          <Ionicons name={a.icon} size={18} color={colors.allworthAccent} />
           <Text style={styles.actionLabel}>{a.label}</Text>
         </Pressable>
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -250,13 +276,19 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 }
 
 const styles = StyleSheet.create({
-  actionsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
-  actionCard: {
+  // Horizontal carousels bleed past the scroll container's 20px padding to the
+  // screen edges, while their content keeps a 20px inset so cards start aligned.
+  carousel: { marginHorizontal: -20 },
+  carouselContent: { paddingHorizontal: 20, gap: 12, alignItems: "stretch" },
+  pillRow: { paddingHorizontal: 20, gap: 10 },
+  actionPill: {
     ...card,
-    flexBasis: "46%",
-    flexGrow: 1,
-    padding: 14,
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 999,
   },
   actionLabel: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.inkPrimary },
   snapshotCard: { ...card, paddingHorizontal: 16, paddingVertical: 6 },

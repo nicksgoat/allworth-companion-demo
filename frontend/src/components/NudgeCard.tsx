@@ -15,11 +15,19 @@ function iconFor(type: string): keyof typeof Ionicons.glyphMap {
   }
 }
 
-export function NudgeCard({ nudge, onPress }: { nudge: Nudge; onPress: () => void }) {
+export function NudgeCard({
+  nudge,
+  onPress,
+  fill,
+}: {
+  nudge: Nudge;
+  onPress: () => void;
+  fill?: boolean;
+}) {
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && { opacity: 0.85 }]}
+      style={({ pressed }) => [styles.card, fill && { flex: 1 }, pressed && { opacity: 0.85 }]}
     >
       <Ionicons
         name={iconFor(nudge.type)}
