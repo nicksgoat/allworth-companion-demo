@@ -32,7 +32,7 @@ function DonutChart({
   const r = (size - thickness) / 2;
   const circ = 2 * Math.PI * r;
   const total = segments.reduce((s, x) => s + x.value, 0) || 1;
-  const gap = circ * 0.03; // visible gap between slices
+  const gap = circ * 0.012; // hairline separation — a cohesive ring, not floating blobs
 
   // Clockwise draw-on sweep, matching the line charts' left-to-right reveal.
   const [progress, setProgress] = useState(0);
@@ -67,7 +67,7 @@ function DonutChart({
                 r={r}
                 stroke={seg.color}
                 strokeWidth={thickness}
-                strokeLinecap="round"
+                strokeLinecap="butt"
                 fill="none"
                 strokeDasharray={`${drawn} ${circ - drawn}`}
                 strokeDashoffset={-(offset + gap / 2)}
@@ -108,7 +108,7 @@ export function AllocationCard({
   return (
     <View style={styles.card}>
       <View style={styles.donutWrap}>
-        <DonutChart segments={donutSegments} size={196} thickness={26} />
+        <DonutChart segments={donutSegments} size={196} thickness={22} />
         <View style={styles.donutCenter} pointerEvents="none">
           <Text style={styles.donutCenterValue}>{Math.round(a.equityPct * 100)}%</Text>
           <Text style={styles.donutCenterLabel}>in stocks</Text>
