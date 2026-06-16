@@ -9,6 +9,7 @@ import { HeroNumber } from "../components/HeroNumber";
 import { AccountHoldingsSection } from "../components/Holdings";
 import { IncomeCard } from "../components/IncomeCard";
 import { BreakdownCard, CompletePictureCard } from "../components/NetWorthBreakdown";
+import { NetWorthDetail } from "../components/NetWorthDetail";
 import { NudgeCard } from "../components/NudgeCard";
 import { RangeChips } from "../components/RangeChips";
 import { RecurringCard } from "../components/RecurringCard";
@@ -136,6 +137,7 @@ function InvestContent({
   const app = useApp();
   const [range, setRange] = useState("1Y");
   const [segment, setSegment] = useState("Overview");
+  const [chartOpen, setChartOpen] = useState(false);
 
   const ask = (prompt: string) => {
     app.setChatPrefill(prompt);
@@ -178,10 +180,17 @@ function InvestContent({
       </View>
 
       <RiseIn style={{ gap: 14 }}>
-        <HeroNumber label="Total net worth" value={d.netWorth} delta={delta} />
+        <Pressable
+          onPress={() => setChartOpen(true)}
+          style={({ pressed }) => pressed && { opacity: 0.7 }}
+        >
+          <HeroNumber label="Total net worth" value={d.netWorth} delta={delta} />
+        </Pressable>
         <RangeChips options={RANGES.map((r) => r.label)} selected={range} onSelect={setRange} />
         <Sparkline points={slice} />
       </RiseIn>
+
+      <NetWorthDetail visible={chartOpen} onClose={() => setChartOpen(false)} d={d} />
 
       <RiseIn delay={60}>
         <SegmentedControl
