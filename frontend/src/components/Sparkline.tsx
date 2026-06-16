@@ -136,7 +136,7 @@ export function Sparkline({
         </Svg>
       ) : null}
       {selected != null ? (
-        <Text style={styles.scrubLabel}>
+        <Text style={[styles.scrubLabel, { color: lineColor }]}>
           {usd(dense[selected].value)} · {monthLabel(dense[selected].month)}
         </Text>
       ) : null}

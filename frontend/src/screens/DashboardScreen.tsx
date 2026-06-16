@@ -2,11 +2,11 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { RiseIn, useAnimatedValue, useCountUp } from "../anim";
+import { RiseIn, useAnimatedValue } from "../anim";
 import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
+import { NetWorthHero } from "../components/NetWorthHero";
 import { NudgeCard } from "../components/NudgeCard";
 import { DisclaimerFooter, HairlineDivider, SectionHeader } from "../components/Rows";
-import { Sparkline } from "../components/Sparkline";
 import { useApp } from "../state";
 import { card, colors, fonts, usd } from "../theme";
 import type { Dashboard, Nudge } from "../types";
@@ -73,29 +73,22 @@ function greetingForNow() {
 
 function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) => void }) {
   const app = useApp();
+  const insets = useSafeAreaInsets();
   const fullName = d.client?.name ?? "Maya Tran";
   const initials = d.client?.avatarInitials ?? "MT";
   return (
     <View style={{ gap: 24 }}>
-      <View style={styles.headerRow}>
-        <View style={styles.greetingBlock}>
-          <Text style={styles.salutation}>{greetingForNow()}</Text>
-          <Text style={styles.clientName} numberOfLines={1} adjustsFontSizeToFit>
-            {fullName}
-          </Text>
-        </View>
-        <Pressable
-          onPress={() => app.setSelectedTab("profile")}
-          hitSlop={8}
-          style={({ pressed }) => [styles.avatar, pressed && { opacity: 0.85 }]}
-        >
-          <Text style={styles.avatarInitials}>{initials}</Text>
-        </Pressable>
-      </View>
-
-      <RiseIn>
-        <NetWorthCard d={d} />
-      </RiseIn>
+      <NetWorthHero
+        greeting={greetingForNow()}
+        name={fullName}
+        initials={initials}
+        netWorth={d.netWorth}
+        delta={trajectory(d)}
+        history={d.netWorthHistory}
+        insetsTop={insets.top}
+        onOpenWealth={() => app.setSelectedTab("invest")}
+        onAvatarPress={() => app.setSelectedTab("profile")}
+      />
 
       {d.nudges.length ? (
         <View style={{ gap: 12 }}>
@@ -122,32 +115,6 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
         <DisclaimerFooter />
       </View>
     </View>
-  );
-}
-
-function NetWorthCard({ d }: { d: Dashboard }) {
-  const app = useApp();
-  const displayed = useCountUp(d.netWorth);
-  const delta = trajectory(d);
-
-  return (
-    <Pressable
-      onPress={() => app.setSelectedTab("invest")}
-      style={({ pressed }) => [styles.nwCard, pressed && { opacity: 0.85 }]}
-    >
-      <SectionHeader>Net worth</SectionHeader>
-      <Text style={styles.nwValue}>{usd(displayed)}</Text>
-      {delta ? (
-        <Text style={[styles.nwDelta, { color: delta.positive ? colors.gain : colors.loss }]}>
-          {delta.text}
-        </Text>
-      ) : null}
-      <Sparkline points={d.netWorthHistory} />
-      <View style={styles.nwLink}>
-        <Text style={styles.nwLinkText}>View your wealth</Text>
-        <Ionicons name="chevron-forward" size={14} color={colors.allworthAccent} />
-      </View>
-    </Pressable>
   );
 }
 
@@ -283,34 +250,6 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  greetingBlock: { flexShrink: 1, gap: 2 },
-  salutation: { fontSize: 14, fontFamily: fonts.sans, color: colors.inkTertiary, letterSpacing: 0.2 },
-  clientName: { fontSize: 27, fontFamily: fonts.displayMedium, color: colors.allworthNavy },
-  avatar: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: colors.allworthNavy,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarInitials: { fontSize: 16, fontFamily: fonts.sansBold, color: "#FFFFFF", letterSpacing: 0.5 },
-  nwCard: { ...card, padding: 16, gap: 6 },
-  nwValue: {
-    fontSize: 34,
-    fontFamily: fonts.displayMedium,
-    color: colors.inkPrimary,
-    fontVariant: ["tabular-nums"],
-  },
-  nwDelta: { fontSize: 14, fontFamily: fonts.sansBold, fontVariant: ["tabular-nums"] },
-  nwLink: { flexDirection: "row", alignItems: "center", gap: 2, paddingTop: 4 },
-  nwLinkText: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.allworthAccent },
   actionsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   actionCard: {
     ...card,
