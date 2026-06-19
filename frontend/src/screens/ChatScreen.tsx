@@ -92,6 +92,12 @@ export function ChatScreen() {
           updated.chips = updated.chips.map((c) =>
             c.name === event.name ? { ...c, running: false } : c,
           );
+          if (event.result) {
+            updated.widgets = [
+              ...(updated.widgets ?? []),
+              { name: event.name, result: event.result },
+            ];
+          }
           break;
         case "text":
           updated.text += event.delta;

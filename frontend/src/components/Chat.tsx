@@ -5,6 +5,7 @@ import { FadeScaleIn, usePulse } from "../anim";
 import { colors, fonts } from "../theme";
 import type { ChatMessage, ToolChip } from "../types";
 import { AdvisorHandoffCard } from "./AdvisorHandoffCard";
+import { ChatToolWidget } from "./ChatToolWidget";
 import { AllworthMark } from "./Wordmark";
 
 export function ToolChipRow({
@@ -135,6 +136,9 @@ export function ChatMessageView({ message }: { message: ChatMessage }) {
         sources={message.sources}
         collapsed={!message.isStreaming}
       />
+      {message.widgets?.map((w, i) => (
+        <ChatToolWidget key={`${w.name}-${i}`} widget={w} />
+      ))}
       {message.text ? <MarkdownText text={message.text} streaming={message.isStreaming} /> : null}
       {!message.isStreaming && message.sources.length > 0 ? (
         <View style={{ paddingTop: 4 }}>

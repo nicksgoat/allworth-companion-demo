@@ -164,7 +164,7 @@ function parseEvent(event: string, json: string): ChatEvent | null {
     case "tool_start":
       return { kind: "tool_start", name: obj.name ?? "", label: obj.label ?? "Working…" };
     case "tool_end":
-      return { kind: "tool_end", name: obj.name ?? "" };
+      return { kind: "tool_end", name: obj.name ?? "", result: obj.result };
     case "text":
       return { kind: "text", delta: obj.delta ?? "" };
     case "done":

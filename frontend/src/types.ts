@@ -161,6 +161,13 @@ export interface ToolChip {
   running: boolean;
 }
 
+// A tool whose structured result the chat renders as a rich inline widget
+// (the rebalancer + the Monte Carlo projection).
+export interface ToolWidget {
+  name: string;
+  result: any;
+}
+
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
@@ -169,11 +176,12 @@ export interface ChatMessage {
   sources: string[];
   isStreaming: boolean;
   suggested?: string[];
+  widgets?: ToolWidget[];
 }
 
 export type ChatEvent =
   | { kind: "tool_start"; name: string; label: string }
-  | { kind: "tool_end"; name: string }
+  | { kind: "tool_end"; name: string; result?: any }
   | { kind: "text"; delta: string }
   | { kind: "done"; sources: string[]; suggested: string[] }
   | { kind: "error"; message: string };

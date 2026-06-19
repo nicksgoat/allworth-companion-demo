@@ -20,6 +20,10 @@ from allworth_api.data.seed import seed
 
 MAX_TOOL_ROUNDS = 8
 
+# Tools whose structured result the client renders as a rich inline widget
+# (the rebalancer + the Monte Carlo retirement projection).
+VISUAL_TOOLS = {"rebalance", "run_retirement_projection", "simulate"}
+
 SOURCE_NAMES = {
     "get_accounts": "Accounts",
     "get_portfolio": "Portfolio",
@@ -131,7 +135,13 @@ async def _stream_live(client_id, session, messages, out, client_name=None, advi
         for tc in tool_calls:
             result = run_tool(tc.name, tc.input, client_id)
             sources.add(SOURCE_NAMES.get(tc.name, tc.name))
-            yield "tool_end", {"name": tc.name}
+            # Surface the structured result to the client for the tools the app
+            # renders as rich inline widgets (rebalancer + Monte Carlo). Other
+            # tools only send the name to keep the stream light.
+            end_payload = {"name": tc.name}
+            if tc.name in VISUAL_TOOLS and isinstance(result, dict) and "error" not in result:
+                end_payload["result"] = result
+            yield "tool_end", end_payload
             results.append(json.dumps(result))
 
         # Format tool results in provider-specific way and add to conversation
