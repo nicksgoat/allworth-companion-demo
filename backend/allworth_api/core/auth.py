@@ -13,13 +13,23 @@ All downstream routes use get_current_household() to enforce data isolation.
 from __future__ import annotations
 
 import hashlib
+import hmac
+import json
 import logging
 import secrets
 import time
+from base64 import urlsafe_b64decode, urlsafe_b64encode
 from dataclasses import dataclass, field
 from typing import Any
 
-from fastapi import Depends, HTTPException, Request
+from fastapi import HTTPException, Request
+
+from allworth_api.config import (
+    demo_auth_fallback_enabled,
+    seed_auth_enabled,
+    session_secret,
+    session_ttl_seconds,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +44,6 @@ class HouseholdSession:
     advisor_id: str | None = None
     created_at: float = field(default_factory=time.time)
 
-
-# In-memory session store (demo-scale; production would use Redis/DB)
-_sessions: dict[str, HouseholdSession] = {}
 
 # Demo credentials — maps household_id to a simple passcode
 # Used as fallback when Synapse is unavailable or for local testing
@@ -53,7 +60,7 @@ def _lookup_email_in_synapse(email: str) -> dict[str, Any] | None:
     Returns dict with household_id (AVHHID), contact_name, role, email
     or None if not found / Synapse unavailable.
     """
-    from allworth_api.data.synapse import is_available, _query
+    from allworth_api.data.synapse import _query, is_available
 
     if not is_available():
         return None
@@ -91,9 +98,7 @@ def authenticate(household_id: str, passcode: str) -> HouseholdSession | None:
         return None
 
     token = _generate_token(household_id)
-    session = HouseholdSession(household_id=household_id, token=token)
-    _sessions[token] = session
-    return session
+    return HouseholdSession(household_id=household_id, token=token)
 
 
 def _lookup_email_in_seed(email: str) -> dict[str, Any] | None:
@@ -107,7 +112,12 @@ def _lookup_email_in_seed(email: str) -> dict[str, Any] | None:
     target = email.strip().lower()
     for c in seed["personas"]["clients"]:
         if (c.get("email") or "").lower() == target:
-            return {"household_id": c["id"], "contact_name": c["name"], "email": c.get("email"), "role": "Primary"}
+            return {
+                "household_id": c["id"],
+                "contact_name": c["name"],
+                "email": c.get("email"),
+                "role": "Primary",
+            }
     return None
 
 
@@ -120,45 +130,103 @@ def authenticate_email(email: str) -> HouseholdSession | None:
 
     Returns HouseholdSession on success, None if email not found.
     """
-    result = _lookup_email_in_synapse(email) or _lookup_email_in_seed(email)
+    result = _lookup_email_in_synapse(email)
+    if not result and seed_auth_enabled():
+        result = _lookup_email_in_seed(email)
     if not result:
         return None
 
     household_id = str(result["household_id"])
-    token = _generate_token(household_id)
     session = HouseholdSession(
         household_id=household_id,
-        token=token,
+        token=_generate_token(
+            household_id,
+            email=email.strip().lower(),
+            contact_name=result.get("contact_name"),
+        ),
         email=email.strip().lower(),
         contact_name=result.get("contact_name"),
     )
-    _sessions[token] = session
     logger.info(f"Email login: {email} → household {household_id} ({result.get('contact_name')})")
     return session
 
 
 def get_session(token: str) -> HouseholdSession | None:
-    """Look up a session by token."""
-    return _sessions.get(token)
+    """Validate and decode a stateless session token."""
+    payload = _verify_token(token)
+    if not payload:
+        return None
+    return HouseholdSession(
+        household_id=str(payload["household_id"]),
+        token=token,
+        email=payload.get("email"),
+        contact_name=payload.get("contact_name"),
+        advisor_id=payload.get("advisor_id"),
+        created_at=float(payload.get("iat", 0)),
+    )
 
 
 def invalidate(token: str) -> bool:
-    """Remove a session (logout)."""
-    return _sessions.pop(token, None) is not None
+    """Stateless tokens cannot be revoked locally; clients discard them on logout."""
+    return bool(get_session(token))
 
 
 def get_session_for_household(household_id: str) -> HouseholdSession | None:
-    """Find the most recent session for a given household_id."""
-    for s in reversed(list(_sessions.values())):
-        if s.household_id == household_id:
-            return s
+    """No process-local session index exists in stateless mode."""
     return None
 
 
-def _generate_token(household_id: str) -> str:
-    """Generate a secure session token."""
-    raw = f"{household_id}:{secrets.token_hex(32)}:{time.time()}"
-    return hashlib.sha256(raw.encode()).hexdigest()
+def _b64url(data: bytes) -> str:
+    return urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
+
+
+def _unb64url(data: str) -> bytes:
+    return urlsafe_b64decode(data + "=" * (-len(data) % 4))
+
+
+def _sign(payload: str) -> str:
+    digest = hmac.new(session_secret().encode("utf-8"), payload.encode("ascii"), hashlib.sha256).digest()
+    return _b64url(digest)
+
+
+def _generate_token(
+    household_id: str,
+    *,
+    email: str | None = None,
+    contact_name: str | None = None,
+    advisor_id: str | None = None,
+) -> str:
+    """Generate a signed, stateless bearer token."""
+    now = int(time.time())
+    payload = {
+        "household_id": household_id,
+        "email": email,
+        "contact_name": contact_name,
+        "advisor_id": advisor_id,
+        "iat": now,
+        "exp": now + session_ttl_seconds(),
+        "nonce": secrets.token_urlsafe(16),
+    }
+    payload_part = _b64url(json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8"))
+    return f"{payload_part}.{_sign(payload_part)}"
+
+
+def _verify_token(token: str) -> dict[str, Any] | None:
+    if not token or "." not in token:
+        return None
+    payload_part, signature = token.rsplit(".", 1)
+    expected = _sign(payload_part)
+    if not hmac.compare_digest(signature, expected):
+        return None
+    try:
+        payload = json.loads(_unb64url(payload_part))
+    except (json.JSONDecodeError, ValueError):
+        return None
+    if int(payload.get("exp", 0)) < int(time.time()):
+        return None
+    if not payload.get("household_id"):
+        return None
+    return payload
 
 
 # ── FastAPI dependency ───────────────────────────────────────────────────
@@ -178,10 +246,13 @@ async def get_current_household(request: Request) -> str:
         if session:
             return session.household_id
 
-    # Fallback: X-Household-Id header (for demo/dev without full login)
-    household_header = request.headers.get("X-Household-Id", "")
-    if household_header:
-        return household_header
+    if demo_auth_fallback_enabled():
+        # Fallback: X-Household-Id header (for demo/dev without full login)
+        household_header = request.headers.get("X-Household-Id", "")
+        if household_header:
+            return household_header
 
-    # Final fallback for backward compat during dev
-    return "maya"
+        # Final fallback for backward compat during dev
+        return "maya"
+
+    raise HTTPException(status_code=401, detail="Authentication required")

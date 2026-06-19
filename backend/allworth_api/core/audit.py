@@ -11,13 +11,13 @@ from __future__ import annotations
 
 import json
 import sys
-import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
-from allworth_api.config import API_DIR
+from allworth_api.config import audit_log_target
 
-AUDIT_PATH = API_DIR / "audit.log"
+AUDIT_TARGET = audit_log_target()
+AUDIT_PATH = Path(AUDIT_TARGET) if AUDIT_TARGET != "stdout" else None
 
 # Fields we never write to disk in plaintext.
 SENSITIVE_KEYS = frozenset({"access_token", "password", "token", "api_key", "secret"})
@@ -54,7 +54,7 @@ def log_tool_call(
     """Append one audit record. Never raises — failures print to stderr."""
     try:
         record = {
-            "ts": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
+            "ts": datetime.now(UTC).isoformat(timespec="milliseconds"),
             "client": client_id,
             "tool": tool,
             "params": _scrub(params or {}),
@@ -62,7 +62,11 @@ def log_tool_call(
             "tokens_in": estimate_tokens(params),
             "tokens_out": estimate_tokens(result) if result else 0,
         }
-        with AUDIT_PATH.open("a") as f:
-            f.write(json.dumps(record, separators=(",", ":"), default=str) + "\n")
+        line = json.dumps(record, separators=(",", ":"), default=str)
+        if AUDIT_TARGET == "stdout":
+            print(line)
+        elif AUDIT_PATH is not None:
+            with AUDIT_PATH.open("a") as f:
+                f.write(line + "\n")
     except Exception as err:
         print(f"[audit] write failed: {err}", file=sys.stderr)

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
 from allworth_api.core.auth import get_current_household, get_session_for_household
@@ -6,10 +6,8 @@ from allworth_api.core.chat_service import suggested_for
 from allworth_api.core.memory import active_facts, episodes_for, forget_fact
 from allworth_api.core.nudges import nudges_for
 from allworth_api.data.household import (
-    get_accounts,
     get_client_persona,
     get_dashboard_data,
-    get_net_worth_history,
     get_portfolio,
     get_spending,
 )
@@ -100,9 +98,8 @@ def proactive(client_id: str, session: str = "wednesday"):
         }
     return {
         "message": (
-            f"Hi {first_name} — I can pull your whole financial picture together: run a retirement "
-            "projection, check how your portfolio is tracking to its target, or look at your goals. "
-            "What would you like to dig into?"
+            f"Hi {first_name} — I can pull your financial picture together, run scenarios, compare "
+            "trade-offs, or score progress toward a goal. What would you like to dig into?"
         ),
         "basedOn": None,
         "suggested": suggested_for(session),

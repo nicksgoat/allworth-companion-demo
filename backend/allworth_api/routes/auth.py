@@ -1,11 +1,18 @@
-from fastapi import APIRouter
-from fastapi.responses import JSONResponse
 import pydantic
+from fastapi import APIRouter, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from allworth_api.core.auth import authenticate, authenticate_email, get_session, invalidate
 
 router = APIRouter()
+
+
+def _bearer_token(request: Request, token: str = "") -> str:
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.startswith("Bearer "):
+        return auth_header[7:]
+    return token
 
 
 class LoginRequest(BaseModel):
@@ -56,9 +63,9 @@ def login_email(body: EmailLoginRequest):
 
 
 @router.get("/api/auth/me")
-def me(token: str = ""):
+def me(request: Request, token: str = ""):
     """Get current session info from a bearer token (passed as query param or header)."""
-    session = get_session(token)
+    session = get_session(_bearer_token(request, token))
     if not session:
         return JSONResponse(status_code=401, content={"error": "Not authenticated"})
     return {
@@ -69,7 +76,7 @@ def me(token: str = ""):
 
 
 @router.post("/api/auth/logout")
-def logout(token: str = ""):
+def logout(request: Request, token: str = ""):
     """Invalidate a session token."""
-    invalidate(token)
+    invalidate(_bearer_token(request, token))
     return {"ok": True}

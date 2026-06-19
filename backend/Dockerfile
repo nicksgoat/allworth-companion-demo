@@ -17,4 +17,4 @@ RUN uv sync --frozen --no-dev
 COPY . .
 
 EXPOSE 3000
-CMD ["uv", "run", "--frozen", "--no-dev", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["sh", "-c", "uv run --frozen --no-dev uvicorn main:app --host 0.0.0.0 --port ${PORT:-3000} --workers ${WEB_CONCURRENCY:-1}"]

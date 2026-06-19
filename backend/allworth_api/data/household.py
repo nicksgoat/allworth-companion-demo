@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 import os
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 from allworth_api.data import synapse
@@ -123,7 +123,6 @@ def get_accounts(household_id: str) -> dict[str, Any]:
         outside = []
 
         for acct in raw:
-            category = (acct.get("account_category") or "").lower()
             acct_type = (acct.get("account_type") or "").lower()
             custodian = (acct.get("custodian") or "").lower()
             balance = acct.get("balance", 0) or 0

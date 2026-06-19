@@ -3,6 +3,8 @@
 __pycache__
 **/__pycache__
 .ruff_cache
+.pytest_cache
+*.log
 tests
 fly.toml
 memory/*.runtime.json

@@ -1,4 +1,6 @@
-# Tool schema definitions and UI labels for the 11 demo tools.
+# Tool schema definitions and UI labels for the demo and financial tools.
+
+from allworth_api.financial_tools.tools import FINANCIAL_TOOL_DEFINITIONS, FINANCIAL_TOOL_LABELS
 
 TOOL_LABELS = {
     "get_accounts": "Reading your accounts…",
@@ -14,6 +16,7 @@ TOOL_LABELS = {
     "run_roth_conversion_analysis": "Modeling Roth conversion…",
     "analyze_goal_funding": "Reviewing goal progress…",
     "analyze_income_sustainability": "Evaluating income plan…",
+    **FINANCIAL_TOOL_LABELS,
 }
 
 TOOL_DEFINITIONS = [
@@ -25,10 +28,10 @@ TOOL_DEFINITIONS = [
     },
     {
         "name": "get_portfolio",
-        "description": "Holdings across all accounts: positions with quantities, prices, values, "
-        "asset classes, plus tax lots with cost basis and holding term.",
+        "description": "Layer 1 data tool. Fetch current holdings, total value, and allocation breakdown.",
         "input_schema": {"type": "object", "properties": {}, "required": []},
     },
+    *FINANCIAL_TOOL_DEFINITIONS,
     {
         "name": "get_financial_plan",
         "description": "The client's financial plan: spending assumption, income plan, tax profile, "
@@ -133,9 +136,8 @@ TOOL_DEFINITIONS = [
     },
     {
         "name": "analyze_portfolio_drift",
-        "description": "Compare current portfolio allocation to the 60/40 target model. "
-        "Returns per-asset-class drift percentages, an overall drift score, and "
-        "suggested rebalance actions for any positions beyond threshold.",
+        "description": "Legacy app-screen drift analyzer. For LLM model/rebalance answers, prefer "
+        "the rebalance tool, which resolves exact AWF Core-Satellite model names and weights.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -157,7 +159,9 @@ TOOL_DEFINITIONS = [
             "properties": {
                 "conversion_amount": {
                     "type": "number",
-                    "description": "Dollar amount to convert (default: $50K or IRA balance, whichever is less)",
+                    "description": (
+                        "Dollar amount to convert (default: $50K or IRA balance, whichever is less)"
+                    ),
                 },
                 "current_income": {
                     "type": "number",

@@ -53,7 +53,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Validate the token against the backend
           const url =
             backendHost === DEFAULT_HOST ? getDefaultBaseURL() : `http://${backendHost}:3000`;
-          const res = await fetch(`${url}/api/auth/me?token=${encodeURIComponent(parsed.token)}`);
+          const res = await fetch(`${url}/api/auth/me`, {
+            headers: { Authorization: `Bearer ${parsed.token}` },
+          });
           if (res.ok) {
             setSession(parsed);
           } else {

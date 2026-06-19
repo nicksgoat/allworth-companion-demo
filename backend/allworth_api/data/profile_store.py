@@ -6,7 +6,7 @@ import string
 import time
 from pathlib import Path
 
-from allworth_api.config import MEMORY_DIR
+from allworth_api.config import MEMORY_DIR, profile_memory_enabled
 
 BASE36 = string.digits + string.ascii_lowercase
 
@@ -25,7 +25,8 @@ def new_id(prefix: str) -> str:
 
 def load_profile(client_id: str) -> dict:
     runtime, seed_file = runtime_path(client_id), seed_path(client_id)
-    if runtime.exists():
+    runtime_enabled = profile_memory_enabled()
+    if runtime_enabled and runtime.exists():
         profile = json.loads(runtime.read_text())
     elif seed_file.exists():
         profile = json.loads(seed_file.read_text())
@@ -36,10 +37,12 @@ def load_profile(client_id: str) -> dict:
         if not f.get("id"):
             f["id"] = f"fact_seed_{i}"
             assigned = True
-    if assigned or not runtime.exists():
+    if runtime_enabled and (assigned or not runtime.exists()):
         save_profile(client_id, profile)
     return profile
 
 
 def save_profile(client_id: str, profile: dict) -> None:
+    if not profile_memory_enabled():
+        return
     runtime_path(client_id).write_text(json.dumps(profile, indent=2))

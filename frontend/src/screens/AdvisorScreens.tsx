@@ -26,7 +26,7 @@ const Stack = createNativeStackNavigator<AdvisorStackParams>();
 
 export function AdvisorNavigator() {
   return (
-    <Stack.Navigator screenOptions={{ headerTintColor: colors.allworthNavy }}>
+    <Stack.Navigator id="AdvisorStack" screenOptions={{ headerTintColor: colors.allworthNavy }}>
       <Stack.Screen name="Book" component={BookScreen} options={{ headerShown: false }} />
       <Stack.Screen
         name="ClientDetail"

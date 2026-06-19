@@ -175,5 +175,5 @@ export type ChatEvent =
   | { kind: "tool_start"; name: string; label: string }
   | { kind: "tool_end"; name: string }
   | { kind: "text"; delta: string }
-  | { kind: "done"; sources: string[]; fallback: boolean; suggested: string[] }
+  | { kind: "done"; sources: string[]; suggested: string[] }
   | { kind: "error"; message: string };

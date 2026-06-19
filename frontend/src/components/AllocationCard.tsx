@@ -109,7 +109,7 @@ export function AllocationCard({
     <View style={styles.card}>
       <View style={styles.donutWrap}>
         <DonutChart segments={donutSegments} size={196} thickness={22} />
-        <View style={styles.donutCenter} pointerEvents="none">
+        <View style={styles.donutCenter}>
           <Text style={styles.donutCenterValue}>{Math.round(a.equityPct * 100)}%</Text>
           <Text style={styles.donutCenterLabel}>in stocks</Text>
         </View>
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 4,
   },
-  donutCenter: { position: "absolute", alignItems: "center" },
+  donutCenter: { position: "absolute", alignItems: "center", pointerEvents: "none" },
   donutCenterValue: {
     fontSize: 38,
     fontFamily: fonts.displayMedium,

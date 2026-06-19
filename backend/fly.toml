@@ -1,14 +1,20 @@
 app = "allworth-demo-api"
 primary_region = "dfw"
 
+[env]
+  APP_ENV = "production"
+  AUDIT_LOG_TARGET = "stdout"
+  PROFILE_MEMORY_ENABLED = "false"
+  WEB_CONCURRENCY = "2"
+
 [http_service]
   internal_port = 3000
   force_https = true
   auto_stop_machines = "off"
   auto_start_machines = true
-  # Keep one machine warm — no cold starts during the demo
-  min_machines_running = 1
+  # Keep capacity warm — no cold starts during demos or early production traffic.
+  min_machines_running = 2
 
 [[vm]]
-  size = "shared-cpu-1x"
-  memory = "512mb"
+  size = "shared-cpu-2x"
+  memory = "1024mb"

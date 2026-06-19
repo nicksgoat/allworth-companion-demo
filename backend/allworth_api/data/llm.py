@@ -15,7 +15,6 @@ from typing import Any
 
 from allworth_api import config as _config  # noqa: F401  (loads .env first)
 
-
 # ── Unified types ────────────────────────────────────────────────────────
 
 
@@ -135,7 +134,7 @@ class AnthropicProvider(LLMProvider):
                     "tool_use_id": tc.id,
                     "content": result,
                 }
-                for tc, result in zip(tool_calls, results)
+                for tc, result in zip(tool_calls, results, strict=True)
             ],
         }
 
@@ -353,7 +352,7 @@ class OpenAIProvider(LLMProvider):
                 "tool_call_id": tc.id,
                 "content": result,
             }
-            for tc, result in zip(tool_calls, results)
+            for tc, result in zip(tool_calls, results, strict=True)
         ]
 
     async def complete(
@@ -473,7 +472,7 @@ class AzureOpenAIProvider(LLMProvider):
                 "tool_call_id": tc.id,
                 "content": result,
             }
-            for tc, result in zip(tool_calls, results)
+            for tc, result in zip(tool_calls, results, strict=True)
         ]
 
     async def complete(
@@ -539,7 +538,8 @@ def get_chat_model() -> str:
 
 
 def get_extract_model() -> str:
-    return os.environ.get("LLM_EXTRACT_MODEL", PROVIDER_DEFAULTS.get(_PROVIDER_NAME, {}).get("extract_model", ""))
+    default = PROVIDER_DEFAULTS.get(_PROVIDER_NAME, {}).get("extract_model", "")
+    return os.environ.get("LLM_EXTRACT_MODEL", default)
 
 
 # Singleton

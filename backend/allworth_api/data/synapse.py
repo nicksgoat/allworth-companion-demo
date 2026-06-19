@@ -20,6 +20,7 @@ import struct
 import sys
 import threading
 import time
+from contextlib import suppress
 from typing import Any
 
 import pyodbc
@@ -80,7 +81,10 @@ def _get_connection_string() -> str:
         base += "Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
     else:
         # SQL auth
-        base += f"UID={_USERNAME};PWD={_PASSWORD};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+        base += (
+            f"UID={_USERNAME};PWD={_PASSWORD};"
+            "Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+        )
     return base
 
 
@@ -97,10 +101,8 @@ def _connect() -> pyodbc.Connection:
             conn.execute("SELECT 1")
             return conn
         except Exception:
-            try:
+            with suppress(Exception):
                 conn.close()
-            except Exception:
-                pass
             _conn_local.conn = None
 
     conn_str = _get_connection_string()
@@ -123,7 +125,7 @@ def _query(sql: str, params: tuple = ()) -> list[dict[str, Any]]:
     if cursor.description is None:
         return []
     columns = [col[0] for col in cursor.description]
-    rows = [dict(zip(columns, row)) for row in cursor.fetchall()]
+    rows = [dict(zip(columns, row, strict=True)) for row in cursor.fetchall()]
     elapsed = round((time.time() - t0) * 1000)
     logger.debug(f"[synapse] query returned {len(rows)} rows in {elapsed}ms")
     return rows
@@ -132,7 +134,10 @@ def _query(sql: str, params: tuple = ()) -> list[dict[str, Any]]:
 # ── Household-scoped queries ─────────────────────────────────────────────
 
 
-def resolve_household(household_id: int | None = None, household_name: str | None = None) -> dict[str, Any] | None:
+def resolve_household(
+    household_id: int | None = None,
+    household_name: str | None = None,
+) -> dict[str, Any] | None:
     """Look up a household by AVHHID or fuzzy name match.
 
     Returns dict with household_id, household_name, or None if not found.

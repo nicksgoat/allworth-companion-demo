@@ -171,7 +171,6 @@ function parseEvent(event: string, json: string): ChatEvent | null {
       return {
         kind: "done",
         sources: obj.sources ?? [],
-        fallback: obj.fallback ?? false,
         suggested: obj.suggested ?? [],
       };
     case "error":
