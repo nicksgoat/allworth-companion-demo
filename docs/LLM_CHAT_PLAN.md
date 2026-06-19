@@ -124,7 +124,7 @@ Each LLM response should record:
 ## Rollout Plan
 
 1. Add LLM client behind env flag.
-2. Keep current demo behavior as fallback.
+2. Keep deterministic mock data for local grounding and tool tests.
 3. Add tests for blocked commands and expected response shape.
 4. Add prompt snapshots.
 5. Add UI disclosure for model/tool trace.

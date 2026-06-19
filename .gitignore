@@ -12,3 +12,6 @@ build/
 .codex-run/
 *.log
 .venv
+
+# App Store Connect API key (used by eas submit) — never commit
+AuthKey_*.p8

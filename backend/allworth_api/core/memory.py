@@ -1,5 +1,6 @@
 # Client intelligence layer: persistent profile store with provenance.
 # Seed file is immutable; runtime file accumulates live facts. Reset = delete runtime.
+from allworth_api.config import profile_memory_enabled
 from allworth_api.core.facts import similar
 from allworth_api.core.formatting import iso_now
 from allworth_api.data.profile_store import (
@@ -11,6 +12,8 @@ from allworth_api.data.profile_store import (
 
 
 def add_facts(client_id: str, facts: list[dict], episode_id: str | None = None) -> list[dict]:
+    if not profile_memory_enabled():
+        return []
     profile = load_profile(client_id)
     added = []
     for f in facts:
@@ -45,6 +48,8 @@ def add_facts(client_id: str, facts: list[dict], episode_id: str | None = None) 
 
 
 def forget_fact(client_id: str, fact_id: str) -> dict | None:
+    if not profile_memory_enabled():
+        return None
     profile = load_profile(client_id)
     fact = next((f for f in profile["facts"] if f["id"] == fact_id and f["status"] == "active"), None)
     if not fact:
@@ -56,6 +61,8 @@ def forget_fact(client_id: str, fact_id: str) -> dict | None:
 
 
 def append_episode(client_id: str, session: str, role: str, content: str) -> dict:
+    if not profile_memory_enabled():
+        return {"id": "", "session": session, "role": role, "content": content, "timestamp": iso_now()}
     profile = load_profile(client_id)
     ep = {"id": new_id("ep"), "session": session, "role": role, "content": content, "timestamp": iso_now()}
     profile["episodes"].append(ep)
@@ -73,7 +80,7 @@ def active_facts(client_id: str) -> list[dict]:
 
 def reset_profile(client_id: str) -> dict:
     runtime = runtime_path(client_id)
-    if runtime.exists():
+    if profile_memory_enabled() and runtime.exists():
         runtime.unlink()
     return load_profile(client_id)
 

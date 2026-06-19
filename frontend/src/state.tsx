@@ -67,7 +67,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Sync auth token synchronously — must happen before children's effects
   // fire (e.g. DashboardScreen calling loadDashboard on mount).
   // Using useEffect would be too late because children's effects run first.
+  // eslint-disable-next-line react-hooks/immutability -- intentional: the module-level api singleton is configured during render so children's mount-effects read a current token
   api.token = authSession?.token ?? null;
+  // eslint-disable-next-line react-hooks/immutability -- see above
   api.onAuthError = () => {
     logout();
   };
@@ -140,9 +142,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setDashboardError(null);
       } catch (e) {
         if (e instanceof AuthError) return; // onAuthError will trigger logout
-        setDashboardError(
-          `Can't reach the backend at ${api.baseURL} — run ./run.sh first.`,
-        );
+        setDashboardError(`Can't reach the backend at ${api.baseURL} — run ./run.sh first.`);
       }
     };
     const loadPortfolio = async () => {
@@ -151,9 +151,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setPortfolioError(null);
       } catch (e) {
         if (e instanceof AuthError) return; // onAuthError will trigger logout
-        setPortfolioError(
-          `Can't reach the backend at ${api.baseURL} — run ./run.sh first.`,
-        );
+        setPortfolioError(`Can't reach the backend at ${api.baseURL} — run ./run.sh first.`);
       }
     };
     const resetDemo = async () => {

@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "test:api": "cd backend && ../../.venv/bin/python -m pytest",
+    "test:api": "cd backend && uv run --with pytest --with httpx python -m pytest tests",
     "test:all": "./scripts/test.sh",
     "dev:api": "./scripts/dev-api.sh",
     "dev:mobile": "./scripts/dev-mobile.sh",
@@ -13,7 +13,6 @@
     "sync:upstream:dry": "powershell -ExecutionPolicy Bypass -File ./scripts/sync-upstream.ps1 -DryRun"
   },
   "workspaces": [
-    "apps/mobile"
+    "frontend"
   ]
 }
-

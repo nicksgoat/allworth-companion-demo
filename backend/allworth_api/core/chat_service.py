@@ -1,12 +1,11 @@
 # Streaming chat: vendor-agnostic LLM tool-use loop yielding (event, data)
-# tuples, with cached fallback responses so the demo never dies on stage.
+# tuples.
 import asyncio
 import json
 import re
 import sys
 from collections.abc import AsyncIterator
 
-from allworth_api.core.auth import get_session_for_household
 from allworth_api.core.memory import (
     add_facts,
     append_episode,
@@ -17,7 +16,6 @@ from allworth_api.core.prompts import STABLE_SYSTEM, volatile_context
 from allworth_api.core.tool_defs import TOOL_DEFINITIONS, TOOL_LABELS
 from allworth_api.core.tool_runner import run_tool
 from allworth_api.data.llm import CHAT_MODEL, EXTRACT_MODEL, provider
-from allworth_api.data.fallbacks import pick_fallback
 from allworth_api.data.seed import seed
 
 MAX_TOOL_ROUNDS = 8
@@ -25,6 +23,8 @@ MAX_TOOL_ROUNDS = 8
 SOURCE_NAMES = {
     "get_accounts": "Accounts",
     "get_portfolio": "Portfolio",
+    "simulate": "Monte Carlo simulation",
+    "rebalance": "Rebalance analysis",
     "get_financial_plan": "Financial plan",
     "get_spending": "Spending",
     "get_client_profile": "Your profile",
@@ -38,34 +38,25 @@ SOURCE_NAMES = {
     "analyze_income_sustainability": "Income plan",
 }
 
-# Conversation state per client+session, reset via demo control.
-conversations: dict[str, list] = {}
-
 _bg_tasks: set[asyncio.Task] = set()
 
 
 def reset_conversations() -> None:
-    conversations.clear()
+    return None
 
 
 def suggested_for(session: str) -> list[str]:
     if session == "wednesday":
-        return ["What changed since I was last here?", "Where did we land on the SpaceX IPO?"]
-    return ["What would $200K into the SpaceX IPO mean for me?"]
-
-
-async def _stream_fallback(user_text, session, out):
-    fb = pick_fallback(user_text, session)
-    for tool in fb["tools"]:
-        yield "tool_start", {"name": tool, "label": TOOL_LABELS.get(tool, tool)}
-        await asyncio.sleep(0.45)
-        yield "tool_end", {"name": tool}
-    words = fb["text"].split(" ")
-    for i in range(0, len(words), 6):
-        yield "text", {"delta": " ".join(words[i : i + 6]) + " "}
-        await asyncio.sleep(0.04)
-    yield "done", {"sources": fb["sources"], "fallback": True, "suggested": fb.get("suggested", [])}
-    out["text"] = fb["text"]
+        return [
+            "Am I on track for retirement?",
+            "Can I afford a $50,000 car?",
+            "What would rebalancing to 70/30 look like?",
+        ]
+    return [
+        "Am I on track for retirement?",
+        "Can I save for a house in 5 years?",
+        "What would a $300,000 mortgage payment be?",
+    ]
 
 
 async def _stream_live(client_id, session, messages, out, client_name=None, advisor_name=None):
@@ -152,43 +143,37 @@ async def _stream_live(client_id, session, messages, out, client_name=None, advi
             # Anthropic: single user message with tool_result blocks
             convo.append(tool_result_msg)
 
-    yield "done", {"sources": sorted(sources), "fallback": False, "suggested": suggested_for(session)}
+    yield "done", {"sources": sorted(sources), "suggested": suggested_for(session)}
     out["text"] = full_text
 
 
 async def stream_chat(client_id: str, session: str, message: str) -> AsyncIterator[tuple[str, dict]]:
-    """Async generator of (event, data) tuples for one chat turn. Owns conversation state."""
-    key = f"{client_id}:{session}"
-    history = conversations.get(key, [])
-    messages = [*history, {"role": "user", "content": message}]
-    user_text = _last_user_text(messages)
+    """Async generator of (event, data) tuples for one stateless chat turn."""
+    messages = [{"role": "user", "content": message}]
+    user_text = message
     out = {"text": ""}
 
-    # Resolve client/advisor names from the authenticated session
-    auth_session = get_session_for_household(client_id)
-    client_name = auth_session.contact_name if auth_session else None
-    # Use seed advisor name as default (Synapse advisor assignment not yet available)
-    advisor_name = seed["personas"]["advisors"][0]["name"]
+    client = next((c for c in seed["personas"]["clients"] if c["id"] == client_id), None)
+    advisor = seed["personas"]["advisors"][0]
+    client_name = client["name"] if client else None
+    advisor_name = advisor["name"]
 
     try:
         if not provider:
-            async for chunk in _stream_fallback(user_text, session, out):
-                yield chunk
+            yield "error", {"message": "The assistant is temporarily unavailable."}
+            return
         else:
             try:
                 async for chunk in _stream_live(client_id, session, messages, out, client_name, advisor_name):
                     yield chunk
             except Exception as err:
-                print(f"[chat] live stream failed, using fallback: {err}", file=sys.stderr)
-                yield "text", {"delta": "\n"}
-                async for chunk in _stream_fallback(user_text, session, out):
-                    yield chunk
+                print(f"[chat] live stream failed: {err}", file=sys.stderr)
+                yield "error", {"message": "The assistant is temporarily unavailable."}
+                return
     except Exception as err:
         print(f"[chat] unrecoverable: {err}", file=sys.stderr)
         yield "error", {"message": "Something went wrong. Please try again."}
         return
-
-    conversations[key] = [*messages, {"role": "assistant", "content": out["text"]}]
 
     append_episode(client_id, session, "user", user_text)
     append_episode(client_id, session, "assistant", out["text"])
@@ -203,18 +188,6 @@ def _monday_recap(client_id):
         return None
     summary = "\n".join(e["content"] for e in eps if e["role"] == "assistant")
     return summary or None
-
-
-def _last_user_text(messages):
-    for m in reversed(messages):
-        if m["role"] != "user":
-            continue
-        if isinstance(m["content"], str):
-            return m["content"]
-        text = " ".join(b["text"] for b in m["content"] if b.get("type") == "text")
-        if text:
-            return text
-    return ""
 
 
 async def _extract_facts(client_id, user_text):

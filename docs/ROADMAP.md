@@ -57,7 +57,7 @@ Goals:
 - Connect read-only approved data sources.
 - Normalize connector outputs.
 - Integrate previous Allworth plugin modules behind adapter.
-- Preserve demo fallback.
+- Preserve deterministic mock data for local tool and UI testing.
 
 Deliverables:
 

@@ -14,6 +14,11 @@ import type {
 // Android emulators reach the host machine at 10.0.2.2, not localhost.
 // On web, use the same hostname the browser loaded from (handles port forwarding).
 export function getDefaultBaseURL(): string {
+  // Release/TestFlight builds inject the deployed backend via eas.json
+  // (EXPO_PUBLIC_API_URL). When set, it wins over the local-dev defaults below.
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL;
+  }
   if (Platform.OS === "web" && typeof window !== "undefined") {
     const host = window.location.hostname;
     const proto = window.location.protocol;
@@ -29,7 +34,7 @@ export const DEFAULT_HOST = Platform.OS === "android" ? "10.0.2.2" : "localhost"
 export class AuthError extends Error {
   constructor(status: number) {
     super(`Authentication failed (${status})`);
-    this.name = 'AuthError';
+    this.name = "AuthError";
   }
 }
 
@@ -166,7 +171,6 @@ function parseEvent(event: string, json: string): ChatEvent | null {
       return {
         kind: "done",
         sources: obj.sources ?? [],
-        fallback: obj.fallback ?? false,
         suggested: obj.suggested ?? [],
       };
     case "error":

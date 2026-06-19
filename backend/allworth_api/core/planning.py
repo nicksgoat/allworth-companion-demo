@@ -14,7 +14,6 @@ from typing import Any
 from allworth_api.core.formatting import fmt_usd, js_round
 from allworth_api.data.seed import seed
 
-
 # ── Retirement Projection (simplified Monte Carlo) ───────────────────────
 
 # Fixed random seed for reproducible demo runs
@@ -73,7 +72,6 @@ def run_retirement_projection(
 
     monthly_spend = plan["spendingAssumptionMonthly"]
     annual_spend = monthly_spend * 12
-    portfolio_income = plan["portfolioIncomeMonthly"] * 12
     other_income = plan["otherIncomeMonthly"] * 12
     # Net annual draw from portfolio
     annual_draw = max(0, annual_spend - other_income)
@@ -407,7 +405,12 @@ def _marginal_bracket(income: float) -> float:
     return 0.37
 
 
-def _interpret_roth(eff_rate: float, bracket_before: float, bracket_after: float, break_even: int | None) -> str:
+def _interpret_roth(
+    eff_rate: float,
+    bracket_before: float,
+    bracket_after: float,
+    break_even: int | None,
+) -> str:
     parts = []
     if bracket_after > bracket_before:
         parts.append(

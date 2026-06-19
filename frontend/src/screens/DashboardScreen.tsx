@@ -1,13 +1,21 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
+import {
+  Animated,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { RiseIn, useAnimatedValue, useCountUp } from "../anim";
+import { RiseIn, useAnimatedValue } from "../anim";
 import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
+import { NetWorthHero } from "../components/NetWorthHero";
 import { NudgeCard } from "../components/NudgeCard";
 import { DisclaimerFooter, HairlineDivider, SectionHeader } from "../components/Rows";
-import { Sparkline } from "../components/Sparkline";
-import { AllworthWordmark } from "../components/Wordmark";
 import { useApp } from "../state";
 import { card, colors, fonts, usd } from "../theme";
 import type { Dashboard, Nudge } from "../types";
@@ -40,6 +48,7 @@ export function DashboardScreen() {
     <>
       <Animated.ScrollView
         style={{ backgroundColor: colors.surfacePrimary }}
+        directionalLockEnabled
         contentContainerStyle={{
           padding: 20,
           paddingTop: insets.top + 8,
@@ -73,29 +82,42 @@ function greetingForNow() {
 }
 
 function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) => void }) {
-  const firstName = d.client?.name.split(" ")[0] ?? "Maya";
+  const app = useApp();
+  const insets = useSafeAreaInsets();
+  const { width: winW } = useWindowDimensions();
+  const nudgeW = Math.min(360, winW - 64); // fixed-width slides so the next card peeks
+  const fullName = d.client?.name ?? "Maya Tran";
   return (
     <View style={{ gap: 24 }}>
-      <View style={styles.headerRow}>
-        <Text style={styles.greeting} numberOfLines={1} adjustsFontSizeToFit>
-          {greetingForNow()}, {firstName}
-        </Text>
-        <AllworthWordmark />
-      </View>
-
-      <RiseIn>
-        <NetWorthCard d={d} />
-      </RiseIn>
+      <NetWorthHero
+        greeting={greetingForNow()}
+        name={fullName}
+        netWorth={d.netWorth}
+        delta={trajectory(d)}
+        history={d.netWorthHistory}
+        insetsTop={insets.top}
+        onOpenWealth={() => app.setSelectedTab("invest")}
+      />
 
       {d.nudges.length ? (
-        <View style={{ gap: 12 }}>
+        <RiseIn delay={80} style={{ gap: 12 }}>
           <SectionHeader>Needs your attention</SectionHeader>
-          {d.nudges.slice(0, 2).map((nudge, i) => (
-            <RiseIn key={nudge.id} delay={80 + i * 60}>
-              <NudgeCard nudge={nudge} onPress={() => onNudge(nudge)} />
-            </RiseIn>
-          ))}
-        </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.carousel}
+            contentContainerStyle={styles.carouselContent}
+            snapToInterval={nudgeW + 12}
+            snapToAlignment="start"
+            decelerationRate="fast"
+          >
+            {d.nudges.map((nudge) => (
+              <View key={nudge.id} style={{ width: nudgeW }}>
+                <NudgeCard nudge={nudge} onPress={() => onNudge(nudge)} fill />
+              </View>
+            ))}
+          </ScrollView>
+        </RiseIn>
       ) : null}
 
       <RiseIn delay={220} style={{ gap: 12 }}>
@@ -112,32 +134,6 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
         <DisclaimerFooter />
       </View>
     </View>
-  );
-}
-
-function NetWorthCard({ d }: { d: Dashboard }) {
-  const app = useApp();
-  const displayed = useCountUp(d.netWorth);
-  const delta = monthDelta(d);
-
-  return (
-    <Pressable
-      onPress={() => app.setSelectedTab("invest")}
-      style={({ pressed }) => [styles.nwCard, pressed && { opacity: 0.85 }]}
-    >
-      <SectionHeader>Net worth</SectionHeader>
-      <Text style={styles.nwValue}>{usd(displayed)}</Text>
-      {delta ? (
-        <Text style={[styles.nwDelta, { color: delta.positive ? colors.gain : colors.loss }]}>
-          {delta.text}
-        </Text>
-      ) : null}
-      <Sparkline points={d.netWorthHistory} />
-      <View style={styles.nwLink}>
-        <Text style={styles.nwLinkText}>View your wealth</Text>
-        <Ionicons name="chevron-forward" size={14} color={colors.allworthAccent} />
-      </View>
-    </Pressable>
   );
 }
 
@@ -171,18 +167,23 @@ function QuickActions() {
   ];
 
   return (
-    <View style={styles.actionsGrid}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.carousel}
+      contentContainerStyle={styles.pillRow}
+    >
       {actions.map((a) => (
         <Pressable
           key={a.label}
           onPress={a.onPress}
-          style={({ pressed }) => [styles.actionCard, pressed && { opacity: 0.7 }]}
+          style={({ pressed }) => [styles.actionPill, pressed && { opacity: 0.7 }]}
         >
-          <Ionicons name={a.icon} size={20} color={colors.allworthAccent} />
+          <Ionicons name={a.icon} size={18} color={colors.allworthAccent} />
           <Text style={styles.actionLabel}>{a.label}</Text>
         </Pressable>
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
@@ -234,11 +235,20 @@ function SnapshotRow({
   );
 }
 
-function monthDelta(d: Dashboard): { text: string; positive: boolean } | undefined {
+// Lead with the long-horizon trajectory, not a one-month dip. A client shouldn't
+// log in to "you're down $7k this month" — over the year they're up, which is the
+// frame a good advisor uses. The sparkline still shows the recent shape honestly.
+function trajectory(d: Dashboard): { text: string; positive: boolean } | undefined {
   const h = d.netWorthHistory;
   if (h.length < 2) return undefined;
-  const diff = h[h.length - 1].value - h[h.length - 2].value;
-  return { text: `${diff >= 0 ? "+" : ""}${usd(diff)} this month`, positive: diff >= 0 };
+  const base = h[0].value;
+  const diff = h[h.length - 1].value - base;
+  const pct = base ? (diff / base) * 100 : 0;
+  const sign = diff >= 0 ? "+" : "−";
+  return {
+    text: `${sign}${usd(Math.abs(diff))} (${sign}${Math.abs(pct).toFixed(1)}%) past year`,
+    positive: diff >= 0,
+  };
 }
 
 function Skeleton() {
@@ -254,7 +264,7 @@ function Skeleton() {
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <View style={styles.errorBox}>
-      <Text style={styles.errorTitle}>Backend offline</Text>
+      <Text style={styles.errorTitle}>We couldn{"'"}t load your accounts</Text>
       <Text style={styles.errorMessage}>{message}</Text>
       <Pressable onPress={onRetry} style={styles.retryButton}>
         <Text style={styles.retryText}>Retry</Text>
@@ -264,30 +274,19 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
+  // Horizontal carousels bleed past the scroll container's 20px padding to the
+  // screen edges, while their content keeps a 20px inset so cards start aligned.
+  carousel: { marginHorizontal: -20 },
+  carouselContent: { paddingHorizontal: 20, gap: 12, alignItems: "stretch" },
+  pillRow: { paddingHorizontal: 20, gap: 10 },
+  actionPill: {
+    ...card,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  greeting: { fontSize: 28, fontFamily: fonts.display, color: colors.inkPrimary, flexShrink: 1 },
-  nwCard: { ...card, padding: 16, gap: 6 },
-  nwValue: {
-    fontSize: 34,
-    fontFamily: fonts.displayMedium,
-    color: colors.inkPrimary,
-    fontVariant: ["tabular-nums"],
-  },
-  nwDelta: { fontSize: 14, fontFamily: fonts.sansBold, fontVariant: ["tabular-nums"] },
-  nwLink: { flexDirection: "row", alignItems: "center", gap: 2, paddingTop: 4 },
-  nwLinkText: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.allworthAccent },
-  actionsGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
-  actionCard: {
-    ...card,
-    flexBasis: "46%",
-    flexGrow: 1,
-    padding: 14,
     gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 999,
   },
   actionLabel: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.inkPrimary },
   snapshotCard: { ...card, paddingHorizontal: 16, paddingVertical: 6 },

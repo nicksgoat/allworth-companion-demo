@@ -20,6 +20,29 @@ Mobile app
 
 This is intentional. Mobile clients should not know about MCP transport, connector names, credentials, or internal tool routing.
 
+## Financial Tool Registry
+
+Financial planning tools are now registered in one backend module:
+
+```text
+backend/allworth_api/financial_tools/tools.py
+```
+
+That registry owns:
+
+- `FINANCIAL_TOOL_DEFINITIONS` for LLM/MCP schemas.
+- `FINANCIAL_TOOL_LABELS` for UI progress labels.
+- `FINANCIAL_TOOL_NAMES` for routing.
+- `run_financial_tool(...)` for execution.
+
+The same contracts are consumed by:
+
+- FastAPI endpoints under `/tools/...`
+- Chat tool-calling through `core/tool_defs.py` and `core/tool_runner.py`
+- MCP stdio server through `backend/allworth_api/mcp.py`
+
+This keeps the data/compute/decision tools composable while avoiding duplicate schemas across HTTP, chat, and MCP.
+
 ## Existing Hook
 
 [services/api/app/tool_adapter.py](/home/stevenluong/MobileApp/services/api/app/tool_adapter.py) already anticipates future plugin mode:

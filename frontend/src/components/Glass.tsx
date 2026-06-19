@@ -17,7 +17,7 @@ export const glassStyle: ViewStyle = Platform.select({
 });
 
 // iOS-style dynamic header: invisible at rest, fades in as the large title
-// scrolls away. pointerEvents none so it never swallows touches.
+// scrolls away. pointer-events none so it never swallows touches.
 export function GlassHeader({ title, scrollY }: { title: string; scrollY: Animated.Value }) {
   const insets = useSafeAreaInsets();
   const opacity = scrollY.interpolate({
@@ -33,7 +33,6 @@ export function GlassHeader({ title, scrollY }: { title: string; scrollY: Animat
 
   return (
     <Animated.View
-      pointerEvents="none"
       style={[
         styles.header,
         glassStyle,
@@ -58,6 +57,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "rgba(0,0,0,0.12)",
+    pointerEvents: "none",
   },
   title: { fontSize: 16, fontFamily: fonts.sansBold, color: colors.inkPrimary, maxWidth: "70%" },
 });

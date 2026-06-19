@@ -30,8 +30,7 @@ export function ChatScreen() {
   const loadProactive = async () => {
     if (app.chatMessages.length > 0) return;
     const clientFirstName = app.dashboard?.client?.name?.split(",")[0]?.split(" ")[0] ?? "there";
-    let greeting =
-      `Hi ${clientFirstName} — I can help you understand your accounts, spending, or plan. What's on your mind?`;
+    let greeting = `Hi ${clientFirstName} — I can help you understand your accounts, spending, or plan. What's on your mind?`;
     let suggested: string[] = [];
     try {
       const res = await app.api.proactive(app.clientId, app.session);
@@ -58,11 +57,17 @@ export function ChatScreen() {
     loadProactive();
   }, [app.session]);
 
+  // A prefilled prompt (from a nudge, a drill-in, or a quick action) auto-sends,
+  // so every chat button is a real one-tap flow: tap → streamed answer, not just
+  // a filled-in input box the user still has to send.
   useEffect(() => {
-    if (app.chatPrefill) {
-      setDraft(app.chatPrefill);
+    if (app.chatPrefill && !sending) {
+      const prompt = app.chatPrefill;
       app.setChatPrefill(null);
+      // eslint-disable-next-line react-hooks/immutability -- send() is defined below; this effect runs after mount, so it is available
+      send(prompt);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [app.chatPrefill]);
 
   useEffect(() => {

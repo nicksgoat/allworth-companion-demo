@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
 from allworth_api.core.auth import get_current_household, get_session_for_household
@@ -6,10 +6,8 @@ from allworth_api.core.chat_service import suggested_for
 from allworth_api.core.memory import active_facts, episodes_for, forget_fact
 from allworth_api.core.nudges import nudges_for
 from allworth_api.data.household import (
-    get_accounts,
     get_client_persona,
     get_dashboard_data,
-    get_net_worth_history,
     get_portfolio,
     get_spending,
 )
@@ -90,26 +88,18 @@ def proactive(client_id: str, session: str = "wednesday"):
         first_name = (persona or {}).get("name", "there").split(",")[0].split()[0]
 
     if session == "wednesday":
-        facts = active_facts(client_id)
-        ipo = next((f for f in facts if f["category"] == "liquidity_events"), None)
-        if ipo:
-            return {
-                "message": (
-                    f"Welcome back, {first_name}. Last time you were weighing $200K into the SpaceX IPO "
-                    "— your deadline is Sunday, June 15. Want to pick up where we left off, "
-                    "or look at something else?"
-                ),
-                "basedOn": {
-                    "fact": ipo["fact"],
-                    "source_quote": ipo["source_quote"],
-                    "learned_at": ipo["learned_at"],
-                },
-                "suggested": suggested_for(session),
-            }
+        return {
+            "message": (
+                f"Welcome back, {first_name}. I've refreshed your full picture — plan, portfolio, and "
+                "goals. A couple of things stand out worth a closer look. Where would you like to start?"
+            ),
+            "basedOn": None,
+            "suggested": suggested_for(session),
+        }
     return {
         "message": (
-            f"Hi {first_name} — I can help you understand your accounts, spending, plan, or anything "
-            "you're weighing. What's on your mind?"
+            f"Hi {first_name} — I can pull your financial picture together, run scenarios, compare "
+            "trade-offs, or score progress toward a goal. What would you like to dig into?"
         ),
         "basedOn": None,
         "suggested": suggested_for(session),

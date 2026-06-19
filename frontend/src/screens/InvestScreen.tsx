@@ -9,6 +9,7 @@ import { HeroNumber } from "../components/HeroNumber";
 import { AccountHoldingsSection } from "../components/Holdings";
 import { IncomeCard } from "../components/IncomeCard";
 import { BreakdownCard, CompletePictureCard } from "../components/NetWorthBreakdown";
+import { NetWorthDetail } from "../components/NetWorthDetail";
 import { NudgeCard } from "../components/NudgeCard";
 import { RangeChips } from "../components/RangeChips";
 import { RecurringCard } from "../components/RecurringCard";
@@ -63,6 +64,7 @@ export function InvestScreen() {
     <>
       <Animated.ScrollView
         style={{ backgroundColor: colors.surfacePrimary }}
+        directionalLockEnabled
         contentContainerStyle={{
           padding: 20,
           paddingTop: insets.top + 8,
@@ -136,6 +138,7 @@ function InvestContent({
   const app = useApp();
   const [range, setRange] = useState("1Y");
   const [segment, setSegment] = useState("Overview");
+  const [chartOpen, setChartOpen] = useState(false);
 
   const ask = (prompt: string) => {
     app.setChatPrefill(prompt);
@@ -148,10 +151,12 @@ function InvestContent({
     const sliced = history.length >= spec.points ? history.slice(-spec.points) : history;
     if (sliced.length < 2) return { slice: sliced, delta: undefined };
     const diff = sliced[sliced.length - 1].value - sliced[0].value;
+    const pct = sliced[0].value ? (diff / sliced[0].value) * 100 : 0;
+    const sign = diff >= 0 ? "+" : "−";
     return {
       slice: sliced,
       delta: {
-        text: `${diff >= 0 ? "+" : ""}${usd(diff)} ${spec.deltaSuffix}`,
+        text: `${sign}${usd(Math.abs(diff))} (${sign}${Math.abs(pct).toFixed(1)}%) ${spec.deltaSuffix}`,
         positive: diff >= 0,
       },
     };
@@ -178,10 +183,17 @@ function InvestContent({
       </View>
 
       <RiseIn style={{ gap: 14 }}>
-        <HeroNumber label="Total net worth" value={d.netWorth} delta={delta} />
+        <Pressable
+          onPress={() => setChartOpen(true)}
+          style={({ pressed }) => pressed && { opacity: 0.7 }}
+        >
+          <HeroNumber label="Total net worth" value={d.netWorth} delta={delta} />
+        </Pressable>
         <RangeChips options={RANGES.map((r) => r.label)} selected={range} onSelect={setRange} />
         <Sparkline points={slice} />
       </RiseIn>
+
+      <NetWorthDetail visible={chartOpen} onClose={() => setChartOpen(false)} d={d} />
 
       <RiseIn delay={60}>
         <SegmentedControl
@@ -272,7 +284,7 @@ function Skeleton() {
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <View style={styles.errorBox}>
-      <Text style={styles.errorTitle}>Backend offline</Text>
+      <Text style={styles.errorTitle}>We couldn{"'"}t load your accounts</Text>
       <Text style={styles.errorMessage}>{message}</Text>
       <Pressable onPress={onRetry} style={styles.retryButton}>
         <Text style={styles.retryText}>Retry</Text>

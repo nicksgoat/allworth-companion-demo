@@ -75,13 +75,52 @@ curl http://localhost:3000/api/health
 
 Expected response includes `{"ok": true, ...}`.
 
-**Live chat (optional):** put an Anthropic key in `backend/.env`:
+**Live chat (optional):** configure the selected LLM provider in `backend/.env`.
+For Azure OpenAI GPT-4o:
 
 ```
-ANTHROPIC_API_KEY=sk-ant-...
+LLM_PROVIDER=azure_openai
+AZURE_OPENAI_API_KEY=...
+AZURE_OPENAI_ENDPOINT=https://YOUR-RESOURCE.openai.azure.com/
+AZURE_OPENAI_API_VERSION=2024-12-01-preview
+LLM_CHAT_MODEL=gpt-4o
+LLM_EXTRACT_MODEL=gpt-4o
 ```
 
-Without a key, chat streams cached fallback responses — the demo works fully offline by design and never dies on stage.
+For deployment, set those values as backend runtime environment variables or secrets.
+Do not put the GPT-4o key in Expo/frontend config. The frontend only needs:
+
+```
+EXPO_PUBLIC_API_URL=https://YOUR-BACKEND-HOST
+```
+
+Chat requires a configured LLM provider. Local development can still use the deterministic seed dataset for household data.
+
+## Production readiness
+
+The backend is designed to run stateless across multiple Fly.io or Azure instances:
+
+- Auth tokens are signed bearer tokens, not process-local sessions.
+- Chat requests do not rely on server-local conversation state.
+- Production audit logs default to stdout.
+- Learned profile memory is disabled by default in production unless you wire it to durable storage.
+
+Required production settings:
+
+```
+APP_ENV=production
+SESSION_SECRET=<strong random secret shared by all backend instances>
+CORS_ORIGINS=https://YOUR-FRONTEND-HOST
+LLM_PROVIDER=azure_openai
+AZURE_OPENAI_API_KEY=<secret>
+AZURE_OPENAI_ENDPOINT=https://YOUR-RESOURCE.openai.azure.com/
+AZURE_OPENAI_API_VERSION=2024-12-01-preview
+LLM_CHAT_MODEL=gpt-4o
+LLM_EXTRACT_MODEL=gpt-4o
+EXPO_PUBLIC_API_URL=https://YOUR-BACKEND-HOST
+```
+
+For real client traffic, also replace demo email auth with Entra/SSO, keep `ALLOW_SEED_AUTH=false`, keep `ALLOW_DEMO_AUTH_FALLBACK=false`, and move any durable client memory to a managed store such as Postgres, Cosmos DB, or Redis.
 
 ## Layout
 
@@ -94,7 +133,6 @@ frontend/                React Native app (Expo SDK 56 + TypeScript)
 backend/                 Python + FastAPI backend (uv-managed)
   allworth_api/          layered package (presentation, application, domain, infrastructure)
   mcp_server.py          MCP server (stdio, read-only, household-scoped)
-  fallbacks/             cached responses for the scripted demo beats
   data/seed.json         deterministic synthetic data
 run.sh                   one-command backend startup
 allworth-ai-demo-handoff.md   full spec — all decisions trace to it
@@ -110,7 +148,7 @@ The `docs/` directory holds the platform design docs — product brief, [Client 
 `backend/mcp_server.py` exposes the backend's tool layer over the Model Context Protocol (stdio), implementing the connector rules in [docs/MCP_INTEGRATION.md](docs/MCP_INTEGRATION.md): backend-only, **read-only** (writes like `update_client_profile` are excluded pending approval/audit design), entitlement-scoped to one household (`ALLWORTH_CLIENT_ID`, never a tool parameter), and every result wrapped in a provenance envelope (`source`, `tool`, `clientId`, `retrieved_at`, `read_only`). The repo's `.mcp.json` registers it, so Claude Code/Desktop pointed at this repo can query the same governed data the app uses:
 
 ```sh
-# 7 read-only tools: accounts, portfolio, plan, spending, profile, tax sim, advisor brief
+# read-only tools include the composable financial tool suite from docs/FINANCIAL_TOOLS.md
 claude mcp list   # → allworth-client-intelligence
 ```
 

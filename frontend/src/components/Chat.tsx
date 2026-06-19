@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { Animated, StyleSheet, Text, View } from "react-native";
+import { FadeScaleIn, usePulse } from "../anim";
 import { colors, fonts } from "../theme";
 import type { ChatMessage, ToolChip } from "../types";
 import { AdvisorHandoffCard } from "./AdvisorHandoffCard";
@@ -27,18 +28,7 @@ export function ToolChipRow({
     return (
       <View style={styles.chipFlow}>
         {chips.map((chip) => (
-          <View key={chip.name} style={styles.chip}>
-            {chip.running ? (
-              <ActivityIndicator
-                size="small"
-                color={colors.inkSecondary}
-                style={{ transform: [{ scale: 0.7 }] }}
-              />
-            ) : (
-              <Ionicons name="checkmark" size={11} color={colors.allworthAccent} />
-            )}
-            <Text style={styles.chipText}>{chip.label}</Text>
-          </View>
+          <ToolChipView key={chip.name} chip={chip} />
         ))}
       </View>
     );
@@ -46,21 +36,72 @@ export function ToolChipRow({
   return null;
 }
 
-// Inline **bold** rendering — matches the Swift inline-markdown treatment.
+// A softly pulsing dot reads as deliberate "thinking" — calmer and more premium
+// than a spinner. Each chip also fades + scales in as the step begins.
+function ThinkingDot() {
+  const pulse = usePulse(0.3, 1, 620);
+  return <Animated.View style={[styles.thinkingDot, { opacity: pulse }]} />;
+}
+
+function ToolChipView({ chip }: { chip: ToolChip }) {
+  return (
+    <FadeScaleIn>
+      <View style={styles.chip}>
+        {chip.running ? (
+          <ThinkingDot />
+        ) : (
+          <Ionicons name="checkmark" size={11} color={colors.allworthAccent} />
+        )}
+        <Text style={styles.chipText}>{chip.label}</Text>
+      </View>
+    </FadeScaleIn>
+  );
+}
+
+// Blinking caret while the answer streams in.
+function TypingCursor() {
+  const blink = usePulse(0.15, 1, 520);
+  return <Animated.Text style={{ color: colors.inkTertiary, opacity: blink }}> ▍</Animated.Text>;
+}
+
+// Inline **bold** rendering that tolerates a half-streamed token: a trailing,
+// not-yet-closed "**" renders its tail bold rather than flashing the asterisks.
+function renderBold(text: string): React.ReactNode[] {
+  const out: React.ReactNode[] = [];
+  let i = 0;
+  let key = 0;
+  while (i < text.length) {
+    const open = text.indexOf("**", i);
+    if (open === -1) {
+      out.push(<Text key={key++}>{text.slice(i)}</Text>);
+      break;
+    }
+    if (open > i) out.push(<Text key={key++}>{text.slice(i, open)}</Text>);
+    const close = text.indexOf("**", open + 2);
+    if (close === -1) {
+      // Bold opened but not yet closed (still revealing) — render tail bold, no markers.
+      out.push(
+        <Text key={key++} style={{ fontFamily: fonts.sansBold }}>
+          {text.slice(open + 2)}
+        </Text>,
+      );
+      break;
+    }
+    out.push(
+      <Text key={key++} style={{ fontFamily: fonts.sansBold }}>
+        {text.slice(open + 2, close)}
+      </Text>,
+    );
+    i = close + 2;
+  }
+  return out;
+}
+
 function MarkdownText({ text, streaming }: { text: string; streaming: boolean }) {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
   return (
     <Text style={styles.assistantText}>
-      {parts.map((part, i) =>
-        part.startsWith("**") && part.endsWith("**") ? (
-          <Text key={i} style={{ fontFamily: fonts.sansBold }}>
-            {part.slice(2, -2)}
-          </Text>
-        ) : (
-          <Text key={i}>{part}</Text>
-        ),
-      )}
-      {streaming ? <Text style={{ color: colors.inkTertiary }}> ▍</Text> : null}
+      {renderBold(text)}
+      {streaming ? <TypingCursor /> : null}
     </Text>
   );
 }
@@ -118,6 +159,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.inkFaint,
   },
   chipText: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary },
+  thinkingDot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: colors.allworthAccent },
   userRow: { flexDirection: "row", justifyContent: "flex-end", paddingLeft: 48 },
   userBubble: {
     backgroundColor: colors.inkFaint,
