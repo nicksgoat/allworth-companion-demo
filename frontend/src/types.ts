@@ -121,6 +121,20 @@ export interface ProfileResponse {
   facts: LearnedFact[];
 }
 
+export interface MeetingNote {
+  id: string;
+  date: string;
+  title: string;
+  summary: string;
+  advisor: string;
+  attendees?: string[];
+}
+
+export interface MeetingNotesResponse {
+  clientId: string;
+  notes: MeetingNote[];
+}
+
 export interface ProactiveResponse {
   message: string;
   suggested?: string[];

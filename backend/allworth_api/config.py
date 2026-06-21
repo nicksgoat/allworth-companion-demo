@@ -80,6 +80,33 @@ def profile_memory_enabled() -> bool:
     return not is_production()
 
 
+def redis_url() -> str:
+    """Connection URL for the conversation-memory store (Fly Upstash Redis).
+
+    When unset, the conversation store falls back to an in-process dict — fine
+    for local dev and tests, but not shared across Fly's machines.
+    """
+    return os.environ.get("REDIS_URL", "").strip()
+
+
+def chat_memory_ttl_seconds() -> int:
+    """How long a conversation thread lives in Redis (default 30 days)."""
+    raw = os.environ.get("CHAT_MEMORY_TTL_SECONDS", "2592000")
+    try:
+        return max(60, int(raw))
+    except ValueError:
+        return 2592000
+
+
+def chat_memory_max_messages() -> int:
+    """Cap on replayed turns (user+assistant messages) to bound tokens/latency."""
+    raw = os.environ.get("CHAT_MEMORY_MAX_MESSAGES", "16")
+    try:
+        return max(2, int(raw))
+    except ValueError:
+        return 16
+
+
 def audit_log_target() -> str:
     """Audit sink: stdout by default in production, file path in development."""
     raw = os.environ.get("AUDIT_LOG_TARGET", "").strip()

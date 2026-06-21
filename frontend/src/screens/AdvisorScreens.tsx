@@ -45,7 +45,7 @@ function BookScreen() {
   const autoPushed = useRef(false);
 
   useEffect(() => {
-    const advisorId = app.dashboard?.advisor?.id ?? "dana";
+    const advisorId = app.dashboard?.advisor?.id ?? "nicole";
     app.api
       .book(advisorId)
       .then(setBook)
@@ -156,7 +156,7 @@ function ClientDetailScreen({ route }: NativeStackScreenProps<AdvisorStackParams
   const [brief, setBrief] = useState<AdvisorBrief | null>(null);
 
   useEffect(() => {
-    const advisorId = app.dashboard?.advisor?.id ?? "dana";
+    const advisorId = app.dashboard?.advisor?.id ?? "nicole";
     app.api
       .brief(advisorId, household.clientId)
       .then(setBrief)

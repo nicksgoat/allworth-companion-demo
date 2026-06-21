@@ -3,22 +3,24 @@ from fastapi import APIRouter
 from allworth_api.core.formatting import fmt_usd
 from allworth_api.core.nudges import nudges_for
 from allworth_api.core.tool_runner import run_tool
-from allworth_api.data.seed import seed
+from allworth_api.data.seed import all_advisors, seed_for_advisor
 
 router = APIRouter()
+
+# Clients with a full seed get live nudge counts; other book rows stay stubs.
+_REAL_CLIENTS = {"maya", "kenny"}
 
 
 @router.get("/api/advisors/{advisor_id}/book")
 def book(advisor_id: str):
+    seed = seed_for_advisor(advisor_id)
     households = [
-        {**h, "openNudges": len(nudges_for(h["clientId"]))} if h["clientId"] == "maya" else h
+        {**h, "openNudges": len(nudges_for(h["clientId"]))} if h["clientId"] in _REAL_CLIENTS else h
         for h in seed["book"]
     ]
+    advisors = all_advisors()
     return {
-        "advisor": next(
-            (a for a in seed["personas"]["advisors"] if a["id"] == advisor_id),
-            seed["personas"]["advisors"][0],
-        ),
+        "advisor": next((a for a in advisors if a["id"] == advisor_id), advisors[0]),
         "households": households,
     }
 

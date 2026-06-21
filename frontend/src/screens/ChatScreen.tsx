@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChatMessageView } from "../components/Chat";
 import { DisclaimerFooter } from "../components/Rows";
@@ -26,6 +27,11 @@ export function ChatScreen() {
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+  // "Stick to bottom": follow a streaming answer only while you're already at
+  // the bottom. The moment you scroll up to read, we stop following so the
+  // text never yanks you back down mid-read.
+  const pinnedToBottom = useRef(true);
+  const lastCount = useRef(0);
 
   const loadProactive = async () => {
     if (app.chatMessages.length > 0) return;
@@ -70,9 +76,21 @@ export function ChatScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [app.chatPrefill]);
 
-  useEffect(() => {
-    scrollRef.current?.scrollToEnd({ animated: true });
-  }, [app.chatMessages]);
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+    const distanceFromBottom = contentSize.height - layoutMeasurement.height - contentOffset.y;
+    pinnedToBottom.current = distanceFromBottom < 80;
+  };
+
+  // Content grows on every streamed token. Follow it only when pinned: a new
+  // bubble (your question, or the answer starting) glides down; token-by-token
+  // growth tracks instantly so the text scrolls up smoothly under your eyes.
+  const onContentSizeChange = () => {
+    if (!pinnedToBottom.current) return;
+    const isNewTurn = app.chatMessages.length !== lastCount.current;
+    lastCount.current = app.chatMessages.length;
+    scrollRef.current?.scrollToEnd({ animated: isNewTurn });
+  };
 
   const canSend = draft.trim().length > 0 && !sending;
 
@@ -121,6 +139,8 @@ export function ChatScreen() {
     if (!text || sending) return;
     setDraft("");
     setSending(true);
+    // A fresh question always anchors to the bottom, even if you'd scrolled up.
+    pinnedToBottom.current = true;
     app.setChatMessages((msgs) => [
       ...msgs,
       newMessage({ role: "user", text, chips: [], sources: [], isStreaming: false }),
@@ -150,6 +170,9 @@ export function ChatScreen() {
         ref={scrollRef}
         contentContainerStyle={{ padding: 20, paddingTop: insets.top + 8, gap: 24 }}
         keyboardDismissMode="interactive"
+        scrollEventThrottle={16}
+        onScroll={onScroll}
+        onContentSizeChange={onContentSizeChange}
       >
         <View style={styles.sessionHeader}>
           <View style={styles.sessionLine} />

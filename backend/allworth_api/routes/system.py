@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query, Request
 
 from allworth_api.config import is_production
+from allworth_api.core.conversation_store import clear as clear_conversation
 from allworth_api.core.system_status import (
     audit_tail_entries,
     health_status,
@@ -41,4 +42,6 @@ async def demo_reset(request: Request):
     except Exception:
         body = {}
     client_id = (body or {}).get("clientId", "maya")
-    return reset_demo_state(client_id)
+    result = reset_demo_state(client_id)
+    await clear_conversation(client_id)
+    return result

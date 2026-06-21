@@ -70,17 +70,17 @@
         "email": "maya@example.com",
         "age": 58,
         "city": "Plano, TX",
-        "advisorId": "dana",
+        "advisorId": "nicole",
         "bio": "Recently semi-retired consultant; lives partly off portfolio income.",
         "avatarInitials": "MT"
       }
     ],
     "advisors": [
       {
-        "id": "dana",
-        "name": "Dana Whitfield",
+        "id": "nicole",
+        "name": "Nicole Whitfield",
         "title": "Senior Financial Advisor, CFP\u00ae",
-        "avatarInitials": "DW"
+        "avatarInitials": "NW"
       }
     ]
   },
@@ -14665,5 +14665,40 @@
         "maximum_weight": 0.00700321
       }
     ]
-  }
+  },
+  "meeting_notes": [
+    {
+      "id": "mn_maya_1",
+      "date": "2026-05-21",
+      "title": "Spring review & lake house planning",
+      "summary": "Reviewed portfolio performance and the lake house goal (32% funded). Talked through pacing the $350K target over four years and funding it tax-aware from the trust account. Next: model two funding paths before the next session.",
+      "advisor": "Nicole Whitfield",
+      "attendees": [
+        "Maya Tran",
+        "Nicole Whitfield"
+      ]
+    },
+    {
+      "id": "mn_maya_2",
+      "date": "2026-04-09",
+      "title": "Spending check-in",
+      "summary": "Spending is running about 18% over plan, mostly travel and gifts to family. Agreed it's sustainable near-term but worth revisiting if it carries into the lake house purchase window.",
+      "advisor": "Nicole Whitfield",
+      "attendees": [
+        "Maya Tran",
+        "Nicole Whitfield"
+      ]
+    },
+    {
+      "id": "mn_maya_3",
+      "date": "2026-02-18",
+      "title": "SpaceX IPO allocation",
+      "summary": "Walked through the $200K SpaceX IPO opportunity \u2014 liquidity trade-offs against the $9K/mo income draw. Maya leaning cautious; revisit once the terms firm up.",
+      "advisor": "Nicole Whitfield",
+      "attendees": [
+        "Maya Tran",
+        "Nicole Whitfield"
+      ]
+    }
+  ]
 }

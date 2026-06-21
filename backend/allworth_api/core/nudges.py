@@ -1,12 +1,17 @@
 """Rule-based nudge engine. Deterministic — no LLM involved."""
 
 from allworth_api.core.formatting import fmt_usd, js_round
-from allworth_api.data.seed import portfolio_for, seed, spending_summary
+from allworth_api.data.seed import advisor_for_client, portfolio_for, seed_for, spending_summary
 
 FUNDS = {"VTI", "VXUS", "VTEB", "BND", "FXAIX", "FSPSX", "FXNAX", "SPAXX"}
 
 
-def build_nudges(spending: dict, positions: list[dict], accounts: list[dict]) -> list[dict]:
+def build_nudges(
+    spending: dict,
+    positions: list[dict],
+    accounts: list[dict],
+    advisor_first: str = "your advisor",
+) -> list[dict]:
     nudges = []
 
     s = spending
@@ -24,7 +29,7 @@ def build_nudges(spending: dict, positions: list[dict], accounts: list[dict]) ->
                     f"checking what it means for the lake house timeline."
                 ),
                 "cta": "Ask me what this means",
-                "advisorCta": "Discuss with Dana",
+                "advisorCta": f"Discuss with {advisor_first}",
                 "severity": "attention",
             }
         )
@@ -60,7 +65,7 @@ def build_nudges(spending: dict, positions: list[dict], accounts: list[dict]) ->
                             f"to reduce concentration over time — some more tax-aware than others."
                         ),
                         "cta": "Ask me about my options",
-                        "advisorCta": "Discuss with Dana",
+                        "advisorCta": f"Discuss with {advisor_first}",
                         "severity": "info",
                     }
                 )
@@ -69,4 +74,10 @@ def build_nudges(spending: dict, positions: list[dict], accounts: list[dict]) ->
 
 
 def nudges_for(client_id: str) -> list[dict]:
-    return build_nudges(spending_summary(3), portfolio_for()["positions"], seed["accounts"])
+    advisor_first = advisor_for_client(client_id)["name"].split(",")[0].split()[0]
+    return build_nudges(
+        spending_summary(3, client_id),
+        portfolio_for(client_id)["positions"],
+        seed_for(client_id)["accounts"],
+        advisor_first,
+    )

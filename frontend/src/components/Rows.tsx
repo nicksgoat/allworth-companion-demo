@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors, fonts, sectionHeader, shortDate, usd } from "../theme";
-import type { Account, LearnedFact } from "../types";
+import type { Account, LearnedFact, MeetingNote } from "../types";
 
 export function SectionHeader({ children }: { children: React.ReactNode }) {
   return <Text style={styles.sectionHeader}>{children}</Text>;
@@ -61,6 +61,21 @@ export function LearnedFactRow({ fact }: { fact: LearnedFact }) {
   );
 }
 
+export function MeetingNoteRow({ note }: { note: MeetingNote }) {
+  return (
+    <View style={styles.factRow}>
+      <View style={styles.noteTitleRow}>
+        <Text style={styles.noteTitle}>{note.title}</Text>
+        <Text style={styles.noteDate}>{shortDate(note.date)}</Text>
+      </View>
+      <Text style={styles.noteSummary} numberOfLines={2}>
+        {note.summary}
+      </Text>
+      <Text style={styles.factMeta}>With {note.advisor}</Text>
+    </View>
+  );
+}
+
 export function DisclaimerFooter() {
   return (
     <Text style={styles.disclaimer}>
@@ -107,6 +122,15 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
   factMeta: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkTertiary },
+  noteTitleRow: { flexDirection: "row", alignItems: "baseline", gap: 10 },
+  noteTitle: { flex: 1, fontSize: 16, fontFamily: fonts.sansBold, color: colors.inkPrimary },
+  noteDate: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkTertiary },
+  noteSummary: {
+    fontSize: 15,
+    fontFamily: fonts.sans,
+    color: colors.inkSecondary,
+    lineHeight: 21,
+  },
   disclaimer: {
     fontSize: 11,
     fontFamily: fonts.sans,

@@ -70,8 +70,8 @@ def simulate_tax_impact(
         "effectiveTaxDragPct": js_round(est_tax / proceeds * 1000) / 10 if proceeds > 0 else 0,
         "assumptions": (
             f"Long-term gains at {LT_RATE * 100:.1f}% (15% cap gains + 3.8% NIIT), short-term at "
-            f"{ST_RATE * 100:.1f}%. Lots sold highest-basis-first. Estimates only — Dana can run "
-            f"exact numbers."
+            f"{ST_RATE * 100:.1f}%. Lots sold highest-basis-first. Estimates only — your advisor can "
+            f"run exact numbers."
         ),
         "sales": sales,
     }

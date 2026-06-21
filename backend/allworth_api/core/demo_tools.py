@@ -14,7 +14,7 @@ from allworth_api.core.formatting import fmt_usd
 from allworth_api.core.memory import active_facts, add_facts, profile_as_context
 from allworth_api.core.nudges import nudges_for
 from allworth_api.core.tax import simulate_tax_impact
-from allworth_api.data.seed import accounts_for, seed, spending_summary
+from allworth_api.data.seed import accounts_for, current_seed, spending_summary
 from allworth_api.financial_tools.data import get_portfolio as get_layered_portfolio
 
 ToolHandler = Callable[[dict[str, Any], str], dict[str, Any]]
@@ -25,6 +25,7 @@ def _strip_history(acct: dict[str, Any]) -> dict[str, Any]:
 
 
 def _get_accounts(_tool_input: dict[str, Any], _client_id: str) -> dict[str, Any]:
+    seed = current_seed()
     accounts = accounts_for()
     return {
         "netWorth": accounts["netWorth"],
@@ -41,6 +42,7 @@ def _get_portfolio(_tool_input: dict[str, Any], client_id: str) -> dict[str, Any
 
 
 def _get_financial_plan(_tool_input: dict[str, Any], _client_id: str) -> dict[str, Any]:
+    seed = current_seed()
     return {"plan": seed["plan"], "liquidityEvent": seed["liquidityEvent"]}
 
 
@@ -75,6 +77,7 @@ def _update_client_profile(tool_input: dict[str, Any], client_id: str) -> dict[s
 
 
 def _simulate_tax_impact(tool_input: dict[str, Any], _client_id: str) -> dict[str, Any]:
+    seed = current_seed()
     return simulate_tax_impact(
         tool_input.get("amount"),
         tool_input.get("accountId"),
@@ -85,6 +88,7 @@ def _simulate_tax_impact(tool_input: dict[str, Any], _client_id: str) -> dict[st
 
 
 def _get_advisor_brief(_tool_input: dict[str, Any], client_id: str) -> dict[str, Any]:
+    seed = current_seed()
     accounts = accounts_for()
     return {
         "client": next((c for c in seed["personas"]["clients"] if c["id"] == client_id), None),

@@ -6,6 +6,7 @@ import re
 import sys
 from collections.abc import AsyncIterator
 
+from allworth_api.core.conversation_store import append_turns, load_turns
 from allworth_api.core.memory import (
     add_facts,
     append_episode,
@@ -16,7 +17,7 @@ from allworth_api.core.prompts import STABLE_SYSTEM, volatile_context
 from allworth_api.core.tool_defs import TOOL_DEFINITIONS, TOOL_LABELS
 from allworth_api.core.tool_runner import run_tool
 from allworth_api.data.llm import CHAT_MODEL, EXTRACT_MODEL, provider
-from allworth_api.data.seed import seed
+from allworth_api.data.seed import advisor_for_client, current_seed, set_current_client
 
 MAX_TOOL_ROUNDS = 8
 
@@ -158,13 +159,21 @@ async def _stream_live(client_id, session, messages, out, client_name=None, advi
 
 
 async def stream_chat(client_id: str, session: str, message: str) -> AsyncIterator[tuple[str, dict]]:
-    """Async generator of (event, data) tuples for one stateless chat turn."""
-    messages = [{"role": "user", "content": message}]
+    """Async generator of (event, data) tuples for one chat turn.
+
+    The turn itself is computed statelessly, but prior turns for this
+    (client_id, session) thread are loaded from the conversation store so the
+    model remembers earlier prompts and answers (see conversation_store).
+    """
+    set_current_client(client_id)
+    history = await load_turns(client_id, session)
+    messages = [*history, {"role": "user", "content": message}]
     user_text = message
     out = {"text": ""}
 
+    seed = current_seed()
     client = next((c for c in seed["personas"]["clients"] if c["id"] == client_id), None)
-    advisor = seed["personas"]["advisors"][0]
+    advisor = advisor_for_client(client_id)
     client_name = client["name"] if client else None
     advisor_name = advisor["name"]
 
@@ -184,6 +193,16 @@ async def stream_chat(client_id: str, session: str, message: str) -> AsyncIterat
         print(f"[chat] unrecoverable: {err}", file=sys.stderr)
         yield "error", {"message": "Something went wrong. Please try again."}
         return
+
+    # Persist this turn so the next prompt in the thread remembers it.
+    await append_turns(
+        client_id,
+        session,
+        [
+            {"role": "user", "content": user_text},
+            {"role": "assistant", "content": out["text"]},
+        ],
+    )
 
     append_episode(client_id, session, "user", user_text)
     append_episode(client_id, session, "assistant", out["text"])

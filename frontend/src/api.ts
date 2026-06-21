@@ -5,6 +5,7 @@ import type {
   BookResponse,
   ChatEvent,
   Dashboard,
+  MeetingNotesResponse,
   Portfolio,
   ProactiveResponse,
   ProfileResponse,
@@ -69,6 +70,10 @@ export class ApiClient {
 
   profile(clientId: string): Promise<ProfileResponse> {
     return this.get(`/api/clients/${clientId}/profile`);
+  }
+
+  meetingNotes(clientId: string): Promise<MeetingNotesResponse> {
+    return this.get(`/api/clients/${clientId}/meeting-notes`);
   }
 
   proactive(clientId: string, session: string): Promise<ProactiveResponse> {

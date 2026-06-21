@@ -11,7 +11,7 @@ from allworth_api.data.household import (
     get_portfolio,
     get_spending,
 )
-from allworth_api.data.seed import seed
+from allworth_api.data.seed import advisor_for_client, seed_for
 
 router = APIRouter()
 
@@ -24,7 +24,8 @@ def dashboard(client_id: str, household_id: str = Depends(get_current_household)
     d = get_dashboard_data(client_id)
     a = d["accounts"]
     s = d["spending"]
-    advisor = seed["personas"]["advisors"][0]
+    seed = seed_for(client_id)
+    advisor = advisor_for_client(client_id)
     return {
         "client": d["client"],
         "advisor": advisor,
@@ -104,6 +105,13 @@ def proactive(client_id: str, session: str = "wednesday"):
         "basedOn": None,
         "suggested": suggested_for(session),
     }
+
+
+@router.get("/api/clients/{client_id}/meeting-notes")
+def meeting_notes(client_id: str, household_id: str = Depends(get_current_household)):
+    if client_id != household_id:
+        return JSONResponse(status_code=403, content={"error": "Access denied for this household"})
+    return {"clientId": client_id, "notes": seed_for(client_id).get("meeting_notes", [])}
 
 
 @router.get("/api/clients/{client_id}/chat-history")

@@ -8,13 +8,15 @@ import {
   DisclaimerFooter,
   HairlineDivider,
   LearnedFactRow,
+  MeetingNoteRow,
   SectionHeader,
 } from "../components/Rows";
 import { useAuth } from "../auth";
 import { useApp } from "../state";
 import { card, colors, fonts } from "../theme";
-import type { LearnedFact } from "../types";
+import type { LearnedFact, MeetingNote } from "../types";
 import { FactDetailSheet } from "./FactDetailSheet";
+import { MeetingNoteDetailSheet } from "./MeetingNoteDetailSheet";
 
 const CATEGORY_LABELS: Record<string, string> = {
   goals: "Your goals",
@@ -30,8 +32,10 @@ export function ProfileScreen() {
   const { session: authSession, logout } = useAuth();
   const insets = useSafeAreaInsets();
   const [facts, setFacts] = useState<LearnedFact[]>([]);
+  const [notes, setNotes] = useState<MeetingNote[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFact, setSelectedFact] = useState<LearnedFact | null>(null);
+  const [selectedNote, setSelectedNote] = useState<MeetingNote | null>(null);
   const scrollY = useAnimatedValue(0);
 
   const client = app.dashboard?.client;
@@ -45,6 +49,9 @@ export function ProfileScreen() {
   const load = useCallback(async () => {
     try {
       setFacts((await app.api.profile(app.clientId)).facts);
+    } catch {}
+    try {
+      setNotes((await app.api.meetingNotes(app.clientId)).notes);
     } catch {}
   }, [app.api, app.clientId]);
 
@@ -66,7 +73,7 @@ export function ProfileScreen() {
   };
 
   const messageAdvisor = () => {
-    const first = advisor?.name?.split(" ")[0] ?? "Dana";
+    const first = advisor?.name?.split(" ")[0] ?? "my advisor";
     app.setChatPrefill(`Can you have ${first} reach out to me?`);
     app.setSelectedTab("chat");
   };
@@ -156,6 +163,29 @@ export function ProfileScreen() {
           ) : null}
         </View>
 
+        {/* Meeting notes (from sessions with your advisor) */}
+        {notes.length > 0 ? (
+          <View style={{ gap: 10 }}>
+            <SectionHeader>Meeting notes</SectionHeader>
+            <Text style={styles.subtitle}>
+              Recaps from your sessions with your advisor. Tap any to read the full note.
+            </Text>
+            <View style={styles.factGroup}>
+              {notes.map((note, i) => (
+                <React.Fragment key={note.id}>
+                  {i > 0 ? <HairlineDivider /> : null}
+                  <Pressable
+                    onPress={() => setSelectedNote(note)}
+                    style={({ pressed }) => pressed && { opacity: 0.6 }}
+                  >
+                    <MeetingNoteRow note={note} />
+                  </Pressable>
+                </React.Fragment>
+              ))}
+            </View>
+          </View>
+        ) : null}
+
         <DisclaimerFooter />
 
         {/* Account */}
@@ -180,6 +210,8 @@ export function ProfileScreen() {
             load();
           }}
         />
+
+        <MeetingNoteDetailSheet note={selectedNote} onClose={() => setSelectedNote(null)} />
       </Animated.ScrollView>
       <GlassHeader title="Profile" scrollY={scrollY} />
     </>
