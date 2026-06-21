@@ -34,6 +34,46 @@ def _key(client_id: str, session: str) -> str:
     return f"chat:{client_id}:{session}"
 
 
+def _build_redis(url: str):
+    """Construct an async Redis client from a redis[s]:// URL.
+
+    Parses the URL manually instead of relying on redis.from_url: Fly/Upstash
+    passwords can contain characters (e.g. brackets) that make Python's URL
+    parser raise "Invalid IPv6 URL". We split on the last '@' and the first ':'
+    in the credentials so a password with special characters still works.
+    """
+    import redis.asyncio as aioredis
+
+    scheme, _, rest = url.partition("://")
+    use_tls = scheme == "rediss"
+    creds, sep, hostpart = rest.rpartition("@")
+    if not sep:  # no credentials
+        hostpart = rest
+    username = password = None
+    if creds:
+        username, _, password = creds.partition(":")
+        password = password or None
+        username = username or None
+    db = 0
+    if "/" in hostpart:
+        hostpart, _, db_str = hostpart.partition("/")
+        db = int(db_str) if db_str.isdigit() else 0
+    if ":" in hostpart:
+        host, _, port_str = hostpart.rpartition(":")
+        port = int(port_str) if port_str.isdigit() else 6379
+    else:
+        host, port = hostpart, 6379
+    return aioredis.Redis(
+        host=host,
+        port=port,
+        username=username,
+        password=password,
+        db=db,
+        ssl=use_tls,
+        decode_responses=True,
+    )
+
+
 def _get_redis():
     """Return a shared async Redis client, or None if not configured/available."""
     global _redis, _redis_init
@@ -44,9 +84,7 @@ def _get_redis():
     if not url:
         return None
     try:
-        import redis.asyncio as aioredis
-
-        _redis = aioredis.from_url(url, decode_responses=True)
+        _redis = _build_redis(url)
     except Exception as err:  # pragma: no cover - import/connection guard
         print(f"[memory] redis unavailable, using in-process store: {err}", file=sys.stderr)
         _redis = None
