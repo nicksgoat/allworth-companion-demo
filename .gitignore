@@ -15,3 +15,5 @@ build/
 
 # App Store Connect API key (used by eas submit) — never commit
 AuthKey_*.p8
+# Local Claude Code agent state
+.claude/
