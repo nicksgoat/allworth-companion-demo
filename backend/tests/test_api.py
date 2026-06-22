@@ -155,7 +155,7 @@ def test_live_mode_without_synapse_does_not_silently_use_seed(monkeypatch) -> No
 def test_email_login_works_in_mock_mode() -> None:
     # The Sign-In screen uses email login — it must resolve against seed in mock
     # mode (case-insensitive), or the demo can't get past the login screen.
-    r = client.post("/api/auth/login/email", json={"email": "MAYA@example.com"})
+    r = client.post("/api/auth/login/email", json={"email": "NICOLE@demo.com"})
     assert r.status_code == 200
     body = r.json()
     assert body["householdId"] == "maya"
@@ -172,7 +172,7 @@ def test_demo_passcode_login_is_hidden_when_demo_fallback_disabled(monkeypatch) 
 
 def test_signed_auth_token_scopes_protected_routes(monkeypatch) -> None:
     monkeypatch.setenv("SESSION_SECRET", "test-secret-for-stateless-auth")
-    r = client.post("/api/auth/login/email", json={"email": "maya@example.com"})
+    r = client.post("/api/auth/login/email", json={"email": "nicole@demo.com"})
     assert r.status_code == 200
     token = r.json()["token"]
     assert get_session(token).household_id == "maya"
@@ -186,7 +186,7 @@ def test_request_logging_uses_signed_token_household_and_returns_request_id(
     caplog,
 ) -> None:
     monkeypatch.setenv("SESSION_SECRET", "test-secret-for-stateless-auth")
-    token = client.post("/api/auth/login/email", json={"email": "maya@example.com"}).json()["token"]
+    token = client.post("/api/auth/login/email", json={"email": "nicole@demo.com"}).json()["token"]
 
     with caplog.at_level(logging.INFO, logger="allworth_api.request"):
         r = client.get(
@@ -264,7 +264,7 @@ def test_app_level_rate_limit_for_tool_routes(monkeypatch) -> None:
 def test_app_level_rate_limit_for_feedback_route(monkeypatch, caplog) -> None:
     reset_rate_limits()
     monkeypatch.setenv("SESSION_SECRET", "test-secret-for-stateless-auth")
-    token = client.post("/api/auth/login/email", json={"email": "maya@example.com"}).json()["token"]
+    token = client.post("/api/auth/login/email", json={"email": "nicole@demo.com"}).json()["token"]
     monkeypatch.setenv("RATE_LIMIT_ENABLED", "true")
     monkeypatch.setenv("RATE_LIMIT_PER_WINDOW", "2")
     monkeypatch.setenv("RATE_LIMIT_WINDOW_SECONDS", "60")
