@@ -169,6 +169,30 @@ Output:
   ],
   "realized_gains": {"long_term": 10000, "short_term": 1000},
   "estimated_tax": {"long_term": 0, "short_term": 0, "total": 0},
+  "tax_calculation": {
+    "method": "For each sell lot, gain_ratio = max(lot_value - lot_cost_basis, 0) / lot_value; realized_gain = actual_sell_amount * gain_ratio; estimated_tax = realized_gain * tax_rate.",
+    "tax_rates": {"long_term": 0, "short_term": 0},
+    "lots": [
+      {
+        "ticker": "AAPL",
+        "lot_value": 100000,
+        "lot_cost_basis": 50000,
+        "lot_unrealized_gain": 50000,
+        "gain_ratio": 0.5,
+        "actual_sell_amount": 20000,
+        "cost_basis_sold": 10000,
+        "realized_gain": 10000,
+        "tax_rate": 0,
+        "estimated_tax": 0,
+        "calculation": {
+          "gain_ratio": "lot_unrealized_gain / lot_value",
+          "realized_gain": "actual_sell_amount * gain_ratio",
+          "cost_basis_sold": "actual_sell_amount - realized_gain",
+          "estimated_tax": "realized_gain * tax_rate"
+        }
+      }
+    ]
+  },
   "residual_drift": {"AAPL": 0.2333, "BND": -0.46, "NVDA": 0.2267},
   "budget_limited": true,
   "model": {

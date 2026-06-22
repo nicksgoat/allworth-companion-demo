@@ -1,5 +1,6 @@
 # Tool schema definitions and UI labels for the demo and financial tools.
 
+from allworth_api.core.vision_tools import VISION_TOOL_DEFINITIONS, VISION_TOOL_LABELS
 from allworth_api.financial_tools.tools import FINANCIAL_TOOL_DEFINITIONS, FINANCIAL_TOOL_LABELS
 
 TOOL_LABELS = {
@@ -17,9 +18,11 @@ TOOL_LABELS = {
     "analyze_goal_funding": "Reviewing goal progress…",
     "analyze_income_sustainability": "Evaluating income plan…",
     **FINANCIAL_TOOL_LABELS,
+    **VISION_TOOL_LABELS,
 }
 
 TOOL_DEFINITIONS = [
+    *VISION_TOOL_DEFINITIONS,
     {
         "name": "get_accounts",
         "description": "All of the client's accounts — Allworth-managed and outside (held-away) — "
@@ -89,7 +92,7 @@ TOOL_DEFINITIONS = [
     {
         "name": "simulate_tax_impact",
         "description": "Estimate capital-gains tax for raising a dollar amount by selling from a "
-        "given account, using real tax lots (highest-basis-first). Returns proceeds, realized gain, "
+        "given account, using aggregate average-basis and long/short unrealized-gain data. Returns proceeds, realized gain, "
         "estimated tax, and effective drag.",
         "input_schema": {
             "type": "object",
@@ -116,9 +119,8 @@ TOOL_DEFINITIONS = [
     },
     {
         "name": "run_retirement_projection",
-        "description": "Monte Carlo retirement projection: simulates 500 market paths to estimate "
-        "probability of funding retirement spending through a target age. Returns success rate, "
-        "percentile wealth paths (p5/p25/median/p75/p95), and interpretation.",
+        "description": "Legacy app-screen retirement projection. For LLM planning or affordability "
+        "answers, prefer simulate, the schema-governed Monte Carlo tool.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -189,9 +191,8 @@ TOOL_DEFINITIONS = [
     },
     {
         "name": "analyze_income_sustainability",
-        "description": "Evaluate whether current income sources (portfolio + other) sustain planned spending "
-        "over 5/10/20 year horizons with inflation. Identifies the crossover year when spending "
-        "exceeds income and reports cash runway.",
+        "description": "Legacy app-screen income sustainability analyzer. For LLM affordability "
+        "answers, prefer simulate with explicit assumptions.",
         "input_schema": {
             "type": "object",
             "properties": {

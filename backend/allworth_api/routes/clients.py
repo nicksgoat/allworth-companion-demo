@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
+from allworth_api.config import data_mode
 from allworth_api.core.auth import get_current_household, get_session_for_household
 from allworth_api.core.chat_service import suggested_for
 from allworth_api.core.memory import active_facts, episodes_for, forget_fact
 from allworth_api.core.nudges import nudges_for
+from allworth_api.data.advisors import advisor_for_client
 from allworth_api.data.household import (
     get_client_persona,
     get_dashboard_data,
@@ -12,6 +14,7 @@ from allworth_api.data.household import (
     get_spending,
 )
 from allworth_api.data.seed import seed
+from allworth_api.financial_tools.performance import period_performance_from_values
 
 router = APIRouter()
 
@@ -24,12 +27,20 @@ def dashboard(client_id: str, household_id: str = Depends(get_current_household)
     d = get_dashboard_data(client_id)
     a = d["accounts"]
     s = d["spending"]
-    advisor = seed["personas"]["advisors"][0]
+    advisor = advisor_for_client(client_id)
+    mode = data_mode()
+    is_live = mode == "live"
     return {
         "client": d["client"],
         "advisor": advisor,
         "netWorth": a["netWorth"],
         "netWorthHistory": d["net_worth_history"],
+        "performanceCashFlows": d.get("performance_cash_flows", []),
+        "performance": {
+            "netWorth": period_performance_from_values(
+                d["net_worth_history"], d.get("performance_cash_flows", [])
+            ),
+        },
         "allworthTotal": a["allworthTotal"],
         "heldAwayTotal": a["heldAwayTotal"],
         "liabilitiesTotal": a["liabilitiesTotal"],
@@ -37,6 +48,14 @@ def dashboard(client_id: str, household_id: str = Depends(get_current_household)
         "spending": {"avg3mo": s["avg3mo"], "plan": s["plan"], "overPlanPct": s["overPlanPct"]},
         "nudges": nudges_for(client_id),
         "liquidityEvent": seed["liquidityEvent"],
+        "dataStatus": {
+            "mode": mode,
+            "label": "Live data" if is_live else "Synthetic demo data",
+            "generatedAt": seed["generatedAt"],
+            "asOf": seed["generatedAt"],
+            "isSynthetic": not is_live,
+            "isStale": False,
+        },
         "disclaimer": seed["disclaimer"],
     }
 
@@ -70,7 +89,9 @@ def profile(client_id: str, household_id: str = Depends(get_current_household)):
 
 
 @router.delete("/api/clients/{client_id}/facts/{fact_id}")
-def forget(client_id: str, fact_id: str):
+def forget(client_id: str, fact_id: str, household_id: str = Depends(get_current_household)):
+    if client_id != household_id:
+        return JSONResponse(status_code=403, content={"error": "Access denied for this household"})
     fact = forget_fact(client_id, fact_id)
     if not fact:
         return JSONResponse(status_code=404, content={"error": "fact not found or not active"})
@@ -78,7 +99,9 @@ def forget(client_id: str, fact_id: str):
 
 
 @router.get("/api/clients/{client_id}/proactive")
-def proactive(client_id: str, session: str = "wednesday"):
+def proactive(client_id: str, session: str = "wednesday", household_id: str = Depends(get_current_household)):
+    if client_id != household_id:
+        return JSONResponse(status_code=403, content={"error": "Access denied for this household"})
     # Resolve the client's first name from their auth session or persona
     auth_sess = get_session_for_household(client_id)
     if auth_sess and auth_sess.contact_name:
@@ -94,7 +117,7 @@ def proactive(client_id: str, session: str = "wednesday"):
                 "goals. A couple of things stand out worth a closer look. Where would you like to start?"
             ),
             "basedOn": None,
-            "suggested": suggested_for(session),
+            "suggested": suggested_for(session, client_id),
         }
     return {
         "message": (
@@ -102,10 +125,16 @@ def proactive(client_id: str, session: str = "wednesday"):
             "trade-offs, or score progress toward a goal. What would you like to dig into?"
         ),
         "basedOn": None,
-        "suggested": suggested_for(session),
+        "suggested": suggested_for(session, client_id),
     }
 
 
 @router.get("/api/clients/{client_id}/chat-history")
-def chat_history(client_id: str, session: str = "wednesday"):
+def chat_history(
+    client_id: str,
+    session: str = "wednesday",
+    household_id: str = Depends(get_current_household),
+):
+    if client_id != household_id:
+        return JSONResponse(status_code=403, content={"error": "Access denied for this household"})
     return {"episodes": episodes_for(client_id, session)}

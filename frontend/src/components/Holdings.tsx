@@ -1,6 +1,7 @@
 import React, { useId, useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import Svg, { Defs, LinearGradient, Path, Stop } from "react-native-svg";
+import { performanceFromSeries } from "../performance";
 import { positionHistory } from "../synthetic";
 import { card, colors, fonts, usd } from "../theme";
 import type { Account, Position } from "../types";
@@ -65,9 +66,7 @@ function HoldingRow({
   const { history, pct } = useMemo(() => {
     if (isCash) return { history: [], pct: 0 };
     const h = positionHistory(position);
-    const first = h[0].value;
-    const last = h[h.length - 1].value;
-    return { history: h.map((m) => m.value), pct: first ? ((last - first) / first) * 100 : 0 };
+    return { history: h.map((m) => m.value), pct: performanceFromSeries(h)?.return_pct ?? 0 };
   }, [position, isCash]);
 
   const up = pct >= 0;

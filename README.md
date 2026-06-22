@@ -1,6 +1,6 @@
 # Allworth Companion — AI Demo
 
-Demo app for the Allworth Financial executive pitch (June 22, 2026): an AI-native client engagement platform. React Native (Expo) iOS app backed by a Python/FastAPI server with an Anthropic tool-use loop.
+Demo app for the Allworth Financial executive pitch (June 22, 2026): an AI-native client engagement platform. React Native (Expo) iOS app backed by a Python/FastAPI server with a provider-neutral LLM tool-use loop. The current target LLM is ChatGPT through Azure OpenAI GPT-4o; the architecture remains LLM-agnostic for future providers.
 
 > **Synthetic data only.** No real client information anywhere in this repo. The assistant never gives directive advice — every answer hands off to the advisor.
 
@@ -118,6 +118,11 @@ AZURE_OPENAI_API_VERSION=2024-12-01-preview
 LLM_CHAT_MODEL=gpt-4o
 LLM_EXTRACT_MODEL=gpt-4o
 EXPO_PUBLIC_API_URL=https://YOUR-BACKEND-HOST
+AUTH_PROVIDER=entra
+ENTRA_TENANT_ID=<tenant id>
+ENTRA_CLIENT_ID=<application/client id>
+ENTRA_AUDIENCE=<api audience>
+PROFILE_MEMORY_ENABLED=false
 ```
 
 For real client traffic, also replace demo email auth with Entra/SSO, keep `ALLOW_SEED_AUTH=false`, keep `ALLOW_DEMO_AUTH_FALLBACK=false`, and move any durable client memory to a managed store such as Postgres, Cosmos DB, or Redis.
@@ -132,20 +137,19 @@ frontend/                React Native app (Expo SDK 56 + TypeScript)
   src/screens/           dashboard, chat, profile, advisor, vision, controls
 backend/                 Python + FastAPI backend (uv-managed)
   allworth_api/          layered package (presentation, application, domain, infrastructure)
-  mcp_server.py          MCP server (stdio, read-only, household-scoped)
+  allworth_api/mcp.py    MCP server (stdio, read-only, household-scoped)
   data/seed.json         deterministic synthetic data
 run.sh                   one-command backend startup
-allworth-ai-demo-handoff.md   full spec — all decisions trace to it
-docs/                    vision + production roadmap (design docs)
+docs/                    canonical spec + production roadmap
 ```
 
 ## Vision & roadmap
 
-The `docs/` directory holds the platform design docs — product brief, [Client Intelligence Layer](docs/CLIENT_INTELLIGENCE_LAYER.md) (governed memory, fact atoms, learning loops), safety/compliance boundaries, and the [phased roadmap](docs/ROADMAP.md) from this demo to production (LLM chat → MCP/real data → advisor briefs → governed memory → production readiness). The demo's vision screen (Beat 6) presents this path.
+Start with the [canonical specification](docs/ALLWORTH_AI_APP_CANONICAL.md). It consolidates the product vision, current backend, GPT-4o usage, provider-neutral LLM boundary, financial tools, Redis memory, safety/compliance boundaries, deployment path, and roadmap. The surviving focused references cover [Financial Tools](docs/FINANCIAL_TOOLS.md), [Redis Chat Memory](docs/REDIS_CHAT_MEMORY.md), and [Testing And Operations](docs/TESTING_OPERATIONS.md).
 
 ## MCP server (Phase 3 preview)
 
-`backend/mcp_server.py` exposes the backend's tool layer over the Model Context Protocol (stdio), implementing the connector rules in [docs/MCP_INTEGRATION.md](docs/MCP_INTEGRATION.md): backend-only, **read-only** (writes like `update_client_profile` are excluded pending approval/audit design), entitlement-scoped to one household (`ALLWORTH_CLIENT_ID`, never a tool parameter), and every result wrapped in a provenance envelope (`source`, `tool`, `clientId`, `retrieved_at`, `read_only`). The repo's `.mcp.json` registers it, so Claude Code/Desktop pointed at this repo can query the same governed data the app uses:
+`backend/allworth_api/mcp.py` exposes the backend's tool layer over the Model Context Protocol (stdio), following the boundary in the [canonical specification](docs/ALLWORTH_AI_APP_CANONICAL.md): backend-only, **read-only** (writes like `update_client_profile` are excluded pending approval/audit design), entitlement-scoped to one household (`ALLWORTH_CLIENT_ID`, never a tool parameter), and every result wrapped in a provenance envelope (`source`, `tool`, `clientId`, `retrieved_at`, `read_only`). MCP clients pointed at this repo can query the same governed data the app uses:
 
 ```sh
 # read-only tools include the composable financial tool suite from docs/FINANCIAL_TOOLS.md
@@ -160,7 +164,7 @@ Six beats, all driven from the app:
 2. **Nudge** — spending running 18% over plan, with monthly breakdown
 3. **Grounded chat** — "$200K SpaceX IPO" question answered via live tool calls (visible tool chips → sources)
 4. **Memory** — return Wednesday, the assistant picks up the IPO thread unprompted, with provenance
-5. **Advisor view** — Dana's book, $611K held-away detected, auto-prepared meeting brief
+5. **Advisor view** — Nicole's book, $611K held-away detected, auto-prepared meeting brief
 6. **Vision** — the Client Intelligence Layer platform story
 
 Demo controls: triple-tap the Allworth wordmark (switch client/advisor/vision, Monday/Wednesday session, backend host, reset).

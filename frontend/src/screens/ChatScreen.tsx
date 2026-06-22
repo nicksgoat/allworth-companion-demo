@@ -15,10 +15,125 @@ import { ChatMessageView } from "../components/Chat";
 import { DisclaimerFooter } from "../components/Rows";
 import { useApp } from "../state";
 import { card, colors, fonts } from "../theme";
-import type { ChatEvent, ChatMessage } from "../types";
+import type { ChatEvent, ChatMessage, Dashboard } from "../types";
 
 let nextId = 1;
 const newMessage = (m: Omit<ChatMessage, "id">): ChatMessage => ({ ...m, id: String(nextId++) });
+
+const LEGACY_SUGGESTIONS = [
+  "Am I on track for retirement?",
+  "Can I afford a $50,000 car?",
+  "What would rebalancing to 70/30 look like?",
+];
+
+const compactSuggestions = (items: string[], limit = 3): string[] => {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const item of items) {
+    const text = item.trim().replace(/\s+/g, " ");
+    const key = text.toLowerCase();
+    if (!text || seen.has(key)) continue;
+    seen.add(key);
+    result.push(text);
+    if (result.length >= limit) break;
+  }
+  return result;
+};
+
+const hasLegacySuggestions = (suggested: string[]): boolean =>
+  suggested.length === LEGACY_SUGGESTIONS.length &&
+  suggested.every((item, index) => item === LEGACY_SUGGESTIONS[index]);
+
+const suggestionsFromDashboard = (dashboard: Dashboard | null): string[] => {
+  const suggestions: string[] = [];
+  for (const nudge of dashboard?.nudges ?? []) {
+    if (nudge.type === "spending") {
+      suggestions.push("How does this spending affect my plan?");
+    } else if (nudge.type === "concentration") {
+      const symbol = nudge.title.split(" ", 1)[0] || "that position";
+      suggestions.push(`What are my options for ${symbol}?`);
+    }
+  }
+  return suggestions;
+};
+
+const dynamicSuggestions = ({
+  suggested,
+  latestUserText,
+  assistantText,
+  sources,
+  dashboard,
+}: {
+  suggested: string[];
+  latestUserText: string;
+  assistantText: string;
+  sources: string[];
+  dashboard: Dashboard | null;
+}): string[] => {
+  if (suggested.length > 0 && !hasLegacySuggestions(suggested)) return compactSuggestions(suggested);
+
+  const text = `${latestUserText} ${assistantText}`.toLowerCase();
+  const candidates: string[] = [];
+  const advisorFirst = dashboard?.advisor?.name?.split(" ")[0] ?? "your advisor";
+  if (text.includes("spending") || text.includes("budget") || text.includes("over plan")) {
+    candidates.push(
+      "What spending level keeps the plan on track?",
+      "Which categories are driving the overage?",
+      "How does this affect the lake house timeline?",
+    );
+  }
+  if (text.includes("car") || text.includes("afford") || text.includes("purchase")) {
+    candidates.push(
+      "What if I finance it instead?",
+      "How would paying cash affect retirement odds?",
+      "Which funding source creates the least tax drag?",
+    );
+  }
+  if (text.includes("rebalance") || text.includes("allocation") || text.includes("70/30")) {
+    candidates.push(
+      "Show the tax impact in plain English",
+      "Which holdings would be sold first?",
+      "What if we limit realized gains?",
+    );
+  }
+  if (sources.includes("Monte Carlo simulation")) {
+    candidates.push("What improves the odds the most?", "How bad is the downside case?");
+  }
+  if (
+    assistantText.toLowerCase().includes(advisorFirst.toLowerCase()) ||
+    assistantText.toLowerCase().includes("advisor")
+  ) {
+    candidates.push(`What should I ask ${advisorFirst}?`);
+  }
+  candidates.push(...suggestionsFromDashboard(dashboard));
+  return compactSuggestions(candidates);
+};
+
+const advisorHandoffPrompt = (
+  message: ChatMessage,
+  advisorName: string | undefined,
+  action: "message" | "schedule",
+): string => {
+  const advisorFirst = advisorName?.split(" ")[0] ?? "my advisor";
+  const sources = message.sources.length ? message.sources.join(", ") : "the conversation";
+  const answer = message.text.trim().replace(/\s+/g, " ").slice(0, 900);
+  if (action === "schedule") {
+    return [
+      `Help me prepare a short agenda for a meeting with ${advisorFirst} about this.`,
+      `Use the sources: ${sources}.`,
+      "Include the decision to review, the key numbers or trade-offs, and the questions I should ask.",
+      "Keep it advisor-prep language, not instructions to trade or make a final tax decision.",
+      `Context from the assistant answer: ${answer}`,
+    ].join(" ");
+  }
+  return [
+    `Draft a concise message I can send to ${advisorFirst} about this.`,
+    `Use the sources: ${sources}.`,
+    "Include the specific concern, what needs review, and the next question for my advisor.",
+    "Do not make it sound generic, and do not tell anyone to place a trade.",
+    `Context from the assistant answer: ${answer}`,
+  ].join(" ");
+};
 
 export function ChatScreen() {
   const app = useApp();
@@ -81,6 +196,7 @@ export function ChatScreen() {
       const last = msgs[msgs.length - 1];
       if (!last || last.role !== "assistant") return msgs;
       const updated = { ...last };
+      const latestUserText = [...msgs].reverse().find((m) => m.role === "user")?.text ?? "";
       switch (event.kind) {
         case "tool_start":
           updated.chips = [
@@ -98,7 +214,14 @@ export function ChatScreen() {
           break;
         case "done":
           updated.sources = event.sources;
-          updated.suggested = event.suggested;
+          updated.suggested = dynamicSuggestions({
+            suggested: event.suggested,
+            latestUserText,
+            assistantText: updated.text,
+            sources: event.sources,
+            dashboard: app.dashboard,
+          });
+          updated.quality = event.quality;
           updated.isStreaming = false;
           break;
         case "error":
@@ -121,7 +244,8 @@ export function ChatScreen() {
       newMessage({ role: "assistant", text: "", chips: [], sources: [], isStreaming: true }),
     ]);
 
-    for await (const event of app.api.chat(app.clientId, app.session, text)) {
+    const conversationId = `${app.clientId}:${app.session}`;
+    for await (const event of app.api.chat(app.clientId, app.session, text, conversationId)) {
       applyEvent(event);
     }
     app.setChatMessages((msgs) => {
@@ -133,6 +257,26 @@ export function ChatScreen() {
       ];
     });
     setSending(false);
+  };
+
+  const sendFeedback = async (message: ChatMessage, rating: "positive" | "negative") => {
+    const conversationId = `${app.clientId}:${app.session}`;
+    app.setChatMessages((msgs) =>
+      msgs.map((m) => (m.id === message.id ? { ...m, feedback: rating } : m)),
+    );
+    try {
+      await app.api.sendFeedback({
+        clientId: app.clientId,
+        conversationId,
+        messageId: message.id,
+        rating,
+        sources: message.sources,
+        toolCalls: message.chips.map((chip) => chip.name),
+        suggestions: message.suggested ?? [],
+        answerPreview: message.text.slice(0, 500),
+        quality: message.quality,
+      });
+    } catch {}
   };
 
   return (
@@ -153,7 +297,15 @@ export function ChatScreen() {
           <View style={styles.sessionLine} />
         </View>
         {app.chatMessages.map((message) => (
-          <ChatMessageView key={message.id} message={message} />
+          <ChatMessageView
+            key={message.id}
+            message={message}
+            onFeedback={sendFeedback}
+            handoffDisabled={sending}
+            onAdvisorHandoff={(assistantMessage, action) =>
+              send(advisorHandoffPrompt(assistantMessage, app.dashboard?.advisor?.name, action))
+            }
+          />
         ))}
         <SuggestionChips messages={app.chatMessages} sending={sending} onPick={send} />
       </ScrollView>

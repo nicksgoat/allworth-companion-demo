@@ -90,7 +90,7 @@ def _get_connection_string() -> str:
 
 def is_available() -> bool:
     """Check if Synapse credentials are configured."""
-    return bool(_SERVER)
+    return bool(os.environ.get("SYNAPSE_SERVER", ""))
 
 
 def _connect() -> pyodbc.Connection:

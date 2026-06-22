@@ -12,6 +12,7 @@ from typing import Any
 from allworth_api.data.seed import seed
 
 DEFAULT_MODEL_ID = "AWF - Core-Satellite - 60/40"
+DEFAULT_MODEL_VERSION = "mock-core-satellite-2026-06"
 MODEL_ALIASES = {
     "growth_income_60_40": DEFAULT_MODEL_ID,
     "core_satellite_60_40": DEFAULT_MODEL_ID,
@@ -57,9 +58,12 @@ def get_portfolio(user_id: str) -> dict[str, Any]:
 
 
 def get_default_rebalance_holdings(user_id: str, account_id: str | None = None) -> list[dict[str, Any]]:
-    """Return mock taxable holdings with lot-level gain metadata for rebalancing.
+    """Return rolled-up mock holdings with aggregate gain metadata.
 
-    Production should back this with current holdings plus lot/cost-basis data.
+    Production should back this with current holdings plus aggregate cost-basis
+    and long/short unrealized gain buckets. The rebalancer does not require
+    lot-level data. If lot-level data becomes available later, `compute.rebalance`
+    already has an optional adapter that normalizes `tax_lots` into tax buckets.
     The target model metadata mirrors `tho.model_list`, and model weights mirror
     `tho.Asset_Allocation_Security_Weights`.
     """
@@ -72,43 +76,51 @@ def get_default_rebalance_holdings(user_id: str, account_id: str | None = None) 
         if position["symbol"] != "CASH"
         and (account_id is None or position.get("accountId") == account_id)
     ]
-    lots_by_position: dict[tuple[str, str], list[dict[str, Any]]] = {}
-    for lot in seed["taxLots"]:
-        if account_id is not None and lot.get("accountId") != account_id:
-            continue
-        lots_by_position.setdefault((lot["accountId"], lot["symbol"]), []).append(lot)
-
-    holdings = []
+    holdings_by_ticker: dict[str, dict[str, Any]] = {}
     for position in positions:
-        lots = lots_by_position.get((position["accountId"], position["symbol"]), [])
-        if lots:
-            holdings.append(
-                {
-                    "ticker": position["symbol"],
-                    "account_id": position["accountId"],
-                    "value": float(position["value"]),
-                    "lots": [
-                        {
-                            "lot_id": lot["id"],
-                            "value": round(float(lot["qty"]) * float(position["price"]), 2),
-                            "cost_basis": round(float(lot["qty"]) * float(lot["costPerShare"]), 2),
-                            "gain_term": lot.get("term", "long"),
-                        }
-                        for lot in lots
-                    ],
-                }
+        ticker = position["symbol"]
+        holding = holdings_by_ticker.setdefault(
+            ticker,
+            {
+                "ticker": ticker,
+                "value": 0.0,
+                "cost_basis": 0.0,
+                "cost_basis_ratio": 0.0,
+                "long_term_value": 0.0,
+                "long_term_cost_basis": 0.0,
+                "long_term_unrealized_gain": 0.0,
+                "short_term_value": 0.0,
+                "short_term_cost_basis": 0.0,
+                "short_term_unrealized_gain": 0.0,
+            },
+        )
+        holding["value"] += float(position["value"])
+        cost_basis = position.get("costBasis")
+        if cost_basis is not None:
+            holding["cost_basis"] += float(cost_basis)
+            holding["long_term_value"] += float(position.get("longTermValue", 0) or 0)
+            holding["long_term_cost_basis"] += float(position.get("longTermCostBasis", 0) or 0)
+            holding["long_term_unrealized_gain"] += float(
+                position.get("longTermUnrealizedGain", 0) or 0
+            )
+            holding["short_term_value"] += float(position.get("shortTermValue", 0) or 0)
+            holding["short_term_cost_basis"] += float(position.get("shortTermCostBasis", 0) or 0)
+            holding["short_term_unrealized_gain"] += float(
+                position.get("shortTermUnrealizedGain", 0) or 0
             )
             continue
-        holdings.append(
-            {
-                "ticker": position["symbol"],
-                "account_id": position["accountId"],
-                "value": float(position["value"]),
-                "cost_basis": float(position["value"]),
-                "gain_term": "long",
-            }
-        )
-    return holdings
+        holding["cost_basis"] += float(position["value"])
+        holding["long_term_value"] += float(position["value"])
+        holding["long_term_cost_basis"] += float(position["value"])
+
+    for holding in holdings_by_ticker.values():
+        if holding["value"]:
+            holding["cost_basis_ratio"] = holding["cost_basis"] / holding["value"]
+
+    return [
+        {key: round(value, 2) if isinstance(value, float) else value for key, value in holding.items()}
+        for holding in sorted(holdings_by_ticker.values(), key=lambda h: h["ticker"])
+    ]
 
 
 def get_model_allocation(model_id: str) -> dict[str, Any]:
@@ -139,6 +151,7 @@ def get_model_allocation(model_id: str) -> dict[str, Any]:
             "model_type": model["model_type"],
             "portfolio_allocation": model["portfolio_allocation"],
             "allocation": model["allocation"],
+            "model_version": model.get("model_version", DEFAULT_MODEL_VERSION),
             "source_table": source_tables.get("modelList", "tho.model_list"),
         },
         "target_allocation": target_allocation,

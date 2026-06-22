@@ -2,6 +2,7 @@
 # Allworth demo — one command runs everything: FastAPI backend + the app.
 #
 #   ./demo.sh --web      backend + web app in your browser (http://localhost:8081) — demo target
+#   ./demo.sh --web --fake-redis  same, with local fake Redis chat memory
 #   ./demo.sh            backend + iOS app (Debug build, Metro attached)
 #   ./demo.sh --release  backend + iOS app (Release build, no Metro)
 #   ./demo.sh --android  backend + Android app (Debug build, Metro attached)
@@ -13,6 +14,7 @@ APP_DIR="$ROOT/frontend"
 LOG=/tmp/allworth-backend.log
 
 CONFIG="Debug"
+USE_FAKE_REDIS=false
 # Default to web on non-Mac (Linux/Windows) since Xcode is unavailable.
 if [[ "$(uname)" == "Darwin" ]]; then
   PLATFORM="ios"
@@ -24,7 +26,8 @@ for arg in "$@"; do
     --release) CONFIG="Release" ;;
     --android) PLATFORM="android" ;;
     --web) PLATFORM="web" ;;
-    *) echo "Unknown option: $arg (use --web, --android, and/or --release)"; exit 1 ;;
+    --fake-redis) USE_FAKE_REDIS=true ;;
+    *) echo "Unknown option: $arg (use --web, --android, --release, and/or --fake-redis)"; exit 1 ;;
   esac
 done
 
@@ -71,7 +74,11 @@ if curl -sf -m 1 http://localhost:3000/api/health >/dev/null 2>&1; then
   echo "Backend already running on :3000 — reusing it."
 else
   echo "Starting backend (log: $LOG)…"
-  "$ROOT/run.sh" >"$LOG" 2>&1 &
+  if [ "$USE_FAKE_REDIS" = "true" ]; then
+    USE_FAKE_REDIS=true "$ROOT/run.sh" >"$LOG" 2>&1 &
+  else
+    "$ROOT/run.sh" >"$LOG" 2>&1 &
+  fi
   BACKEND_PID=$!
   for _ in $(seq 1 30); do
     curl -sf -m 1 http://localhost:3000/api/health >/dev/null 2>&1 && break

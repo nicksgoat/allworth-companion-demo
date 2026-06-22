@@ -2,10 +2,12 @@
   "name": "allworth-mobile-app",
   "private": true,
   "version": "0.1.0",
+  "homepage": ".",
   "type": "module",
   "scripts": {
     "test:api": "cd backend && uv run --with pytest --with httpx python -m pytest tests",
     "test:all": "./scripts/test.sh",
+    "quality:app": "./scripts/quality-loop.sh",
     "dev:api": "./scripts/dev-api.sh",
     "dev:mobile": "./scripts/dev-mobile.sh",
     "start:all:win": "powershell -ExecutionPolicy Bypass -File ./scripts/start-all.ps1",

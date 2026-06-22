@@ -70,17 +70,18 @@
         "email": "maya@example.com",
         "age": 58,
         "city": "Plano, TX",
-        "advisorId": "dana",
+        "advisorId": "nicole",
         "bio": "Recently semi-retired consultant; lives partly off portfolio income.",
         "avatarInitials": "MT"
       }
     ],
     "advisors": [
       {
-        "id": "dana",
-        "name": "Dana Whitfield",
+        "id": "nicole",
+        "name": "Nicole Mayer",
+        "email": "Nicole.Mayer@allworthfinancial.com",
         "title": "Senior Financial Advisor, CFP\u00ae",
-        "avatarInitials": "DW"
+        "avatarInitials": "NM"
       }
     ]
   },
@@ -320,7 +321,16 @@
       "qty": 800,
       "price": 213,
       "assetClass": "us_equity",
-      "value": 170400
+      "value": 170400,
+      "averageCostBasis": 98.95,
+      "costBasis": 79160,
+      "unrealizedGain": 91240,
+      "longTermValue": 149100,
+      "longTermCostBasis": 56160,
+      "longTermUnrealizedGain": 92940,
+      "shortTermValue": 21300,
+      "shortTermCostBasis": 23000,
+      "shortTermUnrealizedGain": -1700
     },
     {
       "accountId": "acct_trust",
@@ -329,7 +339,16 @@
       "qty": 1640,
       "price": 295,
       "assetClass": "us_equity",
-      "value": 483800
+      "value": 483800,
+      "averageCostBasis": 226.33,
+      "costBasis": 371185,
+      "unrealizedGain": 112615,
+      "longTermValue": 454300,
+      "longTermCostBasis": 343185,
+      "longTermUnrealizedGain": 111115,
+      "shortTermValue": 29500,
+      "shortTermCostBasis": 28000,
+      "shortTermUnrealizedGain": 1500
     },
     {
       "accountId": "acct_trust",
@@ -338,7 +357,16 @@
       "qty": 2520,
       "price": 64.5,
       "assetClass": "intl_equity",
-      "value": 162540
+      "value": 162540,
+      "averageCostBasis": 55.1,
+      "costBasis": 138852,
+      "unrealizedGain": 23688,
+      "longTermValue": 162540,
+      "longTermCostBasis": 138852,
+      "longTermUnrealizedGain": 23688,
+      "shortTermValue": 0,
+      "shortTermCostBasis": 0,
+      "shortTermUnrealizedGain": 0
     },
     {
       "accountId": "acct_trust",
@@ -347,7 +375,16 @@
       "qty": 6470,
       "price": 51.2,
       "assetClass": "muni_bond",
-      "value": 331264
+      "value": 331264,
+      "averageCostBasis": 49.85,
+      "costBasis": 322530,
+      "unrealizedGain": 8734,
+      "longTermValue": 331264,
+      "longTermCostBasis": 322530,
+      "longTermUnrealizedGain": 8734,
+      "shortTermValue": 0,
+      "shortTermCostBasis": 0,
+      "shortTermUnrealizedGain": 0
     },
     {
       "accountId": "acct_trust",
@@ -356,7 +393,16 @@
       "qty": 2280,
       "price": 73.4,
       "assetClass": "bond",
-      "value": 167352
+      "value": 167352,
+      "averageCostBasis": 74.95,
+      "costBasis": 170886,
+      "unrealizedGain": -3534,
+      "longTermValue": 167352,
+      "longTermCostBasis": 170886,
+      "longTermUnrealizedGain": -3534,
+      "shortTermValue": 0,
+      "shortTermCostBasis": 0,
+      "shortTermUnrealizedGain": 0
     },
     {
       "accountId": "acct_trust",
@@ -428,7 +474,16 @@
       "qty": 310,
       "price": 168,
       "assetClass": "us_equity",
-      "value": 52080
+      "value": 52080,
+      "averageCostBasis": 43.46,
+      "costBasis": 13472,
+      "unrealizedGain": 38608,
+      "longTermValue": 40320,
+      "longTermCostBasis": 5184,
+      "longTermUnrealizedGain": 35136,
+      "shortTermValue": 11760,
+      "shortTermCostBasis": 8288,
+      "shortTermUnrealizedGain": 3472
     },
     {
       "accountId": "acct_rh",
@@ -437,7 +492,16 @@
       "qty": 95,
       "price": 262,
       "assetClass": "us_equity",
-      "value": 24890
+      "value": 24890,
+      "averageCostBasis": 58.2,
+      "costBasis": 5529,
+      "unrealizedGain": 19361,
+      "longTermValue": 24890,
+      "longTermCostBasis": 5529,
+      "longTermUnrealizedGain": 19361,
+      "shortTermValue": 0,
+      "shortTermCostBasis": 0,
+      "shortTermUnrealizedGain": 0
     },
     {
       "accountId": "acct_rh",
@@ -446,7 +510,16 @@
       "qty": 152,
       "price": 124,
       "assetClass": "us_equity",
-      "value": 18848
+      "value": 18848,
+      "averageCostBasis": 9.85,
+      "costBasis": 1497,
+      "unrealizedGain": 17351,
+      "longTermValue": 18848,
+      "longTermCostBasis": 1497,
+      "longTermUnrealizedGain": 17351,
+      "shortTermValue": 0,
+      "shortTermCostBasis": 0,
+      "shortTermUnrealizedGain": 0
     },
     {
       "accountId": "acct_rh",
@@ -456,116 +529,6 @@
       "price": 182,
       "assetClass": "cash",
       "value": 182
-    }
-  ],
-  "taxLots": [
-    {
-      "id": "lot_aapl_a",
-      "accountId": "acct_trust",
-      "symbol": "AAPL",
-      "qty": 400,
-      "costPerShare": 27.4,
-      "acquired": "2015-03-12",
-      "term": "long"
-    },
-    {
-      "id": "lot_aapl_b",
-      "accountId": "acct_trust",
-      "symbol": "AAPL",
-      "qty": 250,
-      "costPerShare": 132.05,
-      "acquired": "2021-09-08",
-      "term": "long"
-    },
-    {
-      "id": "lot_aapl_c",
-      "accountId": "acct_trust",
-      "symbol": "AAPL",
-      "qty": 150,
-      "costPerShare": 187.9,
-      "acquired": "2024-11-21",
-      "term": "long"
-    },
-    {
-      "id": "lot_vti_t1",
-      "accountId": "acct_trust",
-      "symbol": "VTI",
-      "qty": 1100,
-      "costPerShare": 201.3,
-      "acquired": "2019-06-14",
-      "term": "long"
-    },
-    {
-      "id": "lot_vti_t2",
-      "accountId": "acct_trust",
-      "symbol": "VTI",
-      "qty": 540,
-      "costPerShare": 262.75,
-      "acquired": "2024-02-09",
-      "term": "long"
-    },
-    {
-      "id": "lot_vxus_t",
-      "accountId": "acct_trust",
-      "symbol": "VXUS",
-      "qty": 2520,
-      "costPerShare": 55.1,
-      "acquired": "2020-10-02",
-      "term": "long"
-    },
-    {
-      "id": "lot_vteb_t",
-      "accountId": "acct_trust",
-      "symbol": "VTEB",
-      "qty": 6470,
-      "costPerShare": 49.85,
-      "acquired": "2021-04-16",
-      "term": "long"
-    },
-    {
-      "id": "lot_bnd_t",
-      "accountId": "acct_trust",
-      "symbol": "BND",
-      "qty": 2280,
-      "costPerShare": 74.95,
-      "acquired": "2022-01-20",
-      "term": "long"
-    },
-    {
-      "id": "lot_nvda_1",
-      "accountId": "acct_rh",
-      "symbol": "NVDA",
-      "qty": 240,
-      "costPerShare": 21.6,
-      "acquired": "2019-08-05",
-      "term": "long"
-    },
-    {
-      "id": "lot_nvda_2",
-      "accountId": "acct_rh",
-      "symbol": "NVDA",
-      "qty": 70,
-      "costPerShare": 118.4,
-      "acquired": "2025-10-12",
-      "term": "short"
-    },
-    {
-      "id": "lot_tsla_1",
-      "accountId": "acct_rh",
-      "symbol": "TSLA",
-      "qty": 95,
-      "costPerShare": 58.2,
-      "acquired": "2019-12-18",
-      "term": "long"
-    },
-    {
-      "id": "lot_pltr_1",
-      "accountId": "acct_rh",
-      "symbol": "PLTR",
-      "qty": 152,
-      "costPerShare": 9.85,
-      "acquired": "2020-10-01",
-      "term": "long"
     }
   ],
   "plan": {

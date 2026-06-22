@@ -1,32 +1,28 @@
 # Documentation Index
 
-This folder is the working handbook for the Allworth mobile planning application.
+This folder is the working handbook for the Allworth AI mobile planning
+application.
 
-> **Note:** These docs describe the target platform design and roadmap. The June 22 demo implementation lives in `app/` (React Native client + Node backend); references to `apps/mobile` and `services/api` describe the prototype these docs were authored against.
+Start here:
 
-## Product And App
+- [Allworth AI App Canonical Specification](ALLWORTH_AI_APP_CANONICAL.md):
+  consolidated source of truth for product vision, current architecture, GPT-4o
+  usage, provider-neutral LLM design, tool schemas, memory, safety, deployment,
+  testing, and roadmap.
 
-- [App Design](APP_DESIGN.md): current app map, UX principles, screen requirements, local development, and production roadmap.
-- [Product Brief](PRODUCT_BRIEF.md): product thesis, target users, core jobs, and experience principles.
-- [Frontend](FRONTEND.md): Expo app structure, screen responsibilities, state flow, styling approach, and refactor plan.
+The older standalone product vision has been merged into the canonical
+specification so there is one source of truth.
 
-## Backend And Data
+## Current References
 
-- [Backend API](BACKEND_API.md): FastAPI routes, orchestration, tool adapter, endpoint behavior, and future service boundaries.
-- [Data Contracts](DATA_CONTRACTS.md): mobile/backend payloads, household profile, portfolio positions, tool results, and versioning guidance.
-- [Testing And Operations](TESTING_OPERATIONS.md): setup, run commands, test strategy, preview modes, and operational notes.
+- [Financial Tools](FINANCIAL_TOOLS.md): exact `simulate` and `rebalance`
+  schemas, deterministic behavior, model data mapping, and tax calculations.
+- [Redis Chat Memory](REDIS_CHAT_MEMORY.md): Redis-backed short-term
+  conversation memory for the LLM.
+- [Testing And Operations](TESTING_OPERATIONS.md): setup, run commands, test
+  strategy, preview modes, and GPT-4o / Azure OpenAI deployment notes.
 
-## Intelligence Layer
-
-- [LLM Chat Plan](LLM_CHAT_PLAN.md): hybrid LLM architecture, prompt responsibilities, model modes, and rollout steps.
-- [MCP And Plugin Integration](MCP_INTEGRATION.md): how sanctioned MCP connectors, existing plugin modules, and future production tools should fit.
-- [Client Intelligence Layer](CLIENT_INTELLIGENCE_LAYER.md): governed memory, self-improving loops, profile facts, and advisor briefs.
-
-## Governance
-
-- [Safety And Compliance](SAFETY_COMPLIANCE.md): financial safety boundaries, audit trail, advice limits, and controls.
-- [Roadmap](ROADMAP.md): phased delivery plan from prototype to production.
-
-## Existing Architecture
-
-- [Architecture](ARCHITECTURE.md): high-level frontend/backend/tool-adapter sketch.
+The old scattered planning docs were removed after consolidation. If a product,
+architecture, roadmap, safety, MCP, memory, data-contract, or frontend question
+is not answered by one of the current references above, use the canonical
+specification and current source code as authoritative.

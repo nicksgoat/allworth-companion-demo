@@ -1,13 +1,20 @@
 """Rule-based nudge engine. Deterministic — no LLM involved."""
 
 from allworth_api.core.formatting import fmt_usd, js_round
+from allworth_api.data.advisors import advisor_first_name_for_client
 from allworth_api.data.seed import portfolio_for, seed, spending_summary
 
 FUNDS = {"VTI", "VXUS", "VTEB", "BND", "FXAIX", "FSPSX", "FXNAX", "SPAXX"}
 
 
-def build_nudges(spending: dict, positions: list[dict], accounts: list[dict]) -> list[dict]:
+def build_nudges(
+    spending: dict,
+    positions: list[dict],
+    accounts: list[dict],
+    advisor_first_name: str = "your advisor",
+) -> list[dict]:
     nudges = []
+    advisor_cta = f"Discuss with {advisor_first_name}"
 
     s = spending
     if s["avg3mo"] > s["plan"] * 1.15:
@@ -24,7 +31,7 @@ def build_nudges(spending: dict, positions: list[dict], accounts: list[dict]) ->
                     f"checking what it means for the lake house timeline."
                 ),
                 "cta": "Ask me what this means",
-                "advisorCta": "Discuss with Dana",
+                "advisorCta": advisor_cta,
                 "severity": "attention",
             }
         )
@@ -60,7 +67,7 @@ def build_nudges(spending: dict, positions: list[dict], accounts: list[dict]) ->
                             f"to reduce concentration over time — some more tax-aware than others."
                         ),
                         "cta": "Ask me about my options",
-                        "advisorCta": "Discuss with Dana",
+                        "advisorCta": advisor_cta,
                         "severity": "info",
                     }
                 )
@@ -69,4 +76,9 @@ def build_nudges(spending: dict, positions: list[dict], accounts: list[dict]) ->
 
 
 def nudges_for(client_id: str) -> list[dict]:
-    return build_nudges(spending_summary(3), portfolio_for()["positions"], seed["accounts"])
+    return build_nudges(
+        spending_summary(3),
+        portfolio_for()["positions"],
+        seed["accounts"],
+        advisor_first_name_for_client(client_id),
+    )

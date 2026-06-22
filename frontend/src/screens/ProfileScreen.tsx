@@ -66,7 +66,7 @@ export function ProfileScreen() {
   };
 
   const messageAdvisor = () => {
-    const first = advisor?.name?.split(" ")[0] ?? "Dana";
+    const first = advisor?.name?.split(" ")[0] ?? "my advisor";
     app.setChatPrefill(`Can you have ${first} reach out to me?`);
     app.setSelectedTab("chat");
   };

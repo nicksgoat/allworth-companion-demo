@@ -4,6 +4,7 @@ import type {
   AdvisorBrief,
   BookResponse,
   ChatEvent,
+  ChatMessage,
   Dashboard,
   Portfolio,
   ProactiveResponse,
@@ -103,8 +104,34 @@ export class ApiClient {
     });
   }
 
+  async sendFeedback(args: {
+    clientId: string;
+    conversationId: string;
+    messageId: string;
+    rating: "positive" | "negative";
+    sources: string[];
+    toolCalls: string[];
+    suggestions?: string[];
+    answerPreview?: string;
+    quality?: ChatMessage["quality"];
+  }): Promise<void> {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (this.token) headers["Authorization"] = `Bearer ${this.token}`;
+    const res = await fetch(this.baseURL + "/api/chat/feedback", {
+      method: "POST",
+      headers,
+      body: JSON.stringify(args),
+    });
+    if (!res.ok) throw new Error(`POST feedback -> ${res.status}`);
+  }
+
   // SSE chat — expo/fetch supports response body streaming (RN fetch does not)
-  async *chat(clientId: string, session: string, message: string): AsyncGenerator<ChatEvent> {
+  async *chat(
+    clientId: string,
+    session: string,
+    message: string,
+    conversationId?: string,
+  ): AsyncGenerator<ChatEvent> {
     let res;
     try {
       const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -112,7 +139,7 @@ export class ApiClient {
       res = await expoFetch(this.baseURL + "/api/chat", {
         method: "POST",
         headers,
-        body: JSON.stringify({ clientId, session, message }),
+        body: JSON.stringify({ clientId, session, message, conversationId }),
       });
     } catch {
       yield { kind: "error", message: "Couldn't reach the assistant. Is the backend running?" };
@@ -172,6 +199,7 @@ function parseEvent(event: string, json: string): ChatEvent | null {
         kind: "done",
         sources: obj.sources ?? [],
         suggested: obj.suggested ?? [],
+        quality: obj.quality,
       };
     case "error":
       return { kind: "error", message: obj.message ?? "Something went wrong." };

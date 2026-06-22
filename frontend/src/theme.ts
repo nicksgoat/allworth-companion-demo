@@ -1,3 +1,5 @@
+import { Platform } from "react-native";
+
 // All values from ALW001_01_Brand_Dashboard_DEC2024.pdf (the brand source of truth)
 export const colors = {
   // Primary palette (p.7)
@@ -56,11 +58,16 @@ export const card = {
   // reads as a clean lift on iOS rather than a muddy navy band under the card.
   borderWidth: 1,
   borderColor: "rgba(23,61,103,0.05)",
-  shadowColor: "#0C2E4E",
-  shadowOpacity: 0.05,
-  shadowRadius: 8,
-  shadowOffset: { width: 0, height: 2 },
-  elevation: 2,
+  ...Platform.select({
+    web: { boxShadow: "0 2px 8px rgba(12, 46, 78, 0.05)" },
+    default: {
+      shadowColor: "#0C2E4E",
+      shadowOpacity: 0.05,
+      shadowRadius: 8,
+      shadowOffset: { width: 0, height: 2 },
+      elevation: 2,
+    },
+  }),
 } as const;
 
 export const sectionHeader = {

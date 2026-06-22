@@ -55,7 +55,7 @@ function DonutChart({
   const offsets = segLens.map((_, i) => segLens.slice(0, i).reduce((a, b) => a + b, 0));
   return (
     <Svg width={size} height={size}>
-      <G rotation={-90} originX={size / 2} originY={size / 2}>
+      <G transform={`rotate(-90 ${size / 2} ${size / 2})`}>
         {segments.map((seg, i) => {
           const segLen = segLens[i];
           const offset = offsets[i];

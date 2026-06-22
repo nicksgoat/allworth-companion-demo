@@ -14,7 +14,7 @@ import { useApp } from "../state";
 import { colors, fonts, shortDate } from "../theme";
 import type { LearnedFact } from "../types";
 
-// Governed memory (docs/CLIENT_INTELLIGENCE_LAYER.md): every fact answers
+// Governed memory (docs/ALLWORTH_AI_APP_CANONICAL.md): every fact answers
 // "Why do you know this?" and supports "Forget this detail".
 export function FactDetailSheet({
   fact,

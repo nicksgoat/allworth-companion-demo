@@ -14,7 +14,7 @@ from allworth_api.core.formatting import fmt_usd
 from allworth_api.core.memory import active_facts, add_facts, profile_as_context
 from allworth_api.core.nudges import nudges_for
 from allworth_api.core.tax import simulate_tax_impact
-from allworth_api.data.seed import accounts_for, seed, spending_summary
+from allworth_api.data.seed import accounts_for, portfolio_for, seed, spending_summary
 from allworth_api.financial_tools.data import get_portfolio as get_layered_portfolio
 
 ToolHandler = Callable[[dict[str, Any], str], dict[str, Any]]
@@ -75,12 +75,12 @@ def _update_client_profile(tool_input: dict[str, Any], client_id: str) -> dict[s
 
 
 def _simulate_tax_impact(tool_input: dict[str, Any], _client_id: str) -> dict[str, Any]:
+    portfolio = portfolio_for()
     return simulate_tax_impact(
         tool_input.get("amount"),
         tool_input.get("accountId"),
         tool_input.get("symbol"),
-        positions=seed["positions"],
-        tax_lots=seed["taxLots"],
+        positions=portfolio["positions"],
     )
 
 

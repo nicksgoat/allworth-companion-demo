@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Animated, StyleSheet, Text, View } from "react-native";
+import { Animated, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { FadeScaleIn, usePulse } from "../anim";
 import { colors, fonts } from "../theme";
 import type { ChatMessage, ToolChip } from "../types";
@@ -99,7 +99,7 @@ function renderBold(text: string): React.ReactNode[] {
 
 function MarkdownText({ text, streaming }: { text: string; streaming: boolean }) {
   return (
-    <Text style={styles.assistantText}>
+    <Text style={[styles.assistantText, webTextWrap]}>
       {renderBold(text)}
       {streaming ? <TypingCursor /> : null}
     </Text>
@@ -117,18 +117,28 @@ function AssistantIdentity() {
   );
 }
 
-export function ChatMessageView({ message }: { message: ChatMessage }) {
+export function ChatMessageView({
+  message,
+  onFeedback,
+  onAdvisorHandoff,
+  handoffDisabled,
+}: {
+  message: ChatMessage;
+  onFeedback?: (message: ChatMessage, rating: "positive" | "negative") => void;
+  onAdvisorHandoff?: (message: ChatMessage, action: "message" | "schedule") => void;
+  handoffDisabled?: boolean;
+}) {
   if (message.role === "user") {
     return (
       <View style={styles.userRow}>
         <View style={styles.userBubble}>
-          <Text style={styles.userText}>{message.text}</Text>
+          <Text style={[styles.userText, webTextWrap]}>{message.text}</Text>
         </View>
       </View>
     );
   }
   return (
-    <View style={{ gap: 10 }}>
+    <View style={styles.assistantBlock}>
       <AssistantIdentity />
       <ToolChipRow
         chips={message.chips}
@@ -138,16 +148,67 @@ export function ChatMessageView({ message }: { message: ChatMessage }) {
       {message.text ? <MarkdownText text={message.text} streaming={message.isStreaming} /> : null}
       {!message.isStreaming && message.sources.length > 0 ? (
         <View style={{ paddingTop: 4 }}>
-          <AdvisorHandoffCard />
+          <AdvisorHandoffCard
+            disabled={handoffDisabled}
+            onMessage={() => onAdvisorHandoff?.(message, "message")}
+            onSchedule={() => onAdvisorHandoff?.(message, "schedule")}
+          />
+        </View>
+      ) : null}
+      {!message.isStreaming && message.text ? (
+        <View style={styles.feedbackRow}>
+          <Text style={styles.feedbackLabel}>Was this helpful?</Text>
+          <Pressable
+            onPress={() => onFeedback?.(message, "positive")}
+            style={[
+              styles.feedbackButton,
+              message.feedback === "positive" && styles.feedbackButtonSelected,
+            ]}
+          >
+            <Ionicons
+              name="thumbs-up-outline"
+              size={14}
+              color={message.feedback === "positive" ? colors.allworthAccent : colors.inkTertiary}
+            />
+          </Pressable>
+          <Pressable
+            onPress={() => onFeedback?.(message, "negative")}
+            style={[
+              styles.feedbackButton,
+              message.feedback === "negative" && styles.feedbackButtonSelected,
+            ]}
+          >
+            <Ionicons
+              name="thumbs-down-outline"
+              size={14}
+              color={message.feedback === "negative" ? colors.allworthAccent : colors.inkTertiary}
+            />
+          </Pressable>
         </View>
       ) : null}
     </View>
   );
 }
 
+const webTextWrap =
+  Platform.OS === "web"
+    ? ({
+        whiteSpace: "pre-wrap",
+        overflowWrap: "break-word",
+        wordBreak: "break-word",
+      } as any)
+    : null;
+
 const styles = StyleSheet.create({
   sourcesRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-  sourcesText: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkTertiary, flex: 1 },
+  sourcesText: {
+    fontSize: 13,
+    fontFamily: fonts.sans,
+    color: colors.inkTertiary,
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
+  },
   chipFlow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   chip: {
     flexDirection: "row",
@@ -160,15 +221,39 @@ const styles = StyleSheet.create({
   },
   chipText: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary },
   thinkingDot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: colors.allworthAccent },
-  userRow: { flexDirection: "row", justifyContent: "flex-end", paddingLeft: 48 },
+  userRow: { flexDirection: "row", justifyContent: "flex-end", paddingLeft: 48, maxWidth: "100%" },
   userBubble: {
     backgroundColor: colors.inkFaint,
     borderRadius: 16,
     paddingHorizontal: 14,
     paddingVertical: 10,
+    maxWidth: "100%",
+    flexShrink: 1,
   },
-  userText: { fontSize: 17, fontFamily: fonts.sans, color: colors.inkPrimary },
-  assistantText: { fontSize: 17, fontFamily: fonts.sans, color: colors.inkPrimary, lineHeight: 24 },
+  userText: {
+    fontSize: 17,
+    fontFamily: fonts.sans,
+    color: colors.inkPrimary,
+    flexShrink: 1,
+    minWidth: 0,
+  },
+  assistantBlock: {
+    gap: 10,
+    alignSelf: "stretch",
+    maxWidth: "100%",
+    flexShrink: 1,
+    minWidth: 0,
+  },
+  assistantText: {
+    fontSize: 17,
+    fontFamily: fonts.sans,
+    color: colors.inkPrimary,
+    lineHeight: 24,
+    alignSelf: "stretch",
+    maxWidth: "100%",
+    flexShrink: 1,
+    minWidth: 0,
+  },
   identityRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   avatar: {
     width: 22,
@@ -180,4 +265,15 @@ const styles = StyleSheet.create({
   },
   avatarText: { fontSize: 12, fontFamily: fonts.sansBold, color: "#FFFFFF" },
   identityName: { fontSize: 13, fontFamily: fonts.sansBold, color: colors.inkSecondary },
+  feedbackRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  feedbackLabel: { fontSize: 12, fontFamily: fonts.sans, color: colors.inkTertiary },
+  feedbackButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.inkFaint,
+  },
+  feedbackButtonSelected: { borderWidth: 1, borderColor: colors.allworthAccent },
 });

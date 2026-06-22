@@ -1,6 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { Mode, useApp } from "../state";
 import { card, colors, fonts } from "../theme";
 import { SectionHeader } from "../components/Rows";
@@ -141,12 +150,15 @@ const styles = StyleSheet.create({
   segment: { flex: 1, paddingVertical: 7, borderRadius: 7, alignItems: "center" },
   segmentActive: {
     backgroundColor: "#fff",
-    ...{
-      shadowColor: "#000",
-      shadowOpacity: 0.08,
-      shadowRadius: 4,
-      shadowOffset: { width: 0, height: 1 },
-    },
+    ...Platform.select({
+      web: { boxShadow: "0 1px 4px rgba(0, 0, 0, 0.08)" },
+      default: {
+        shadowColor: "#000",
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 1 },
+      },
+    }),
   },
   segmentText: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary },
   segmentTextActive: { color: colors.inkPrimary, fontFamily: fonts.sansBold },

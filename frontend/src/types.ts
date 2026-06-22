@@ -30,6 +30,14 @@ export interface MonthValue {
   value: number;
 }
 
+export interface CashFlow {
+  date: string;
+  amount: number;
+  month?: string;
+  source?: string;
+  label?: string;
+}
+
 export interface Nudge {
   id: string;
   type: string;
@@ -53,6 +61,20 @@ export interface Dashboard {
   advisor: Advisor;
   netWorth: number;
   netWorthHistory: MonthValue[];
+  performanceCashFlows?: CashFlow[];
+  performance?: {
+    netWorth?: {
+      method: string;
+      return: number;
+      ratio: number;
+      return_pct: number;
+      gain_loss: number;
+      inflow: number;
+      outflow: number;
+      net_cash_flow: number;
+      weighted_cash_flow: number;
+    } | null;
+  };
   allworthTotal: number;
   heldAwayTotal: number;
   liabilitiesTotal: number;
@@ -60,6 +82,14 @@ export interface Dashboard {
   spending: { avg3mo: number; plan: number; overPlanPct: number };
   nudges: Nudge[];
   liquidityEvent: LiquidityEvent;
+  dataStatus?: {
+    mode: string;
+    label: string;
+    generatedAt: string;
+    asOf: string;
+    isSynthetic: boolean;
+    isStale: boolean;
+  };
   disclaimer: string;
 }
 
@@ -73,22 +103,20 @@ export interface Position {
   price: number;
   value: number;
   assetClass: AssetClass;
-}
-
-export interface TaxLot {
-  id: string;
-  accountId: string;
-  symbol: string;
-  qty: number;
-  costPerShare: number;
-  acquired: string;
-  term: "long" | "short";
+  averageCostBasis?: number;
+  costBasis?: number;
+  unrealizedGain?: number;
+  longTermValue?: number;
+  longTermCostBasis?: number;
+  longTermUnrealizedGain?: number;
+  shortTermValue?: number;
+  shortTermCostBasis?: number;
+  shortTermUnrealizedGain?: number;
 }
 
 export interface Portfolio {
   positions: Position[];
   byAccount: Record<string, Position[]>;
-  taxLots: TaxLot[];
 }
 
 export interface SpendingMonth {
@@ -151,6 +179,14 @@ export interface AdvisorBrief {
   profile: LearnedFact[];
   liquidityEvent: LiquidityEvent;
   narrative: string;
+  reviewWorkflow?: {
+    status: string;
+    summary: string;
+    decisionsToReview: { id: string; label: string; whyItMatters: string }[];
+    talkingPoints: string[];
+    openQuestions: string[];
+    nextBestAction: string;
+  };
 }
 
 // Chat
@@ -169,11 +205,17 @@ export interface ChatMessage {
   sources: string[];
   isStreaming: boolean;
   suggested?: string[];
+  feedback?: "positive" | "negative";
+  quality?: {
+    vision_score?: number;
+    safety_flags?: string[];
+    missing?: string[];
+  };
 }
 
 export type ChatEvent =
   | { kind: "tool_start"; name: string; label: string }
   | { kind: "tool_end"; name: string }
   | { kind: "text"; delta: string }
-  | { kind: "done"; sources: string[]; suggested: string[] }
+  | { kind: "done"; sources: string[]; suggested: string[]; quality?: ChatMessage["quality"] }
   | { kind: "error"; message: string };
