@@ -24,26 +24,40 @@ def is_configured() -> bool:
 
 
 def reachability_status(timeout_seconds: float = 0.25) -> dict[str, Any]:
-    """Return a fast, non-mutating Redis reachability check for readiness."""
+    """Return a fast, non-mutating Redis reachability check for readiness.
+
+    Parses the URL manually rather than via urlparse: Fly/Upstash passwords can
+    contain characters that make urlparse raise "Invalid IPv6 URL" (the same
+    reason conversation_store._build_redis hand-parses). The whole probe is
+    wrapped so a malformed URL or refused connection degrades to
+    reachable=False instead of raising a 500 from the readiness endpoint.
+    """
     url = redis_url()
     if not url:
         return {"configured": False, "reachable": False, "error": "REDIS_URL is not configured"}
-    parsed = urlparse(url)
-    if parsed.scheme not in {"redis", "rediss"}:
-        return {"configured": True, "reachable": False, "error": "REDIS_URL must start with redis:// or rediss://"}
-    host = parsed.hostname or "localhost"
-    port = parsed.port or 6379
     try:
+        scheme, _, rest = url.partition("://")
+        if scheme not in {"redis", "rediss"}:
+            return {
+                "configured": True,
+                "reachable": False,
+                "error": "REDIS_URL must start with redis:// or rediss://",
+            }
+        _, sep, hostpart = rest.rpartition("@")
+        if not sep:
+            hostpart = rest
+        if "/" in hostpart:
+            hostpart, _, _ = hostpart.partition("/")
+        if ":" in hostpart:
+            host, _, port_str = hostpart.rpartition(":")
+            port = int(port_str) if port_str.isdigit() else 6379
+        else:
+            host, port = hostpart, 6379
+        host = host or "localhost"
         with socket.create_connection((host, port), timeout=timeout_seconds):
             return {"configured": True, "reachable": True, "host": host, "port": port}
-    except OSError as err:
-        return {
-            "configured": True,
-            "reachable": False,
-            "host": host,
-            "port": port,
-            "error": err.__class__.__name__,
-        }
+    except Exception as err:
+        return {"configured": True, "reachable": False, "error": err.__class__.__name__}
 
 
 async def execute(*parts: str | int | float) -> Any:
