@@ -1,9 +1,8 @@
-import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from "react-native";
 import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
 import { useCountUp } from "../anim";
-import { colors, fonts, usd } from "../theme";
+import { colors, fonts, space, usd } from "../theme";
 import type { MonthValue } from "../types";
 import { Sparkline } from "./Sparkline";
 import { AllworthLogo } from "./Wordmark";
@@ -96,15 +95,6 @@ export function NetWorthHero({
       <View style={styles.chart}>
         <Sparkline points={history} lineColor="#FFFFFF" />
       </View>
-
-      <Pressable
-        onPress={onOpenWealth}
-        hitSlop={8}
-        style={({ pressed }) => [styles.link, pressed && { opacity: 0.7 }]}
-      >
-        <Text style={styles.linkText}>View your wealth</Text>
-        <Ionicons name="chevron-forward" size={14} color="rgba(255,255,255,0.9)" />
-      </Pressable>
     </View>
   );
 }
@@ -112,14 +102,19 @@ export function NetWorthHero({
 const styles = StyleSheet.create({
   band: {
     backgroundColor: colors.chartNightBlue,
-    paddingBottom: 20,
+    paddingBottom: space[5],
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     overflow: "hidden",
-    gap: 14,
+    gap: space[4],
   },
-  topRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
-  greetingBlock: { flexShrink: 1, gap: 2 },
+  topRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: space[3],
+  },
+  greetingBlock: { flexShrink: 1, gap: space[1] / 2 },
   salutation: {
     fontSize: 14,
     fontFamily: fonts.sans,
@@ -144,7 +139,5 @@ const styles = StyleSheet.create({
   },
   nwDelta: { fontSize: 15, fontFamily: fonts.sansBold, fontVariant: ["tabular-nums"] },
 
-  chart: { marginTop: 2 },
-  link: { flexDirection: "row", alignItems: "center", gap: 2 },
-  linkText: { fontSize: 14, fontFamily: fonts.sansBold, color: "rgba(255,255,255,0.92)" },
+  chart: { marginTop: space[1] / 2 },
 });

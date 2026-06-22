@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChatMessageView } from "../components/Chat";
 import { DisclaimerFooter } from "../components/Rows";
 import { useApp } from "../state";
-import { card, colors, fonts } from "../theme";
+import { card, colors, fonts, radius, space, text } from "../theme";
 import type { ChatEvent, ChatMessage, Dashboard } from "../types";
 
 let nextId = 1;
@@ -75,7 +75,6 @@ const dynamicSuggestions = ({
 
   const text = `${latestUserText} ${assistantText}`.toLowerCase();
   const candidates: string[] = [];
-  const advisorFirst = dashboard?.advisor?.name?.split(" ")[0] ?? "your advisor";
   if (text.includes("spending") || text.includes("budget") || text.includes("over plan")) {
     candidates.push(
       "What spending level keeps the plan on track?",
@@ -99,12 +98,6 @@ const dynamicSuggestions = ({
   }
   if (sources.includes("Monte Carlo simulation")) {
     candidates.push("What improves the odds the most?", "How bad is the downside case?");
-  }
-  if (
-    assistantText.toLowerCase().includes(advisorFirst.toLowerCase()) ||
-    assistantText.toLowerCase().includes("advisor")
-  ) {
-    candidates.push(`What should I ask ${advisorFirst}?`);
   }
   candidates.push(...suggestionsFromDashboard(dashboard));
   return compactSuggestions(candidates);
@@ -312,7 +305,7 @@ export function ChatScreen() {
     >
       <ScrollView
         ref={scrollRef}
-        contentContainerStyle={{ padding: 20, paddingTop: insets.top + 8, gap: 24 }}
+        contentContainerStyle={{ padding: space[5], paddingTop: insets.top + space[2], gap: space[5] }}
         keyboardDismissMode="interactive"
         scrollEventThrottle={16}
         onScroll={onScroll}
@@ -325,10 +318,11 @@ export function ChatScreen() {
           </Text>
           <View style={styles.sessionLine} />
         </View>
-        {app.chatMessages.map((message) => (
+        {app.chatMessages.map((message, i) => (
           <ChatMessageView
             key={message.id}
             message={message}
+            showIdentity={app.chatMessages[i - 1]?.role !== "assistant"}
             onFeedback={sendFeedback}
             handoffDisabled={sending}
             onAdvisorHandoff={(assistantMessage, action) =>
@@ -393,7 +387,7 @@ function SuggestionChips({
 }
 
 const styles = StyleSheet.create({
-  sessionHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: -8 },
+  sessionHeader: { flexDirection: "row", alignItems: "center", gap: space[3] },
   sessionLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: colors.hairline },
   sessionText: {
     fontSize: 12,
@@ -401,16 +395,18 @@ const styles = StyleSheet.create({
     color: colors.inkTertiary,
     letterSpacing: 0.4,
   },
-  inputArea: { paddingHorizontal: 20, paddingTop: 6, paddingBottom: 10, gap: 8 },
-  suggestRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: -8 },
+  inputArea: { paddingHorizontal: space[5], paddingTop: 6, paddingBottom: space[3], gap: space[2] },
+  // Restrained chips: hairline border, no fill, smaller body type — they assist
+  // the answer rather than compete with the accent-filled handoff action.
+  suggestRow: { flexDirection: "row", flexWrap: "wrap", gap: space[2] },
   suggestChip: {
     borderWidth: 1,
-    borderColor: colors.allworthAccent,
-    borderRadius: 999,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    borderColor: colors.hairline,
+    borderRadius: radius.pill,
+    paddingHorizontal: space[3],
+    paddingVertical: 6,
   },
-  suggestText: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.allworthAccent },
+  suggestText: { ...text.bodySm, color: colors.inkSecondary },
   inputBar: { ...card, flexDirection: "row", alignItems: "center" },
   input: {
     flex: 1,

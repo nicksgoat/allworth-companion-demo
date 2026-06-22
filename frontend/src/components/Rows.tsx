@@ -30,20 +30,6 @@ export function HairlineDivider() {
   return <View style={styles.hairline} />;
 }
 
-export function DataStatusBadge({ status }: { status?: Dashboard["dataStatus"] }) {
-  const label = status?.label ?? "Data status unavailable";
-  const detail = status?.isStale ? "Stale" : status?.asOf ? `As of ${status.asOf}` : "Current view";
-  const icon = status?.isSynthetic ? "flask-outline" : status?.isStale ? "time-outline" : "checkmark-circle-outline";
-  return (
-    <View style={styles.dataStatus}>
-      <Ionicons name={icon} size={14} color={colors.inkSecondary} />
-      <Text style={styles.dataStatusText}>
-        {label} · {detail}
-      </Text>
-    </View>
-  );
-}
-
 export function AccountRow({ account }: { account: Account }) {
   return (
     <View style={styles.accountRow}>
@@ -90,10 +76,15 @@ export function MeetingNoteRow({ note }: { note: MeetingNote }) {
   );
 }
 
-export function DisclaimerFooter() {
+export function DisclaimerFooter({ status }: { status?: Dashboard["dataStatus"] }) {
+  // Fold the "Synthetic · As of…" data-status indication into the footer so the
+  // compliance information stays present without competing with the net-worth
+  // number under the hero.
+  const asOf = status?.isStale ? "stale data" : status?.asOf ? `as of ${status.asOf}` : null;
   return (
     <Text style={styles.disclaimer}>
-      Educational information, not investment advice. Allworth Financial demo — synthetic data.
+      Educational information, not investment advice. Allworth Financial demo — synthetic data
+      {asOf ? `, ${asOf}` : ""}.
     </Text>
   );
 }
@@ -110,17 +101,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   hairline: { height: StyleSheet.hairlineWidth, backgroundColor: colors.hairline },
-  dataStatus: {
-    alignSelf: "flex-start",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: colors.inkFaint,
-  },
-  dataStatusText: { fontSize: 12, fontFamily: fonts.sansBold, color: colors.inkSecondary },
   accountRow: { flexDirection: "row", alignItems: "center", paddingVertical: 12, gap: 12 },
   accountName: { fontSize: 17, fontFamily: fonts.sans, color: colors.inkPrimary },
   accountInstitution: {

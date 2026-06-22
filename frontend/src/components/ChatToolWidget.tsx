@@ -21,7 +21,6 @@ import Svg, {
   Text as SvgText,
 } from "react-native-svg";
 import { FadeScaleIn } from "../anim";
-import { useApp } from "../state";
 import { card, colors, fonts, usd } from "../theme";
 import type { ToolWidget } from "../types";
 import { AllworthMark } from "./Wordmark";
@@ -301,34 +300,6 @@ function DetailModal({
   );
 }
 
-function AdvisorCta() {
-  const app = useApp();
-  const [sent, setSent] = useState(false);
-  const advisorFirst = app.dashboard?.advisor?.name?.split(" ")[0] ?? "your advisor";
-  if (sent) {
-    return (
-      <View style={[styles.cta, styles.ctaSent]}>
-        <Ionicons name="checkmark-circle" size={18} color={colors.gainOnDark} />
-        <Text style={[styles.ctaText, { color: "#FFFFFF" }]}>
-          Flagged for {advisorFirst} — they{"'"}ll follow up
-        </Text>
-      </View>
-    );
-  }
-  return (
-    <Pressable
-      onPress={() => {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        setSent(true);
-      }}
-      style={({ pressed }) => [styles.cta, pressed && { opacity: 0.85 }]}
-    >
-      <Ionicons name="chatbubble-ellipses" size={18} color={colors.allworthNavy} />
-      <Text style={styles.ctaText}>Bring this to {advisorFirst}</Text>
-    </Pressable>
-  );
-}
-
 // ─── Monte Carlo ────────────────────────────────────────────────────────────
 function ProjectionCard({ result, onOpen }: { result: any; onOpen: () => void }) {
   const rate = Math.round(result.successRate);
@@ -400,7 +371,6 @@ function ProjectionDetail({
           </View>
         ))}
       </View>
-      <AdvisorCta />
     </DetailModal>
   );
 }
@@ -599,7 +569,6 @@ function RebalanceDetail({
           <Text style={styles.factKey}>Portfolio value</Text>
         </View>
       </View>
-      <AdvisorCta />
     </DetailModal>
   );
 }
@@ -774,16 +743,4 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.5)",
     paddingTop: 10,
   },
-
-  cta: {
-    flexDirection: "row",
-    gap: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 12,
-    paddingVertical: 15,
-  },
-  ctaSent: { backgroundColor: "rgba(255,255,255,0.12)" },
-  ctaText: { fontSize: 16, fontFamily: fonts.sansBold, color: colors.allworthNavy },
 });

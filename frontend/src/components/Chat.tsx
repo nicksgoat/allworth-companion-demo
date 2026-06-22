@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Animated, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { FadeScaleIn, usePulse } from "../anim";
-import { colors, fonts } from "../theme";
+import { colors, fonts, radius, space, text } from "../theme";
 import type { ChatMessage, ToolChip } from "../types";
 import { AdvisorHandoffCard } from "./AdvisorHandoffCard";
 import { ChatToolWidget } from "./ChatToolWidget";
@@ -120,11 +120,15 @@ function AssistantIdentity() {
 
 export function ChatMessageView({
   message,
+  showIdentity = true,
   onFeedback,
   onAdvisorHandoff,
   handoffDisabled,
 }: {
   message: ChatMessage;
+  // Only the first assistant message in a consecutive run shows the identity row,
+  // so a thread reads as one continuing voice rather than a repeating header.
+  showIdentity?: boolean;
   onFeedback?: (message: ChatMessage, rating: "positive" | "negative") => void;
   onAdvisorHandoff?: (message: ChatMessage, action: "message" | "schedule") => void;
   handoffDisabled?: boolean;
@@ -138,9 +142,16 @@ export function ChatMessageView({
       </View>
     );
   }
+
+  const done = !message.isStreaming;
+  // One subtle action row at the foot of a finished answer: ghost thumbs on the
+  // left, the compact advisor handoff on the right — no labels, no extra card.
+  const showHandoff = done && message.sources.length > 0;
+  const showFeedback = done && !!message.text;
+
   return (
     <View style={styles.assistantBlock}>
-      <AssistantIdentity />
+      {showIdentity ? <AssistantIdentity /> : null}
       <ToolChipRow
         chips={message.chips}
         sources={message.sources}
@@ -150,44 +161,48 @@ export function ChatMessageView({
         <ChatToolWidget key={`${w.name}-${i}`} widget={w} />
       ))}
       {message.text ? <MarkdownText text={message.text} streaming={message.isStreaming} /> : null}
-      {!message.isStreaming && message.sources.length > 0 ? (
-        <View style={{ paddingTop: 4 }}>
-          <AdvisorHandoffCard
-            disabled={handoffDisabled}
-            onMessage={() => onAdvisorHandoff?.(message, "message")}
-            onSchedule={() => onAdvisorHandoff?.(message, "schedule")}
-          />
-        </View>
-      ) : null}
-      {!message.isStreaming && message.text ? (
-        <View style={styles.feedbackRow}>
-          <Text style={styles.feedbackLabel}>Was this helpful?</Text>
-          <Pressable
-            onPress={() => onFeedback?.(message, "positive")}
-            style={[
-              styles.feedbackButton,
-              message.feedback === "positive" && styles.feedbackButtonSelected,
-            ]}
-          >
-            <Ionicons
-              name="thumbs-up-outline"
-              size={14}
-              color={message.feedback === "positive" ? colors.allworthAccent : colors.inkTertiary}
-            />
-          </Pressable>
-          <Pressable
-            onPress={() => onFeedback?.(message, "negative")}
-            style={[
-              styles.feedbackButton,
-              message.feedback === "negative" && styles.feedbackButtonSelected,
-            ]}
-          >
-            <Ionicons
-              name="thumbs-down-outline"
-              size={14}
-              color={message.feedback === "negative" ? colors.allworthAccent : colors.inkTertiary}
-            />
-          </Pressable>
+      {showHandoff || showFeedback ? (
+        <View style={styles.actionRow}>
+          {showFeedback ? (
+            <View style={styles.feedbackRow}>
+              <Pressable
+                hitSlop={8}
+                onPress={() => onFeedback?.(message, "positive")}
+                style={({ pressed }) => [styles.feedbackButton, pressed && { opacity: 0.6 }]}
+              >
+                <Ionicons
+                  name={message.feedback === "positive" ? "thumbs-up" : "thumbs-up-outline"}
+                  size={15}
+                  color={
+                    message.feedback === "positive" ? colors.allworthAccent : colors.inkTertiary
+                  }
+                />
+              </Pressable>
+              <Pressable
+                hitSlop={8}
+                onPress={() => onFeedback?.(message, "negative")}
+                style={({ pressed }) => [styles.feedbackButton, pressed && { opacity: 0.6 }]}
+              >
+                <Ionicons
+                  name={message.feedback === "negative" ? "thumbs-down" : "thumbs-down-outline"}
+                  size={15}
+                  color={
+                    message.feedback === "negative" ? colors.allworthAccent : colors.inkTertiary
+                  }
+                />
+              </Pressable>
+            </View>
+          ) : null}
+          {showHandoff ? (
+            <View style={styles.handoffSlot}>
+              <AdvisorHandoffCard
+                compact
+                disabled={handoffDisabled}
+                onMessage={() => onAdvisorHandoff?.(message, "message")}
+                onSchedule={() => onAdvisorHandoff?.(message, "schedule")}
+              />
+            </View>
+          ) : null}
         </View>
       ) : null}
     </View>
@@ -206,24 +221,23 @@ const webTextWrap =
 const styles = StyleSheet.create({
   sourcesRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   sourcesText: {
-    fontSize: 13,
-    fontFamily: fonts.sans,
+    ...text.bodySm,
     color: colors.inkTertiary,
     flex: 1,
     flexShrink: 1,
     minWidth: 0,
   },
-  chipFlow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  chipFlow: { flexDirection: "row", flexWrap: "wrap", gap: space[2] },
   chip: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    paddingHorizontal: 10,
+    paddingHorizontal: space[3],
     paddingVertical: 6,
-    borderRadius: 999,
+    borderRadius: radius.pill,
     backgroundColor: colors.inkFaint,
   },
-  chipText: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary },
+  chipText: { ...text.bodySm, color: colors.inkSecondary },
   thinkingDot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: colors.allworthAccent },
   userRow: { flexDirection: "row", justifyContent: "flex-end", paddingLeft: 48, maxWidth: "100%" },
   userBubble: {
@@ -242,7 +256,7 @@ const styles = StyleSheet.create({
     minWidth: 0,
   },
   assistantBlock: {
-    gap: 10,
+    gap: space[3],
     alignSelf: "stretch",
     maxWidth: "100%",
     flexShrink: 1,
@@ -269,15 +283,15 @@ const styles = StyleSheet.create({
   },
   avatarText: { fontSize: 12, fontFamily: fonts.sansBold, color: "#FFFFFF" },
   identityName: { fontSize: 13, fontFamily: fonts.sansBold, color: colors.inkSecondary },
-  feedbackRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  feedbackLabel: { fontSize: 12, fontFamily: fonts.sans, color: colors.inkTertiary },
-  feedbackButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+  // The single foot-of-answer action row: ghost thumbs + compact handoff.
+  actionRow: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.inkFaint,
+    justifyContent: "space-between",
+    gap: space[3],
+    paddingTop: space[1],
   },
-  feedbackButtonSelected: { borderWidth: 1, borderColor: colors.allworthAccent },
+  feedbackRow: { flexDirection: "row", alignItems: "center", gap: space[3] },
+  feedbackButton: { alignItems: "center", justifyContent: "center" },
+  handoffSlot: { flexShrink: 1, alignItems: "flex-end" },
 });

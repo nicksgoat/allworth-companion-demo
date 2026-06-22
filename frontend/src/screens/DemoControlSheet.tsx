@@ -2,7 +2,6 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -11,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { Mode, useApp } from "../state";
-import { card, colors, fonts } from "../theme";
+import { card, colors, fonts, shadowSoft } from "../theme";
 import { SectionHeader } from "../components/Rows";
 
 const MODES: { value: Mode; label: string }[] = [
@@ -150,15 +149,7 @@ const styles = StyleSheet.create({
   segment: { flex: 1, paddingVertical: 7, borderRadius: 7, alignItems: "center" },
   segmentActive: {
     backgroundColor: "#fff",
-    ...Platform.select({
-      web: { boxShadow: "0 1px 4px rgba(0, 0, 0, 0.08)" },
-      default: {
-        shadowColor: "#000",
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-        shadowOffset: { width: 0, height: 1 },
-      },
-    }),
+    ...shadowSoft,
   },
   segmentText: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary },
   segmentTextActive: { color: colors.inkPrimary, fontFamily: fonts.sansBold },

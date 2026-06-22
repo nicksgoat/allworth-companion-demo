@@ -3,9 +3,12 @@ import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useApp } from "../state";
-import { card, colors, fonts } from "../theme";
+import { card, colors, fonts, radius, space, text } from "../theme";
 
 // The most important recurring component: every analytical answer and nudge ends here.
+// `compact` renders a single inline "Bring this to {advisor} →" row that reveals the
+// Message/Schedule actions on tap, for dense surfaces like the chat stream. Default
+// stays the full bordered card used by Invest / Position / Nudge screens.
 export function AdvisorHandoffCard({
   advisorName,
   advisorInitials,
@@ -13,6 +16,7 @@ export function AdvisorHandoffCard({
   onMessage,
   onSchedule,
   disabled,
+  compact,
 }: {
   advisorName?: string;
   advisorInitials?: string;
@@ -20,12 +24,14 @@ export function AdvisorHandoffCard({
   onMessage?: () => void;
   onSchedule?: () => void;
   disabled?: boolean;
+  compact?: boolean;
 }) {
   const { dashboard } = useApp();
   const name = advisorName ?? dashboard?.advisor?.name ?? "Your Advisor";
   const initials = advisorInitials ?? dashboard?.advisor?.avatarInitials ?? "??";
   const title = advisorTitle ?? dashboard?.advisor?.title ?? "Financial Advisor";
   const [requestedAction, setRequestedAction] = useState<"message" | "schedule" | null>(null);
+  const [expanded, setExpanded] = useState(false);
   const firstName = name.split(" ")[0];
 
   const requestDraft = (action: "message" | "schedule") => {
@@ -47,6 +53,40 @@ export function AdvisorHandoffCard({
     requestedAction === "schedule"
       ? `Preparing an agenda for ${firstName} in chat`
       : `Drafting a note for ${firstName} in chat`;
+
+  if (compact) {
+    if (requestedAction) {
+      return (
+        <View style={styles.compactSentRow}>
+          <Ionicons name="checkmark-circle" size={16} color={colors.allworthAccent} />
+          <Text style={styles.sentText}>{requestedText}</Text>
+        </View>
+      );
+    }
+    return (
+      <View style={styles.compactWrap}>
+        <Pressable
+          onPress={() => setExpanded((v) => !v)}
+          disabled={disabled}
+          style={({ pressed }) => [styles.compactTrigger, pressed && { opacity: 0.6 }]}
+        >
+          <Ionicons name="chatbubble-ellipses-outline" size={15} color={colors.allworthAccent} />
+          <Text style={styles.compactTriggerText}>Bring this to {firstName}</Text>
+          <Ionicons
+            name={expanded ? "chevron-up" : "chevron-forward"}
+            size={14}
+            color={colors.inkTertiary}
+          />
+        </Pressable>
+        {expanded ? (
+          <View style={styles.buttons}>
+            <HandoffButton label="Message" filled onPress={handleMessage} disabled={disabled} />
+            <HandoffButton label="Schedule" onPress={handleSchedule} disabled={disabled} />
+          </View>
+        ) : null}
+      </View>
+    );
+  }
 
   return (
     <View style={styles.card}>
@@ -104,6 +144,21 @@ function HandoffButton({
 }
 
 const styles = StyleSheet.create({
+  // Compact inline variant (chat stream): a light single-row affordance.
+  compactWrap: { gap: space[2] },
+  compactTrigger: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[2],
+    alignSelf: "flex-start",
+  },
+  compactTriggerText: {
+    ...text.bodySm,
+    fontFamily: fonts.sansBold,
+    color: colors.allworthAccent,
+  },
+  compactSentRow: { flexDirection: "row", alignItems: "center", gap: space[2] },
+
   card: { ...card, padding: 16, gap: 14 },
   header: { flexDirection: "row", alignItems: "center", gap: 12 },
   avatar: {
@@ -117,9 +172,9 @@ const styles = StyleSheet.create({
   avatarText: { color: "#fff", fontSize: 16, fontFamily: fonts.sansBold },
   title: { fontSize: 17, fontFamily: fonts.sansBold, color: colors.inkPrimary },
   subtitle: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary, marginTop: 2 },
-  buttons: { flexDirection: "row", gap: 10 },
-  button: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: "center" },
+  buttons: { flexDirection: "row", gap: space[3] },
+  button: { flex: 1, paddingVertical: space[3], borderRadius: radius.chip, alignItems: "center" },
   buttonText: { fontSize: 15, fontFamily: fonts.sansBold },
   sentRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-  sentText: { fontSize: 15, fontFamily: fonts.sans, color: colors.allworthAccent },
+  sentText: { ...text.bodySm, color: colors.allworthAccent },
 });
