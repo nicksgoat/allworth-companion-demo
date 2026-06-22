@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors, fonts, sectionHeader, shortDate, usd } from "../theme";
-import type { Account, LearnedFact, MeetingNote } from "../types";
+import type { Account, Dashboard, LearnedFact, MeetingNote } from "../types";
 
 export function SectionHeader({ children }: { children: React.ReactNode }) {
   return <Text style={styles.sectionHeader}>{children}</Text>;
@@ -28,6 +28,20 @@ export function SheetHeader({ title, onClose }: { title: string; onClose: () => 
 
 export function HairlineDivider() {
   return <View style={styles.hairline} />;
+}
+
+export function DataStatusBadge({ status }: { status?: Dashboard["dataStatus"] }) {
+  const label = status?.label ?? "Data status unavailable";
+  const detail = status?.isStale ? "Stale" : status?.asOf ? `As of ${status.asOf}` : "Current view";
+  const icon = status?.isSynthetic ? "flask-outline" : status?.isStale ? "time-outline" : "checkmark-circle-outline";
+  return (
+    <View style={styles.dataStatus}>
+      <Ionicons name={icon} size={14} color={colors.inkSecondary} />
+      <Text style={styles.dataStatusText}>
+        {label} · {detail}
+      </Text>
+    </View>
+  );
 }
 
 export function AccountRow({ account }: { account: Account }) {
@@ -96,6 +110,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   hairline: { height: StyleSheet.hairlineWidth, backgroundColor: colors.hairline },
+  dataStatus: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: colors.inkFaint,
+  },
+  dataStatusText: { fontSize: 12, fontFamily: fonts.sansBold, color: colors.inkSecondary },
   accountRow: { flexDirection: "row", alignItems: "center", paddingVertical: 12, gap: 12 },
   accountName: { fontSize: 17, fontFamily: fonts.sans, color: colors.inkPrimary },
   accountInstitution: {

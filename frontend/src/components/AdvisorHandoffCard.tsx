@@ -10,22 +10,43 @@ export function AdvisorHandoffCard({
   advisorName,
   advisorInitials,
   advisorTitle,
+  onMessage,
+  onSchedule,
+  disabled,
 }: {
   advisorName?: string;
   advisorInitials?: string;
   advisorTitle?: string;
+  onMessage?: () => void;
+  onSchedule?: () => void;
+  disabled?: boolean;
 }) {
   const { dashboard } = useApp();
   const name = advisorName ?? dashboard?.advisor?.name ?? "Your Advisor";
   const initials = advisorInitials ?? dashboard?.advisor?.avatarInitials ?? "??";
   const title = advisorTitle ?? dashboard?.advisor?.title ?? "Financial Advisor";
-  const [sent, setSent] = useState(false);
+  const [requestedAction, setRequestedAction] = useState<"message" | "schedule" | null>(null);
   const firstName = name.split(" ")[0];
 
-  const send = () => {
+  const requestDraft = (action: "message" | "schedule") => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    setSent(true);
+    setRequestedAction(action);
   };
+
+  const handleMessage = () => {
+    requestDraft("message");
+    onMessage?.();
+  };
+
+  const handleSchedule = () => {
+    requestDraft("schedule");
+    onSchedule?.();
+  };
+
+  const requestedText =
+    requestedAction === "schedule"
+      ? `Preparing an agenda for ${firstName} in chat`
+      : `Drafting a note for ${firstName} in chat`;
 
   return (
     <View style={styles.card}>
@@ -38,15 +59,15 @@ export function AdvisorHandoffCard({
           <Text style={styles.subtitle}>{title}</Text>
         </View>
       </View>
-      {sent ? (
+      {requestedAction ? (
         <View style={styles.sentRow}>
           <Ionicons name="checkmark-circle" size={17} color={colors.allworthAccent} />
-          <Text style={styles.sentText}>Flagged for your next session with {firstName}</Text>
+          <Text style={styles.sentText}>{requestedText}</Text>
         </View>
       ) : (
         <View style={styles.buttons}>
-          <HandoffButton label="Message" filled onPress={send} />
-          <HandoffButton label="Schedule" onPress={send} />
+          <HandoffButton label="Message" filled onPress={handleMessage} disabled={disabled} />
+          <HandoffButton label="Schedule" onPress={handleSchedule} disabled={disabled} />
         </View>
       )}
     </View>
@@ -57,17 +78,21 @@ function HandoffButton({
   label,
   filled,
   onPress,
+  disabled,
 }: {
   label: string;
   filled?: boolean;
   onPress: () => void;
+  disabled?: boolean;
 }) {
   return (
     <Pressable
       onPress={onPress}
+      disabled={disabled}
       style={({ pressed }) => [
         styles.button,
         { backgroundColor: filled ? colors.allworthAccent : "rgba(62,113,183,0.12)" },
+        disabled && { opacity: 0.45 },
         pressed && { opacity: 0.85 },
       ]}
     >

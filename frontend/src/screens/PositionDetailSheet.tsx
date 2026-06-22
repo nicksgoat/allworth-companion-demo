@@ -6,10 +6,11 @@ import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
 import { RangeChips } from "../components/RangeChips";
 import { DisclaimerFooter, HairlineDivider, SectionHeader, SheetHeader } from "../components/Rows";
 import { Sparkline } from "../components/Sparkline";
+import { performanceFromSeries } from "../performance";
 import { useApp } from "../state";
 import { positionHistory } from "../synthetic";
-import { card, colors, fonts, shortDate, usd } from "../theme";
-import type { Account, Position, TaxLot } from "../types";
+import { card, colors, fonts, usd } from "../theme";
+import type { Account, Position } from "../types";
 
 const RANGES: { label: string; points: number; suffix: string }[] = [
   { label: "3M", points: 4, suffix: "past 3 months" },
@@ -17,7 +18,7 @@ const RANGES: { label: string; points: number; suffix: string }[] = [
   { label: "1Y", points: 12, suffix: "past year" },
 ];
 
-// "$27.40" — lot costs need cents, unlike the rounded usd() used everywhere else
+// "$27.40" — per-share costs need cents, unlike the rounded usd() used elsewhere
 function usdExact(n: number): string {
   return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -25,12 +26,10 @@ function usdExact(n: number): string {
 export function PositionDetailSheet({
   position,
   account,
-  lots,
   onClose,
 }: {
   position: Position | null;
   account: Account | null;
-  lots: TaxLot[];
   onClose: () => void;
 }) {
   return (
@@ -44,7 +43,6 @@ export function PositionDetailSheet({
         <PositionDetailContent
           position={position}
           account={account}
-          lots={lots}
           onClose={onClose}
         />
       ) : null}
@@ -55,12 +53,10 @@ export function PositionDetailSheet({
 function PositionDetailContent({
   position,
   account,
-  lots,
   onClose,
 }: {
   position: Position;
   account: Account | null;
-  lots: TaxLot[];
   onClose: () => void;
 }) {
   const app = useApp();
@@ -70,16 +66,18 @@ function PositionDetailContent({
   const history = useMemo(() => positionHistory(position), [position]);
   const spec = RANGES.find((r) => r.label === range) ?? RANGES[RANGES.length - 1];
   const slice = history.slice(-spec.points);
-  const diff = slice.length >= 2 ? slice[slice.length - 1].value - slice[0].value : 0;
+  const performance = performanceFromSeries(slice);
+  const diff = performance?.gain_loss ?? 0;
 
-  const basis = lots.reduce((sum, lot) => sum + lot.qty * lot.costPerShare, 0);
+  const basis = position.costBasis ?? position.value;
   const gain = position.value - basis;
   const gainPct = basis ? Math.round((gain / basis) * 100) : 0;
-  const hasShortLot = lots.some((lot) => lot.term === "short");
+  const hasAggregateTaxData = position.costBasis != null;
+  const hasShortTermGain = Math.abs(position.shortTermUnrealizedGain ?? 0) > 0.005;
 
   const ask = () => {
     app.setChatPrefill(
-      lots.length
+      hasAggregateTaxData
         ? `If I trimmed my ${position.symbol} position, what would the tax impact look like?`
         : `How does my ${position.symbol} holding fit my overall allocation?`,
     );
@@ -113,7 +111,8 @@ function PositionDetailContent({
         <View style={styles.deltaRow}>
           <Text style={[styles.delta, { color: diff >= 0 ? colors.gain : colors.loss }]}>
             {diff >= 0 ? "+" : ""}
-            {usd(diff)} {spec.suffix}
+            {usd(diff)} ({diff >= 0 ? "+" : "−"}
+            {Math.abs(performance?.return_pct ?? 0).toFixed(1)}%) {spec.suffix}
           </Text>
           <Text style={styles.illustrative}>illustrative</Text>
         </View>
@@ -121,9 +120,18 @@ function PositionDetailContent({
         <RangeChips options={RANGES.map((r) => r.label)} selected={range} onSelect={setRange} />
       </View>
 
-      {lots.length ? (
+      {hasAggregateTaxData ? (
         <View style={styles.card}>
           <SectionHeader>Cost basis & gains</SectionHeader>
+          {position.averageCostBasis != null ? (
+            <>
+              <BasisRow
+                label="Average cost basis"
+                value={`${usdExact(position.averageCostBasis)} / share`}
+              />
+              <HairlineDivider />
+            </>
+          ) : null}
           <BasisRow label="Cost basis" value={usd(basis)} />
           <HairlineDivider />
           <BasisRow label="Market value" value={usd(position.value)} />
@@ -133,6 +141,26 @@ function PositionDetailContent({
             value={`${gain >= 0 ? "+" : ""}${usd(gain)} (${gainPct}%)`}
             color={gain >= 0 ? colors.gain : colors.loss}
           />
+          {Math.abs(position.longTermUnrealizedGain ?? 0) > 0.005 ? (
+            <>
+              <HairlineDivider />
+              <BasisRow
+                label="Long-term unrealized gain"
+                value={`${(position.longTermUnrealizedGain ?? 0) >= 0 ? "+" : ""}${usd(position.longTermUnrealizedGain ?? 0)}`}
+                color={(position.longTermUnrealizedGain ?? 0) >= 0 ? colors.gain : colors.loss}
+              />
+            </>
+          ) : null}
+          {hasShortTermGain ? (
+            <>
+              <HairlineDivider />
+              <BasisRow
+                label="Short-term unrealized gain"
+                value={`${(position.shortTermUnrealizedGain ?? 0) >= 0 ? "+" : ""}${usd(position.shortTermUnrealizedGain ?? 0)}`}
+                color={(position.shortTermUnrealizedGain ?? 0) >= 0 ? colors.gain : colors.loss}
+              />
+            </>
+          ) : null}
         </View>
       ) : (
         <View style={styles.card}>
@@ -142,27 +170,17 @@ function PositionDetailContent({
         </View>
       )}
 
-      {lots.length ? (
-        <View style={{ gap: 4 }}>
-          <SectionHeader>Your tax lots</SectionHeader>
-          {lots.map((lot, i) => (
-            <React.Fragment key={lot.id}>
-              {i > 0 ? <HairlineDivider /> : null}
-              <LotRow lot={lot} price={position.price} />
-            </React.Fragment>
-          ))}
-          {hasShortLot ? (
-            <Text style={styles.shortNote}>
-              Short-term lots are taxed at a higher rate — worth asking about before selling.
-            </Text>
-          ) : null}
-        </View>
+      {hasShortTermGain ? (
+        <Text style={styles.shortNote}>
+          Some of this position appears short-term on an aggregate basis, which can change the tax
+          estimate before selling.
+        </Text>
       ) : null}
 
       <Pressable onPress={ask} style={({ pressed }) => [styles.cta, pressed && { opacity: 0.85 }]}>
         <Ionicons name="chatbubbles-outline" size={18} color="#fff" />
         <Text style={styles.ctaText}>
-          {lots.length ? "Ask about the tax impact" : "Ask how this fits my plan"}
+          {hasAggregateTaxData ? "Ask about the tax impact" : "Ask how this fits my plan"}
         </Text>
       </Pressable>
 
@@ -182,31 +200,6 @@ function BasisRow({ label, value, color }: { label: string; value: string; color
     <View style={styles.basisRow}>
       <Text style={styles.basisLabel}>{label}</Text>
       <Text style={[styles.basisValue, color ? { color } : null]}>{value}</Text>
-    </View>
-  );
-}
-
-function LotRow({ lot, price }: { lot: TaxLot; price: number }) {
-  const lotGain = (price - lot.costPerShare) * lot.qty;
-  return (
-    <View style={styles.lotRow}>
-      <View style={{ flex: 1 }}>
-        <Text style={styles.lotTitle}>
-          {lot.qty.toLocaleString("en-US")} sh · {usdExact(lot.costPerShare)}
-        </Text>
-        <Text style={styles.lotMeta}>Bought {shortDate(lot.acquired)}</Text>
-      </View>
-      <View style={{ alignItems: "flex-end", gap: 3 }}>
-        <Text style={[styles.lotGain, { color: lotGain >= 0 ? colors.gain : colors.loss }]}>
-          {lotGain >= 0 ? "+" : ""}
-          {usd(lotGain)}
-        </Text>
-        <View style={[styles.termBadge, lot.term === "short" && styles.termBadgeShort]}>
-          <Text style={[styles.termText, lot.term === "short" && styles.termTextShort]}>
-            {lot.term === "short" ? "Short-term" : "Long-term"}
-          </Text>
-        </View>
-      </View>
     </View>
   );
 }
@@ -239,24 +232,6 @@ const styles = StyleSheet.create({
     fontVariant: ["tabular-nums"],
   },
   noLots: { fontSize: 14, fontFamily: fonts.sans, color: colors.inkSecondary, lineHeight: 20 },
-  lotRow: { flexDirection: "row", alignItems: "center", paddingVertical: 10, gap: 12 },
-  lotTitle: {
-    fontSize: 15,
-    fontFamily: fonts.sans,
-    color: colors.inkPrimary,
-    fontVariant: ["tabular-nums"],
-  },
-  lotMeta: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkTertiary, marginTop: 2 },
-  lotGain: { fontSize: 15, fontFamily: fonts.sansBold, fontVariant: ["tabular-nums"] },
-  termBadge: {
-    backgroundColor: colors.inkFaint,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  termBadgeShort: { backgroundColor: "rgba(210,109,55,0.12)" },
-  termText: { fontSize: 11, fontFamily: fonts.sansBold, color: colors.inkSecondary },
-  termTextShort: { color: colors.attention },
   shortNote: {
     fontSize: 13,
     fontFamily: fonts.sans,

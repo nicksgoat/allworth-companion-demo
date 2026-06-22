@@ -215,7 +215,16 @@
       "qty": 15000,
       "price": 170,
       "assetClass": "us_equity",
-      "value": 2550000
+      "value": 2550000,
+      "averageCostBasis": 34.5,
+      "costBasis": 517500,
+      "unrealizedGain": 2032500,
+      "longTermValue": 2550000,
+      "longTermCostBasis": 517500,
+      "longTermUnrealizedGain": 2032500,
+      "shortTermValue": 0,
+      "shortTermCostBasis": 0,
+      "shortTermUnrealizedGain": 0
     },
     {
       "accountId": "acct_kenny_brokerage",
@@ -252,53 +261,6 @@
       "price": 189,
       "assetClass": "us_equity",
       "value": 359100
-    }
-  ],
-  "taxLots": [
-    {
-      "id": "lot_nvda_k1",
-      "accountId": "acct_kenny_brokerage",
-      "symbol": "NVDA",
-      "qty": 11000,
-      "costPerShare": 12.5,
-      "acquired": "2016-08-01",
-      "term": "long"
-    },
-    {
-      "id": "lot_nvda_k2",
-      "accountId": "acct_kenny_brokerage",
-      "symbol": "NVDA",
-      "qty": 4000,
-      "costPerShare": 95.0,
-      "acquired": "2024-02-15",
-      "term": "long"
-    },
-    {
-      "id": "lot_vti_k1",
-      "accountId": "acct_kenny_ira",
-      "symbol": "VTI",
-      "qty": 1100,
-      "costPerShare": 180.0,
-      "acquired": "2021-06-10",
-      "term": "long"
-    },
-    {
-      "id": "lot_bnd_k1",
-      "accountId": "acct_kenny_ira",
-      "symbol": "BND",
-      "qty": 2120,
-      "costPerShare": 78.0,
-      "acquired": "2021-06-10",
-      "term": "long"
-    },
-    {
-      "id": "lot_fxaix_k1",
-      "accountId": "acct_kenny_401k",
-      "symbol": "FXAIX",
-      "qty": 1900,
-      "costPerShare": 140.0,
-      "acquired": "2020-01-15",
-      "term": "long"
     }
   ],
   "plan": {

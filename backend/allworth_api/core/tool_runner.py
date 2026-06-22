@@ -9,10 +9,11 @@ import time
 
 from allworth_api.core.audit import estimate_tokens, log_tool_call
 from allworth_api.core.demo_tools import is_demo_tool, run_demo_tool
+from allworth_api.core.vision_tools import VISION_TOOL_NAMES, is_vision_tool, run_vision_tool
 from allworth_api.data.seed import set_current_client
 from allworth_api.financial_tools.tools import FINANCIAL_TOOL_NAMES, is_financial_tool, run_financial_tool
 
-SCHEMA_GOVERNED_TOOLS = {"get_portfolio", *FINANCIAL_TOOL_NAMES}
+SCHEMA_GOVERNED_TOOLS = {"get_portfolio", *FINANCIAL_TOOL_NAMES, *VISION_TOOL_NAMES}
 
 
 def run_tool(name: str, tool_input: dict | None, client_id: str) -> dict:
@@ -51,6 +52,8 @@ def run_tool(name: str, tool_input: dict | None, client_id: str) -> dict:
 
 
 def _dispatch(name: str, tool_input: dict, client_id: str) -> dict:
+    if is_vision_tool(name):
+        return run_vision_tool(name, tool_input, client_id)
     if is_financial_tool(name):
         return run_financial_tool(name, tool_input, client_id)
     if is_demo_tool(name):

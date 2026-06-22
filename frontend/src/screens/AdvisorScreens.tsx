@@ -199,6 +199,33 @@ function ClientDetailScreen({ route }: NativeStackScreenProps<AdvisorStackParams
             ))}
           </View>
 
+          {brief.reviewWorkflow ? (
+            <View style={styles.workflowPanel}>
+              <View style={styles.briefHeader}>
+                <Ionicons name="checkmark-done" size={13} color={colors.allworthAccent} />
+                <SectionHeader>Advisor review workflow</SectionHeader>
+              </View>
+              <Text style={styles.workflowSummary}>{brief.reviewWorkflow.summary}</Text>
+              <View style={styles.workflowSection}>
+                <Text style={styles.workflowLabel}>Decisions to review</Text>
+                {brief.reviewWorkflow.decisionsToReview.map((item) => (
+                  <View key={item.id} style={styles.workflowItem}>
+                    <Text style={styles.workflowItemTitle}>{item.label}</Text>
+                    <Text style={styles.workflowItemBody}>{item.whyItMatters}</Text>
+                  </View>
+                ))}
+              </View>
+              <View style={styles.workflowGrid}>
+                <Checklist title="Talking points" items={brief.reviewWorkflow.talkingPoints} />
+                <Checklist title="Open questions" items={brief.reviewWorkflow.openQuestions} />
+              </View>
+              <View style={styles.nextActionRow}>
+                <Ionicons name="arrow-forward-circle" size={16} color={colors.allworthAccent} />
+                <Text style={styles.nextActionText}>{brief.reviewWorkflow.nextBestAction}</Text>
+              </View>
+            </View>
+          ) : null}
+
           {brief.openNudges.length > 0 ? (
             <View style={{ gap: 8 }}>
               <SectionHeader>Open nudges</SectionHeader>
@@ -236,6 +263,20 @@ function ClientDetailScreen({ route }: NativeStackScreenProps<AdvisorStackParams
   );
 }
 
+function Checklist({ title, items }: { title: string; items: string[] }) {
+  return (
+    <View style={styles.checklist}>
+      <Text style={styles.workflowLabel}>{title}</Text>
+      {items.map((item) => (
+        <View key={item} style={styles.checkRow}>
+          <View style={styles.checkDot} />
+          <Text style={styles.checkText}>{item}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   headerRow: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" },
   title: { fontSize: 28, fontFamily: fonts.display, color: colors.inkPrimary },
@@ -270,6 +311,36 @@ const styles = StyleSheet.create({
   briefCard: { ...card, padding: 16, gap: 10 },
   briefHeader: { flexDirection: "row", alignItems: "center", gap: 6 },
   briefText: { fontSize: 15, fontFamily: fonts.sans, lineHeight: 22, color: colors.inkPrimary },
+  workflowPanel: { gap: 14 },
+  workflowSummary: { fontSize: 15, fontFamily: fonts.sans, color: colors.inkPrimary, lineHeight: 22 },
+  workflowSection: { gap: 8 },
+  workflowLabel: {
+    fontSize: 12,
+    fontFamily: fonts.sansBold,
+    color: colors.inkTertiary,
+    textTransform: "uppercase",
+  },
+  workflowItem: {
+    borderLeftWidth: 2,
+    borderLeftColor: colors.allworthAccent,
+    paddingLeft: 10,
+    gap: 2,
+  },
+  workflowItemTitle: { fontSize: 15, fontFamily: fonts.sansBold, color: colors.inkPrimary },
+  workflowItemBody: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary, lineHeight: 18 },
+  workflowGrid: { gap: 12 },
+  checklist: { gap: 6 },
+  checkRow: { flexDirection: "row", alignItems: "flex-start", gap: 8 },
+  checkDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: colors.allworthAccent,
+    marginTop: 7,
+  },
+  checkText: { flex: 1, fontSize: 14, fontFamily: fonts.sans, color: colors.inkPrimary, lineHeight: 20 },
+  nextActionRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  nextActionText: { flex: 1, fontSize: 14, fontFamily: fonts.sansBold, color: colors.allworthAccent },
   nudgeRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 6 },
   nudgeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.attention },
   nudgeTitle: { flex: 1, fontSize: 15, fontFamily: fonts.sans, color: colors.inkPrimary },

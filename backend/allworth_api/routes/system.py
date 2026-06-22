@@ -5,6 +5,8 @@ from allworth_api.core.conversation_store import clear as clear_conversation
 from allworth_api.core.system_status import (
     audit_tail_entries,
     health_status,
+    liveness_status,
+    readiness_status,
     reset_demo_state,
     route_intent_status,
 )
@@ -15,6 +17,19 @@ router = APIRouter()
 @router.get("/api/health")
 def health():
     return health_status()
+
+
+@router.get("/api/health/live")
+def health_live():
+    return liveness_status()
+
+
+@router.get("/api/health/ready")
+def health_ready():
+    status = readiness_status()
+    if not status["ok"]:
+        raise HTTPException(status_code=503, detail=status)
+    return status
 
 
 @router.get("/api/route-intent")

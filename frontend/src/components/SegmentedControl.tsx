@@ -1,6 +1,6 @@
 import * as Haptics from "expo-haptics";
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { colors, fonts } from "../theme";
 
 export function SegmentedControl({
@@ -43,11 +43,16 @@ const styles = StyleSheet.create({
   segment: { flex: 1, alignItems: "center", paddingVertical: 7, borderRadius: 8 },
   segmentActive: {
     backgroundColor: colors.surfaceCard,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 2,
+    ...Platform.select({
+      web: { boxShadow: "0 1px 4px rgba(0, 0, 0, 0.1)" },
+      default: {
+        shadowColor: "#000",
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 1 },
+        elevation: 2,
+      },
+    }),
   },
   label: { fontSize: 13, fontFamily: fonts.sansBold, color: colors.inkSecondary },
   labelActive: { color: colors.inkPrimary },

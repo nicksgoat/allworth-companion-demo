@@ -5,6 +5,7 @@ import { LayoutChangeEvent, Modal, Pressable, StyleSheet, Text, View } from "rea
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Defs, LinearGradient, Line, Path, Stop } from "react-native-svg";
 import { densify } from "../chartData";
+import { performanceDeltaLabel } from "../performance";
 import { colors, fonts, monthLabel, usd } from "../theme";
 import type { Dashboard, MonthValue } from "../types";
 import { AllworthMark } from "./Wordmark";
@@ -156,16 +157,12 @@ export function NetWorthDetail({
     const spec = RANGES.find((r) => r.label === range) ?? RANGES[RANGES.length - 1];
     const sliced = history.length >= spec.points ? history.slice(-spec.points) : history;
     if (sliced.length < 2) return { slice: sliced, delta: undefined };
-    const diff = sliced[sliced.length - 1].value - sliced[0].value;
-    const pct = sliced[0].value ? (diff / sliced[0].value) * 100 : 0;
+    const perf = performanceDeltaLabel(sliced, spec.suffix, d.performanceCashFlows ?? []);
     return {
       slice: sliced,
-      delta: {
-        text: `${diff >= 0 ? "+" : "−"}${usd(Math.abs(diff))} (${diff >= 0 ? "+" : "−"}${Math.abs(pct).toFixed(1)}%) ${spec.suffix}`,
-        positive: diff >= 0,
-      },
+      delta: perf ? { text: perf.text, positive: perf.positive } : undefined,
     };
-  }, [d.netWorthHistory, range]);
+  }, [d.netWorthHistory, d.performanceCashFlows, range]);
 
   return (
     <Modal

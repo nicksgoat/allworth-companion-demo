@@ -3,6 +3,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+from allworth_api.config import demo_auth_fallback_enabled
 from allworth_api.core.auth import authenticate, authenticate_email, get_session, invalidate
 
 router = APIRouter()
@@ -29,6 +30,8 @@ class EmailLoginRequest(BaseModel):
 @router.post("/api/auth/login")
 def login(body: LoginRequest):
     """Authenticate a household with passcode (demo mode)."""
+    if not demo_auth_fallback_enabled():
+        return JSONResponse(status_code=404, content={"error": "Not found"})
     session = authenticate(body.household_id, body.passcode)
     if not session:
         return JSONResponse(status_code=401, content={"error": "Invalid credentials"})

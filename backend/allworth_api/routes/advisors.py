@@ -1,8 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 
+from allworth_api.core.auth import get_current_household
 from allworth_api.core.formatting import fmt_usd
 from allworth_api.core.nudges import nudges_for
 from allworth_api.core.tool_runner import run_tool
+from allworth_api.data.advisors import advisor_by_id
 from allworth_api.data.seed import all_advisors, seed_for_advisor
 
 router = APIRouter()
@@ -12,7 +15,7 @@ _REAL_CLIENTS = {"maya", "kenny"}
 
 
 @router.get("/api/advisors/{advisor_id}/book")
-def book(advisor_id: str):
+def book(advisor_id: str, household_id: str = Depends(get_current_household)):
     seed = seed_for_advisor(advisor_id)
     households = [
         {**h, "openNudges": len(nudges_for(h["clientId"]))} if h["clientId"] in _REAL_CLIENTS else h
@@ -20,15 +23,17 @@ def book(advisor_id: str):
     ]
     advisors = all_advisors()
     return {
-        "advisor": next((a for a in advisors if a["id"] == advisor_id), advisors[0]),
+        "advisor": next((a for a in advisors if a["id"] == advisor_id), advisor_by_id(advisor_id)),
         "households": households,
     }
 
 
 @router.get("/api/advisors/{advisor_id}/clients/{client_id}/brief")
-def brief(advisor_id: str, client_id: str):
+def brief(advisor_id: str, client_id: str, household_id: str = Depends(get_current_household)):
+    if client_id != household_id:
+        return JSONResponse(status_code=403, content={"error": "Access denied for this household"})
     data = run_tool("get_advisor_brief", {}, client_id)
-    return {**data, "narrative": brief_narrative(data)}
+    return {**data, "narrative": brief_narrative(data), "reviewWorkflow": review_workflow(data)}
 
 
 def brief_narrative(d: dict) -> str:
@@ -50,3 +55,52 @@ def brief_narrative(d: dict) -> str:
         "She prefers plain-English explanations and is tax-sensitive about her 2015 Apple shares.",
     ]
     return "\n".join(line for line in lines if line)
+
+
+def review_workflow(d: dict) -> dict:
+    client_name = (d.get("client") or {}).get("name", "Client").split(",")[0]
+    nudge = d["openNudges"][0] if d["openNudges"] else None
+    return {
+        "status": "advisor_review_required",
+        "summary": (
+            f"Prepare {client_name}'s next review around liquidity, spending, held-away assets, "
+            "and whether the current plan still fits."
+        ),
+        "decisionsToReview": [
+            {
+                "id": "liquidity-event",
+                "label": d["liquidityEvent"]["label"],
+                "whyItMatters": (
+                    f"{fmt_usd(d['liquidityEvent']['amount'])} decision with a "
+                    f"{d['liquidityEvent']['deadline']} deadline."
+                ),
+            },
+            {
+                "id": "spending-plan",
+                "label": "Spending versus income plan",
+                "whyItMatters": "Recent spending is above plan and affects goal timing.",
+            },
+            {
+                "id": "held-away-assets",
+                "label": "Held-away assets",
+                "whyItMatters": (
+                    f"{fmt_usd(d['heldAwayDetected'])} detected outside Allworth management."
+                ),
+            },
+        ],
+        "talkingPoints": [
+            "Confirm whether the liquidity decision still fits the income draw.",
+            "Review tax-sensitive funding sources before any sale.",
+            "Use plain-English trade-offs and avoid directive recommendations.",
+        ],
+        "openQuestions": [
+            "Which funding source creates the least tax drag?",
+            "Does recent spending change the lake house timeline?",
+            "Should held-away assets be part of the next planning conversation?",
+        ],
+        "nextBestAction": (
+            f"Discuss {nudge['title'].lower()} and the liquidity event in the next review."
+            if nudge
+            else "Prepare a focused review agenda before the next client meeting."
+        ),
+    }

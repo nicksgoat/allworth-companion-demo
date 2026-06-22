@@ -15,7 +15,8 @@ import { RiseIn, useAnimatedValue } from "../anim";
 import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
 import { NetWorthHero } from "../components/NetWorthHero";
 import { NudgeCard } from "../components/NudgeCard";
-import { DisclaimerFooter, HairlineDivider, SectionHeader } from "../components/Rows";
+import { DataStatusBadge, DisclaimerFooter, HairlineDivider, SectionHeader } from "../components/Rows";
+import { performanceDeltaLabel } from "../performance";
 import { useApp } from "../state";
 import { card, colors, fonts, usd } from "../theme";
 import type { Dashboard, Nudge } from "../types";
@@ -98,6 +99,7 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
         insetsTop={insets.top}
         onOpenWealth={() => app.setSelectedTab("invest")}
       />
+      <DataStatusBadge status={d.dataStatus} />
 
       {d.nudges.length ? (
         <RiseIn delay={80} style={{ gap: 12 }}>
@@ -241,13 +243,16 @@ function SnapshotRow({
 function trajectory(d: Dashboard): { text: string; positive: boolean } | undefined {
   const h = d.netWorthHistory;
   if (h.length < 2) return undefined;
-  const base = h[0].value;
-  const diff = h[h.length - 1].value - base;
-  const pct = base ? (diff / base) * 100 : 0;
-  const sign = diff >= 0 ? "+" : "−";
+  const backendPerf = d.performance?.netWorth;
+  if (backendPerf) {
+    const sign = backendPerf.gain_loss >= 0 ? "+" : "−";
+    return {
+      text: `${sign}${usd(Math.abs(backendPerf.gain_loss))} (${sign}${Math.abs(backendPerf.return_pct).toFixed(1)}%) past year`,
+      positive: backendPerf.gain_loss >= 0,
+    };
+  }
   return {
-    text: `${sign}${usd(Math.abs(diff))} (${sign}${Math.abs(pct).toFixed(1)}%) past year`,
-    positive: diff >= 0,
+    ...performanceDeltaLabel(h, "past year", d.performanceCashFlows ?? [])!,
   };
 }
 

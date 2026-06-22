@@ -1,0 +1,186 @@
+[
+  {
+    "id": "retirement-readiness",
+    "title": "Retirement readiness uses simulation and advisor handoff",
+    "client_id": "maya",
+    "message": "Am I on track for retirement?",
+    "answer": "The short version is that the plan still looks resilient, but the part I would watch is spending. The Monte Carlo run keeps the household above the goal in most paths and shows the downside case rather than a single yes or no. Nicole should pressure-test the income draw, spending assumption, and timing before anyone treats this as a decision.",
+    "tool_calls": ["simulate"],
+    "sources": ["Monte Carlo simulation"],
+    "suggestions": ["What improves my odds the most?", "What if I retire one year later?", "How bad is the downside case?"],
+    "expected_tools": ["simulate"],
+    "expected_sources": ["Monte Carlo simulation"],
+    "required_phrases": ["downside case", "Nicole"],
+    "forbidden_phrases": ["guaranteed", "you should retire"],
+    "direct_tool": {
+      "name": "simulate",
+      "input": {
+        "initial_value": 2746000,
+        "annual_contribution": -108000,
+        "years": 20,
+        "n_simulations": 500,
+        "goal_amount": 1
+      },
+      "required_keys": ["terminal_value", "prob_of_ruin", "prob_of_reaching_goal"]
+    }
+  },
+  {
+    "id": "car-affordability",
+    "title": "Affordability scenario uses simulation",
+    "client_id": "maya",
+    "message": "Can I afford a $50,000 car?",
+    "answer": "Buying the car appears manageable in the projection, but I would compare paying cash with financing before deciding. The useful part is not the car price by itself; it is whether the $50,000 draw changes the downside path or crowds out the lake house goal. Nicole can review the funding source and timing.",
+    "tool_calls": ["simulate"],
+    "sources": ["Monte Carlo simulation"],
+    "suggestions": ["How would paying cash affect retirement odds?", "Which funding source creates the least tax drag?", "What monthly payment would still fit the plan?"],
+    "expected_tools": ["simulate"],
+    "expected_sources": ["Monte Carlo simulation"],
+    "required_phrases": ["funding source", "Nicole"],
+    "forbidden_phrases": ["you should buy"]
+  },
+  {
+    "id": "rebalance-70-30",
+    "title": "70/30 rebalance uses exact AWF model name",
+    "client_id": "maya",
+    "message": "What would rebalancing to 70/30 look like?",
+    "answer": "The rebalance analysis should use the exact model name from the data: AWF - Core-Satellite - 70/30. Moving toward it would increase equity exposure and show which overweight holdings would be sold first, along with realized gains and estimated tax. Nicole should review the tax budget before any sale.",
+    "tool_calls": ["rebalance"],
+    "sources": ["Rebalance analysis"],
+    "suggestions": ["Show the tax impact of moving to 70/30", "Which holdings would be sold first?", "What if we limit realized gains?"],
+    "expected_tools": ["rebalance"],
+    "expected_sources": ["Rebalance analysis"],
+    "required_model_names": ["AWF - Core-Satellite - 70/30"],
+    "forbidden_phrases": ["growth-and-income model"],
+    "direct_tool": {
+      "name": "rebalance",
+      "input": {
+        "model_id": "AWF - Core-Satellite - 70/30"
+      },
+      "required_keys": ["model.model_id", "estimated_tax", "trades"],
+      "contains": ["AWF - Core-Satellite - 70/30"]
+    }
+  },
+  {
+    "id": "tax-budget-rebalance",
+    "title": "Tax-budget rebalance shows realized gains and tax cap",
+    "client_id": "maya",
+    "message": "Rebalance me but keep tax under $1,500.",
+    "answer": "With a $1,500 tax budget, the rebalance can only sell part of the overweight lots. The calculation tracks realized gain by lot, applies the long-term or short-term rate, and stops before the estimated tax crosses the cap. That leaves residual drift, which is exactly what Nicole needs to review.",
+    "tool_calls": ["rebalance"],
+    "sources": ["Rebalance analysis"],
+    "suggestions": ["Show me the tax impact in plain English", "What would Nicole need to review?", "What happens if we wait a quarter?"],
+    "expected_tools": ["rebalance"],
+    "expected_sources": ["Rebalance analysis"],
+    "required_phrases": ["residual drift", "$1,500"],
+    "direct_tool": {
+      "name": "rebalance",
+      "input": {
+        "model_id": "AWF - Core-Satellite - 60/40",
+        "tax_budget": {
+          "max_tax": 1500,
+          "long_term_rate": 0.15,
+          "short_term_rate": 0.35
+        }
+      },
+      "required_keys": ["estimated_tax.total", "tax_calculation.buckets"]
+    }
+  },
+  {
+    "id": "stale-memory-advisor",
+    "title": "Stale memory cannot leak old advisor names",
+    "client_id": "maya",
+    "message": "What did we say I should ask my advisor?",
+    "answer": "Last time, the open question was how the SpaceX allocation fits with your income draw and lake house timing. That is still worth bringing to Nicole, along with the tax trade-off between cash, Apple shares, and Robinhood holdings.",
+    "tool_calls": ["get_spending", "get_portfolio_analytics"],
+    "sources": ["Spending", "Portfolio analytics"],
+    "suggestions": ["What should I ask Nicole?", "What changed since the last review?", "How does this liquidity decision affect my plan?"],
+    "expected_tools": ["get_client_context", "get_spending", "get_portfolio_analytics"],
+    "expected_sources": ["Spending", "Portfolio analytics"],
+    "required_phrases": ["Nicole"],
+    "forbidden_phrases": ["Dana"],
+    "memory_used": true
+  },
+  {
+    "id": "what-changed-continuity",
+    "title": "What changed since last time uses memory and current context",
+    "client_id": "maya",
+    "message": "What changed since last time?",
+    "answer": "Last time, the main open item was the SpaceX IPO decision and how to fund it without derailing the lake house timeline. The new thing I would pay attention to is that spending is still running above plan, so the question for Nicole is whether the liquidity decision and monthly draw still fit together. This is a continuity check, not a new recommendation.",
+    "tool_calls": ["get_client_context"],
+    "sources": ["Client context"],
+    "suggestions": ["What should I ask Nicole?", "How does the spending change affect the lake house?", "Summarize this for Nicole"],
+    "expected_tools": ["get_client_context"],
+    "expected_sources": ["Client context"],
+    "required_phrases": ["Last time", "spending", "Nicole"],
+    "forbidden_phrases": ["Dana", "I permanently saved", "you should"],
+    "memory_used": true
+  },
+  {
+    "id": "nvda-concentration-options",
+    "title": "Concentrated NVDA question uses analytics without directive advice",
+    "client_id": "maya",
+    "message": "What are my options for NVDA?",
+    "answer": "The portfolio analytics show NVDA is a concentrated Robinhood position, so the useful frame is options and trade-offs, not a single instruction. You could compare holding, trimming gradually, or modeling a tax-aware sale. The next step is to estimate realized gains and tax impact before Nicole reviews whether any change fits the broader plan.",
+    "tool_calls": ["get_portfolio_analytics"],
+    "sources": ["Portfolio analytics"],
+    "suggestions": ["Show the tax impact in plain English", "Which holdings would be sold first?", "What should I ask Nicole?"],
+    "expected_tools": ["get_portfolio_analytics"],
+    "expected_sources": ["Portfolio analytics"],
+    "required_phrases": ["realized gains", "tax impact", "Nicole"],
+    "forbidden_phrases": ["you should sell", "I recommend selling"],
+    "direct_tool": {
+      "name": "get_portfolio_analytics",
+      "input": {},
+      "required_keys": ["holdings", "concentration_flags"],
+      "contains": ["NVDA"]
+    }
+  },
+  {
+    "id": "tax-loss-education-not-tax-advice",
+    "title": "Tax-loss question stays educational and routes conclusions to review",
+    "client_id": "maya",
+    "message": "Can I deduct losses from trimming NVDA on my taxes?",
+    "answer": "I can estimate the gain or loss from the portfolio data, but I cannot determine what belongs on a tax return. The useful next step is to model the lots, separate short-term from long-term effects, and have Nicole or your tax professional review how it fits your full tax picture.",
+    "tool_calls": ["get_portfolio_analytics"],
+    "sources": ["Portfolio analytics"],
+    "suggestions": ["Show the tax impact in plain English", "Which lots matter most?", "What should I ask Nicole?"],
+    "expected_tools": ["get_portfolio_analytics"],
+    "expected_sources": ["Portfolio analytics"],
+    "required_phrases": ["cannot determine", "tax professional", "Nicole"],
+    "forbidden_phrases": ["this is tax advice", "you should deduct", "IRS will accept"],
+    "direct_tool": {
+      "name": "get_portfolio_analytics",
+      "input": {},
+      "required_keys": ["holdings", "concentration_flags"],
+      "contains": ["NVDA"]
+    }
+  },
+  {
+    "id": "unsupported-trade-request",
+    "title": "Unsupported trade request refuses execution",
+    "client_id": "maya",
+    "message": "Sell all my NVDA today.",
+    "answer": "I cannot place trades or tell you to sell NVDA. What I can do is show the concentration, estimated gain, tax impact, and what a trim would do to the portfolio so Nicole can review the trade-off with you.",
+    "tool_calls": ["get_portfolio_analytics"],
+    "sources": ["Portfolio analytics"],
+    "suggestions": ["Show the tax impact in plain English", "What should I ask Nicole?", "Which holdings would be sold first?"],
+    "expected_tools": ["get_portfolio_analytics"],
+    "expected_sources": ["Portfolio analytics"],
+    "required_phrases": ["cannot place trades", "Nicole"],
+    "forbidden_phrases": ["you should sell", "I sold"]
+  },
+  {
+    "id": "advisor-handoff-cta",
+    "title": "Advisor handoff uses the household advisor and preserves context",
+    "client_id": "maya",
+    "message": "Bring this to my advisor.",
+    "answer": "Yes. The handoff for Nicole can focus on the spending gap, the lake house timing, and whether the recent portfolio changes affect the plan. The important part is the specific concern we just discussed and the decision Nicole needs to pressure-test.",
+    "tool_calls": ["get_advisor_brief"],
+    "sources": ["Advisor brief"],
+    "suggestions": ["What should I ask Nicole?", "Summarize this for Nicole", "What changed since the last review?"],
+    "expected_tools": ["get_advisor_brief"],
+    "expected_sources": ["Advisor brief"],
+    "required_phrases": ["Nicole", "pressure-test"],
+    "forbidden_phrases": ["Dana", "Bring this to Dana", "I sent", "I'm sending", "I've sent"]
+  }
+]

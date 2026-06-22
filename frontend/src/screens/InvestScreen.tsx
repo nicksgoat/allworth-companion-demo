@@ -17,8 +17,9 @@ import { DisclaimerFooter, SectionHeader } from "../components/Rows";
 import { SegmentedControl } from "../components/SegmentedControl";
 import { Sparkline } from "../components/Sparkline";
 import { AllworthWordmark } from "../components/Wordmark";
+import { performanceDeltaLabel } from "../performance";
 import { useApp } from "../state";
-import { colors, fonts, usd } from "../theme";
+import { colors, fonts } from "../theme";
 import type { AssetClass, Dashboard, Nudge, Portfolio, Position } from "../types";
 import { ClassDetailSheet } from "./ClassDetailSheet";
 import { NudgeDetailSheet } from "./NudgeDetailSheet";
@@ -101,15 +102,6 @@ export function InvestScreen() {
               ) ?? null)
             : null
         }
-        lots={
-          selectedPosition && p
-            ? p.taxLots.filter(
-                (l) =>
-                  l.accountId === selectedPosition.accountId &&
-                  l.symbol === selectedPosition.symbol,
-              )
-            : []
-        }
         onClose={() => setSelectedPosition(null)}
       />
       <ClassDetailSheet
@@ -150,17 +142,12 @@ function InvestContent({
     const spec = RANGES.find((r) => r.label === range) ?? RANGES[RANGES.length - 1];
     const sliced = history.length >= spec.points ? history.slice(-spec.points) : history;
     if (sliced.length < 2) return { slice: sliced, delta: undefined };
-    const diff = sliced[sliced.length - 1].value - sliced[0].value;
-    const pct = sliced[0].value ? (diff / sliced[0].value) * 100 : 0;
-    const sign = diff >= 0 ? "+" : "−";
+    const perf = performanceDeltaLabel(sliced, spec.deltaSuffix, d.performanceCashFlows ?? []);
     return {
       slice: sliced,
-      delta: {
-        text: `${sign}${usd(Math.abs(diff))} (${sign}${Math.abs(pct).toFixed(1)}%) ${spec.deltaSuffix}`,
-        positive: diff >= 0,
-      },
+      delta: perf ? { text: perf.text, positive: perf.positive } : undefined,
     };
-  }, [d.netWorthHistory, range]);
+  }, [d.netWorthHistory, d.performanceCashFlows, range]);
 
   const askRebalance = () => {
     app.setChatPrefill(

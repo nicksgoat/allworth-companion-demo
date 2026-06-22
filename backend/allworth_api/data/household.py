@@ -11,8 +11,10 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
+from allworth_api.config import allow_seed_fallback_in_live, data_mode
 from allworth_api.data import synapse
 from allworth_api.data.seed import accounts_for as seed_accounts_for
+from allworth_api.data.seed import performance_cash_flows_for as seed_performance_cash_flows_for
 from allworth_api.data.seed import portfolio_for as seed_portfolio_for
 from allworth_api.data.seed import seed_for
 from allworth_api.data.seed import spending_summary as seed_spending_summary
@@ -26,7 +28,7 @@ logger = logging.getLogger(__name__)
 # a numeric client_id is used as-is. Flipping mock→live is pure config — set
 # DATA_MODE=live, DEMO_HOUSEHOLD_ID, and the SYNAPSE_* connection vars in
 # backend/.env. No code changes.
-_DATA_MODE = os.environ.get("DATA_MODE", "mock").strip().lower()
+_DATA_MODE = data_mode()
 _DEMO_HOUSEHOLD_ID = os.environ.get("DEMO_HOUSEHOLD_ID", "").strip()
 
 # Thread pool for parallel Synapse queries
@@ -39,8 +41,12 @@ def _resolve_hh(client_id: str) -> int | None:
     Returns None whenever we should serve seed data — i.e. mock mode, or live mode
     without a reachable Synapse. This is the single point where the switch is read.
     """
-    if _DATA_MODE != "live" or not synapse.is_available():
+    if data_mode() != "live":
         return None
+    if not synapse.is_available():
+        if allow_seed_fallback_in_live():
+            return None
+        raise RuntimeError("DATA_MODE=live but Synapse is not configured")
     if _DEMO_HOUSEHOLD_ID:
         return int(_DEMO_HOUSEHOLD_ID)
     return int(client_id) if client_id.isdigit() else None
@@ -49,6 +55,12 @@ def _resolve_hh(client_id: str) -> int | None:
 def _is_synapse_household(household_id: str) -> bool:
     """True when this request should be served from live Synapse data."""
     return _resolve_hh(household_id) is not None
+
+
+def _fallback_or_raise(factory, reason: str):
+    if data_mode() == "live" and not allow_seed_fallback_in_live():
+        raise RuntimeError(f"Live data unavailable: {reason}")
+    return factory()
 
 
 # ── Client persona ────────────────────────────────────────────────────────
@@ -118,7 +130,9 @@ def get_accounts(household_id: str) -> dict[str, Any]:
         hh_id = _resolve_hh(household_id)
         raw = synapse.get_accounts(hh_id)
         if not raw:
-            return seed_accounts_for(household_id)
+            return _fallback_or_raise(
+                lambda: seed_accounts_for(household_id), "no Synapse accounts returned"
+            )
 
         allworth = []
         outside = []
@@ -160,7 +174,9 @@ def get_accounts(household_id: str) -> dict[str, Any]:
         }
     except Exception as e:
         logger.warning(f"Synapse accounts failed for {household_id}: {e}")
-        return seed_accounts_for(household_id)
+        return _fallback_or_raise(
+            lambda: seed_accounts_for(household_id), f"accounts query failed: {e}"
+        )
 
 
 def _infer_institution(custodian: str, model_name: str | None) -> str:
@@ -222,10 +238,14 @@ def get_net_worth_history(household_id: str) -> list[dict[str, Any]]:
 
         result = [{"month": m, "value": v} for m, v in by_month.items()]
         result = result[-12:]  # last 12 months
-        return result if result else seed_for(household_id)["netWorthHistory"]
+        return result if result else _fallback_or_raise(
+            lambda: seed_for(household_id)["netWorthHistory"], "no net worth history"
+        )
     except Exception as e:
         logger.warning(f"Synapse net worth history failed for {household_id}: {e}")
-        return seed_for(household_id)["netWorthHistory"]
+        return _fallback_or_raise(
+            lambda: seed_for(household_id)["netWorthHistory"], f"net worth query failed: {e}"
+        )
 
 
 # ── Portfolio / positions ─────────────────────────────────────────────────
@@ -240,7 +260,9 @@ def get_portfolio(household_id: str) -> dict[str, Any]:
         hh_id = _resolve_hh(household_id)
         raw = synapse.get_holdings(hh_id)
         if not raw:
-            return seed_portfolio_for(household_id)
+            return _fallback_or_raise(
+                lambda: seed_portfolio_for(household_id), "no Synapse holdings returned"
+            )
 
         positions = []
         by_account: dict[str, list] = {}
@@ -261,10 +283,12 @@ def get_portfolio(household_id: str) -> dict[str, Any]:
             positions.append(pos)
             by_account.setdefault(acct_id, []).append(pos)
 
-        return {"positions": positions, "byAccount": by_account, "taxLots": []}
+        return {"positions": positions, "byAccount": by_account}
     except Exception as e:
         logger.warning(f"Synapse portfolio failed for {household_id}: {e}")
-        return seed_portfolio_for(household_id)
+        return _fallback_or_raise(
+            lambda: seed_portfolio_for(household_id), f"portfolio query failed: {e}"
+        )
 
 
 def _map_asset_class(raw: str) -> str:
@@ -296,7 +320,9 @@ def get_spending(household_id: str, months: int = 3) -> dict[str, Any]:
         hh_id = _resolve_hh(household_id)
         raw = synapse.get_rollforward(hh_id, periods=max(months, 12))
         if not raw:
-            return seed_spending_summary(months, household_id)
+            return _fallback_or_raise(
+                lambda: seed_spending_summary(months, household_id), "no Synapse rollforward returned"
+            )
 
         monthly = []
         for r in raw:
@@ -311,7 +337,9 @@ def get_spending(household_id: str, months: int = 3) -> dict[str, Any]:
         monthly.reverse()  # oldest first
         recent = monthly[-months:] if monthly else []
         if not recent:
-            return seed_spending_summary(months, household_id)
+            return _fallback_or_raise(
+                lambda: seed_spending_summary(months, household_id), "no recent Synapse spending"
+            )
 
         avg = sum(m["total"] for m in recent) / len(recent)
         # No plan data in Synapse — use a reasonable estimate
@@ -326,7 +354,9 @@ def get_spending(household_id: str, months: int = 3) -> dict[str, Any]:
         }
     except Exception as e:
         logger.warning(f"Synapse spending failed for {household_id}: {e}")
-        return seed_spending_summary(months, household_id)
+        return _fallback_or_raise(
+            lambda: seed_spending_summary(months, household_id), f"spending query failed: {e}"
+        )
 
 
 # ── Parallel dashboard fetch ─────────────────────────────────────────────
@@ -345,6 +375,7 @@ def get_dashboard_data(household_id: str) -> dict[str, Any]:
             "client": next((c for c in clients if c["id"] == household_id), None),
             "accounts": seed_accounts_for(household_id),
             "net_worth_history": seed["netWorthHistory"],
+            "performance_cash_flows": seed_performance_cash_flows_for(),
             "spending": seed_spending_summary(3, household_id),
         }
 
@@ -371,10 +402,17 @@ def get_dashboard_data(household_id: str) -> dict[str, Any]:
 
     # Apply fallbacks for any failed queries
     if results.get("accounts") is None:
-        results["accounts"] = seed_accounts_for(household_id)
+        results["accounts"] = _fallback_or_raise(
+            lambda: seed_accounts_for(household_id), "dashboard accounts failed"
+        )
     if results.get("net_worth_history") is None:
-        results["net_worth_history"] = seed_for(household_id)["netWorthHistory"]
+        results["net_worth_history"] = _fallback_or_raise(
+            lambda: seed_for(household_id)["netWorthHistory"], "dashboard net worth history failed"
+        )
     if results.get("spending") is None:
-        results["spending"] = seed_spending_summary(3, household_id)
+        results["spending"] = _fallback_or_raise(
+            lambda: seed_spending_summary(3, household_id), "dashboard spending failed"
+        )
+    results["performance_cash_flows"] = seed_performance_cash_flows_for()
 
     return results

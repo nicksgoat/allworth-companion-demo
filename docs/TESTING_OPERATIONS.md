@@ -98,7 +98,18 @@ Frontend logic tests:
 npm test
 ```
 
-Backend tests:
+Full app quality gate:
+
+```bash
+./scripts/quality-loop.sh --offline --no-redis
+```
+
+This runs backend tests, backend lint, frontend TypeScript, deterministic evals,
+MCP smoke, performance smoke, and the product quality report. It writes both a
+Markdown report and a JSON sidecar for CI or future improvement-agent workflows.
+Set `SKIP_FRONTEND_TYPECHECK=true` only for temporary backend-only diagnostics.
+
+Backend tests only:
 
 ```bash
 cd backend
@@ -109,7 +120,7 @@ TypeScript:
 
 ```bash
 cd frontend
-npx tsc --noEmit -p tsconfig.json
+npm run typecheck
 ```
 
 ## GPT-4o / Azure OpenAI Deployment

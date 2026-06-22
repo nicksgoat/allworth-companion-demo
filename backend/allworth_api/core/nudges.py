@@ -10,9 +10,10 @@ def build_nudges(
     spending: dict,
     positions: list[dict],
     accounts: list[dict],
-    advisor_first: str = "your advisor",
+    advisor_first_name: str = "your advisor",
 ) -> list[dict]:
     nudges = []
+    advisor_cta = f"Discuss with {advisor_first_name}"
 
     s = spending
     if s["avg3mo"] > s["plan"] * 1.15:
@@ -29,7 +30,7 @@ def build_nudges(
                     f"checking what it means for the lake house timeline."
                 ),
                 "cta": "Ask me what this means",
-                "advisorCta": f"Discuss with {advisor_first}",
+                "advisorCta": advisor_cta,
                 "severity": "attention",
             }
         )
@@ -65,7 +66,7 @@ def build_nudges(
                             f"to reduce concentration over time — some more tax-aware than others."
                         ),
                         "cta": "Ask me about my options",
-                        "advisorCta": f"Discuss with {advisor_first}",
+                        "advisorCta": advisor_cta,
                         "severity": "info",
                     }
                 )
@@ -74,10 +75,10 @@ def build_nudges(
 
 
 def nudges_for(client_id: str) -> list[dict]:
-    advisor_first = advisor_for_client(client_id)["name"].split(",")[0].split()[0]
+    advisor_first_name = advisor_for_client(client_id)["name"].split(",")[0].split()[0]
     return build_nudges(
         spending_summary(3, client_id),
         portfolio_for(client_id)["positions"],
         seed_for(client_id)["accounts"],
-        advisor_first,
+        advisor_first_name,
     )
