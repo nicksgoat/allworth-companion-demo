@@ -37,7 +37,34 @@ logger = logging.getLogger("allworth_api.chat")
 
 # Tools whose structured result the client renders as a rich inline widget
 # (the rebalancer + the Monte Carlo retirement projection).
-VISUAL_TOOLS = {"rebalance", "run_retirement_projection", "simulate"}
+VISUAL_TOOLS = {
+    "rebalance",
+    "run_retirement_projection",
+    "simulate",
+    "run_mock_rebalance",
+    "run_monte_carlo",
+}
+
+
+def _widget_payload(name: str, result: dict, client_id: str) -> dict | None:
+    """Map a tool result to the shape the frontend ChatToolWidget renders.
+
+    The widget routes by result shape (trades + target_allocation -> rebalance,
+    pathSnapshots + successRate -> projection), so the vision tools — which wrap
+    those results in a canonical schema — are mapped to their widget-shaped data.
+    Vision run_monte_carlo only carries terminal percentiles (no path snapshots),
+    so we reuse the planning projection fan for the visual.
+    """
+    if name == "run_mock_rebalance":
+        return result.get("underlying_rebalance")
+    if name == "run_monte_carlo":
+        from allworth_api.core.planning import run_retirement_projection
+
+        try:
+            return run_retirement_projection()
+        except Exception:
+            return None
+    return result
 
 SOURCE_NAMES = {
     "get_client_context": "Client context",
@@ -432,7 +459,9 @@ async def _stream_live(
             # tools only send the name to keep the stream light.
             end_payload = {"name": tc.name}
             if tc.name in VISUAL_TOOLS and isinstance(result, dict) and "error" not in result:
-                end_payload["result"] = result
+                widget = _widget_payload(tc.name, result, client_id)
+                if isinstance(widget, dict):
+                    end_payload["result"] = widget
             yield "tool_end", end_payload
             results.append(json.dumps(result))
 
