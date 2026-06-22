@@ -81,10 +81,10 @@ def test_advisor_resolution_uses_client_advisor_id_not_seed_order() -> None:
         *advisors,
     ]
     try:
-        assert advisor_for_client("maya")["name"] == "Nicole Whitfield"
-        assert vision_tools.get_client_context("maya")["advisor"]["name"] == "Nicole Whitfield"
+        assert advisor_for_client("maya")["name"] == "Nicole Mayer"
+        assert vision_tools.get_client_context("maya")["advisor"]["name"] == "Nicole Mayer"
         dashboard_payload = dashboard("maya", "maya")
-        assert dashboard_payload["advisor"]["name"] == "Nicole Whitfield"
+        assert dashboard_payload["advisor"]["name"] == "Nicole Mayer"
         assert {nudge["advisorCta"] for nudge in dashboard_payload["nudges"]} == {
             "Discuss with Nicole"
         }

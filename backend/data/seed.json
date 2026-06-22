@@ -78,9 +78,10 @@
     "advisors": [
       {
         "id": "nicole",
-        "name": "Nicole Whitfield",
+        "name": "Nicole Mayer",
+        "email": "Nicole.Mayer@allworthfinancial.com",
         "title": "Senior Financial Advisor, CFP\u00ae",
-        "avatarInitials": "NW"
+        "avatarInitials": "NM"
       }
     ]
   },
@@ -14634,10 +14635,10 @@
       "date": "2026-05-21",
       "title": "Spring review & lake house planning",
       "summary": "Reviewed portfolio performance and the lake house goal (32% funded). Talked through pacing the $350K target over four years and funding it tax-aware from the trust account. Next: model two funding paths before the next session.",
-      "advisor": "Nicole Whitfield",
+      "advisor": "Nicole Mayer",
       "attendees": [
         "Maya Tran",
-        "Nicole Whitfield"
+        "Nicole Mayer"
       ]
     },
     {
@@ -14645,10 +14646,10 @@
       "date": "2026-04-09",
       "title": "Spending check-in",
       "summary": "Spending is running about 18% over plan, mostly travel and gifts to family. Agreed it's sustainable near-term but worth revisiting if it carries into the lake house purchase window.",
-      "advisor": "Nicole Whitfield",
+      "advisor": "Nicole Mayer",
       "attendees": [
         "Maya Tran",
-        "Nicole Whitfield"
+        "Nicole Mayer"
       ]
     },
     {
@@ -14656,10 +14657,10 @@
       "date": "2026-02-18",
       "title": "SpaceX IPO allocation",
       "summary": "Walked through the $200K SpaceX IPO opportunity \u2014 liquidity trade-offs against the $9K/mo income draw. Maya leaning cautious; revisit once the terms firm up.",
-      "advisor": "Nicole Whitfield",
+      "advisor": "Nicole Mayer",
       "attendees": [
         "Maya Tran",
-        "Nicole Whitfield"
+        "Nicole Mayer"
       ]
     }
   ]
