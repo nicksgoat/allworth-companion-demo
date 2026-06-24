@@ -1,0 +1,13 @@
+{
+  "name": "allworth-companion-launch",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Apple-style sales-pitch launch page for the Allworth Companion product.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Allworth Companion</title>
+    <meta
+      name="description"
+      content="Allworth Companion — an AI-native client engagement platform. A financial ally for life."
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#0C2E4E" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Allworth" />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <!-- Top tab bar -->
+    <header class="topbar">
+      <img class="logo" src="assets/logo.svg" alt="Allworth" />
+      <nav class="tabs">
+        <button class="tab active" data-tab="pitch">Overview</button>
+        <button class="tab" data-tab="updates">Updates</button>
+      </nav>
+      <span class="confidential">Internal · Confidential</span>
+    </header>
+
+    <main>
+      <!-- ===================== PITCH ===================== -->
+      <div data-view="pitch" class="active">
+        <!-- Hero -->
+        <section class="hero">
+          <img class="hero__logo" src="assets/logo-white.svg" alt="Allworth" />
+          <h1>Allworth Companion</h1>
+          <p class="hero__tagline">
+            An AI-native client engagement platform. A financial ally for life.
+          </p>
+          <div class="hero__meta">
+            <span class="pill"><span class="dot"></span><span id="hero-version">iOS · TestFlight</span></span>
+            <span class="pill" id="hero-model">Azure OpenAI · GPT-4o</span>
+            <span class="pill">Synthetic data · advisor-reviewed</span>
+          </div>
+        </section>
+
+        <!-- Problem -->
+        <section class="section">
+          <div class="wrap center">
+            <p class="eyebrow">The shift</p>
+            <h2 class="section-head" style="font-size: clamp(30px, 4.6vw, 56px)">
+              Most wealth apps are dashboards.<br />This one is a conversation.
+            </h2>
+            <p class="lede">
+              Clients don't want another grid of numbers — they want an answer to the question behind
+              the question. Allworth Companion gives each client the feeling of a brilliant,
+              always-available advisor who knows their goals, portfolio, and constraints, while every
+              real decision stays under advisor review.
+            </p>
+            <p
+              class="display"
+              style="margin-top: 34px; font-style: italic; font-size: clamp(24px, 3.4vw, 40px); color: var(--navy)"
+            >
+              “Can I retire in 2027?”
+            </p>
+          </div>
+        </section>
+
+        <!-- Four surfaces -->
+        <section class="section section--tight" style="background: var(--card)">
+          <div class="wrap">
+            <div class="section-head center">
+              <p class="eyebrow">One companion, four surfaces</p>
+              <h2>Everything a client asks, in one place</h2>
+            </div>
+            <div class="grid grid--4">
+              <div class="card surface reveal">
+                <div class="surface__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+                </div>
+                <h3>Chat</h3>
+                <p>Grounded, streaming answers from a real LLM that calls financial tools — with visible provenance.</p>
+              </div>
+              <div class="card surface reveal">
+                <div class="surface__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4"/></svg>
+                </div>
+                <h3>Goals</h3>
+                <p>Retirement, income, and funding questions answered with Monte-Carlo planning, not vibes.</p>
+              </div>
+              <div class="card surface reveal">
+                <div class="surface__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12A9 9 0 1 1 12 3"/><path d="M12 12 21 12A9 9 0 0 0 12 3Z"/></svg>
+                </div>
+                <h3>Portfolio</h3>
+                <p>Allocation, drift, and concentration across held and held-away accounts — with tax-aware rebalancing.</p>
+              </div>
+              <div class="card surface reveal">
+                <div class="surface__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3-6 7-6s7 2.4 7 6"/></svg>
+                </div>
+                <h3>Advisor</h3>
+                <p>The book view: held-away assets detected, an auto-prepared brief, and a clean handoff every time.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- How it works / trust -->
+        <section class="section">
+          <div class="wrap">
+            <div class="section-head center">
+              <p class="eyebrow">How it works</p>
+              <h2>Calculations from tools. Context on every number.</h2>
+            </div>
+            <div class="grid grid--3" style="margin-bottom: 28px">
+              <div class="reveal">
+                <h3 style="font-family: var(--font-sans); font-weight: 700; font-size: 18px">Deterministic tools</h3>
+                <p style="color: var(--ink-2); margin-top: 8px">Numbers come from auditable financial tools — performance, projections, rebalancing — not freeform model text.</p>
+              </div>
+              <div class="reveal">
+                <h3 style="font-family: var(--font-sans); font-weight: 700; font-size: 18px">Provenance everywhere</h3>
+                <p style="color: var(--ink-2); margin-top: 8px">Every important figure carries a source and a timestamp. Tool chips show their work, then resolve to sources.</p>
+              </div>
+              <div class="reveal">
+                <h3 style="font-family: var(--font-sans); font-weight: 700; font-size: 18px">Advisor in the loop</h3>
+                <p style="color: var(--ink-2); margin-top: 8px">Insights read like advisor preparation. The assistant never gives directive advice — it hands off.</p>
+              </div>
+            </div>
+            <div class="trust reveal">
+              <h3>Built for trust, by design</h3>
+              <p>
+                100% synthetic demo data — no real client information anywhere. The assistant is
+                educational, never directive, and routes every tax, legal, or transaction decision to
+                a fiduciary advisor.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Features (rendered from content.js) -->
+        <section class="section section--tight" style="background: var(--card)">
+          <div class="wrap">
+            <div class="section-head center">
+              <p class="eyebrow">Capabilities</p>
+              <h2>What's inside today</h2>
+            </div>
+            <div class="grid grid--3" id="features"></div>
+          </div>
+        </section>
+
+        <!-- Screens (rendered from content.js) -->
+        <section class="section">
+          <div class="wrap">
+            <div class="section-head center">
+              <p class="eyebrow">The app</p>
+              <h2>See it in motion</h2>
+            </div>
+            <div class="screens" id="screens"></div>
+          </div>
+        </section>
+
+        <!-- Vision / moat -->
+        <section class="section vision">
+          <div class="wrap">
+            <div class="section-head center">
+              <p class="eyebrow">The vision</p>
+              <h2>What the funded platform becomes</h2>
+              <p class="lede">
+                The moat is the governed intelligence loop created when client questions, advisor
+                handoffs, tool usage, and outcomes are safely connected — a Client Intelligence Layer
+                that runs nightly and compounds.
+              </p>
+            </div>
+            <div class="loops">
+              <div class="loop reveal">
+                <span class="loop__marker">1</span>
+                <div><h4>Per-client learning</h4><p>Knows every client better every day.</p></div>
+              </div>
+              <div class="loop reveal">
+                <span class="loop__marker">2</span>
+                <div><h4>Cross-client patterns</h4><p>Every client benefits from patterns across the book — fully anonymized.</p></div>
+              </div>
+              <div class="loop reveal">
+                <span class="loop__marker">3</span>
+                <div><h4>System outcomes</h4><p>Measurably better every week it runs.</p></div>
+              </div>
+              <div class="loop reveal">
+                <span class="loop__marker">✓</span>
+                <div><h4>Provenance</h4><p>Every fact has a source, a timestamp, and an audit trail.</p></div>
+              </div>
+            </div>
+
+            <div class="roadmap reveal">
+              <p class="roadmap__label">PATH TO PRODUCTION</p>
+              <div class="steps">
+                <span class="step step--today">Demo</span>
+                <span class="sep">→</span>
+                <span class="step">LLM chat</span>
+                <span class="sep">→</span>
+                <span class="step">Real data</span>
+                <span class="sep">→</span>
+                <span class="step">Briefs</span>
+                <span class="sep">→</span>
+                <span class="step">Memory</span>
+                <span class="sep">→</span>
+                <span class="step">Production</span>
+              </div>
+            </div>
+
+            <p class="vision__closing">Models are rented. This memory is owned — and it compounds.</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===================== UPDATES ===================== -->
+      <div data-view="updates">
+        <section class="section">
+          <div class="wrap">
+            <div class="section-head center">
+              <p class="eyebrow">Release log</p>
+              <h2>What's new</h2>
+              <p class="lede">Every build that's shipped to the team, newest first.</p>
+            </div>
+            <div class="changelog" id="changelog"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <img class="logo" src="assets/logo-white.svg" alt="Allworth" />
+      <div class="footer__rule"></div>
+      <p id="footer-version">Allworth Companion · v1.0.0</p>
+      <p style="margin-top: 8px">
+        Educational information, not investment advice. Allworth Financial demo — synthetic data.
+      </p>
+      <p style="margin-top: 8px; opacity: 0.6">Internal &amp; confidential.</p>
+    </footer>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+      <button class="lightbox__close" id="lightbox-close" aria-label="Close">×</button>
+      <img id="lightbox-img" src="" alt="" />
+    </div>
+
+    <script src="assets/content.js"></script>
+    <script src="assets/app.js"></script>
+  </body>
+</html>

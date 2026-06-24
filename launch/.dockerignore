@@ -1,0 +1,7 @@
+.git
+node_modules
+scripts
+README.md
+fly.toml
+Dockerfile
+.dockerignore
