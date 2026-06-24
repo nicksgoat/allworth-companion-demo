@@ -51,8 +51,8 @@ export function AdvisorHandoffCard({
 
   const requestedText =
     requestedAction === "schedule"
-      ? `Preparing an agenda for ${firstName} in chat`
-      : `Drafting a note for ${firstName} in chat`;
+      ? `Saved to your calendar — ${firstName} will confirm`
+      : `Saved & sent to ${firstName}`;
 
   if (compact) {
     if (requestedAction) {

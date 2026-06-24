@@ -40,13 +40,13 @@ export function usePulse(min = 0.35, max = 1, duration = 700): Animated.Value {
           toValue: min,
           duration,
           easing: Easing.inOut(Easing.quad),
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
         Animated.timing(value, {
           toValue: max,
           duration,
           easing: Easing.inOut(Easing.quad),
-          useNativeDriver: false,
+          useNativeDriver: true,
         }),
       ]),
     );

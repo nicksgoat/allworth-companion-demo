@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -71,7 +71,8 @@ const dynamicSuggestions = ({
   sources: string[];
   dashboard: Dashboard | null;
 }): string[] => {
-  if (suggested.length > 0 && !hasLegacySuggestions(suggested)) return compactSuggestions(suggested);
+  if (suggested.length > 0 && !hasLegacySuggestions(suggested))
+    return compactSuggestions(suggested);
 
   const text = `${latestUserText} ${assistantText}`.toLowerCase();
   const candidates: string[] = [];
@@ -103,37 +104,15 @@ const dynamicSuggestions = ({
   return compactSuggestions(candidates);
 };
 
-const advisorHandoffPrompt = (
-  message: ChatMessage,
-  advisorName: string | undefined,
-  action: "message" | "schedule",
-): string => {
-  const advisorFirst = advisorName?.split(" ")[0] ?? "my advisor";
-  const sources = message.sources.length ? message.sources.join(", ") : "the conversation";
-  const answer = message.text.trim().replace(/\s+/g, " ").slice(0, 900);
-  if (action === "schedule") {
-    return [
-      `Help me prepare a short agenda for a meeting with ${advisorFirst} about this.`,
-      `Use the sources: ${sources}.`,
-      "Include the decision to review, the key numbers or trade-offs, and the questions I should ask.",
-      "Keep it advisor-prep language, not instructions to trade or make a final tax decision.",
-      `Context from the assistant answer: ${answer}`,
-    ].join(" ");
-  }
-  return [
-    `Draft a concise message I can send to ${advisorFirst} about this.`,
-    `Use the sources: ${sources}.`,
-    "Include the specific concern, what needs review, and the next question for my advisor.",
-    "Do not make it sound generic, and do not tell anyone to place a trade.",
-    `Context from the assistant answer: ${answer}`,
-  ].join(" ");
-};
-
 export function ChatScreen() {
   const app = useApp();
   const insets = useSafeAreaInsets();
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  // Id of the last assistant message that has finished typing in — follow-up
+  // suggestion chips wait for this, so they don't pop in mid-reveal.
+  const [revealedId, setRevealedId] = useState<string | null>(null);
+  const handleRevealed = useCallback((id: string) => setRevealedId(id), []);
   const scrollRef = useRef<ScrollView>(null);
   // "Stick to bottom": follow a streaming answer only while you're already at
   // the bottom. The moment you scroll up to read, we stop following so the
@@ -264,9 +243,33 @@ export function ChatScreen() {
     ]);
 
     const conversationId = `${app.clientId}:${app.session}`;
+    // Coalesce token deltas to one repaint per frame. GPT-4o streams tokens far
+    // faster than 60fps, and each delta re-renders the whole ScrollView (no
+    // virtualization) plus a scrollToEnd — applying every token individually
+    // thrashes the UI thread. Buffer text and flush on rAF; flush eagerly before
+    // any non-text event (tool widget, done) so ordering is preserved.
+    let pendingText = "";
+    let rafScheduled = false;
+    const flushText = () => {
+      rafScheduled = false;
+      if (!pendingText) return;
+      const delta = pendingText;
+      pendingText = "";
+      applyEvent({ kind: "text", delta });
+    };
     for await (const event of app.api.chat(app.clientId, app.session, text, conversationId)) {
-      applyEvent(event);
+      if (event.kind === "text") {
+        pendingText += event.delta;
+        if (!rafScheduled) {
+          rafScheduled = true;
+          requestAnimationFrame(flushText);
+        }
+      } else {
+        flushText();
+        applyEvent(event);
+      }
     }
+    flushText();
     app.setChatMessages((msgs) => {
       const last = msgs[msgs.length - 1];
       if (!last || last.role !== "assistant") return msgs;
@@ -305,7 +308,11 @@ export function ChatScreen() {
     >
       <ScrollView
         ref={scrollRef}
-        contentContainerStyle={{ padding: space[5], paddingTop: insets.top + space[2], gap: space[5] }}
+        contentContainerStyle={{
+          padding: space[5],
+          paddingTop: insets.top + space[2],
+          gap: space[5],
+        }}
         keyboardDismissMode="interactive"
         scrollEventThrottle={16}
         onScroll={onScroll}
@@ -325,12 +332,15 @@ export function ChatScreen() {
             showIdentity={app.chatMessages[i - 1]?.role !== "assistant"}
             onFeedback={sendFeedback}
             handoffDisabled={sending}
-            onAdvisorHandoff={(assistantMessage, action) =>
-              send(advisorHandoffPrompt(assistantMessage, app.dashboard?.advisor?.name, action))
-            }
+            onRevealed={handleRevealed}
           />
         ))}
-        <SuggestionChips messages={app.chatMessages} sending={sending} onPick={send} />
+        <SuggestionChips
+          messages={app.chatMessages}
+          sending={sending}
+          revealedId={revealedId}
+          onPick={send}
+        />
       </ScrollView>
 
       <View style={styles.inputArea}>
@@ -361,14 +371,18 @@ export function ChatScreen() {
 function SuggestionChips({
   messages,
   sending,
+  revealedId,
   onPick,
 }: {
   messages: ChatMessage[];
   sending: boolean;
+  revealedId: string | null;
   onPick: (text: string) => void;
 }) {
   const last = messages[messages.length - 1];
   if (sending || !last || last.role !== "assistant" || last.isStreaming) return null;
+  // Hold the chips until the answer has fully typed in, not just when the stream ends.
+  if (last.id !== revealedId) return null;
   const suggested = last.suggested ?? [];
   if (!suggested.length) return null;
   return (
