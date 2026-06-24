@@ -15,7 +15,7 @@ from allworth_api.config import (
     llm_timeout_seconds,
 )
 from allworth_api.core.audit import estimate_tokens
-from allworth_api.core.conversation_memory import append_turn, default_conversation_id, recent_messages
+from allworth_api.core.conversation_store import append_turns, load_turns
 from allworth_api.core.memory import (
     active_facts,
     add_facts,
@@ -29,12 +29,42 @@ from allworth_api.core.prompts import STABLE_SYSTEM, volatile_context
 from allworth_api.core.tool_defs import TOOL_DEFINITIONS, TOOL_LABELS
 from allworth_api.core.tool_runner import run_tool
 from allworth_api.core.vision_scorecard import score_chat_turn
-from allworth_api.data.advisors import advisor_for_client
 from allworth_api.data.llm import CHAT_MODEL, EXTRACT_MODEL, provider
-from allworth_api.data.seed import seed
+from allworth_api.data.seed import advisor_for_client, current_seed, set_current_client
 
 MAX_TOOL_ROUNDS = 8
 logger = logging.getLogger("allworth_api.chat")
+
+# Tools whose structured result the client renders as a rich inline widget
+# (the rebalancer + the Monte Carlo retirement projection).
+VISUAL_TOOLS = {
+    "rebalance",
+    "run_retirement_projection",
+    "simulate",
+    "run_mock_rebalance",
+    "run_monte_carlo",
+}
+
+
+def _widget_payload(name: str, result: dict, client_id: str) -> dict | None:
+    """Map a tool result to the shape the frontend ChatToolWidget renders.
+
+    The widget routes by result shape (trades + target_allocation -> rebalance,
+    pathSnapshots + successRate -> projection), so the vision tools — which wrap
+    those results in a canonical schema — are mapped to their widget-shaped data.
+    Vision run_monte_carlo only carries terminal percentiles (no path snapshots),
+    so we reuse the planning projection fan for the visual.
+    """
+    if name == "run_mock_rebalance":
+        return result.get("underlying_rebalance")
+    if name == "run_monte_carlo":
+        from allworth_api.core.planning import run_retirement_projection
+
+        try:
+            return run_retirement_projection()
+        except Exception:
+            return None
+    return result
 
 SOURCE_NAMES = {
     "get_client_context": "Client context",
@@ -424,7 +454,15 @@ async def _stream_live(
             if isinstance(result, dict) and "error" in result:
                 tool_errors += 1
             sources.add(SOURCE_NAMES.get(tc.name, tc.name))
-            yield "tool_end", {"name": tc.name}
+            # Surface the structured result to the client for the tools the app
+            # renders as rich inline widgets (rebalancer + Monte Carlo). Other
+            # tools only send the name to keep the stream light.
+            end_payload = {"name": tc.name}
+            if tc.name in VISUAL_TOOLS and isinstance(result, dict) and "error" not in result:
+                widget = _widget_payload(tc.name, result, client_id)
+                if isinstance(widget, dict):
+                    end_payload["result"] = widget
+            yield "tool_end", end_payload
             results.append(json.dumps(result))
 
         # Format tool results in provider-specific way and add to conversation
@@ -517,13 +555,21 @@ async def stream_chat(
     message: str,
     conversation_id: str | None = None,
 ) -> AsyncIterator[tuple[str, dict]]:
-    """Async generator of (event, data) tuples for one stateless chat turn."""
+    """Async generator of (event, data) tuples for one chat turn.
+
+    The turn itself is computed statelessly, but prior turns for this
+    (client_id, session) thread are loaded from the conversation store so the
+    model remembers earlier prompts and answers (see conversation_store). The
+    optional conversation_id is accepted for API compatibility; memory is keyed
+    on (client_id, session).
+    """
+    set_current_client(client_id)
+    seed = current_seed()
     client = next((c for c in seed["personas"]["clients"] if c["id"] == client_id), None)
     advisor = advisor_for_client(client_id)
     client_name = client["name"] if client else None
     advisor_name = advisor["name"]
-    conversation_id = conversation_id or default_conversation_id(client_id, session)
-    prior_messages = await recent_messages(client_id, conversation_id)
+    prior_messages = await load_turns(client_id, session)
     messages = _sanitize_messages([
         *prior_messages,
         {"role": "user", "content": message},
@@ -556,10 +602,19 @@ async def stream_chat(
         yield "error", {"message": "Something went wrong. Please try again."}
         return
 
+    # Persist this turn so the next prompt in the thread remembers it.
+    await append_turns(
+        client_id,
+        session,
+        [
+            {"role": "user", "content": user_text},
+            {"role": "assistant", "content": out["text"]},
+        ],
+    )
+
     append_episode(client_id, session, "user", user_text)
     sanitized_answer = _sanitize_advisor_references(out["text"], advisor_name)
     append_episode(client_id, session, "assistant", sanitized_answer)
-    await append_turn(client_id, conversation_id, user_text, sanitized_answer)
     task = asyncio.create_task(_extract_facts(client_id, user_text))
     _bg_tasks.add(task)
     task.add_done_callback(_bg_tasks.discard)

@@ -6,6 +6,7 @@ import type {
   ChatEvent,
   ChatMessage,
   Dashboard,
+  MeetingNotesResponse,
   Portfolio,
   ProactiveResponse,
   ProfileResponse,
@@ -70,6 +71,10 @@ export class ApiClient {
 
   profile(clientId: string): Promise<ProfileResponse> {
     return this.get(`/api/clients/${clientId}/profile`);
+  }
+
+  meetingNotes(clientId: string): Promise<MeetingNotesResponse> {
+    return this.get(`/api/clients/${clientId}/meeting-notes`);
   }
 
   proactive(clientId: string, session: string): Promise<ProactiveResponse> {
@@ -191,7 +196,7 @@ function parseEvent(event: string, json: string): ChatEvent | null {
     case "tool_start":
       return { kind: "tool_start", name: obj.name ?? "", label: obj.label ?? "Working…" };
     case "tool_end":
-      return { kind: "tool_end", name: obj.name ?? "" };
+      return { kind: "tool_end", name: obj.name ?? "", result: obj.result };
     case "text":
       return { kind: "text", delta: obj.delta ?? "" };
     case "done":

@@ -24,7 +24,7 @@ from allworth_api.core.quality_loop import (
 )
 from allworth_api.core.vision_scorecard import score_chat_turn
 from allworth_api.data.advisors import advisor_for_client
-from allworth_api.data.seed import seed
+from allworth_api.data.seed import current_seed, set_current_client
 from allworth_api.routes.clients import dashboard
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "quality_loop.py"
@@ -73,6 +73,8 @@ def test_vision_scorecard_accepts_canonical_vision_tool_aliases() -> None:
 
 
 def test_advisor_resolution_uses_client_advisor_id_not_seed_order() -> None:
+    set_current_client("maya")
+    seed = current_seed()
     advisors = seed["personas"]["advisors"]
     seed["personas"]["advisors"] = [
         {"id": "other", "name": "Other Advisor", "title": "Advisor", "avatarInitials": "OA"},

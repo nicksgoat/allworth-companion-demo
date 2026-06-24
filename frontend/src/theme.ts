@@ -1,4 +1,4 @@
-import { Platform } from "react-native";
+import { Platform, TextStyle } from "react-native";
 
 // All values from ALW001_01_Brand_Dashboard_DEC2024.pdf (the brand source of truth)
 export const colors = {
@@ -12,6 +12,7 @@ export const colors = {
   beige: "#EBE9DD",
   linen: "#F3F2E5",
   ice: "#EDF2F7",
+  surfaceHero: "#0C2E4E", // Night Blue — premium dark hero/sheet surface (brand: Night Blue → Indigo)
 
   // Monotone (p.7) — black + dark gray for copy and stats
   inkPrimary: "#000000",
@@ -51,6 +52,42 @@ export const fonts = {
 
 export const cardRadius = 16;
 
+// 4px spacing scale. Snap paddings / margins / gaps to these so the whole app
+// shares one rhythm instead of ~25 near-duplicate magic numbers.
+export const space = {
+  0: 0,
+  1: 4,
+  2: 8,
+  3: 12,
+  4: 16,
+  5: 20,
+  6: 24,
+  8: 32,
+  10: 40,
+  12: 48,
+} as const;
+
+// Corner radii. `card` is already 16; `pill` for fully-rounded chips/buttons.
+export const radius = {
+  chip: 10,
+  card: cardRadius,
+  pill: 999,
+  hairline: 1,
+} as const;
+
+// The single, brand-correct elevation: a tight navy-tinted lift. Reuse this
+// instead of inventing new shadow treatments so the UI stays flat and upmarket.
+export const shadowSoft = Platform.select({
+  web: { boxShadow: "0 2px 8px rgba(12, 46, 78, 0.05)" },
+  default: {
+    shadowColor: "#0C2E4E",
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+});
+
 export const card = {
   backgroundColor: colors.surfaceCard,
   borderRadius: cardRadius,
@@ -58,16 +95,7 @@ export const card = {
   // reads as a clean lift on iOS rather than a muddy navy band under the card.
   borderWidth: 1,
   borderColor: "rgba(23,61,103,0.05)",
-  ...Platform.select({
-    web: { boxShadow: "0 2px 8px rgba(12, 46, 78, 0.05)" },
-    default: {
-      shadowColor: "#0C2E4E",
-      shadowOpacity: 0.05,
-      shadowRadius: 8,
-      shadowOffset: { width: 0, height: 2 },
-      elevation: 2,
-    },
-  }),
+  ...shadowSoft,
 } as const;
 
 export const sectionHeader = {
@@ -77,6 +105,24 @@ export const sectionHeader = {
   letterSpacing: 0.6,
   color: colors.inkTertiary,
 } as const;
+
+// Type scale — Playfair Display for display/title/heading, Lato for body/caption.
+// Collapses the app's ~24 ad-hoc font sizes into one ladder; model big stats on
+// `display` (Playfair Medium + tabular figures, per brand).
+export const text = {
+  display: {
+    fontFamily: fonts.displayMedium,
+    fontSize: 48,
+    color: colors.inkPrimary,
+    fontVariant: ["tabular-nums"],
+  },
+  title: { fontFamily: fonts.displayMedium, fontSize: 28, color: colors.inkPrimary },
+  heading: { fontFamily: fonts.displayMedium, fontSize: 20, color: colors.inkPrimary },
+  sectionLabel: sectionHeader,
+  body: { fontFamily: fonts.sans, fontSize: 15, color: colors.inkPrimary },
+  bodySm: { fontFamily: fonts.sans, fontSize: 13, color: colors.inkSecondary },
+  caption: { fontFamily: fonts.sans, fontSize: 12, color: colors.inkTertiary },
+} satisfies Record<string, TextStyle>;
 
 // "$2,746,000" — negatives render as "-$310,000"
 export function usd(n: number): string {

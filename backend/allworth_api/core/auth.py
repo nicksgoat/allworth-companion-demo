@@ -49,6 +49,7 @@ class HouseholdSession:
 # Used as fallback when Synapse is unavailable or for local testing
 _DEMO_CREDENTIALS: dict[str, str] = {
     "maya": "demo",
+    "kenny": "demo",
     "hh_castillo": "demo",
     "hh_raman": "demo",
 }
@@ -107,10 +108,10 @@ def _lookup_email_in_seed(email: str) -> dict[str, Any] | None:
     Mirrors _lookup_email_in_synapse so the same email login screen works in both
     mock and live mode — flipping DATA_MODE doesn't change how you sign in.
     """
-    from allworth_api.data.seed import seed
+    from allworth_api.data.seed import all_client_personas
 
     target = email.strip().lower()
-    for c in seed["personas"]["clients"]:
+    for c in all_client_personas():
         if (c.get("email") or "").lower() == target:
             return {
                 "household_id": c["id"],
@@ -238,21 +239,26 @@ async def get_current_household(request: Request) -> str:
     Checks Authorization header (Bearer token) or falls back to query param
     for demo convenience. Returns the household_id.
     """
+    from allworth_api.data.seed import set_current_client
+
     # Check Authorization header
     auth_header = request.headers.get("Authorization", "")
     if auth_header.startswith("Bearer "):
         token = auth_header[7:]
         session = get_session(token)
         if session:
+            set_current_client(session.household_id)
             return session.household_id
 
     if demo_auth_fallback_enabled():
         # Fallback: X-Household-Id header (for demo/dev without full login)
         household_header = request.headers.get("X-Household-Id", "")
         if household_header:
+            set_current_client(household_header)
             return household_header
 
         # Final fallback for backward compat during dev
+        set_current_client("maya")
         return "maya"
 
     raise HTTPException(status_code=401, detail="Authentication required")

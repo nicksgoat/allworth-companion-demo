@@ -16,7 +16,7 @@ from allworth_api.data import synapse
 from allworth_api.data.seed import accounts_for as seed_accounts_for
 from allworth_api.data.seed import performance_cash_flows_for as seed_performance_cash_flows_for
 from allworth_api.data.seed import portfolio_for as seed_portfolio_for
-from allworth_api.data.seed import seed
+from allworth_api.data.seed import seed_for
 from allworth_api.data.seed import spending_summary as seed_spending_summary
 
 logger = logging.getLogger(__name__)
@@ -69,7 +69,8 @@ def _fallback_or_raise(factory, reason: str):
 def get_client_persona(household_id: str) -> dict[str, Any] | None:
     """Build a ClientPersona-shaped dict for the household."""
     if not _is_synapse_household(household_id):
-        return next((c for c in seed["personas"]["clients"] if c["id"] == household_id), None)
+        clients = seed_for(household_id)["personas"]["clients"]
+        return next((c for c in clients if c["id"] == household_id), None)
 
     try:
         hh_id = _resolve_hh(household_id)
@@ -123,13 +124,15 @@ def _calc_age(dob: Any) -> int | None:
 def get_accounts(household_id: str) -> dict[str, Any]:
     """Return accounts summary shaped for the dashboard."""
     if not _is_synapse_household(household_id):
-        return seed_accounts_for()
+        return seed_accounts_for(household_id)
 
     try:
         hh_id = _resolve_hh(household_id)
         raw = synapse.get_accounts(hh_id)
         if not raw:
-            return _fallback_or_raise(seed_accounts_for, "no Synapse accounts returned")
+            return _fallback_or_raise(
+                lambda: seed_accounts_for(household_id), "no Synapse accounts returned"
+            )
 
         allworth = []
         outside = []
@@ -171,7 +174,9 @@ def get_accounts(household_id: str) -> dict[str, Any]:
         }
     except Exception as e:
         logger.warning(f"Synapse accounts failed for {household_id}: {e}")
-        return _fallback_or_raise(seed_accounts_for, f"accounts query failed: {e}")
+        return _fallback_or_raise(
+            lambda: seed_accounts_for(household_id), f"accounts query failed: {e}"
+        )
 
 
 def _infer_institution(custodian: str, model_name: str | None) -> str:
@@ -213,13 +218,13 @@ def _map_account_type(raw_type: str) -> str:
 def get_net_worth_history(household_id: str) -> list[dict[str, Any]]:
     """Return monthly net worth history for the dashboard chart."""
     if not _is_synapse_household(household_id):
-        return seed["netWorthHistory"]
+        return seed_for(household_id)["netWorthHistory"]
 
     try:
         hh_id = _resolve_hh(household_id)
         raw = synapse.get_net_worth_history(hh_id)
         if not raw:
-            return seed["netWorthHistory"]
+            return seed_for(household_id)["netWorthHistory"]
 
         # Deduplicate by month — keep the latest period_key per month
         by_month: dict[str, int] = {}
@@ -234,11 +239,13 @@ def get_net_worth_history(household_id: str) -> list[dict[str, Any]]:
         result = [{"month": m, "value": v} for m, v in by_month.items()]
         result = result[-12:]  # last 12 months
         return result if result else _fallback_or_raise(
-            lambda: seed["netWorthHistory"], "no net worth history"
+            lambda: seed_for(household_id)["netWorthHistory"], "no net worth history"
         )
     except Exception as e:
         logger.warning(f"Synapse net worth history failed for {household_id}: {e}")
-        return _fallback_or_raise(lambda: seed["netWorthHistory"], f"net worth query failed: {e}")
+        return _fallback_or_raise(
+            lambda: seed_for(household_id)["netWorthHistory"], f"net worth query failed: {e}"
+        )
 
 
 # ── Portfolio / positions ─────────────────────────────────────────────────
@@ -247,13 +254,15 @@ def get_net_worth_history(household_id: str) -> list[dict[str, Any]]:
 def get_portfolio(household_id: str) -> dict[str, Any]:
     """Return portfolio data (positions by account)."""
     if not _is_synapse_household(household_id):
-        return seed_portfolio_for()
+        return seed_portfolio_for(household_id)
 
     try:
         hh_id = _resolve_hh(household_id)
         raw = synapse.get_holdings(hh_id)
         if not raw:
-            return _fallback_or_raise(seed_portfolio_for, "no Synapse holdings returned")
+            return _fallback_or_raise(
+                lambda: seed_portfolio_for(household_id), "no Synapse holdings returned"
+            )
 
         positions = []
         by_account: dict[str, list] = {}
@@ -277,7 +286,9 @@ def get_portfolio(household_id: str) -> dict[str, Any]:
         return {"positions": positions, "byAccount": by_account}
     except Exception as e:
         logger.warning(f"Synapse portfolio failed for {household_id}: {e}")
-        return _fallback_or_raise(seed_portfolio_for, f"portfolio query failed: {e}")
+        return _fallback_or_raise(
+            lambda: seed_portfolio_for(household_id), f"portfolio query failed: {e}"
+        )
 
 
 def _map_asset_class(raw: str) -> str:
@@ -302,7 +313,7 @@ def _map_asset_class(raw: str) -> str:
 def get_spending(household_id: str, months: int = 3) -> dict[str, Any]:
     """Return spending summary. Currently only available from seed data."""
     if not _is_synapse_household(household_id):
-        return seed_spending_summary(months)
+        return seed_spending_summary(months, household_id)
 
     # Synapse rollforward has cash withdrawal / expenses data
     try:
@@ -310,7 +321,7 @@ def get_spending(household_id: str, months: int = 3) -> dict[str, Any]:
         raw = synapse.get_rollforward(hh_id, periods=max(months, 12))
         if not raw:
             return _fallback_or_raise(
-                lambda: seed_spending_summary(months), "no Synapse rollforward returned"
+                lambda: seed_spending_summary(months, household_id), "no Synapse rollforward returned"
             )
 
         monthly = []
@@ -326,7 +337,9 @@ def get_spending(household_id: str, months: int = 3) -> dict[str, Any]:
         monthly.reverse()  # oldest first
         recent = monthly[-months:] if monthly else []
         if not recent:
-            return _fallback_or_raise(lambda: seed_spending_summary(months), "no recent Synapse spending")
+            return _fallback_or_raise(
+                lambda: seed_spending_summary(months, household_id), "no recent Synapse spending"
+            )
 
         avg = sum(m["total"] for m in recent) / len(recent)
         # No plan data in Synapse — use a reasonable estimate
@@ -341,7 +354,9 @@ def get_spending(household_id: str, months: int = 3) -> dict[str, Any]:
         }
     except Exception as e:
         logger.warning(f"Synapse spending failed for {household_id}: {e}")
-        return _fallback_or_raise(lambda: seed_spending_summary(months), f"spending query failed: {e}")
+        return _fallback_or_raise(
+            lambda: seed_spending_summary(months, household_id), f"spending query failed: {e}"
+        )
 
 
 # ── Parallel dashboard fetch ─────────────────────────────────────────────
@@ -354,12 +369,14 @@ def get_dashboard_data(household_id: str) -> dict[str, Any]:
     For Synapse households, runs all queries concurrently via thread pool.
     """
     if not _is_synapse_household(household_id):
+        seed = seed_for(household_id)
+        clients = seed["personas"]["clients"]
         return {
-            "client": next((c for c in seed["personas"]["clients"] if c["id"] == household_id), None),
-            "accounts": seed_accounts_for(),
+            "client": next((c for c in clients if c["id"] == household_id), None),
+            "accounts": seed_accounts_for(household_id),
             "net_worth_history": seed["netWorthHistory"],
             "performance_cash_flows": seed_performance_cash_flows_for(),
-            "spending": seed_spending_summary(3),
+            "spending": seed_spending_summary(3, household_id),
         }
 
     import time as _time
@@ -385,14 +402,16 @@ def get_dashboard_data(household_id: str) -> dict[str, Any]:
 
     # Apply fallbacks for any failed queries
     if results.get("accounts") is None:
-        results["accounts"] = _fallback_or_raise(seed_accounts_for, "dashboard accounts failed")
+        results["accounts"] = _fallback_or_raise(
+            lambda: seed_accounts_for(household_id), "dashboard accounts failed"
+        )
     if results.get("net_worth_history") is None:
         results["net_worth_history"] = _fallback_or_raise(
-            lambda: seed["netWorthHistory"], "dashboard net worth history failed"
+            lambda: seed_for(household_id)["netWorthHistory"], "dashboard net worth history failed"
         )
     if results.get("spending") is None:
         results["spending"] = _fallback_or_raise(
-            lambda: seed_spending_summary(3), "dashboard spending failed"
+            lambda: seed_spending_summary(3, household_id), "dashboard spending failed"
         )
     results["performance_cash_flows"] = seed_performance_cash_flows_for()
 

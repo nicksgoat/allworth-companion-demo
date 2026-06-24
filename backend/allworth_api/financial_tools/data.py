@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from allworth_api.data.seed import seed
+from allworth_api.data.seed import DEFAULT_CLIENT, current_seed, seed_for
 
 DEFAULT_MODEL_ID = "AWF - Core-Satellite - 60/40"
 DEFAULT_MODEL_VERSION = "mock-core-satellite-2026-06"
@@ -28,6 +28,7 @@ def get_portfolio(user_id: str) -> dict[str, Any]:
     if not _current_user_is_demo(user_id):
         return {"error": "user_id required"}
 
+    seed = current_seed()
     total_value = sum(p["value"] for p in seed["positions"])
     holdings_by_ticker: dict[str, dict[str, Any]] = {}
 
@@ -70,6 +71,7 @@ def get_default_rebalance_holdings(user_id: str, account_id: str | None = None) 
     if not _current_user_is_demo(user_id):
         return []
 
+    seed = current_seed()
     positions = [
         position
         for position in seed["positions"]
@@ -125,7 +127,11 @@ def get_default_rebalance_holdings(user_id: str, account_id: str | None = None) 
 
 def get_model_allocation(model_id: str) -> dict[str, Any]:
     """Return a mock model allocation shaped after Synapse model tables."""
-    allocation_models = seed.get("allocationModels", {})
+    # House models are shared across clients; fall back to the default seed so
+    # a leaner per-client seed doesn't need to duplicate them.
+    allocation_models = current_seed().get("allocationModels") or seed_for(DEFAULT_CLIENT).get(
+        "allocationModels", {}
+    )
     source_tables = allocation_models.get("sourceTables", {})
     resolved_model_id = MODEL_ALIASES.get(model_id, model_id)
     model_rows = allocation_models.get("modelList", [])

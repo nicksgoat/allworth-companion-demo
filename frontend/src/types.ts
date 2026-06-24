@@ -149,6 +149,20 @@ export interface ProfileResponse {
   facts: LearnedFact[];
 }
 
+export interface MeetingNote {
+  id: string;
+  date: string;
+  title: string;
+  summary: string;
+  advisor: string;
+  attendees?: string[];
+}
+
+export interface MeetingNotesResponse {
+  clientId: string;
+  notes: MeetingNote[];
+}
+
 export interface ProactiveResponse {
   message: string;
   suggested?: string[];
@@ -197,6 +211,13 @@ export interface ToolChip {
   running: boolean;
 }
 
+// A tool whose structured result the chat renders as a rich inline widget
+// (the rebalancer + the Monte Carlo projection).
+export interface ToolWidget {
+  name: string;
+  result: any;
+}
+
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
@@ -205,6 +226,7 @@ export interface ChatMessage {
   sources: string[];
   isStreaming: boolean;
   suggested?: string[];
+  widgets?: ToolWidget[];
   feedback?: "positive" | "negative";
   quality?: {
     vision_score?: number;
@@ -215,7 +237,7 @@ export interface ChatMessage {
 
 export type ChatEvent =
   | { kind: "tool_start"; name: string; label: string }
-  | { kind: "tool_end"; name: string }
+  | { kind: "tool_end"; name: string; result?: any }
   | { kind: "text"; delta: string }
   | { kind: "done"; sources: string[]; suggested: string[]; quality?: ChatMessage["quality"] }
   | { kind: "error"; message: string };

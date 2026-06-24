@@ -1,8 +1,7 @@
 """Rule-based nudge engine. Deterministic — no LLM involved."""
 
 from allworth_api.core.formatting import fmt_usd, js_round
-from allworth_api.data.advisors import advisor_first_name_for_client
-from allworth_api.data.seed import portfolio_for, seed, spending_summary
+from allworth_api.data.seed import advisor_for_client, portfolio_for, seed_for, spending_summary
 
 FUNDS = {"VTI", "VXUS", "VTEB", "BND", "FXAIX", "FSPSX", "FXNAX", "SPAXX"}
 
@@ -76,9 +75,10 @@ def build_nudges(
 
 
 def nudges_for(client_id: str) -> list[dict]:
+    advisor_first_name = advisor_for_client(client_id)["name"].split(",")[0].split()[0]
     return build_nudges(
-        spending_summary(3),
-        portfolio_for()["positions"],
-        seed["accounts"],
-        advisor_first_name_for_client(client_id),
+        spending_summary(3, client_id),
+        portfolio_for(client_id)["positions"],
+        seed_for(client_id)["accounts"],
+        advisor_first_name,
     )

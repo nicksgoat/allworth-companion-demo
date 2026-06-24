@@ -1,0 +1,589 @@
+{
+  "generatedAt": "deterministic",
+  "disclaimer": "SYNTHETIC DATA \u2014 Allworth Financial demo. All personas, accounts, balances and transactions are fabricated.",
+  "personas": {
+    "clients": [
+      {
+        "id": "kenny",
+        "name": "Kenny Smith",
+        "email": "kyle@demo.com",
+        "age": 47,
+        "city": "Austin, TX",
+        "advisorId": "kyle",
+        "bio": "Tech executive with a large concentrated NVDA position from early equity grants.",
+        "avatarInitials": "KS"
+      }
+    ],
+    "advisors": [
+      {
+        "id": "kyle",
+        "name": "Kyle Bennett",
+        "title": "Financial Advisor, CFP\u00ae",
+        "avatarInitials": "KB"
+      }
+    ]
+  },
+  "accounts": [
+    {
+      "id": "acct_kenny_brokerage",
+      "name": "Individual Brokerage",
+      "institution": "Allworth (Schwab)",
+      "group": "allworth",
+      "type": "taxable",
+      "balance": 2640000,
+      "history": [
+        1980000,
+        2081626,
+        2122270,
+        2130289,
+        2181835,
+        2289293,
+        2383137,
+        2413785,
+        2424238,
+        2487082,
+        2598151,
+        2640000
+      ]
+    },
+    {
+      "id": "acct_kenny_ira",
+      "name": "Rollover IRA",
+      "institution": "Allworth (Schwab)",
+      "group": "allworth",
+      "type": "ira",
+      "balance": 479260,
+      "history": [
+        430000,
+        438236,
+        440967,
+        440752,
+        444467,
+        453230,
+        460763,
+        462592,
+        462597,
+        467332,
+        476420,
+        479260
+      ]
+    },
+    {
+      "id": "acct_kenny_401k",
+      "name": "Workplace 401(k)",
+      "institution": "Fidelity",
+      "group": "outside",
+      "type": "401k",
+      "balance": 359100,
+      "history": [
+        300000,
+        309131,
+        312756,
+        313436,
+        318045,
+        327703,
+        336131,
+        338854,
+        339753,
+        345383,
+        355366,
+        359100
+      ]
+    },
+    {
+      "id": "acct_kenny_chk",
+      "name": "Checking",
+      "institution": "Chase",
+      "group": "outside",
+      "type": "cash",
+      "balance": 85000,
+      "history": [
+        60000,
+        65163,
+        66092,
+        64755,
+        66441,
+        72009,
+        76632,
+        76866,
+        75698,
+        78169,
+        83988,
+        85000
+      ]
+    },
+    {
+      "id": "acct_kenny_sav",
+      "name": "High-Yield Savings",
+      "institution": "Marcus",
+      "group": "outside",
+      "type": "cash",
+      "balance": 120000,
+      "history": [
+        90000,
+        95040,
+        96692,
+        96531,
+        98789,
+        104153,
+        108760,
+        109857,
+        109831,
+        112717,
+        118281,
+        120000
+      ]
+    },
+    {
+      "id": "acct_kenny_mort",
+      "name": "Home Mortgage",
+      "institution": "Rocket Mortgage",
+      "group": "outside",
+      "type": "liability",
+      "balance": -540000,
+      "history": [
+        -560000,
+        -555869,
+        -555126,
+        -556196,
+        -554848,
+        -550393,
+        -546694,
+        -546507,
+        -547441,
+        -545465,
+        -540810,
+        -540000
+      ]
+    }
+  ],
+  "netWorthHistory": [
+    {
+      "month": "2025-07",
+      "value": 2420000
+    },
+    {
+      "month": "2025-08",
+      "value": 2510000
+    },
+    {
+      "month": "2025-09",
+      "value": 2380000
+    },
+    {
+      "month": "2025-10",
+      "value": 2620000
+    },
+    {
+      "month": "2025-11",
+      "value": 2705000
+    },
+    {
+      "month": "2025-12",
+      "value": 2560000
+    },
+    {
+      "month": "2026-01",
+      "value": 2790000
+    },
+    {
+      "month": "2026-02",
+      "value": 2910000
+    },
+    {
+      "month": "2026-03",
+      "value": 2760000
+    },
+    {
+      "month": "2026-04",
+      "value": 3010000
+    },
+    {
+      "month": "2026-05",
+      "value": 3080000
+    },
+    {
+      "month": "2026-06",
+      "value": 3143360
+    }
+  ],
+  "positions": [
+    {
+      "accountId": "acct_kenny_brokerage",
+      "symbol": "NVDA",
+      "name": "NVIDIA Corp.",
+      "qty": 15000,
+      "price": 170,
+      "assetClass": "us_equity",
+      "value": 2550000,
+      "averageCostBasis": 34.5,
+      "costBasis": 517500,
+      "unrealizedGain": 2032500,
+      "longTermValue": 2550000,
+      "longTermCostBasis": 517500,
+      "longTermUnrealizedGain": 2032500,
+      "shortTermValue": 0,
+      "shortTermCostBasis": 0,
+      "shortTermUnrealizedGain": 0
+    },
+    {
+      "accountId": "acct_kenny_brokerage",
+      "symbol": "CASH",
+      "name": "Cash",
+      "qty": 1,
+      "price": 90000,
+      "assetClass": "cash",
+      "value": 90000
+    },
+    {
+      "accountId": "acct_kenny_ira",
+      "symbol": "VTI",
+      "name": "Vanguard Total Stock Market ETF",
+      "qty": 1100,
+      "price": 295,
+      "assetClass": "us_equity",
+      "value": 324500
+    },
+    {
+      "accountId": "acct_kenny_ira",
+      "symbol": "BND",
+      "name": "Vanguard Total Bond Market ETF",
+      "qty": 2120,
+      "price": 73,
+      "assetClass": "bond",
+      "value": 154760
+    },
+    {
+      "accountId": "acct_kenny_401k",
+      "symbol": "FXAIX",
+      "name": "Fidelity 500 Index Fund",
+      "qty": 1900,
+      "price": 189,
+      "assetClass": "us_equity",
+      "value": 359100
+    }
+  ],
+  "plan": {
+    "clientId": "kenny",
+    "riskTarget": "AWF - Core-Satellite - 60/40",
+    "spendingAssumptionMonthly": 16000,
+    "portfolioIncomeMonthly": 0,
+    "otherIncomeMonthly": 35000,
+    "filingStatus": "married_joint",
+    "state": "TX",
+    "estFederalBracket": 0.35,
+    "capGainsRate": 0.2,
+    "niitApplies": true,
+    "goals": [
+      {
+        "id": "goal_diversify",
+        "label": "Diversify NVDA position",
+        "target": 2550000,
+        "horizonYears": 5,
+        "funded": 0.0
+      },
+      {
+        "id": "goal_college",
+        "label": "Kids' college",
+        "target": 400000,
+        "horizonYears": 6,
+        "funded": 0.25
+      },
+      {
+        "id": "goal_retire",
+        "label": "Retire at 60",
+        "target": null,
+        "detail": "Build a diversified portfolio to support retirement at 60",
+        "funded": null
+      }
+    ]
+  },
+  "spending": [
+    {
+      "month": "2025-07",
+      "total": 16800,
+      "planned": 16000,
+      "categories": {
+        "Housing": 5200,
+        "Travel": 3024,
+        "Dining": 1512,
+        "Health": 720,
+        "Auto": 980,
+        "Gifts/Family": 1176,
+        "Everything else": 4188
+      }
+    },
+    {
+      "month": "2025-08",
+      "total": 17900,
+      "planned": 16000,
+      "categories": {
+        "Housing": 5200,
+        "Travel": 3222,
+        "Dining": 1611,
+        "Health": 720,
+        "Auto": 980,
+        "Gifts/Family": 1253,
+        "Everything else": 4914
+      }
+    },
+    {
+      "month": "2025-09",
+      "total": 16400,
+      "planned": 16000,
+      "categories": {
+        "Housing": 5200,
+        "Travel": 2952,
+        "Dining": 1476,
+        "Health": 720,
+        "Auto": 980,
+        "Gifts/Family": 1148,
+        "Everything else": 3924
+      }
+    },
+    {
+      "month": "2025-10",
+      "total": 18200,
+      "planned": 16000,
+      "categories": {
+        "Housing": 5200,
+        "Travel": 3276,
+        "Dining": 1638,
+        "Health": 720,
+        "Auto": 980,
+        "Gifts/Family": 1274,
+        "Everything else": 5112
+      }
+    },
+    {
+      "month": "2025-11",
+      "total": 19100,
+      "planned": 16000,
+      "categories": {
+        "Housing": 5200,
+        "Travel": 3438,
+        "Dining": 1719,
+        "Health": 720,
+        "Auto": 980,
+        "Gifts/Family": 1337,
+        "Everything else": 5706
+      }
+    },
+    {
+      "month": "2025-12",
+      "total": 21500,
+      "planned": 16000,
+      "categories": {
+        "Housing": 5200,
+        "Travel": 3870,
+        "Dining": 1935,
+        "Health": 720,
+        "Auto": 980,
+        "Gifts/Family": 1505,
+        "Everything else": 7290
+      }
+    },
+    {
+      "month": "2026-01",
+      "total": 16900,
+      "planned": 16000,
+      "categories": {
+        "Housing": 5200,
+        "Travel": 3042,
+        "Dining": 1521,
+        "Health": 720,
+        "Auto": 980,
+        "Gifts/Family": 1183,
+        "Everything else": 4254
+      }
+    },
+    {
+      "month": "2026-02",
+      "total": 17100,
+      "planned": 16000,
+      "categories": {
+        "Housing": 5200,
+        "Travel": 3078,
+        "Dining": 1539,
+        "Health": 720,
+        "Auto": 980,
+        "Gifts/Family": 1197,
+        "Everything else": 4386
+      }
+    },
+    {
+      "month": "2026-03",
+      "total": 16600,
+      "planned": 16000,
+      "categories": {
+        "Housing": 5200,
+        "Travel": 2988,
+        "Dining": 1494,
+        "Health": 720,
+        "Auto": 980,
+        "Gifts/Family": 1162,
+        "Everything else": 4056
+      }
+    },
+    {
+      "month": "2026-04",
+      "total": 17200,
+      "planned": 16000,
+      "categories": {
+        "Housing": 5200,
+        "Travel": 3096,
+        "Dining": 1548,
+        "Health": 720,
+        "Auto": 980,
+        "Gifts/Family": 1204,
+        "Everything else": 4452
+      }
+    },
+    {
+      "month": "2026-05",
+      "total": 17600,
+      "planned": 16000,
+      "categories": {
+        "Housing": 5200,
+        "Travel": 3168,
+        "Dining": 1584,
+        "Health": 720,
+        "Auto": 980,
+        "Gifts/Family": 1232,
+        "Everything else": 4716
+      }
+    },
+    {
+      "month": "2026-06",
+      "total": 17700,
+      "planned": 16000,
+      "categories": {
+        "Housing": 5200,
+        "Travel": 3186,
+        "Dining": 1593,
+        "Health": 720,
+        "Auto": 980,
+        "Gifts/Family": 1239,
+        "Everything else": 4782
+      }
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx_k1",
+      "accountId": "acct_kenny_chk",
+      "date": "2026-06-24",
+      "merchant": "Whole Foods Market",
+      "category": "Groceries",
+      "amount": -312
+    },
+    {
+      "id": "tx_k2",
+      "accountId": "acct_kenny_chk",
+      "date": "2026-06-20",
+      "merchant": "Tesla Supercharger",
+      "category": "Auto",
+      "amount": -41
+    },
+    {
+      "id": "tx_k3",
+      "accountId": "acct_kenny_chk",
+      "date": "2026-06-15",
+      "merchant": "United Airlines",
+      "category": "Travel",
+      "amount": -1840
+    },
+    {
+      "id": "tx_k4",
+      "accountId": "acct_kenny_chk",
+      "date": "2026-06-12",
+      "merchant": "Rocket Mortgage",
+      "category": "Housing",
+      "amount": -4200
+    },
+    {
+      "id": "tx_k5",
+      "accountId": "acct_kenny_chk",
+      "date": "2026-06-08",
+      "merchant": "Austin Country Day School",
+      "category": "Education",
+      "amount": -2650
+    },
+    {
+      "id": "tx_k6",
+      "accountId": "acct_kenny_chk",
+      "date": "2026-06-03",
+      "merchant": "Apple Store",
+      "category": "Everything else",
+      "amount": -1299
+    }
+  ],
+  "book": [
+    {
+      "clientId": "kenny",
+      "name": "Kenny Smith",
+      "managedAssets": 3119260,
+      "heldAwayDetected": 564100,
+      "openNudges": 1,
+      "lastContact": "2026-06-12",
+      "highlight": true
+    },
+    {
+      "clientId": "hh_okafor",
+      "name": "Okafor Family",
+      "managedAssets": 4180000,
+      "heldAwayDetected": 720000,
+      "openNudges": 2,
+      "lastContact": "2026-05-30"
+    },
+    {
+      "clientId": "hh_petrov",
+      "name": "Petrov Household",
+      "managedAssets": 1960000,
+      "heldAwayDetected": 240000,
+      "openNudges": 0,
+      "lastContact": "2026-06-01"
+    }
+  ],
+  "liquidityEvent": {
+    "label": "NVDA RSU vesting",
+    "amount": 320000,
+    "deadline": "2026-08-15",
+    "note": "Kenny has about $320K of NVDA RSUs vesting in August, which would add to an already concentrated position \u2014 deciding whether to sell at vest to diversify."
+  },
+  "meeting_notes": [
+    {
+      "id": "mn_kenny_1",
+      "date": "2026-06-12",
+      "title": "Concentration & diversification strategy",
+      "summary": "Reviewed the concentrated NVDA position (~81% of net worth). Walked through a multi-year, tax-aware diversification plan using the long-term lots and an exchange fund. Next: Kyle to model a 3-year unwind vs. the lump-sum tax cost.",
+      "advisor": "Kyle Bennett",
+      "attendees": [
+        "Kenny Smith",
+        "Kyle Bennett"
+      ]
+    },
+    {
+      "id": "mn_kenny_2",
+      "date": "2026-05-02",
+      "title": "RSU vesting plan",
+      "summary": "$320K of NVDA RSUs vest in August. Discussed selling-to-diversify at vest so it doesn't add to the concentration, and the ordinary-income tax implications.",
+      "advisor": "Kyle Bennett",
+      "attendees": [
+        "Kenny Smith",
+        "Kyle Bennett"
+      ]
+    },
+    {
+      "id": "mn_kenny_3",
+      "date": "2026-03-15",
+      "title": "Onboarding & goals",
+      "summary": "Initial planning session. Set goals: diversify NVDA, fund the kids' college (25% funded), and target retirement at 60. Established a risk target and a cash-reserve floor.",
+      "advisor": "Kyle Bennett",
+      "attendees": [
+        "Kenny Smith",
+        "Kyle Bennett"
+      ]
+    }
+  ]
+}

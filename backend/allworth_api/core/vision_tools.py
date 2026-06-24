@@ -11,7 +11,7 @@ from typing import Any
 
 from allworth_api.core.memory import active_facts
 from allworth_api.data.advisors import advisor_for_client
-from allworth_api.data.seed import accounts_for, portfolio_for, seed
+from allworth_api.data.seed import accounts_for, current_seed, portfolio_for
 from allworth_api.financial_tools.compute import simulate
 from allworth_api.financial_tools.data import DEFAULT_MODEL_ID
 from allworth_api.financial_tools.tools import run_financial_tool
@@ -129,6 +129,7 @@ def run_vision_tool(name: str, tool_input: dict[str, Any] | None, client_id: str
 
 
 def get_client_context(client_id: str) -> dict[str, Any]:
+    seed = current_seed()
     client = next((c for c in seed["personas"]["clients"] if c["id"] == client_id), None)
     accounts = accounts_for()
     plan = seed["plan"]
@@ -196,7 +197,7 @@ def get_portfolio_analytics(client_id: str, account_ids: list[str] | None = None
 
 def run_monte_carlo(client_id: str, tool_input: dict[str, Any]) -> dict[str, Any]:
     accounts = accounts_for()
-    plan = seed["plan"]
+    plan = current_seed()["plan"]
     portfolio_value = float(tool_input.get("portfolio_value") or accounts["allworthTotal"])
     monthly_contribution = float(tool_input.get("monthly_contribution", 0))
     monthly_withdrawal = float(

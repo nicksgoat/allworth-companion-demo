@@ -15,10 +15,10 @@ import { RiseIn, useAnimatedValue } from "../anim";
 import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
 import { NetWorthHero } from "../components/NetWorthHero";
 import { NudgeCard } from "../components/NudgeCard";
-import { DataStatusBadge, DisclaimerFooter, HairlineDivider, SectionHeader } from "../components/Rows";
+import { DisclaimerFooter, SectionHeader } from "../components/Rows";
 import { performanceDeltaLabel } from "../performance";
 import { useApp } from "../state";
-import { card, colors, fonts, usd } from "../theme";
+import { card, colors, fonts, radius, space, text, usd } from "../theme";
 import type { Dashboard, Nudge } from "../types";
 import { NudgeDetailSheet } from "./NudgeDetailSheet";
 
@@ -88,8 +88,9 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
   const { width: winW } = useWindowDimensions();
   const nudgeW = Math.min(360, winW - 64); // fixed-width slides so the next card peeks
   const fullName = d.client?.name ?? "Maya Tran";
+  const accountCount = d.accounts.allworth.length + d.accounts.outside.length;
   return (
-    <View style={{ gap: 24 }}>
+    <View style={{ gap: space[6] }}>
       <NetWorthHero
         greeting={greetingForNow()}
         name={fullName}
@@ -99,17 +100,16 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
         insetsTop={insets.top}
         onOpenWealth={() => app.setSelectedTab("invest")}
       />
-      <DataStatusBadge status={d.dataStatus} />
 
       {d.nudges.length ? (
-        <RiseIn delay={80} style={{ gap: 12 }}>
+        <RiseIn delay={80} style={{ gap: space[3] }}>
           <SectionHeader>Needs your attention</SectionHeader>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.carousel}
             contentContainerStyle={styles.carouselContent}
-            snapToInterval={nudgeW + 12}
+            snapToInterval={nudgeW + space[3]}
             snapToAlignment="start"
             decelerationRate="fast"
           >
@@ -122,118 +122,31 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
         </RiseIn>
       ) : null}
 
-      <RiseIn delay={220} style={{ gap: 12 }}>
-        <SectionHeader>Quick actions</SectionHeader>
-        <QuickActions />
+      <RiseIn delay={220}>
+        <AccountsSummaryLine count={accountCount} onPress={() => app.setSelectedTab("invest")} />
       </RiseIn>
 
-      <RiseIn delay={280} style={{ gap: 12 }}>
-        <SectionHeader>Your accounts</SectionHeader>
-        <AccountsSnapshotCard d={d} />
-      </RiseIn>
-
-      <View style={{ paddingVertical: 8 }}>
-        <DisclaimerFooter />
+      <View style={{ paddingVertical: space[2] }}>
+        <DisclaimerFooter status={d.dataStatus} />
       </View>
     </View>
   );
 }
 
-function QuickActions() {
-  const app = useApp();
-
-  const actions: { icon: keyof typeof Ionicons.glyphMap; label: string; onPress: () => void }[] = [
-    {
-      icon: "chatbubbles-outline",
-      label: "Ask anything",
-      onPress: () => app.setSelectedTab("chat"),
-    },
-    {
-      icon: "pie-chart-outline",
-      label: "Your wealth",
-      onPress: () => app.setSelectedTab("invest"),
-    },
-    {
-      icon: "wallet-outline",
-      label: "Spending plan",
-      onPress: () => {
-        app.setChatPrefill("How is my spending tracking against my plan?");
-        app.setSelectedTab("chat");
-      },
-    },
-    {
-      icon: "sparkles-outline",
-      label: "What I've learned",
-      onPress: () => app.setSelectedTab("profile"),
-    },
-  ];
-
-  return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={styles.carousel}
-      contentContainerStyle={styles.pillRow}
-    >
-      {actions.map((a) => (
-        <Pressable
-          key={a.label}
-          onPress={a.onPress}
-          style={({ pressed }) => [styles.actionPill, pressed && { opacity: 0.7 }]}
-        >
-          <Ionicons name={a.icon} size={18} color={colors.allworthAccent} />
-          <Text style={styles.actionLabel}>{a.label}</Text>
-        </Pressable>
-      ))}
-    </ScrollView>
-  );
-}
-
-function AccountsSnapshotCard({ d }: { d: Dashboard }) {
-  const app = useApp();
-
+// A single tappable line that hands off to the Wealth tab for the full
+// breakdown, instead of duplicating Invest's account/liability card here.
+function AccountsSummaryLine({ count, onPress }: { count: number; onPress: () => void }) {
   return (
     <Pressable
-      onPress={() => app.setSelectedTab("invest")}
-      style={({ pressed }) => [styles.snapshotCard, pressed && { opacity: 0.85 }]}
+      onPress={onPress}
+      style={({ pressed }) => [styles.summaryLine, pressed && { opacity: 0.7 }]}
     >
-      <SnapshotRow
-        label="Allworth accounts"
-        sublabel={`${d.accounts.allworth.length} accounts managed`}
-        value={usd(d.allworthTotal)}
-      />
-      <HairlineDivider />
-      <SnapshotRow
-        label="Outside accounts we can see"
-        sublabel="Held away — not yet part of your plan"
-        value={usd(d.heldAwayTotal)}
-      />
-      <HairlineDivider />
-      <SnapshotRow label="Liabilities" value={usd(d.liabilitiesTotal)} negative />
+      <Ionicons name="pie-chart-outline" size={18} color={colors.allworthAccent} />
+      <Text style={styles.summaryText}>
+        Accounts · {count} · View in Wealth
+      </Text>
+      <Ionicons name="chevron-forward" size={16} color={colors.inkTertiary} />
     </Pressable>
-  );
-}
-
-function SnapshotRow({
-  label,
-  sublabel,
-  value,
-  negative,
-}: {
-  label: string;
-  sublabel?: string;
-  value: string;
-  negative?: boolean;
-}) {
-  return (
-    <View style={styles.snapshotRow}>
-      <View style={{ flex: 1 }}>
-        <Text style={styles.snapshotLabel}>{label}</Text>
-        {sublabel ? <Text style={styles.snapshotSublabel}>{sublabel}</Text> : null}
-      </View>
-      <Text style={[styles.snapshotValue, negative && { color: colors.loss }]}>{value}</Text>
-      <Ionicons name="chevron-forward" size={14} color={colors.inkTertiary} />
-    </View>
   );
 }
 
@@ -281,35 +194,19 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 const styles = StyleSheet.create({
   // Horizontal carousels bleed past the scroll container's 20px padding to the
   // screen edges, while their content keeps a 20px inset so cards start aligned.
-  carousel: { marginHorizontal: -20 },
-  carouselContent: { paddingHorizontal: 20, gap: 12, alignItems: "stretch" },
-  pillRow: { paddingHorizontal: 20, gap: 10 },
-  actionPill: {
+  carousel: { marginHorizontal: -space[5] },
+  carouselContent: { paddingHorizontal: space[5], gap: space[3], alignItems: "stretch" },
+  summaryLine: {
     ...card,
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 999,
+    gap: space[3],
+    paddingHorizontal: space[4],
+    paddingVertical: space[4],
+    borderRadius: radius.card,
   },
-  actionLabel: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.inkPrimary },
-  snapshotCard: { ...card, paddingHorizontal: 16, paddingVertical: 6 },
-  snapshotRow: { flexDirection: "row", alignItems: "center", gap: 10, paddingVertical: 13 },
-  snapshotLabel: { fontSize: 15, fontFamily: fonts.sans, color: colors.inkPrimary },
-  snapshotSublabel: {
-    fontSize: 12,
-    fontFamily: fonts.sans,
-    color: colors.inkTertiary,
-    marginTop: 2,
-  },
-  snapshotValue: {
-    fontSize: 15,
-    fontFamily: fonts.sansBold,
-    color: colors.inkPrimary,
-    fontVariant: ["tabular-nums"],
-  },
-  skeletonBlock: { height: 72, borderRadius: 12, backgroundColor: colors.inkFaint },
+  summaryText: { ...text.body, flex: 1, fontFamily: fonts.sansBold },
+  skeletonBlock: { height: 72, borderRadius: radius.card, backgroundColor: colors.inkFaint },
   errorBox: { alignItems: "center", paddingTop: 120, gap: 10, paddingHorizontal: 20 },
   errorTitle: { fontSize: 20, fontFamily: fonts.displayMedium, color: colors.inkPrimary },
   errorMessage: {

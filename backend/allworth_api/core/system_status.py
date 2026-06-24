@@ -12,7 +12,7 @@ from allworth_api.core.memory import reset_profile
 from allworth_api.core.routing import route_intent
 from allworth_api.data.llm import _PROVIDER_NAME, provider
 from allworth_api.data.redis_client import reachability_status as redis_reachability_status
-from allworth_api.data.seed import seed
+from allworth_api.data.seed import current_seed
 from allworth_api.data.synapse import is_available as synapse_available
 
 
@@ -24,7 +24,7 @@ def health_status() -> dict[str, Any]:
         "llm": provider is not None,
         "llmProvider": _PROVIDER_NAME if provider else None,
         "synapse": synapse_available() and data_mode() == "live",
-        "generatedAt": seed["generatedAt"],
+        "generatedAt": current_seed()["generatedAt"],
         "readiness": config,
     }
 

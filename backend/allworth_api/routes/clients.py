@@ -6,14 +6,13 @@ from allworth_api.core.auth import get_current_household, get_session_for_househ
 from allworth_api.core.chat_service import suggested_for
 from allworth_api.core.memory import active_facts, episodes_for, forget_fact
 from allworth_api.core.nudges import nudges_for
-from allworth_api.data.advisors import advisor_for_client
 from allworth_api.data.household import (
     get_client_persona,
     get_dashboard_data,
     get_portfolio,
     get_spending,
 )
-from allworth_api.data.seed import seed
+from allworth_api.data.seed import advisor_for_client, seed_for
 from allworth_api.financial_tools.performance import period_performance_from_values
 
 router = APIRouter()
@@ -27,6 +26,7 @@ def dashboard(client_id: str, household_id: str = Depends(get_current_household)
     d = get_dashboard_data(client_id)
     a = d["accounts"]
     s = d["spending"]
+    seed = seed_for(client_id)
     advisor = advisor_for_client(client_id)
     mode = data_mode()
     is_live = mode == "live"
@@ -127,6 +127,13 @@ def proactive(client_id: str, session: str = "wednesday", household_id: str = De
         "basedOn": None,
         "suggested": suggested_for(session, client_id),
     }
+
+
+@router.get("/api/clients/{client_id}/meeting-notes")
+def meeting_notes(client_id: str, household_id: str = Depends(get_current_household)):
+    if client_id != household_id:
+        return JSONResponse(status_code=403, content={"error": "Access denied for this household"})
+    return {"clientId": client_id, "notes": seed_for(client_id).get("meeting_notes", [])}
 
 
 @router.get("/api/clients/{client_id}/chat-history")

@@ -12,7 +12,7 @@ import random
 from typing import Any
 
 from allworth_api.core.formatting import fmt_usd, js_round
-from allworth_api.data.seed import seed
+from allworth_api.data.seed import current_seed
 
 # ── Retirement Projection (simplified Monte Carlo) ───────────────────────
 
@@ -57,6 +57,7 @@ def run_retirement_projection(
     Returns success rate, percentile paths (p5, p25, p50, p75, p95),
     and a year-by-year projection table.
     """
+    seed = current_seed()
     plan = seed["plan"]
     accounts = seed["accounts"]
 
@@ -213,6 +214,7 @@ def analyze_portfolio_drift(*, account_id: str | None = None) -> dict[str, Any]:
 
     Returns per-asset-class drift, overall drift score, and rebalance actions.
     """
+    seed = current_seed()
     positions = seed["positions"]
     if account_id:
         positions = [p for p in positions if p["accountId"] == account_id]
@@ -317,9 +319,10 @@ def run_roth_conversion_analysis(
 ) -> dict[str, Any]:
     """Estimate the tax impact of converting IRA → Roth in the current year.
 
-    Uses Maya's tax profile from the plan. Shows marginal bracket impact,
+    Uses the client's tax profile from the plan. Shows marginal bracket impact,
     estimated tax cost, and break-even horizon.
     """
+    seed = current_seed()
     plan = seed["plan"]
     accounts = seed["accounts"]
 
@@ -447,6 +450,7 @@ def analyze_goal_funding(*, growth_rate: float = 0.06) -> dict[str, Any]:
     plus expected growth will reach the target on time, and calculates
     the monthly contribution needed to close any gap.
     """
+    seed = current_seed()
     plan = seed["plan"]
     goals = plan.get("goals", [])
     accounts = seed["accounts"]
@@ -518,6 +522,7 @@ def analyze_income_sustainability(*, inflation_rate: float = 0.03) -> dict[str, 
     Projects income vs. spending over 5/10/20 year horizons with inflation,
     identifies the gap and which year spending overtakes income.
     """
+    seed = current_seed()
     plan = seed["plan"]
     accounts = seed["accounts"]
 

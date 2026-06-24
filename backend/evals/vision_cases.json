@@ -82,7 +82,7 @@
           "short_term_rate": 0.35
         }
       },
-      "required_keys": ["estimated_tax.total", "tax_calculation.lots"]
+      "required_keys": ["estimated_tax.total", "tax_calculation.buckets"]
     }
   },
   {

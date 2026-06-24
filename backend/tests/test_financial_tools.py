@@ -120,8 +120,9 @@ def test_rebalancer_defaults_to_mock_synapse_model_tables() -> None:
 
 
 def test_seed_contains_only_core_satellite_models_for_rebalancer() -> None:
-    from allworth_api.data.seed import seed
+    from allworth_api.data.seed import seed_for
 
+    seed = seed_for("maya")
     model_rows = seed["allocationModels"]["modelList"]
     weight_rows = seed["allocationModels"]["securityWeights"]
     model_names = {row["allocation_model_name"] for row in model_rows}
@@ -135,7 +136,9 @@ def test_seed_contains_only_core_satellite_models_for_rebalancer() -> None:
 
 
 def test_seed_positions_include_average_basis_and_term_gain_scenarios() -> None:
-    from allworth_api.data.seed import seed
+    from allworth_api.data.seed import seed_for
+
+    seed = seed_for("maya")
 
     assert "taxLots" not in seed
 
