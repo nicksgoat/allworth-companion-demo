@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAnimatedValue } from "../anim";
-import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
+import { APP_HEADER_HEIGHT, AppHeader, TAB_BAR_HEIGHT } from "../components/Glass";
 import {
   DisclaimerFooter,
   HairlineDivider,
@@ -93,7 +93,7 @@ export function ProfileScreen() {
         style={{ backgroundColor: colors.surfacePrimary }}
         contentContainerStyle={{
           padding: 20,
-          paddingTop: insets.top + 8,
+          paddingTop: insets.top + APP_HEADER_HEIGHT + 8,
           paddingBottom: TAB_BAR_HEIGHT + insets.bottom + 24,
           gap: 24,
         }}
@@ -239,7 +239,7 @@ export function ProfileScreen() {
         />
         <DocumentsSheet visible={documentsOpen} onClose={() => setDocumentsOpen(false)} />
       </Animated.ScrollView>
-      <GlassHeader title="Profile" scrollY={scrollY} />
+      <AppHeader title="Profile" scrollY={scrollY} />
     </>
   );
 }

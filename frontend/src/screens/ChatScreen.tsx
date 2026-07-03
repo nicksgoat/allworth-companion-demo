@@ -17,9 +17,10 @@ import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
+import { useAnimatedValue } from "../anim";
 import { ChatMessageView } from "../components/Chat";
+import { APP_HEADER_HEIGHT, AppHeader } from "../components/Glass";
 import { DisclaimerFooter } from "../components/Rows";
-import { AllworthMark } from "../components/Wordmark";
 import { useApp } from "../state";
 import { colors, fonts, radius, shadowSoft, space, text } from "../theme";
 import type { ChatEvent, ChatMessage, Dashboard } from "../types";
@@ -328,12 +329,18 @@ export function ChatScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [app.chatPrefill]);
 
-  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
-    const distanceFromBottom = contentSize.height - layoutMeasurement.height - contentOffset.y;
-    pinnedToBottom.current = distanceFromBottom < 80;
-    setShowScrollDown(distanceFromBottom > 240);
-  };
+  // scrollY feeds the AppHeader's open/close animation; the listener keeps
+  // the stick-to-bottom + scroll-pill logic.
+  const scrollY = useAnimatedValue(0);
+  const onScroll = Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+    useNativeDriver: false,
+    listener: (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+      const distanceFromBottom = contentSize.height - layoutMeasurement.height - contentOffset.y;
+      pinnedToBottom.current = distanceFromBottom < 80;
+      setShowScrollDown(distanceFromBottom > 240);
+    },
+  });
 
   // Content grows on every streamed token. Follow it only when pinned: a new
   // bubble (your question, or the answer starting) glides down; token-by-token
@@ -518,14 +525,14 @@ export function ChatScreen() {
       style={{ flex: 1, backgroundColor: colors.surfacePrimary }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ChatHeader
-        topInset={insets.top}
+      <AppHeader
         title={assistantTitle}
-        onNewChat={startNewChat}
-        onOpenHistory={() => {
+        scrollY={scrollY}
+        onPressMark={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           setHistoryOpen(true);
         }}
+        action={{ icon: "create-outline", onPress: startNewChat }}
       />
       <ThreadHistorySheet
         visible={historyOpen}
@@ -536,9 +543,13 @@ export function ChatScreen() {
         onOpenThread={openThread}
       />
       <View style={{ flex: 1 }}>
-        <ScrollView
-          ref={scrollRef}
-          contentContainerStyle={{ padding: space[5], paddingTop: space[3], gap: space[5] }}
+        <Animated.ScrollView
+          ref={scrollRef as React.RefObject<any>}
+          contentContainerStyle={{
+            padding: space[5],
+            paddingTop: insets.top + APP_HEADER_HEIGHT + space[3],
+            gap: space[5],
+          }}
           keyboardDismissMode="interactive"
           scrollEventThrottle={16}
           onScroll={onScroll}
@@ -566,7 +577,7 @@ export function ChatScreen() {
             revealedId={revealedId}
             onPick={send}
           />
-        </ScrollView>
+        </Animated.ScrollView>
         {showScrollDown ? (
           <Pressable onPress={scrollToBottom} style={styles.scrollDownBtn} hitSlop={6}>
             <Ionicons name="arrow-down" size={20} color={colors.inkSecondary} />
@@ -609,45 +620,6 @@ export function ChatScreen() {
         </View>
       </View>
     </KeyboardAvoidingView>
-  );
-}
-
-// ChatGPT-style top bar: brand mark (opens the thread-history drawer) + the
-// advisor's-assistant identity on the left ("Nicole's Assistant" — who you're
-// talking to), a compose button on the right that starts a fresh conversation.
-function ChatHeader({
-  topInset,
-  title,
-  onNewChat,
-  onOpenHistory,
-}: {
-  topInset: number;
-  title: string;
-  onNewChat: () => void;
-  onOpenHistory: () => void;
-}) {
-  return (
-    <View style={[styles.header, { paddingTop: topInset + 6 }]}>
-      <View style={styles.headerBrand}>
-        <Pressable
-          onPress={onOpenHistory}
-          hitSlop={8}
-          style={({ pressed }) => [styles.headerMark, pressed && { opacity: 0.6 }]}
-        >
-          <AllworthMark size={18} color={colors.allworthNavy} />
-        </Pressable>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {title}
-        </Text>
-      </View>
-      <Pressable
-        onPress={onNewChat}
-        hitSlop={8}
-        style={({ pressed }) => [styles.headerBtn, pressed && { opacity: 0.6 }]}
-      >
-        <Ionicons name="create-outline" size={22} color={colors.inkPrimary} />
-      </Pressable>
-    </View>
   );
 }
 
@@ -784,34 +756,6 @@ function SuggestionChips({
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: space[4],
-    paddingBottom: space[2],
-    backgroundColor: colors.surfacePrimary,
-  },
-  headerBrand: { flexDirection: "row", alignItems: "center", gap: space[2] },
-  headerMark: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    backgroundColor: colors.surfaceCard,
-    alignItems: "center",
-    justifyContent: "center",
-    ...shadowSoft,
-  },
-  headerTitle: { fontSize: 17, fontFamily: fonts.sansBold, color: colors.inkPrimary },
-  headerBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 12,
-    backgroundColor: colors.surfaceCard,
-    alignItems: "center",
-    justifyContent: "center",
-    ...shadowSoft,
-  },
   // Thread-history drawer (left slide-over).
   historyScrim: {
     position: "absolute",

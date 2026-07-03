@@ -66,7 +66,8 @@ nothing shouts, nothing is clever at the reader's expense. When in doubt, remove
 | Card | `theme.card` token | White, radius 16, hairline navy border, `shadowSoft`. |
 | Section header | `Rows.SectionHeader` | 11pt uppercase Lato Bold, `inkTertiary`. Sits `space[2]` above content. |
 | Hero number | `HeroNumber` | Playfair, tabular, count-up ≤800ms. One per screen. |
-| Glass bar | `Glass.tsx` (`glassStyle`, `TAB_BAR_HEIGHT`) | The only translucent surface. Content may scroll under it. |
+| **Global header** | `Glass.tsx AppHeader` | THE header — every top-level screen. Mark chip + title left, ≤1 action right, on glass. With a `scrollY` it closes on scroll-down and reopens on scroll-up (diffClamp); the status-bar glass strip never leaves. Content scrolls under it (`paddingTop: insets.top + APP_HEADER_HEIGHT`). No per-screen title rows or logo rows. Pushed detail screens keep the native stack header (back affordance). |
+| Glass surface | `Glass.tsx` (`GlassSurface`, `TAB_BAR_HEIGHT`) | The only translucent material (BlurView on iOS). Header + tab bar only. |
 | Chips | hairline border, no fill, `bodySm` | Assistive, never competing with the primary action. |
 | Primary action | navy fill, white Lato Bold text, radius pill/12 | One per view. Secondary = ice/ghost fill, accent text. |
 | Chat: user bubble | `Chat.tsx` userBubble | Gray fill, right-aligned. |

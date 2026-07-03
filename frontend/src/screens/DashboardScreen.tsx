@@ -13,7 +13,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { RiseIn, useAnimatedValue } from "../anim";
-import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
+import { APP_HEADER_HEIGHT, AppHeader, TAB_BAR_HEIGHT } from "../components/Glass";
 import { NudgeCard } from "../components/NudgeCard";
 import { DisclaimerFooter, SectionHeader } from "../components/Rows";
 import { useApp } from "../state";
@@ -53,7 +53,7 @@ export function DashboardScreen() {
         directionalLockEnabled
         contentContainerStyle={{
           padding: 20,
-          paddingTop: insets.top + 8,
+          paddingTop: insets.top + APP_HEADER_HEIGHT + 8,
           paddingBottom: TAB_BAR_HEIGHT + insets.bottom + 24,
         }}
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
@@ -70,7 +70,7 @@ export function DashboardScreen() {
           <Skeleton />
         )}
       </Animated.ScrollView>
-      <GlassHeader title="Home" scrollY={scrollY} />
+      <AppHeader title="Home" scrollY={scrollY} />
       <NudgeDetailSheet nudge={selectedNudge} onClose={() => setSelectedNudge(null)} />
     </>
   );

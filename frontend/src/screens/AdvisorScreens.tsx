@@ -20,7 +20,7 @@ import {
   HairlineDivider,
   SectionHeader,
 } from "../components/Rows";
-import { AllworthWordmark } from "../components/Wordmark";
+import { APP_HEADER_HEIGHT, AppHeader } from "../components/Glass";
 import { useApp } from "../state";
 import { card, colors, fonts, radius, space, text, usd } from "../theme";
 import type { AdvisorBrief, BookResponse, ConversationMessage, Household } from "../types";
@@ -72,21 +72,16 @@ function BookScreen() {
   }, [book, app.demoScreen]);
 
   return (
+    <>
     <ScrollView
       style={{ backgroundColor: colors.surfacePrimary }}
-      contentContainerStyle={{ padding: 20, paddingTop: insets.top + 8, gap: 20 }}
+      contentContainerStyle={{ padding: 20, paddingTop: insets.top + APP_HEADER_HEIGHT + 8, gap: 20 }}
     >
-      <View style={styles.headerRow}>
-        <View style={{ gap: 2 }}>
-          <Text style={styles.title}>Your book</Text>
-          {book ? (
-            <Text style={styles.subtitle}>
-              {book.advisor.name} · {book.advisor.title}
-            </Text>
-          ) : null}
-        </View>
-        <AllworthWordmark />
-      </View>
+      {book ? (
+        <Text style={styles.subtitle}>
+          {book.advisor.name} · {book.advisor.title}
+        </Text>
+      ) : null}
 
       {book ? (
         <View>
@@ -108,6 +103,8 @@ function BookScreen() {
         <DisclaimerFooter />
       </View>
     </ScrollView>
+    <AppHeader title="Your book" />
+    </>
   );
 }
 

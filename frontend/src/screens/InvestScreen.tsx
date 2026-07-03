@@ -3,7 +3,7 @@ import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "rea
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { RiseIn, useAnimatedValue } from "../anim";
 import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
-import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
+import { APP_HEADER_HEIGHT, AppHeader, TAB_BAR_HEIGHT } from "../components/Glass";
 import { AllocationCard } from "../components/AllocationCard";
 import { HeroNumber } from "../components/HeroNumber";
 import { AccountHoldingsSection } from "../components/Holdings";
@@ -16,7 +16,6 @@ import { RecurringCard } from "../components/RecurringCard";
 import { DisclaimerFooter, SectionHeader } from "../components/Rows";
 import { SegmentedControl } from "../components/SegmentedControl";
 import { Sparkline } from "../components/Sparkline";
-import { AllworthWordmark } from "../components/Wordmark";
 import { performanceDeltaLabel } from "../performance";
 import { useApp } from "../state";
 import { colors, fonts } from "../theme";
@@ -68,7 +67,7 @@ export function InvestScreen() {
         directionalLockEnabled
         contentContainerStyle={{
           padding: 20,
-          paddingTop: insets.top + 8,
+          paddingTop: insets.top + APP_HEADER_HEIGHT + 8,
           paddingBottom: TAB_BAR_HEIGHT + insets.bottom + 24,
         }}
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
@@ -91,7 +90,7 @@ export function InvestScreen() {
           <Skeleton />
         )}
       </Animated.ScrollView>
-      <GlassHeader title="Your wealth" scrollY={scrollY} />
+      <AppHeader title="Your wealth" scrollY={scrollY} />
       <NudgeDetailSheet nudge={selectedNudge} onClose={() => setSelectedNudge(null)} />
       <PositionDetailSheet
         position={selectedPosition}
@@ -162,13 +161,6 @@ function InvestContent({
 
   return (
     <View style={{ gap: 24 }}>
-      <View style={styles.headerRow}>
-        <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit>
-          Your wealth
-        </Text>
-        <AllworthWordmark />
-      </View>
-
       <RiseIn style={{ gap: 14 }}>
         <Pressable
           onPress={() => setChartOpen(true)}

@@ -1,10 +1,13 @@
+import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import React from "react";
-import { Animated, Platform, StyleSheet, View, ViewStyle } from "react-native";
+import { Animated, Platform, Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { colors, fonts } from "../theme";
+import { colors, fonts, space } from "../theme";
+import { AllworthMark } from "./Wordmark";
 
 export const TAB_BAR_HEIGHT = 60;
+export const APP_HEADER_HEIGHT = 48;
 
 // Liquid-glass surface: react-native-web passes backdropFilter through to
 // CSS; iOS gets a real BlurView via GlassSurface; Android falls back to a
@@ -42,23 +45,41 @@ export function GlassSurface({
   return <View style={[glassStyle, style as ViewStyle]}>{children}</View>;
 }
 
-// iOS-style dynamic header: invisible at rest, fades in as the large title
-// scrolls away. pointer-events none so it never swallows touches.
-export function GlassHeader({ title, scrollY }: { title: string; scrollY: Animated.Value }) {
+// The one global header (DESIGN.md): the chat pattern applied everywhere —
+// brand mark chip + title on the left, one optional action on the right, on
+// glass. Given a scrollY it animates closed (the title row slides away, the
+// status-bar glass strip stays) as you scroll down and reopens the moment you
+// scroll back up — Animated.diffClamp, so it tracks gesture direction, not
+// absolute position.
+export function AppHeader({
+  title,
+  scrollY,
+  onPressMark,
+  action,
+}: {
+  title: string;
+  scrollY?: Animated.Value;
+  // Optional tap on the brand mark (chat uses it for thread history).
+  onPressMark?: () => void;
+  action?: { icon: keyof typeof Ionicons.glyphMap; onPress: () => void };
+}) {
   const insets = useSafeAreaInsets();
-  const opacity = scrollY.interpolate({
-    inputRange: [28, 64],
-    outputRange: [0, 1],
-    extrapolate: "clamp",
-  });
-  const translateY = scrollY.interpolate({
-    inputRange: [28, 64],
-    outputRange: [6, 0],
-    extrapolate: "clamp",
-  });
+  // Closed = just the status-bar glass strip; open = strip + title row. The
+  // container's height animates between the two (clipping the row out), so
+  // the title can never slide into the status bar.
+  const clamp = scrollY ? Animated.diffClamp(scrollY, 0, APP_HEADER_HEIGHT) : null;
+  const height = clamp
+    ? clamp.interpolate({
+        inputRange: [0, APP_HEADER_HEIGHT],
+        outputRange: [insets.top + APP_HEADER_HEIGHT, insets.top],
+      })
+    : insets.top + APP_HEADER_HEIGHT;
+  const rowOpacity = clamp
+    ? clamp.interpolate({ inputRange: [0, APP_HEADER_HEIGHT], outputRange: [1, 0] })
+    : 1;
 
   return (
-    <Animated.View style={[styles.header, { height: 44 + insets.top, opacity }]}>
+    <Animated.View style={[styles.header, { height }]}>
       <GlassSurface
         style={[
           StyleSheet.absoluteFill as ViewStyle,
@@ -66,9 +87,33 @@ export function GlassHeader({ title, scrollY }: { title: string; scrollY: Animat
           { paddingTop: insets.top },
         ]}
       >
-        <Animated.Text style={[styles.title, { transform: [{ translateY }] }]} numberOfLines={1}>
-          {title}
-        </Animated.Text>
+        <Animated.View style={[styles.headerRow, { opacity: rowOpacity }]}>
+          <Pressable
+            onPress={onPressMark}
+            disabled={!onPressMark}
+            hitSlop={8}
+            style={({ pressed }) => [
+              styles.headerMark,
+              pressed && onPressMark ? { opacity: 0.6 } : null,
+            ]}
+          >
+            <AllworthMark size={18} color={colors.allworthNavy} />
+          </Pressable>
+          <Text style={styles.headerTitle} numberOfLines={1}>
+            {title}
+          </Text>
+          {action ? (
+            <Pressable
+              onPress={action.onPress}
+              hitSlop={8}
+              style={({ pressed }) => [styles.headerBtn, pressed && { opacity: 0.6 }]}
+            >
+              <Ionicons name={action.icon} size={22} color={colors.inkPrimary} />
+            </Pressable>
+          ) : (
+            <View style={styles.headerBtn} />
+          )}
+        </Animated.View>
       </GlassSurface>
     </Animated.View>
   );
@@ -81,14 +126,38 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10,
-    pointerEvents: "none",
   },
   headerSurface: {
-    alignItems: "center",
-    justifyContent: "center",
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "rgba(0,0,0,0.12)",
     overflow: "hidden",
   },
-  title: { fontSize: 16, fontFamily: fonts.sansBold, color: colors.inkPrimary, maxWidth: "70%" },
+  headerRow: {
+    height: APP_HEADER_HEIGHT,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[2],
+    paddingHorizontal: space[4],
+  },
+  headerMark: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.85)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 17,
+    fontFamily: fonts.sansBold,
+    color: colors.inkPrimary,
+  },
+  headerBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
