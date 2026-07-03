@@ -206,6 +206,25 @@ export function ProfileScreen() {
           </View>
         ) : null}
 
+        {/* Demo-only: reach the advisor side without typing a deep link. */}
+        <View style={{ gap: 8 }}>
+          <SectionHeader>Demo</SectionHeader>
+          <Pressable
+            onPress={() => app.setMode("advisor")}
+            style={({ pressed }) => [styles.linkRow, pressed && { opacity: 0.7 }]}
+          >
+            <Ionicons name="people-outline" size={18} color={colors.allworthAccent} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.linkRowText}>Switch to advisor view</Text>
+              <Text style={styles.linkRowSub}>
+                See {advisor?.name?.split(" ")[0] ?? "the advisor"}
+                {"'"}s book and live client conversations
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color={colors.inkTertiary} />
+          </Pressable>
+        </View>
+
         <DisclaimerFooter />
 
         {/* Account */}
@@ -284,6 +303,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   linkRowText: { flex: 1, fontSize: 14, fontFamily: fonts.sansBold, color: colors.inkPrimary },
+  linkRowSub: { fontSize: 12, fontFamily: fonts.sans, color: colors.inkTertiary, marginTop: 2 },
   advisorBtn: {
     width: 40,
     height: 40,

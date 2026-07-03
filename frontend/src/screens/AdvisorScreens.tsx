@@ -103,7 +103,10 @@ function BookScreen() {
         <DisclaimerFooter />
       </View>
     </ScrollView>
-    <AppHeader title="Your book" />
+    <AppHeader
+      title="Your book"
+      action={{ icon: "swap-horizontal-outline", onPress: () => app.setMode("client") }}
+    />
     </>
   );
 }
