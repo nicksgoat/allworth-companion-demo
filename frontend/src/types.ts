@@ -220,8 +220,10 @@ export interface ToolWidget {
 
 export interface ChatMessage {
   id: string;
-  role: "user" | "assistant";
+  role: "user" | "assistant" | "advisor";
   text: string;
+  // Set on advisor interjections — who posted into the thread.
+  advisorName?: string;
   chips: ToolChip[];
   sources: string[];
   isStreaming: boolean;
@@ -233,6 +235,19 @@ export interface ChatMessage {
     safety_flags?: string[];
     missing?: string[];
   };
+}
+
+// One entry of the server-stored thread (GET /api/clients/{id}/conversation).
+// Advisor interjections carry an id (poll cursor) + attribution; user/assistant
+// turns are id-less store records.
+export interface ConversationMessage {
+  seq: number;
+  id: string | null;
+  role: "user" | "assistant" | "advisor";
+  text: string;
+  advisorId?: string;
+  advisorName?: string;
+  ts?: string | null;
 }
 
 export type ChatEvent =

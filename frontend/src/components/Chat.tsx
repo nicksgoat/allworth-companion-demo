@@ -380,7 +380,39 @@ function ChatMessageViewImpl(props: ChatMessageViewProps) {
       </View>
     );
   }
+  if (props.message.role === "advisor") {
+    return <AdvisorBubble message={props.message} />;
+  }
   return <AssistantBubble {...props} />;
+}
+
+// An advisor interjection: a human broke into the AI thread, so it gets human
+// attribution (initials avatar + name) and an accent-edged card — visually
+// distinct from both the client's gray bubble and the assistant's bare text.
+function AdvisorBubble({ message }: { message: ChatMessage }) {
+  const name = message.advisorName ?? "Your advisor";
+  const initials = name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+  return (
+    <View style={styles.advisorBlock}>
+      <View style={styles.advisorIdentityRow}>
+        <View style={styles.advisorAvatar}>
+          <Text style={styles.advisorAvatarText}>{initials}</Text>
+        </View>
+        <Text style={styles.advisorName}>{name}</Text>
+        <View style={styles.advisorTag}>
+          <Text style={styles.advisorTagText}>Advisor</Text>
+        </View>
+      </View>
+      <View style={styles.advisorBubble}>
+        <Text style={[styles.advisorText, webTextWrap]}>{message.text}</Text>
+      </View>
+    </View>
+  );
 }
 
 function AssistantBubble({
@@ -568,6 +600,41 @@ const styles = StyleSheet.create({
   // Word-fade reveal: words flow + wrap like text, each fading in over the layout.
   fadeRow: { flexDirection: "row", flexWrap: "wrap", alignSelf: "stretch", maxWidth: "100%" },
   fadeBold: { fontFamily: fonts.sansBold },
+  // Advisor interjection: human attribution + an accent-edged card.
+  advisorBlock: { gap: 8 },
+  advisorIdentityRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  advisorAvatar: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.allworthNavy,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  advisorAvatarText: { fontSize: 10, fontFamily: fonts.sansBold, color: "#FFFFFF" },
+  advisorName: { fontSize: 13, fontFamily: fonts.sansBold, color: colors.inkSecondary },
+  advisorTag: {
+    borderWidth: 1,
+    borderColor: colors.allworthAccent,
+    borderRadius: 999,
+    paddingHorizontal: 7,
+    paddingVertical: 1,
+  },
+  advisorTagText: {
+    fontSize: 10,
+    fontFamily: fonts.sansBold,
+    color: colors.allworthAccent,
+    letterSpacing: 0.4,
+  },
+  advisorBubble: {
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radius.card,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.allworthAccent,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  advisorText: { fontSize: 17, lineHeight: 25, fontFamily: fonts.sans, color: colors.inkPrimary },
   // The single foot-of-answer action row: ghost thumbs + compact handoff.
   actionRow: {
     flexDirection: "row",

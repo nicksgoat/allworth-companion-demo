@@ -1,12 +1,16 @@
+import uuid
+
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from allworth_api.core.auth import get_current_household
-from allworth_api.core.formatting import fmt_usd
+from allworth_api.core.conversation_store import append_turns
+from allworth_api.core.formatting import fmt_usd, iso_now
 from allworth_api.core.nudges import nudges_for
 from allworth_api.core.tool_runner import run_tool
 from allworth_api.data.advisors import advisor_by_id
-from allworth_api.data.seed import all_advisors, seed_for_advisor
+from allworth_api.data.seed import advisor_for_client, all_advisors, seed_for_advisor
 
 router = APIRouter()
 
@@ -34,6 +38,57 @@ def brief(advisor_id: str, client_id: str, household_id: str = Depends(get_curre
         return JSONResponse(status_code=403, content={"error": "Access denied for this household"})
     data = run_tool("get_advisor_brief", {}, client_id)
     return {**data, "narrative": brief_narrative(data), "reviewWorkflow": review_workflow(data)}
+
+
+class InterjectRequest(BaseModel):
+    session: str = "wednesday"
+    text: str = ""
+
+
+@router.post("/api/advisors/clients/{client_id}/interject")
+async def interject(
+    client_id: str,
+    body: InterjectRequest,
+    household_id: str = Depends(get_current_household),
+):
+    """Post an advisor message directly into a client's assistant thread.
+
+    The record lands in the shared conversation store, so (a) the client app
+    picks it up by polling GET /api/clients/{id}/conversation, and (b) the
+    model sees it as clearly-attributed context on the client's next turn.
+    Like `book`, this is an advisor surface, so it skips the client==household
+    check (there is no separate advisor identity in the demo).
+    """
+    text = body.text.strip()
+    if not text:
+        return JSONResponse(status_code=400, content={"error": "text is required"})
+    advisor = advisor_for_client(client_id)
+    record = {
+        # role/content are what the LLM replays; the rest is UI metadata the
+        # prompt builder strips (see chat_service._sanitize_messages).
+        "role": "user",
+        "content": (
+            f"[Message from {advisor['name']}, the client's advisor, "
+            f"posted directly into this chat thread]: {text}"
+        ),
+        "kind": "advisor",
+        "id": uuid.uuid4().hex[:12],
+        "advisorId": advisor["id"],
+        "advisorName": advisor["name"],
+        "displayText": text,
+        "ts": iso_now(),
+    }
+    await append_turns(client_id, body.session, [record])
+    return {
+        "message": {
+            "id": record["id"],
+            "role": "advisor",
+            "text": text,
+            "advisorId": advisor["id"],
+            "advisorName": advisor["name"],
+            "ts": record["ts"],
+        }
+    }
 
 
 def brief_narrative(d: dict) -> str:

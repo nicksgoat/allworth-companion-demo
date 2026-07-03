@@ -2,7 +2,15 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { HeroNumber } from "../components/HeroNumber";
 import {
@@ -14,7 +22,7 @@ import {
 import { AllworthWordmark } from "../components/Wordmark";
 import { useApp } from "../state";
 import { card, colors, fonts, radius, space, text, usd } from "../theme";
-import type { AdvisorBrief, BookResponse, Household } from "../types";
+import type { AdvisorBrief, BookResponse, ConversationMessage, Household } from "../types";
 
 type AdvisorStackParams = {
   Book: undefined;
@@ -198,6 +206,11 @@ function ClientDetailScreen({ route }: NativeStackScreenProps<AdvisorStackParams
             ))}
           </View>
 
+          <ConversationCard
+            clientId={household.clientId}
+            clientName={household.name.split(",")[0].split(" ")[0]}
+          />
+
           {brief.reviewWorkflow ? (
             <ReviewWorkflowCard workflow={brief.reviewWorkflow} />
           ) : null}
@@ -209,6 +222,107 @@ function ClientDetailScreen({ route }: NativeStackScreenProps<AdvisorStackParams
         <DisclaimerFooter />
       </View>
     </ScrollView>
+  );
+}
+
+// The client's live assistant thread, with a composer so the advisor can post
+// into it (three-way: client / assistant / advisor). Demo-grade polling.
+function ConversationCard({ clientId, clientName }: { clientId: string; clientName: string }) {
+  const app = useApp();
+  const [messages, setMessages] = useState<ConversationMessage[]>([]);
+  const [draft, setDraft] = useState("");
+  const [posting, setPosting] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const tick = async () => {
+      try {
+        const res = await app.api.conversation(clientId, app.session);
+        if (!cancelled) setMessages(res.messages);
+      } catch {}
+    };
+    tick();
+    const interval = setInterval(tick, 4000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clientId, app.session]);
+
+  const send = async () => {
+    const text = draft.trim();
+    if (!text || posting) return;
+    setPosting(true);
+    try {
+      await app.api.interject(clientId, app.session, text);
+      setDraft("");
+      const res = await app.api.conversation(clientId, app.session);
+      setMessages(res.messages);
+    } catch {}
+    setPosting(false);
+  };
+
+  const recent = messages.slice(-8);
+  const speaker = (m: ConversationMessage) =>
+    m.role === "advisor"
+      ? (m.advisorName ?? "You").split(" ")[0]
+      : m.role === "user"
+        ? clientName
+        : "Assistant";
+
+  return (
+    <View style={styles.briefCard}>
+      <View style={styles.briefHeader}>
+        <Ionicons name="chatbubbles-outline" size={13} color={colors.allworthAccent} />
+        <SectionHeader>Live conversation</SectionHeader>
+      </View>
+
+      {recent.length === 0 ? (
+        <Text style={styles.convoEmpty}>
+          No thread yet — {clientName}'s next assistant chat will appear here.
+        </Text>
+      ) : (
+        recent.map((m) => (
+          <View key={`${m.seq}-${m.id ?? "t"}`} style={styles.convoRow}>
+            <Text
+              style={[styles.convoSpeaker, m.role === "advisor" && styles.convoSpeakerAdvisor]}
+            >
+              {speaker(m)}
+            </Text>
+            <Text style={styles.convoText} numberOfLines={m.role === "assistant" ? 3 : 6}>
+              {m.text}
+            </Text>
+          </View>
+        ))
+      )}
+
+      <View style={styles.convoComposer}>
+        <TextInput
+          style={styles.convoInput}
+          placeholder={`Message ${clientName} in this thread…`}
+          placeholderTextColor={colors.inkTertiary}
+          value={draft}
+          onChangeText={setDraft}
+          multiline
+          editable={!posting}
+        />
+        <Pressable
+          onPress={send}
+          disabled={!draft.trim() || posting}
+          style={[styles.convoSend, (!draft.trim() || posting) && { opacity: 0.4 }]}
+        >
+          {posting ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <Ionicons name="arrow-up" size={18} color="#FFFFFF" />
+          )}
+        </Pressable>
+      </View>
+      <Text style={styles.convoHint}>
+        Posts into {clientName}'s assistant thread as you — the assistant sees it as context.
+      </Text>
+    </View>
   );
 }
 
@@ -332,6 +446,39 @@ const styles = StyleSheet.create({
   briefCard: { ...card, padding: space[4], gap: space[3] },
   briefHeader: { flexDirection: "row", alignItems: "center", gap: space[2] },
   briefText: { ...text.body, lineHeight: 22 },
+  // Live conversation card: compact transcript + interjection composer.
+  convoEmpty: { ...text.bodySm, color: colors.inkTertiary },
+  convoRow: { gap: 2 },
+  convoSpeaker: {
+    fontSize: 11,
+    fontFamily: fonts.sansBold,
+    color: colors.inkTertiary,
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
+  },
+  convoSpeakerAdvisor: { color: colors.allworthAccent },
+  convoText: { ...text.bodySm, color: colors.inkSecondary, lineHeight: 19 },
+  convoComposer: { flexDirection: "row", alignItems: "flex-end", gap: space[2], paddingTop: 4 },
+  convoInput: {
+    flex: 1,
+    ...text.bodySm,
+    color: colors.inkPrimary,
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    borderRadius: radius.chip,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    maxHeight: 90,
+  },
+  convoSend: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.allworthNavy,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  convoHint: { fontSize: 11, fontFamily: fonts.sans, color: colors.inkTertiary },
   workflowSummary: { ...text.body, lineHeight: 22 },
   nextActionRow: { flexDirection: "row", alignItems: "center", gap: space[2] },
   nextActionText: { flex: 1, fontFamily: fonts.sansBold, fontSize: 15, color: colors.allworthAccent },

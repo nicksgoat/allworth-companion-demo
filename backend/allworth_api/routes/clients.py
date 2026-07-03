@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from allworth_api.config import data_mode
 from allworth_api.core.auth import get_current_household, get_session_for_household
 from allworth_api.core.chat_service import suggested_for
+from allworth_api.core.conversation_store import load_turns
 from allworth_api.core.memory import active_facts, episodes_for, forget_fact
 from allworth_api.core.nudges import nudges_for
 from allworth_api.data.household import (
@@ -145,3 +146,47 @@ def chat_history(
     if client_id != household_id:
         return JSONResponse(status_code=403, content={"error": "Access denied for this household"})
     return {"episodes": episodes_for(client_id, session)}
+
+
+@router.get("/api/clients/{client_id}/conversation")
+async def conversation(
+    client_id: str,
+    session: str = "wednesday",
+    household_id: str = Depends(get_current_household),
+):
+    """The stored thread, oldest first, including advisor interjections.
+
+    Unlike chat-history (episodes, disabled when profile memory is off), this
+    reads the Redis-backed conversation store, so it works in production. The
+    client app polls it to surface advisor interjections; the advisor view
+    renders it as the live transcript. Advisor turns are stored with a
+    prefixed `content` for the LLM but expose their clean `displayText` here.
+    """
+    if client_id != household_id:
+        return JSONResponse(status_code=403, content={"error": "Access denied for this household"})
+    turns = await load_turns(client_id, session)
+    messages = []
+    for seq, turn in enumerate(turns):
+        if turn.get("kind") == "advisor":
+            messages.append(
+                {
+                    "seq": seq,
+                    "id": turn.get("id"),
+                    "role": "advisor",
+                    "text": turn.get("displayText") or "",
+                    "advisorId": turn.get("advisorId"),
+                    "advisorName": turn.get("advisorName"),
+                    "ts": turn.get("ts"),
+                }
+            )
+        else:
+            messages.append(
+                {
+                    "seq": seq,
+                    "id": None,
+                    "role": turn.get("role"),
+                    "text": turn.get("content") or "",
+                    "ts": None,
+                }
+            )
+    return {"messages": messages}

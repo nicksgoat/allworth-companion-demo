@@ -112,13 +112,15 @@ def _sanitize_advisor_references(text: str, advisor_name: str | None) -> str:
 
 
 def _sanitize_messages(messages: list[dict], advisor_name: str | None) -> list[dict]:
+    # Project to {role, content} only: stored turns may carry UI metadata
+    # (advisor interjections tag kind/id/displayText) and providers reject
+    # unknown message fields.
     sanitized = []
     for message in messages:
-        copied = dict(message)
-        content = copied.get("content")
+        content = message.get("content")
         if isinstance(content, str):
-            copied["content"] = _sanitize_advisor_references(content, advisor_name)
-        sanitized.append(copied)
+            content = _sanitize_advisor_references(content, advisor_name)
+        sanitized.append({"role": message.get("role"), "content": content})
     return sanitized
 
 

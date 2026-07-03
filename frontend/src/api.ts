@@ -5,6 +5,7 @@ import type {
   BookResponse,
   ChatEvent,
   ChatMessage,
+  ConversationMessage,
   Dashboard,
   MeetingNotesResponse,
   Portfolio,
@@ -83,6 +84,28 @@ export class ApiClient {
 
   book(advisorId: string): Promise<BookResponse> {
     return this.get(`/api/advisors/${advisorId}/book`);
+  }
+
+  // The server-stored thread including advisor interjections — polled by the
+  // client chat (to surface interjections) and the advisor transcript view.
+  conversation(clientId: string, session: string): Promise<{ messages: ConversationMessage[] }> {
+    return this.get(`/api/clients/${clientId}/conversation?session=${session}`);
+  }
+
+  async interject(
+    clientId: string,
+    session: string,
+    text: string,
+  ): Promise<{ message: ConversationMessage }> {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (this.token) headers["Authorization"] = `Bearer ${this.token}`;
+    const res = await fetch(`${this.baseURL}/api/advisors/clients/${clientId}/interject`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ session, text }),
+    });
+    if (!res.ok) throw new Error(`POST interject -> ${res.status}`);
+    return res.json();
   }
 
   brief(advisorId: string, clientId: string): Promise<AdvisorBrief> {

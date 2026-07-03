@@ -128,6 +128,12 @@ export function ChatScreen() {
   // write into the fresh one (applyEvent targets the last assistant message,
   // which after a reset would be the new greeting).
   const threadEpoch = useRef(0);
+  // Advisor interjections arrive by polling; the interval closure reads these
+  // refs, not state. Priming marks everything already stored as seen so only
+  // messages posted after this screen mounts surface live.
+  const sendingRef = useRef(false);
+  const seenInterjections = useRef<Set<string>>(new Set());
+  const interjectionsPrimed = useRef(false);
 
   const buildGreeting = async (): Promise<ChatMessage> => {
     const clientFirstName = app.dashboard?.client?.name?.split(",")[0]?.split(" ")[0] ?? "there";
@@ -160,6 +166,7 @@ export function ChatScreen() {
   const startNewChat = async () => {
     threadEpoch.current += 1;
     setSending(false);
+    sendingRef.current = false;
     setDraft("");
     setRevealedId(null);
     app.setChatMessages([]);
@@ -170,6 +177,51 @@ export function ChatScreen() {
   useEffect(() => {
     loadProactive();
   }, [app.session]);
+
+  // Demo-grade advisor presence: poll the server-stored thread and surface any
+  // advisor interjection as its own bubble. Merges are skipped mid-stream
+  // (applyEvent targets the last assistant message) and picked up next tick.
+  useEffect(() => {
+    let cancelled = false;
+    interjectionsPrimed.current = false;
+    const tick = async () => {
+      try {
+        const res = await app.api.conversation(app.clientId, app.session);
+        if (cancelled) return;
+        const advisorMsgs = res.messages.filter((m) => m.role === "advisor" && m.id);
+        if (!interjectionsPrimed.current) {
+          for (const m of advisorMsgs) seenInterjections.current.add(m.id as string);
+          interjectionsPrimed.current = true;
+          return;
+        }
+        if (sendingRef.current) return;
+        const fresh = advisorMsgs.filter((m) => !seenInterjections.current.has(m.id as string));
+        if (fresh.length === 0) return;
+        for (const m of fresh) seenInterjections.current.add(m.id as string);
+        pinnedToBottom.current = true;
+        app.setChatMessages((msgs) => [
+          ...msgs,
+          ...fresh.map((m) =>
+            newMessage({
+              role: "advisor",
+              text: m.text,
+              advisorName: m.advisorName,
+              chips: [],
+              sources: [],
+              isStreaming: false,
+            }),
+          ),
+        ]);
+      } catch {}
+    };
+    tick();
+    const interval = setInterval(tick, 3500);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [app.clientId, app.session]);
 
   // A prefilled prompt (from a nudge, a drill-in, or a quick action) auto-sends,
   // so every chat button is a real one-tap flow: tap → streamed answer, not just
@@ -263,6 +315,7 @@ export function ChatScreen() {
     if (!text || sending) return;
     setDraft("");
     setSending(true);
+    sendingRef.current = true;
     // A fresh question always anchors to the bottom, even if you'd scrolled up.
     pinnedToBottom.current = true;
     app.setChatMessages((msgs) => [
@@ -317,6 +370,7 @@ export function ChatScreen() {
       ];
     });
     setSending(false);
+    sendingRef.current = false;
   };
 
   const sendFeedback = async (message: ChatMessage, rating: "positive" | "negative") => {
