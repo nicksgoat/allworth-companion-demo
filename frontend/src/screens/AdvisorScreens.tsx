@@ -18,6 +18,7 @@ import {
   HairlineDivider,
   SectionHeader,
 } from "../components/Rows";
+import { CollapsibleCard } from "../components/Collapsible";
 import { APP_HEADER_HEIGHT, AppHeader } from "../components/Glass";
 import { AdvisorConversationView } from "./AdvisorConversationScreen";
 import { useApp } from "../state";
@@ -427,51 +428,6 @@ function StatBlock({
         {value}
       </Text>
       <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
-
-// Summary-first card: title (+ optional one-line preview) always visible,
-// body behind a tap — keeps the detail screen scannable without scrolling.
-function CollapsibleCard({
-  icon,
-  title,
-  preview,
-  children,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  title: string;
-  preview?: string;
-  children: React.ReactNode;
-}) {
-  const [expanded, setExpanded] = useState(false);
-  return (
-    <View style={styles.briefCard}>
-      <Pressable
-        onPress={() => setExpanded((v) => !v)}
-        hitSlop={6}
-        style={({ pressed }) => [styles.briefHeader, pressed && { opacity: 0.6 }]}
-      >
-        <Ionicons name={icon} size={13} color={colors.allworthAccent} />
-        <SectionHeader>{title}</SectionHeader>
-        <View style={{ flex: 1 }} />
-        <Ionicons
-          name={expanded ? "chevron-up" : "chevron-down"}
-          size={14}
-          color={colors.inkTertiary}
-        />
-      </Pressable>
-      {preview && !expanded ? (
-        <Text style={styles.briefText} numberOfLines={2}>
-          {preview}
-        </Text>
-      ) : null}
-      {expanded ? (
-        <View style={{ gap: space[3] }}>
-          {preview ? <Text style={styles.briefText}>{preview}</Text> : null}
-          {children}
-        </View>
-      ) : null}
     </View>
   );
 }

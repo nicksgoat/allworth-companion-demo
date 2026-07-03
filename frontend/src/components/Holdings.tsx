@@ -1,4 +1,6 @@
-import React from "react";
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { card, colors, fonts, usd } from "../theme";
 import type { Account, Position } from "../types";
@@ -14,34 +16,55 @@ function isConcentrated(p: Position, accountTotal: number): boolean {
   return accountTotal > 0 && p.value / accountTotal > 0.2;
 }
 
+// Glance rule (DESIGN.md): the account header — name, institution, holding
+// count, total — is always visible; the position rows unfold on tap.
 export function AccountHoldingsSection({
   account,
   positions,
   onSelect,
+  initiallyExpanded = false,
 }: {
   account: Account;
   positions: Position[];
   onSelect?: (p: Position) => void;
+  initiallyExpanded?: boolean;
 }) {
+  const [expanded, setExpanded] = useState(initiallyExpanded);
   const accountTotal = positions.reduce((sum, p) => sum + p.value, 0);
   const sorted = [...positions].sort((x, y) => y.value - x.value);
 
+  const toggle = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setExpanded((v) => !v);
+  };
+
   return (
     <View style={styles.card}>
-      <View style={styles.cardHeader}>
+      <Pressable
+        onPress={toggle}
+        style={({ pressed }) => [styles.cardHeader, pressed && { opacity: 0.7 }]}
+      >
         <View style={{ flex: 1 }}>
           <Text style={styles.accountName}>{account.name}</Text>
-          <Text style={styles.accountInstitution}>{account.institution}</Text>
+          <Text style={styles.accountInstitution}>
+            {account.institution} · {sorted.length} holding{sorted.length === 1 ? "" : "s"}
+          </Text>
         </View>
         <Text style={styles.accountTotal}>{usd(accountTotal)}</Text>
-      </View>
-      <HairlineDivider />
-      {sorted.map((position, i) => (
-        <React.Fragment key={`${position.accountId}-${position.symbol}`}>
-          {i > 0 ? <HairlineDivider /> : null}
-          <HoldingRow position={position} accountTotal={accountTotal} onSelect={onSelect} />
-        </React.Fragment>
-      ))}
+        <Ionicons
+          name={expanded ? "chevron-up" : "chevron-down"}
+          size={14}
+          color={colors.inkTertiary}
+        />
+      </Pressable>
+      {expanded
+        ? sorted.map((position) => (
+            <React.Fragment key={`${position.accountId}-${position.symbol}`}>
+              <HairlineDivider />
+              <HoldingRow position={position} accountTotal={accountTotal} onSelect={onSelect} />
+            </React.Fragment>
+          ))
+        : null}
     </View>
   );
 }

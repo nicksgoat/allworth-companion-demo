@@ -76,6 +76,22 @@ nothing shouts, nothing is clever at the reader's expense. When in doubt, remove
 | Composer | `ChatScreen` inputBar | Rounded pill (26), grows with draft, navy send orb appears only with text. |
 | Disclaimer | `Rows.DisclaimerFooter` | On every client-facing screen bottom. |
 
+## The glance rule
+
+Every screen's key state fits the first viewport — no scrolling to find out
+"what's going on." Details collapse behind summary-first modules:
+
+- `Collapsible.tsx CollapsibleCard` is the one container for this: icon +
+  section-label title (with a `· count` when it hides a list) + optional
+  2-line preview, body behind a tap (Light haptic).
+- Cards with their own rich header (e.g. `RecurringCard`, holdings account
+  sections) implement the same pattern inline: header always visible, rows
+  unfold.
+- Lists longer than ~4 rows at screen level either collapse or move behind a
+  pushed detail screen. Never nest a card inside a card.
+- Order modules by "why did I open this screen" — the live/actionable thing
+  first (see advisor ClientDetail: stat strip → live conversation → briefs).
+
 ## Motion
 
 All motion lives in `src/anim.tsx` — reuse `RiseIn` (fade + 14px rise, 420ms),

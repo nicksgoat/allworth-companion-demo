@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAnimatedValue } from "../anim";
+import { CollapsibleCard } from "../components/Collapsible";
 import { APP_HEADER_HEIGHT, AppHeader, TAB_BAR_HEIGHT } from "../components/Glass";
 import {
   DisclaimerFooter,
@@ -151,14 +152,16 @@ export function ProfileScreen() {
           </View>
         ) : null}
 
-        {/* What I've learned (the AI's memory) */}
-        <View style={{ gap: 10 }}>
-          <SectionHeader>What I{"'"}ve learned</SectionHeader>
-          <Text style={styles.subtitle}>
-            Everything here came from you — each fact carries a source, a timestamp, and an audit
-            trail. Tap any to see why I know it, or to remove it.
-          </Text>
-
+        {/* What I've learned (the AI's memory) — summary-first per the glance rule. */}
+        <CollapsibleCard
+          icon="sparkles"
+          title={`What I've learned · ${facts.length}`}
+          preview={
+            facts.length
+              ? "Everything here came from you — each fact carries a source and an audit trail. Tap to review or remove."
+              : "Nothing learned yet — start a conversation."
+          }
+        >
           {categories.map((category) => (
             <View key={category} style={styles.factGroup}>
               <Text style={styles.factGroupLabel}>{CATEGORY_LABELS[category] ?? category}</Text>
@@ -177,19 +180,15 @@ export function ProfileScreen() {
                 ))}
             </View>
           ))}
-
-          {facts.length === 0 ? (
-            <Text style={styles.empty}>Nothing learned yet — start a conversation.</Text>
-          ) : null}
-        </View>
+        </CollapsibleCard>
 
         {/* Meeting notes (from sessions with your advisor) */}
         {notes.length > 0 ? (
-          <View style={{ gap: 10 }}>
-            <SectionHeader>Meeting notes</SectionHeader>
-            <Text style={styles.subtitle}>
-              Recaps from your sessions with your advisor. Tap any to read the full note.
-            </Text>
+          <CollapsibleCard
+            icon="document-text-outline"
+            title={`Meeting notes · ${notes.length}`}
+            preview={`Latest: ${notes[0].title}`}
+          >
             <View style={styles.factGroup}>
               {notes.map((note, i) => (
                 <React.Fragment key={note.id}>
@@ -203,7 +202,7 @@ export function ProfileScreen() {
                 </React.Fragment>
               ))}
             </View>
-          </View>
+          </CollapsibleCard>
         ) : null}
 
         {/* Demo-only: reach the advisor side without typing a deep link. */}
@@ -313,7 +312,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  subtitle: { fontSize: 15, fontFamily: fonts.sans, lineHeight: 21, color: colors.inkSecondary },
   factGroup: { gap: 2 },
   factGroupLabel: {
     fontSize: 13,
@@ -321,13 +319,6 @@ const styles = StyleSheet.create({
     color: colors.inkSecondary,
     paddingBottom: 2,
     paddingTop: 6,
-  },
-  empty: {
-    fontSize: 15,
-    fontFamily: fonts.sans,
-    color: colors.inkTertiary,
-    textAlign: "center",
-    paddingTop: 24,
   },
 
   accountSection: {

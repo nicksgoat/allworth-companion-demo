@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import * as Haptics from "expo-haptics";
+import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { card, colors, fonts, usd } from "../theme";
 import { HairlineDivider } from "./Rows";
@@ -16,15 +17,26 @@ const PLANS = [
   { id: "roth", label: "Roth IRA", caption: "On track to max your annual limit", amount: 667 },
 ];
 
+// Glance rule: the header row (total + next deposit) is the summary; the
+// per-plan rows and ask affordance unfold on tap.
 export function RecurringCard({ onAsk }: { onAsk: () => void }) {
+  const [expanded, setExpanded] = useState(false);
   const monthlyTotal = PLANS.reduce((sum, p) => sum + p.amount, 0);
   const now = new Date();
   const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
   const nextLabel = next.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
+  const toggle = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setExpanded((v) => !v);
+  };
+
   return (
     <View style={styles.card}>
-      <View style={styles.header}>
+      <Pressable
+        onPress={toggle}
+        style={({ pressed }) => [styles.header, pressed && { opacity: 0.7 }]}
+      >
         <View style={styles.icon}>
           <Ionicons name="repeat" size={20} color={colors.allworthAccent} />
         </View>
@@ -33,27 +45,36 @@ export function RecurringCard({ onAsk }: { onAsk: () => void }) {
           <Text style={styles.subtitle}>Next deposit {nextLabel}</Text>
         </View>
         <Text style={styles.total}>{usd(monthlyTotal)}/mo</Text>
-      </View>
-
-      {PLANS.map((plan, i) => (
-        <React.Fragment key={plan.id}>
-          {i > 0 ? <HairlineDivider /> : null}
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.rowLabel}>{plan.label}</Text>
-              <Text style={styles.rowCaption}>{plan.caption}</Text>
-            </View>
-            <Text style={styles.rowAmount}>{usd(plan.amount)}/mo</Text>
-          </View>
-        </React.Fragment>
-      ))}
-
-      <Pressable
-        onPress={onAsk}
-        style={({ pressed }) => [styles.ask, pressed && { opacity: 0.85 }]}
-      >
-        <Text style={styles.askText}>Could I be investing more each month?</Text>
+        <Ionicons
+          name={expanded ? "chevron-up" : "chevron-down"}
+          size={14}
+          color={colors.inkTertiary}
+        />
       </Pressable>
+
+      {expanded ? (
+        <>
+          {PLANS.map((plan) => (
+            <React.Fragment key={plan.id}>
+              <HairlineDivider />
+              <View style={styles.row}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.rowLabel}>{plan.label}</Text>
+                  <Text style={styles.rowCaption}>{plan.caption}</Text>
+                </View>
+                <Text style={styles.rowAmount}>{usd(plan.amount)}/mo</Text>
+              </View>
+            </React.Fragment>
+          ))}
+
+          <Pressable
+            onPress={onAsk}
+            style={({ pressed }) => [styles.ask, pressed && { opacity: 0.85 }]}
+          >
+            <Text style={styles.askText}>Could I be investing more each month?</Text>
+          </Pressable>
+        </>
+      ) : null}
     </View>
   );
 }

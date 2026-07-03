@@ -142,8 +142,7 @@ function InvestContent({
         <View style={{ gap: 6 }}>
           <Text style={styles.leadTitle}>Where your money lives</Text>
           <Text style={styles.leadSubtitle}>
-            Across {accountCount} accounts — what Allworth manages for you, what{"'"}s held away,
-            and what{"'"}s owed.
+            {accountCount} accounts — managed, held away, and owed.
           </Text>
         </View>
         <BreakdownCard
@@ -183,8 +182,7 @@ function InvestContent({
             <CompletePictureCard heldAwayTotal={d.heldAwayTotal} />
           </RiseIn>
 
-          <RiseIn delay={180} style={{ gap: 12 }}>
-            <SectionHeader>Automatic investing</SectionHeader>
+          <RiseIn delay={180}>
             <RecurringCard
               onAsk={() => ask("Could I be investing more each month without hurting my plan?")}
             />
@@ -193,12 +191,13 @@ function InvestContent({
       ) : (
         <View key="holdings" style={{ gap: 24 }}>
           <RiseIn style={{ gap: 16 }}>
-            {investedAccounts.map((account) => (
+            {investedAccounts.map((account, i) => (
               <AccountHoldingsSection
                 key={account.id}
                 account={account}
                 positions={p.byAccount[account.id]}
                 onSelect={onPosition}
+                initiallyExpanded={i === 0}
               />
             ))}
           </RiseIn>
