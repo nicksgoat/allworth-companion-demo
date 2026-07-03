@@ -9,7 +9,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -21,6 +20,7 @@ import {
   SectionHeader,
 } from "../components/Rows";
 import { APP_HEADER_HEIGHT, AppHeader } from "../components/Glass";
+import { AdvisorConversationView } from "./AdvisorConversationScreen";
 import { useApp } from "../state";
 import { card, colors, fonts, radius, space, text, usd } from "../theme";
 import type { AdvisorBrief, BookResponse, ConversationMessage, Household } from "../types";
@@ -28,6 +28,7 @@ import type { AdvisorBrief, BookResponse, ConversationMessage, Household } from 
 type AdvisorStackParams = {
   Book: undefined;
   ClientDetail: { household: Household };
+  ClientConversation: { household: Household };
 };
 
 const Stack = createNativeStackNavigator<AdvisorStackParams>();
@@ -41,7 +42,27 @@ export function AdvisorNavigator() {
         component={ClientDetailScreen}
         options={({ route }) => ({ title: route.params.household.name, headerBackTitle: "Book" })}
       />
+      <Stack.Screen
+        name="ClientConversation"
+        component={ClientConversationScreen}
+        options={({ route }) => ({
+          title: `${route.params.household.name.split(",")[0].split(" ")[0]}'s conversation`,
+          headerBackTitle: "Client",
+        })}
+      />
     </Stack.Navigator>
+  );
+}
+
+function ClientConversationScreen({
+  route,
+}: NativeStackScreenProps<AdvisorStackParams, "ClientConversation">) {
+  const { household } = route.params;
+  return (
+    <AdvisorConversationView
+      clientId={household.clientId}
+      clientName={household.name.split(",")[0].split(" ")[0]}
+    />
   );
 }
 
@@ -210,10 +231,7 @@ function ClientDetailScreen({ route }: NativeStackScreenProps<AdvisorStackParams
             ))}
           </View>
 
-          <ConversationCard
-            clientId={household.clientId}
-            clientName={household.name.split(",")[0].split(" ")[0]}
-          />
+          <ConversationPreviewCard household={household} />
 
           {brief.reviewWorkflow ? (
             <ReviewWorkflowCard workflow={brief.reviewWorkflow} />
@@ -229,19 +247,19 @@ function ClientDetailScreen({ route }: NativeStackScreenProps<AdvisorStackParams
   );
 }
 
-// The client's live assistant thread, with a composer so the advisor can post
-// into it (three-way: client / assistant / advisor). Demo-grade polling.
-function ConversationCard({ clientId, clientName }: { clientId: string; clientName: string }) {
+// Compact entry point to the full-screen conversation: the last exchange at a
+// glance, then push into AdvisorConversationView to read and interject.
+function ConversationPreviewCard({ household }: { household: Household }) {
   const app = useApp();
+  const navigation = useNavigation<any>();
+  const clientName = household.name.split(",")[0].split(" ")[0];
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
-  const [draft, setDraft] = useState("");
-  const [posting, setPosting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     const tick = async () => {
       try {
-        const res = await app.api.conversation(clientId, app.session);
+        const res = await app.api.conversation(household.clientId, app.session);
         if (!cancelled) setMessages(res.messages);
       } catch {}
     };
@@ -252,22 +270,9 @@ function ConversationCard({ clientId, clientName }: { clientId: string; clientNa
       clearInterval(interval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clientId, app.session]);
+  }, [household.clientId, app.session]);
 
-  const send = async () => {
-    const text = draft.trim();
-    if (!text || posting) return;
-    setPosting(true);
-    try {
-      await app.api.interject(clientId, app.session, text);
-      setDraft("");
-      const res = await app.api.conversation(clientId, app.session);
-      setMessages(res.messages);
-    } catch {}
-    setPosting(false);
-  };
-
-  const recent = messages.slice(-8);
+  const recent = messages.slice(-3);
   const speaker = (m: ConversationMessage) =>
     m.role === "advisor"
       ? (m.advisorName ?? "You").split(" ")[0]
@@ -276,10 +281,17 @@ function ConversationCard({ clientId, clientName }: { clientId: string; clientNa
         : "Assistant";
 
   return (
-    <View style={styles.briefCard}>
+    <Pressable
+      onPress={() => navigation.navigate("ClientConversation", { household })}
+      style={({ pressed }) => [styles.briefCard, pressed && { opacity: 0.8 }]}
+    >
       <View style={styles.briefHeader}>
         <Ionicons name="chatbubbles-outline" size={13} color={colors.allworthAccent} />
         <SectionHeader>Live conversation</SectionHeader>
+        <View style={{ flex: 1 }} />
+        {messages.length > 0 ? (
+          <Text style={styles.convoCount}>{messages.length} messages</Text>
+        ) : null}
       </View>
 
       {recent.length === 0 ? (
@@ -288,45 +300,24 @@ function ConversationCard({ clientId, clientName }: { clientId: string; clientNa
         </Text>
       ) : (
         recent.map((m) => (
-          <View key={`${m.seq}-${m.id ?? "t"}`} style={styles.convoRow}>
+          <View key={`${m.seq}-${m.id ?? "t"}`} style={styles.convoPreviewRow}>
             <Text
               style={[styles.convoSpeaker, m.role === "advisor" && styles.convoSpeakerAdvisor]}
             >
               {speaker(m)}
             </Text>
-            <Text style={styles.convoText} numberOfLines={m.role === "assistant" ? 3 : 6}>
+            <Text style={styles.convoPreviewText} numberOfLines={1}>
               {m.text}
             </Text>
           </View>
         ))
       )}
 
-      <View style={styles.convoComposer}>
-        <TextInput
-          style={styles.convoInput}
-          placeholder={`Message ${clientName} in this thread…`}
-          placeholderTextColor={colors.inkTertiary}
-          value={draft}
-          onChangeText={setDraft}
-          multiline
-          editable={!posting}
-        />
-        <Pressable
-          onPress={send}
-          disabled={!draft.trim() || posting}
-          style={[styles.convoSend, (!draft.trim() || posting) && { opacity: 0.4 }]}
-        >
-          {posting ? (
-            <ActivityIndicator size="small" color="#FFFFFF" />
-          ) : (
-            <Ionicons name="arrow-up" size={18} color="#FFFFFF" />
-          )}
-        </Pressable>
+      <View style={styles.convoOpenRow}>
+        <Text style={styles.convoOpenText}>Open conversation</Text>
+        <Ionicons name="arrow-forward" size={15} color={colors.allworthAccent} />
       </View>
-      <Text style={styles.convoHint}>
-        Posts into {clientName}'s assistant thread as you — the assistant sees it as context.
-      </Text>
-    </View>
+    </Pressable>
   );
 }
 
@@ -450,9 +441,10 @@ const styles = StyleSheet.create({
   briefCard: { ...card, padding: space[4], gap: space[3] },
   briefHeader: { flexDirection: "row", alignItems: "center", gap: space[2] },
   briefText: { ...text.body, lineHeight: 22 },
-  // Live conversation card: compact transcript + interjection composer.
+  // Live-conversation preview: three one-liners + the open affordance.
   convoEmpty: { ...text.bodySm, color: colors.inkTertiary },
-  convoRow: { gap: 2 },
+  convoCount: { fontSize: 11, fontFamily: fonts.sans, color: colors.inkTertiary },
+  convoPreviewRow: { flexDirection: "row", alignItems: "baseline", gap: space[2] },
   convoSpeaker: {
     fontSize: 11,
     fontFamily: fonts.sansBold,
@@ -461,30 +453,15 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   convoSpeakerAdvisor: { color: colors.allworthAccent },
-  convoText: { ...text.bodySm, color: colors.inkSecondary, lineHeight: 19 },
-  convoComposer: { flexDirection: "row", alignItems: "flex-end", gap: space[2], paddingTop: 4 },
-  convoInput: {
-    flex: 1,
-    ...text.bodySm,
-    color: colors.inkPrimary,
-    borderWidth: 1,
-    borderColor: colors.hairline,
-    borderRadius: radius.chip,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    maxHeight: 90,
-    // The bordered field is the focus affordance; the browser ring fights it.
-    ...(Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : null),
-  },
-  convoSend: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.allworthNavy,
+  convoPreviewText: { ...text.bodySm, color: colors.inkSecondary, flex: 1 },
+  convoOpenRow: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: space[2],
+    paddingTop: space[1],
   },
-  convoHint: { fontSize: 11, fontFamily: fonts.sans, color: colors.inkTertiary },
+  convoOpenText: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.allworthAccent },
   workflowSummary: { ...text.body, lineHeight: 22 },
   nextActionRow: { flexDirection: "row", alignItems: "center", gap: space[2] },
   nextActionText: { flex: 1, fontFamily: fonts.sansBold, fontSize: 15, color: colors.allworthAccent },
