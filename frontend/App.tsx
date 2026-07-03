@@ -21,6 +21,7 @@ import { ChatScreen } from "./src/screens/ChatScreen";
 import { DashboardScreen } from "./src/screens/DashboardScreen";
 import { DemoControlSheet } from "./src/screens/DemoControlSheet";
 import { InvestScreen } from "./src/screens/InvestScreen";
+import { LockScreen } from "./src/screens/LockScreen";
 import { LoginScreen } from "./src/screens/LoginScreen";
 import { ProfileScreen } from "./src/screens/ProfileScreen";
 import { VisionScreen } from "./src/screens/VisionScreen";
@@ -46,7 +47,10 @@ export default function App() {
 
 /** Show login screen if not authenticated, otherwise the full app. */
 function AuthGate() {
-  const { session, loading } = useAuth();
+  const { session, loading, restoredFromStorage } = useAuth();
+  // A restored session (app relaunch) gets a biometric gate; a fresh email
+  // login already proved presence and goes straight in.
+  const [unlocked, setUnlocked] = React.useState(false);
 
   if (loading) {
     return (
@@ -65,6 +69,10 @@ function AuthGate() {
 
   if (!session) {
     return <LoginScreen />;
+  }
+
+  if (restoredFromStorage && !unlocked) {
+    return <LockScreen onUnlocked={() => setUnlocked(true)} />;
   }
 
   return (

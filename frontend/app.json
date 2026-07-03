@@ -28,7 +28,13 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allworth uses Face ID to unlock your account securely."
+        }
+      ]
     ],
     "extra": {
       "eas": {

@@ -16,5 +16,8 @@
   },
   "workspaces": [
     "frontend"
-  ]
+  ],
+  "devDependencies": {
+    "@types/react": "^19.2.17"
+  }
 }

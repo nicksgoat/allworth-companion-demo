@@ -15,6 +15,8 @@ import { useAuth } from "../auth";
 import { useApp } from "../state";
 import { card, colors, fonts } from "../theme";
 import type { LearnedFact, MeetingNote } from "../types";
+import { AdvisorConciergeSheet } from "./AdvisorConciergeSheet";
+import { DocumentsSheet } from "./DocumentsSheet";
 import { FactDetailSheet } from "./FactDetailSheet";
 import { MeetingNoteDetailSheet } from "./MeetingNoteDetailSheet";
 
@@ -36,6 +38,8 @@ export function ProfileScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [selectedFact, setSelectedFact] = useState<LearnedFact | null>(null);
   const [selectedNote, setSelectedNote] = useState<MeetingNote | null>(null);
+  const [conciergeOpen, setConciergeOpen] = useState(false);
+  const [documentsOpen, setDocumentsOpen] = useState(false);
   const scrollY = useAnimatedValue(0);
 
   const client = app.dashboard?.client;
@@ -128,6 +132,22 @@ export function ProfileScreen() {
                 <Ionicons name="chatbubble-ellipses" size={18} color={colors.allworthAccent} />
               </Pressable>
             </View>
+            <Pressable
+              onPress={() => setConciergeOpen(true)}
+              style={({ pressed }) => [styles.linkRow, pressed && { opacity: 0.7 }]}
+            >
+              <Ionicons name="calendar-outline" size={18} color={colors.allworthAccent} />
+              <Text style={styles.linkRowText}>Book a meeting or request a topic</Text>
+              <Ionicons name="chevron-forward" size={16} color={colors.inkTertiary} />
+            </Pressable>
+            <Pressable
+              onPress={() => setDocumentsOpen(true)}
+              style={({ pressed }) => [styles.linkRow, pressed && { opacity: 0.7 }]}
+            >
+              <Ionicons name="folder-open-outline" size={18} color={colors.allworthAccent} />
+              <Text style={styles.linkRowText}>Documents</Text>
+              <Ionicons name="chevron-forward" size={16} color={colors.inkTertiary} />
+            </Pressable>
           </View>
         ) : null}
 
@@ -212,6 +232,12 @@ export function ProfileScreen() {
         />
 
         <MeetingNoteDetailSheet note={selectedNote} onClose={() => setSelectedNote(null)} />
+        <AdvisorConciergeSheet
+          visible={conciergeOpen}
+          advisor={advisor ?? null}
+          onClose={() => setConciergeOpen(false)}
+        />
+        <DocumentsSheet visible={documentsOpen} onClose={() => setDocumentsOpen(false)} />
       </Animated.ScrollView>
       <GlassHeader title="Profile" scrollY={scrollY} />
     </>
@@ -249,6 +275,15 @@ const styles = StyleSheet.create({
   },
   advisorName: { fontSize: 16, fontFamily: fonts.sansBold, color: colors.inkPrimary },
   advisorTitle: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary, marginTop: 2 },
+  linkRow: {
+    ...card,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  linkRowText: { flex: 1, fontSize: 14, fontFamily: fonts.sansBold, color: colors.inkPrimary },
   advisorBtn: {
     width: 40,
     height: 40,
