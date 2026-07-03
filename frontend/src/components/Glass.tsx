@@ -67,7 +67,20 @@ export function AppHeader({
   // Closed = just the status-bar glass strip; open = strip + title row. The
   // container's height animates between the two (clipping the row out), so
   // the title can never slide into the status bar.
-  const clamp = scrollY ? Animated.diffClamp(scrollY, 0, APP_HEADER_HEIGHT) : null;
+  // extrapolateLeft clamps out iOS rubber-band overscroll: without it, the
+  // bounce settling back from negative to 0 reads as a scroll-down and closes
+  // the header at the very top of the list.
+  const clamp = scrollY
+    ? Animated.diffClamp(
+        scrollY.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 1],
+          extrapolateLeft: "clamp",
+        }),
+        0,
+        APP_HEADER_HEIGHT,
+      )
+    : null;
   const height = clamp
     ? clamp.interpolate({
         inputRange: [0, APP_HEADER_HEIGHT],
