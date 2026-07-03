@@ -42,6 +42,16 @@ window.ALW_CONTENT = {
       body: "Mock Core-Satellite trades with tax impact and loss-harvesting flags. Nothing executes — it prepares the advisor.",
     },
     {
+      tag: "Goals",
+      title: "Live, adjustable goals",
+      body: "The real goals from the client's plan — funded status, projection, and the monthly amount that closes the gap. Turn the dials, save a plan, and both the assistant and the advisor plan around it.",
+    },
+    {
+      tag: "Concierge",
+      title: "Book a meeting, Calendly-style",
+      body: "Pick a day, pick a time from the advisor's availability, confirm. Bookings and topic requests land in the advisor's view of that client — no email round trip.",
+    },
+    {
       tag: "Advisory",
       title: "Advisor handoff",
       body: "Every substantive answer ends with a compliance-driven handoff — and can draft the note for the next meeting.",
@@ -49,35 +59,52 @@ window.ALW_CONTENT = {
     {
       tag: "Presence",
       title: "Advisors inside the thread",
-      body: "Advisors see the conversation and can step into it with their own message. Client, advisor, and assistant share one thread.",
+      body: "Advisors see the conversation live and can step into it with their own message. Client, advisor, and assistant share one thread.",
     },
     {
-      tag: "Relationship",
-      title: "Meeting notes",
-      body: "Past advisor meeting summaries surfaced in-app, so context never resets between conversations.",
+      tag: "Advisor view",
+      title: "The client at a glance",
+      body: "One screen per client: managed and held-away totals, open items, the live conversation, the request inbox, and an auto-prepared brief — no scrolling to find out what's going on.",
+    },
+    {
+      tag: "Access",
+      title: "Face ID and one design language",
+      body: "Biometric unlock on return, a single glass header that tucks away as you read, and a calm, summary-first layout on every screen.",
     },
     {
       tag: "Proactive",
       title: "Insight nudges",
       body: "Alerts that matter: spending running over plan, a concentrated position. The detail is one tap away.",
     },
-    {
-      tag: "Households",
-      title: "Two client profiles",
-      body: "Maya, semi-retired and income-focused, and Kenny, working through a concentrated NVDA position.",
-    },
   ],
 
   // Real captures live in assets/screenshots/. Until an image exists the frame
   // shows a tasteful placeholder, so the page is presentable before capture.
   screenshots: [
-    { file: "dashboard.png", caption: "Dashboard", sub: "Net worth, held & held-away" },
-    { file: "chat.png", caption: "Grounded chat", sub: "Live tool calls → sources" },
-    { file: "advisor.png", caption: "Advisor brief", sub: "Auto-prepared for the meeting" },
+    { file: "dashboard.png", caption: "Home", sub: "What needs attention, and the advisor in reach" },
+    { file: "goals.png", caption: "My goals", sub: "Real plan goals with adjustable funding" },
+    { file: "chat.png", caption: "Goals in chat", sub: "Ask, and the live tracker streams in" },
+    { file: "booking.png", caption: "Book a meeting", sub: "Pick a day, pick a time, confirmed" },
+    { file: "advisor.png", caption: "Advisor view", sub: "The client at a glance — requests included" },
+    { file: "conversation.png", caption: "Three-way thread", sub: "Advisor, client, and assistant together" },
     { file: "vision.png", caption: "Vision", sub: "The Client Intelligence Layer" },
   ],
 
   releases: [
+    {
+      build: 14,
+      version: "1.0.0",
+      date: "2026-07-03",
+      channel: "Up next",
+      title: "Real goals, real booking, one design language",
+      notes: [
+        "My goals is now a real tool: the goals from your plan with live funded status, adjustable monthly and timeline dials, and a saved plan the assistant and your advisor both use.",
+        "Book a meeting Calendly-style — a day strip and real time slots — and the request appears in the advisor's view alongside a new client-request inbox.",
+        "One glass header across every screen that tucks away as you scroll, Face ID unlock on return, and a glance-first layout: key state on the first screen, detail one tap deeper.",
+        "The advisor side grew up: a client-at-a-glance detail screen and a full-screen live conversation for reading and replying inside a client's thread.",
+        "Wealth is structure-first — what's managed, held away, and owed — with performance detail kept to tapped-in views.",
+      ],
+    },
     {
       build: 13,
       version: "1.0.0",
