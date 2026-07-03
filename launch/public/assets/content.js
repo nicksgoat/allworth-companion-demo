@@ -10,7 +10,7 @@
 window.ALW_CONTENT = {
   meta: {
     version: "1.0.0",
-    build: 11,
+    build: 12,
     channel: "TestFlight",
     model: "Azure OpenAI · GPT-4o",
   },
@@ -47,6 +47,11 @@ window.ALW_CONTENT = {
       body: "Every substantive answer ends with a compliance-driven handoff — and can draft the note for the next meeting.",
     },
     {
+      tag: "Presence",
+      title: "Advisors inside the thread",
+      body: "An advisor can read a client's conversation and step in with their own message — a three-way thread the assistant treats as context.",
+    },
+    {
       tag: "Relationship",
       title: "Meeting notes",
       body: "Past advisor meeting summaries surfaced in-app, so context never resets between conversations.",
@@ -73,6 +78,18 @@ window.ALW_CONTENT = {
   ],
 
   releases: [
+    {
+      build: 12,
+      version: "1.0.0",
+      date: "2026-07-03",
+      channel: "TestFlight",
+      title: "Advisor presence + a ChatGPT-class chat",
+      notes: [
+        "Advisors can now message directly inside a client's assistant thread — a live three-way conversation the assistant understands as context.",
+        "Rebuilt chat shell: assistant identity header, new-chat, growing composer, jump-to-latest — with smoother streaming.",
+        "Advisor view gains a live conversation transcript beside the auto-prepared brief.",
+      ],
+    },
     {
       build: 11,
       version: "1.0.0",
