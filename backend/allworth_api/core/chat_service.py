@@ -43,6 +43,7 @@ VISUAL_TOOLS = {
     "simulate",
     "run_mock_rebalance",
     "run_monte_carlo",
+    "analyze_goal_funding",
 }
 
 

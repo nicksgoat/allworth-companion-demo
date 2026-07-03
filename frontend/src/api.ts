@@ -2,11 +2,14 @@ import { fetch as expoFetch } from "expo/fetch";
 import { Platform } from "react-native";
 import type {
   AdvisorBrief,
+  Availability,
   BookResponse,
   ChatEvent,
   ChatMessage,
+  ClientRequest,
   ConversationMessage,
   Dashboard,
+  GoalFunding,
   MeetingNotesResponse,
   Portfolio,
   ProactiveResponse,
@@ -110,6 +113,52 @@ export class ApiClient {
 
   brief(advisorId: string, clientId: string): Promise<AdvisorBrief> {
     return this.get(`/api/advisors/${advisorId}/clients/${clientId}/brief`);
+  }
+
+  // ── Goals (live goal planning) ──────────────────────────────────────────
+
+  goals(clientId: string): Promise<GoalFunding> {
+    return this.get(`/api/clients/${clientId}/goals`);
+  }
+
+  async saveGoalPlan(
+    clientId: string,
+    goalId: string,
+    plan: { monthly: number; years: number },
+  ): Promise<void> {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (this.token) headers["Authorization"] = `Bearer ${this.token}`;
+    const res = await fetch(`${this.baseURL}/api/clients/${clientId}/goals/${goalId}/plan`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(plan),
+    });
+    if (!res.ok) throw new Error(`POST goal plan → ${res.status}`);
+  }
+
+  // ── Advisor concierge: availability + requests ──────────────────────────
+
+  availability(clientId: string): Promise<Availability> {
+    return this.get(`/api/clients/${clientId}/availability`);
+  }
+
+  async sendRequest(
+    clientId: string,
+    body: { kind: "booking" | "topic"; slotISO?: string; slotDisplay?: string; topic?: string },
+  ): Promise<{ request: ClientRequest }> {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (this.token) headers["Authorization"] = `Bearer ${this.token}`;
+    const res = await fetch(`${this.baseURL}/api/clients/${clientId}/requests`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`POST request → ${res.status}`);
+    return res.json();
+  }
+
+  advisorRequests(clientId: string): Promise<{ requests: ClientRequest[] }> {
+    return this.get(`/api/advisors/clients/${clientId}/requests`);
   }
 
   async forgetFact(clientId: string, factId: string): Promise<void> {

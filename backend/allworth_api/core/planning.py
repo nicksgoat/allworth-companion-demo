@@ -450,11 +450,15 @@ def analyze_goal_funding(*, growth_rate: float = 0.06) -> dict[str, Any]:
     plus expected growth will reach the target on time, and calculates
     the monthly contribution needed to close any gap.
     """
+    from allworth_api.core.client_store import load_goal_plans
+
     seed = current_seed()
     plan = seed["plan"]
     goals = plan.get("goals", [])
     accounts = seed["accounts"]
     total_invested = sum(a["balance"] for a in accounts if a["type"] not in ("cash", "liability"))
+    # Client-saved "live goal" funding plans (GoalsSheet / chat widget dials).
+    saved_plans = load_goal_plans(plan.get("clientId", seed.get("clientId", "")))
 
     results = []
     for goal in goals:
@@ -489,7 +493,7 @@ def analyze_goal_funding(*, growth_rate: float = 0.06) -> dict[str, Any]:
             else:
                 monthly_needed = gap / n_months
 
-        results.append({
+        entry = {
             "id": goal["id"],
             "label": goal["label"],
             "type": "lump_sum",
@@ -502,7 +506,32 @@ def analyze_goal_funding(*, growth_rate: float = 0.06) -> dict[str, Any]:
             "onTrack": on_track,
             "monthlyContributionToClose": js_round(monthly_needed),
             "status": "on_track" if on_track else "needs_attention",
-        })
+        }
+
+        # Merge the client's committed funding plan, if they saved one: project
+        # again with their monthly contribution over their chosen timeline so
+        # chat answers and the advisor brief reflect the live goal.
+        committed = saved_plans.get(goal["id"])
+        if committed:
+            c_monthly = float(committed.get("monthly", 0) or 0)
+            c_years = int(committed.get("years", horizon) or horizon)
+            r_monthly = growth_rate / 12
+            n_months = max(1, c_years * 12)
+            fv_contrib = (
+                c_monthly * (((1 + r_monthly) ** n_months - 1) / r_monthly)
+                if r_monthly > 0
+                else c_monthly * n_months
+            )
+            projected_with = current_value * (1 + growth_rate) ** c_years + fv_contrib
+            entry.update({
+                "committedMonthly": c_monthly,
+                "committedYears": c_years,
+                "projectedWithPlan": js_round(projected_with),
+                "onTrackWithPlan": projected_with >= target,
+                "status": "on_track" if projected_with >= target else "needs_attention",
+            })
+
+        results.append(entry)
 
     on_track_count = sum(1 for r in results if r["status"] == "on_track")
     return {

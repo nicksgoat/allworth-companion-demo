@@ -22,7 +22,8 @@ import Svg, {
 } from "react-native-svg";
 import { FadeScaleIn } from "../anim";
 import { card, colors, fonts, usd } from "../theme";
-import type { ToolWidget } from "../types";
+import type { FundedGoal, ToolWidget } from "../types";
+import { GoalDials } from "./GoalPlanner";
 import { AllworthMark } from "./Wordmark";
 
 // ─── Shape detection ────────────────────────────────────────────────────────
@@ -573,98 +574,98 @@ function RebalanceDetail({
   );
 }
 
-// ─── Live goal planner (stakeholder ask: adjustable goal + cash-flow card
-// that appears when a goal comes up in conversation). Deterministic local
-// math — the LLM narrates, the widget lets the client turn the dials. ───────
-type GoalPlan = {
-  goalLabel: string;
-  target: number;
-  saved: number;
-  years: number;
-};
+// ─── Live goal tracker (streams when the model calls analyze_goal_funding).
+// Real plan goals with real funded status; each expands into the shared
+// GoalDials planner, so a plan saved here is the same live goal the GoalsSheet
+// and the advisor brief see. ───────
+type GoalFundingResult = { goals: FundedGoal[]; summary: string };
 
-const GOAL_YEARS = [3, 4, 5];
-const GOAL_MONTHLY = [2000, 3000, 4500];
-const MONTHLY_GROWTH = 0.0035; // ~4.3%/yr, conservative planning rate
-
-function isGoalPlan(r: any): r is GoalPlan {
-  return r && typeof r.target === "number" && typeof r.goalLabel === "string";
+function isGoalFunding(r: any): r is GoalFundingResult {
+  return r && Array.isArray(r.goals) && typeof r.summary === "string";
 }
 
-function projectGoal(saved: number, monthly: number, months: number): number {
-  let v = saved;
-  for (let i = 0; i < months; i++) v = v * (1 + MONTHLY_GROWTH) + monthly;
-  return Math.round(v);
-}
+function GoalFundingCard({ result }: { result: GoalFundingResult }) {
+  const [openId, setOpenId] = useState<string | null>(null);
 
-function GoalPlannerCard({ plan }: { plan: GoalPlan }) {
-  const [years, setYears] = useState(plan.years);
-  const [monthly, setMonthly] = useState(GOAL_MONTHLY[1]);
-  const projected = projectGoal(plan.saved, monthly, years * 12);
-  const pct = Math.min(1, projected / plan.target);
-  const onTrack = projected >= plan.target;
-
-  const pick = <T,>(setter: (v: T) => void) => (v: T) => {
+  const toggle = (id: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setter(v);
+    setOpenId((v) => (v === id ? null : id));
   };
 
   return (
     <View style={styles.widget}>
       <View style={styles.goalHeader}>
         <Ionicons name="flag-outline" size={14} color={colors.allworthAccent} />
-        <Text style={styles.goalTitle}>{plan.goalLabel}</Text>
-        <Text style={[styles.goalVerdict, { color: onTrack ? colors.gain : colors.attention }]}>
-          {onTrack ? "On track" : "Falling short"}
-        </Text>
+        <Text style={styles.goalTitle}>Your goals</Text>
+        <Text style={styles.goalSummary}>{result.summary}</Text>
       </View>
 
-      <Text style={styles.goalProjection}>
-        {usd(projected)} <Text style={styles.goalOf}>of {usd(plan.target)} by year {years}</Text>
-      </Text>
-      <View style={styles.goalTrack}>
-        <View
-          style={[
-            styles.goalFill,
-            { width: `${Math.round(pct * 100)}%` },
-            { backgroundColor: onTrack ? colors.chartEvergreen : colors.chartPumpkin },
-          ]}
-        />
-      </View>
-
-      <View style={styles.goalDialRow}>
-        <Text style={styles.goalDialLabel}>Timeline</Text>
-        {GOAL_YEARS.map((y) => (
-          <Pressable
-            key={y}
-            onPress={() => pick(setYears)(y)}
-            style={[styles.goalChip, years === y && styles.goalChipActive]}
-          >
-            <Text style={[styles.goalChipText, years === y && styles.goalChipTextActive]}>
-              {y} yr
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-      <View style={styles.goalDialRow}>
-        <Text style={styles.goalDialLabel}>Monthly</Text>
-        {GOAL_MONTHLY.map((m) => (
-          <Pressable
-            key={m}
-            onPress={() => pick(setMonthly)(m)}
-            style={[styles.goalChip, monthly === m && styles.goalChipActive]}
-          >
-            <Text style={[styles.goalChipText, monthly === m && styles.goalChipTextActive]}>
-              ${(m / 1000).toFixed(m % 1000 ? 1 : 0)}k
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-
-      <Text style={styles.goalFootnote}>
-        Assumes a conservative planning rate. Adjust the dials, then pressure-test the plan with
-        your advisor.
-      </Text>
+      {result.goals.map((goal, i) => (
+        <View key={goal.id} style={i > 0 ? styles.goalRowDivider : undefined}>
+          {goal.type === "income" ? (
+            <View style={{ gap: 3 }}>
+              <View style={styles.goalRowHeader}>
+                <Text style={styles.goalRowLabel}>{goal.label}</Text>
+                <Text
+                  style={[
+                    styles.goalVerdict,
+                    { color: goal.status === "on_track" ? colors.gain : colors.attention },
+                  ]}
+                >
+                  {goal.status === "on_track" ? "On track" : "At risk"}
+                </Text>
+              </View>
+              <Text style={styles.goalDetail}>{goal.detail}</Text>
+            </View>
+          ) : (
+            <>
+              <Pressable onPress={() => toggle(goal.id)} style={{ gap: 5 }}>
+                <View style={styles.goalRowHeader}>
+                  <Text style={styles.goalRowLabel}>{goal.label}</Text>
+                  <Text
+                    style={[
+                      styles.goalVerdict,
+                      { color: goal.status === "on_track" ? colors.gain : colors.attention },
+                    ]}
+                  >
+                    {goal.status === "on_track" ? "On track" : "Needs attention"}
+                  </Text>
+                  <Ionicons
+                    name={openId === goal.id ? "chevron-up" : "chevron-down"}
+                    size={13}
+                    color={colors.inkTertiary}
+                  />
+                </View>
+                <View style={styles.goalTrack}>
+                  <View
+                    style={[
+                      styles.goalFill,
+                      { width: `${Math.min(100, Math.round(goal.fundedPct ?? 0))}%` },
+                      {
+                        backgroundColor:
+                          goal.status === "on_track" ? colors.chartEvergreen : colors.chartPumpkin,
+                      },
+                    ]}
+                  />
+                </View>
+                <Text style={styles.goalDetail}>
+                  {usd(goal.currentFunded ?? 0)} of {usd(goal.target ?? 0)}
+                  {goal.committedMonthly
+                    ? ` · your plan: ${usd(goal.committedMonthly)}/mo`
+                    : goal.status === "on_track"
+                      ? ""
+                      : ` · ~${usd(goal.monthlyContributionToClose ?? 0)}/mo closes the gap`}
+                </Text>
+              </Pressable>
+              {openId === goal.id ? (
+                <View style={styles.goalDialsWrap}>
+                  <GoalDials goal={goal} />
+                </View>
+              ) : null}
+            </>
+          )}
+        </View>
+      ))}
     </View>
   );
 }
@@ -673,10 +674,10 @@ function GoalPlannerCard({ plan }: { plan: GoalPlan }) {
 export function ChatToolWidget({ widget }: { widget: ToolWidget }) {
   const [open, setOpen] = useState(false);
   const r = widget.result;
-  if (widget.name === "goal_planner" && isGoalPlan(r)) {
+  if (isGoalFunding(r)) {
     return (
       <FadeScaleIn>
-        <GoalPlannerCard plan={r} />
+        <GoalFundingCard result={r} />
       </FadeScaleIn>
     );
   }
@@ -706,23 +707,29 @@ const styles = StyleSheet.create({
   goalHeader: { flexDirection: "row", alignItems: "center", gap: 6 },
   goalTitle: { flex: 1, fontSize: 13, fontFamily: fonts.sansBold, color: colors.inkSecondary },
   goalVerdict: { fontSize: 12, fontFamily: fonts.sansBold },
-  goalProjection: { fontSize: 22, fontFamily: fonts.displayMedium, color: colors.inkPrimary },
-  goalOf: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkTertiary },
+  goalSummary: { fontSize: 12, fontFamily: fonts.sans, color: colors.inkTertiary },
+  goalRowDivider: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.hairline,
+    paddingTop: 10,
+    marginTop: 10,
+  },
+  goalRowHeader: { flexDirection: "row", alignItems: "center", gap: 6 },
+  goalRowLabel: { flex: 1, fontSize: 14, fontFamily: fonts.sansBold, color: colors.inkPrimary },
+  goalDetail: {
+    fontSize: 12,
+    fontFamily: fonts.sans,
+    color: colors.inkSecondary,
+    fontVariant: ["tabular-nums"],
+  },
+  goalDialsWrap: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.hairline,
+    paddingTop: 10,
+    marginTop: 10,
+  },
   goalTrack: { height: 6, borderRadius: 3, backgroundColor: colors.inkFaint, overflow: "hidden" },
   goalFill: { height: 6, borderRadius: 3 },
-  goalDialRow: { flexDirection: "row", alignItems: "center", gap: 6 },
-  goalDialLabel: { width: 62, fontSize: 12, fontFamily: fonts.sans, color: colors.inkTertiary },
-  goalChip: {
-    borderWidth: 1,
-    borderColor: colors.hairline,
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-  },
-  goalChipActive: { borderColor: colors.allworthNavy, backgroundColor: colors.allworthNavy },
-  goalChipText: { fontSize: 12, fontFamily: fonts.sansBold, color: colors.inkSecondary },
-  goalChipTextActive: { color: "#FFFFFF" },
-  goalFootnote: { fontSize: 11, fontFamily: fonts.sans, color: colors.inkTertiary, lineHeight: 15 },
   wHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
   wIcon: {
     width: 26,

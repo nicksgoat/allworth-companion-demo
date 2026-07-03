@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from allworth_api.core.auth import get_current_household
+from allworth_api.core.client_store import load_requests
 from allworth_api.core.conversation_store import append_turns
 from allworth_api.core.formatting import fmt_usd, iso_now
 from allworth_api.core.nudges import nudges_for
@@ -89,6 +90,17 @@ async def interject(
             "ts": record["ts"],
         }
     }
+
+
+@router.get("/api/advisors/clients/{client_id}/requests")
+def client_requests(client_id: str, household_id: str = Depends(get_current_household)):
+    """Bookings and topic requests the client sent — the advisor's inbox view.
+
+    Advisor surface, so like `book`/`interject` it skips the client==household
+    check (no separate advisor identity in the demo).
+    """
+    records = load_requests(client_id)
+    return {"requests": list(reversed(records))}
 
 
 def brief_narrative(d: dict) -> str:

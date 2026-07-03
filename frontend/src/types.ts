@@ -256,3 +256,66 @@ export type ChatEvent =
   | { kind: "text"; delta: string }
   | { kind: "done"; sources: string[]; suggested: string[]; quality?: ChatMessage["quality"] }
   | { kind: "error"; message: string };
+
+// ── Goals (live goal planning) ─────────────────────────────────────────────
+
+export interface FundedGoal {
+  id: string;
+  label: string;
+  type: "lump_sum" | "income";
+  status: "on_track" | "needs_attention" | "at_risk";
+  // lump_sum goals
+  target?: number;
+  currentFunded?: number;
+  fundedPct?: number;
+  projectedAtHorizon?: number;
+  gap?: number;
+  horizonYears?: number;
+  onTrack?: boolean;
+  monthlyContributionToClose?: number;
+  // client's saved "live goal" plan, merged server-side
+  committedMonthly?: number;
+  committedYears?: number;
+  projectedWithPlan?: number;
+  onTrackWithPlan?: boolean;
+  // income goals
+  detail?: string;
+}
+
+export interface GoalFunding {
+  goals: FundedGoal[];
+  summary: string;
+  totalInvestedAssets: number;
+  assumedGrowthRate: number;
+}
+
+// ── Advisor concierge: availability + requests ─────────────────────────────
+
+export interface AvailabilitySlot {
+  iso: string;
+  display: string;
+}
+
+export interface AvailabilityDay {
+  dateISO: string;
+  label: string;
+  longLabel: string;
+  slots: AvailabilitySlot[];
+}
+
+export interface Availability {
+  advisor: Advisor;
+  days: AvailabilityDay[];
+}
+
+export interface ClientRequest {
+  id: string;
+  kind: "booking" | "topic";
+  slotISO: string;
+  slotDisplay: string;
+  topic: string;
+  clientId: string;
+  clientName: string;
+  status: string;
+  ts: string;
+}

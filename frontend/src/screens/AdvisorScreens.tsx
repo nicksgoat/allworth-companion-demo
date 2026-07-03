@@ -23,7 +23,13 @@ import { APP_HEADER_HEIGHT, AppHeader } from "../components/Glass";
 import { AdvisorConversationView } from "./AdvisorConversationScreen";
 import { useApp } from "../state";
 import { card, colors, fonts, radius, space, text, usd } from "../theme";
-import type { AdvisorBrief, BookResponse, ConversationMessage, Household } from "../types";
+import type {
+  AdvisorBrief,
+  BookResponse,
+  ClientRequest as ClientRequestRecord,
+  ConversationMessage,
+  Household,
+} from "../types";
 
 type AdvisorStackParams = {
   Book: undefined;
@@ -222,6 +228,8 @@ function ClientDetailScreen({ route }: NativeStackScreenProps<AdvisorStackParams
           {/* The live thread is the reason you opened this screen. */}
           <ConversationPreviewCard household={household} />
 
+          <RequestsCard clientId={household.clientId} />
+
           <CollapsibleCard
             icon="sparkles"
             title="Auto-prepared brief"
@@ -404,6 +412,63 @@ function ReviewWorkflowCard({
   );
 }
 
+// Bookings and topic requests the client sent from the concierge sheet —
+// the advisor's inbox for this client. Hidden until something arrives.
+function RequestsCard({ clientId }: { clientId: string }) {
+  const app = useApp();
+  const [requests, setRequests] = useState<ClientRequestRecord[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    app.api
+      .advisorRequests(clientId)
+      .then((res) => {
+        if (!cancelled) setRequests(res.requests);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clientId]);
+
+  if (requests.length === 0) return null;
+
+  return (
+    <View style={styles.briefCard}>
+      <View style={styles.briefHeader}>
+        <Ionicons name="mail-unread-outline" size={13} color={colors.allworthAccent} />
+        <SectionHeader>Requests · {requests.length}</SectionHeader>
+      </View>
+      {requests.slice(0, 4).map((r, i) => (
+        <View key={r.id} style={[styles.requestRow, i > 0 && styles.requestRowDivider]}>
+          <Ionicons
+            name={r.kind === "booking" ? "calendar-outline" : "help-circle-outline"}
+            size={16}
+            color={colors.allworthAccent}
+          />
+          <Text style={styles.requestText} numberOfLines={2}>
+            {r.kind === "booking" ? `Booked ${r.slotDisplay}` : r.topic}
+          </Text>
+          <Text style={styles.requestTime}>{requestTime(r.ts)}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function requestTime(ts: string): string {
+  try {
+    const d = new Date(ts);
+    const sameDay = new Date().toDateString() === d.toDateString();
+    return sameDay
+      ? d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+      : d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  } catch {
+    return "";
+  }
+}
+
 // One number in the glance strip.
 function StatBlock({
   label,
@@ -501,6 +566,15 @@ const styles = StyleSheet.create({
   briefCard: { ...card, padding: space[4], gap: space[3] },
   briefHeader: { flexDirection: "row", alignItems: "center", gap: space[2] },
   briefText: { ...text.body, lineHeight: 22 },
+  requestRow: { flexDirection: "row", alignItems: "center", gap: space[2] },
+  requestRowDivider: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.hairline,
+    paddingTop: space[2],
+    marginTop: space[2],
+  },
+  requestText: { ...text.bodySm, flex: 1, color: colors.inkPrimary },
+  requestTime: { fontSize: 11, fontFamily: fonts.sans, color: colors.inkTertiary },
   // Live-conversation preview: three one-liners + the open affordance.
   convoEmpty: { ...text.bodySm, color: colors.inkTertiary },
   convoCount: { fontSize: 11, fontFamily: fonts.sans, color: colors.inkTertiary },

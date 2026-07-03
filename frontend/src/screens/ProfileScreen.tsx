@@ -18,6 +18,7 @@ import { card, colors, fonts } from "../theme";
 import type { LearnedFact, MeetingNote } from "../types";
 import { AdvisorConciergeSheet } from "./AdvisorConciergeSheet";
 import { DocumentsSheet } from "./DocumentsSheet";
+import { GoalsSheet } from "./GoalsSheet";
 import { FactDetailSheet } from "./FactDetailSheet";
 import { MeetingNoteDetailSheet } from "./MeetingNoteDetailSheet";
 
@@ -41,6 +42,7 @@ export function ProfileScreen() {
   const [selectedNote, setSelectedNote] = useState<MeetingNote | null>(null);
   const [conciergeOpen, setConciergeOpen] = useState(false);
   const [documentsOpen, setDocumentsOpen] = useState(false);
+  const [goalsOpen, setGoalsOpen] = useState(false);
   const scrollY = useAnimatedValue(0);
 
   const client = app.dashboard?.client;
@@ -139,6 +141,14 @@ export function ProfileScreen() {
             >
               <Ionicons name="calendar-outline" size={18} color={colors.allworthAccent} />
               <Text style={styles.linkRowText}>Book a meeting or request a topic</Text>
+              <Ionicons name="chevron-forward" size={16} color={colors.inkTertiary} />
+            </Pressable>
+            <Pressable
+              onPress={() => setGoalsOpen(true)}
+              style={({ pressed }) => [styles.linkRow, pressed && { opacity: 0.7 }]}
+            >
+              <Ionicons name="flag-outline" size={18} color={colors.allworthAccent} />
+              <Text style={styles.linkRowText}>Your goals</Text>
               <Ionicons name="chevron-forward" size={16} color={colors.inkTertiary} />
             </Pressable>
             <Pressable
@@ -256,6 +266,7 @@ export function ProfileScreen() {
           onClose={() => setConciergeOpen(false)}
         />
         <DocumentsSheet visible={documentsOpen} onClose={() => setDocumentsOpen(false)} />
+        <GoalsSheet visible={goalsOpen} onClose={() => setGoalsOpen(false)} />
       </Animated.ScrollView>
       <AppHeader title="Profile" scrollY={scrollY} />
     </>

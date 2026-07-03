@@ -471,26 +471,6 @@ export function ChatScreen() {
     });
     setSending(false);
     sendingRef.current = false;
-    maybeAttachGoalPlanner(text);
-  };
-
-  // Stakeholder ask: when a goal comes up in conversation, the live adjustable
-  // plan appears right in the thread. Client-side trigger over the household's
-  // seeded goal — the LLM narrates, the widget lets the client turn the dials.
-  const maybeAttachGoalPlanner = (userText: string) => {
-    if (!/\b(goals?|lake house)\b/i.test(userText)) return;
-    app.setChatMessages((msgs) => {
-      const last = msgs[msgs.length - 1];
-      if (!last || last.role !== "assistant") return msgs;
-      if (last.widgets?.some((w) => w.name === "goal_planner")) return msgs;
-      const widget = {
-        name: "goal_planner",
-        // saved matches the backend goal tracker's figure so the widget and
-        // the assistant's narration tell one story.
-        result: { goalLabel: "Lake house", target: 350000, saved: 112000, years: 4 },
-      };
-      return [...msgs.slice(0, -1), { ...last, widgets: [...(last.widgets ?? []), widget] }];
-    });
   };
 
   const sendFeedback = async (message: ChatMessage, rating: "positive" | "negative") => {

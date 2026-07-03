@@ -18,6 +18,7 @@ import { card, colors, fonts, radius, space, text, usd } from "../theme";
 import type { Dashboard, Nudge } from "../types";
 import { AdvisorConciergeSheet } from "./AdvisorConciergeSheet";
 import { DocumentsSheet } from "./DocumentsSheet";
+import { GoalsSheet } from "./GoalsSheet";
 import { NudgeDetailSheet } from "./NudgeDetailSheet";
 
 export function DashboardScreen() {
@@ -91,6 +92,7 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
   const advisorFirst = d.advisor?.name?.split(" ")[0] ?? "your advisor";
   const [conciergeOpen, setConciergeOpen] = useState(false);
   const [documentsOpen, setDocumentsOpen] = useState(false);
+  const [goalsOpen, setGoalsOpen] = useState(false);
 
   const askChat = (prompt: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -107,7 +109,10 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
     {
       icon: "flag-outline",
       label: "My goals",
-      go: () => askChat("Am I on track for the lake house goal?"),
+      go: () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setGoalsOpen(true);
+      },
     },
     {
       icon: "calendar-outline",
@@ -228,6 +233,7 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
         onClose={() => setConciergeOpen(false)}
       />
       <DocumentsSheet visible={documentsOpen} onClose={() => setDocumentsOpen(false)} />
+      <GoalsSheet visible={goalsOpen} onClose={() => setGoalsOpen(false)} />
     </View>
   );
 }
