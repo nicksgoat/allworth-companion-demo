@@ -1,8 +1,5 @@
-import React, { useId, useMemo } from "react";
+import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Svg, { Defs, LinearGradient, Path, Stop } from "react-native-svg";
-import { performanceFromSeries } from "../performance";
-import { positionHistory } from "../synthetic";
 import { card, colors, fonts, usd } from "../theme";
 import type { Account, Position } from "../types";
 import { HairlineDivider } from "./Rows";
@@ -49,6 +46,9 @@ export function AccountHoldingsSection({
   );
 }
 
+// Structure-first rows (stakeholder rules): value + share of account, no
+// gain/loss pills or price charts at list level. Performance detail lives in
+// the tapped-in PositionDetailSheet.
 function HoldingRow({
   position,
   accountTotal,
@@ -62,14 +62,6 @@ function HoldingRow({
   const concentrated = isConcentrated(position, accountTotal);
   const isCash = position.assetClass === "cash" || position.symbol === "CASH";
   const tappable = onSelect != null && !isCash;
-
-  const { history, pct } = useMemo(() => {
-    if (isCash) return { history: [], pct: 0 };
-    const h = positionHistory(position);
-    return { history: h.map((m) => m.value), pct: performanceFromSeries(h)?.return_pct ?? 0 };
-  }, [position, isCash]);
-
-  const up = pct >= 0;
 
   return (
     <Pressable
@@ -88,56 +80,14 @@ function HoldingRow({
           </View>
         ) : null}
       </View>
-      {!isCash ? <MiniSparkline values={history} color={up ? colors.gain : colors.loss} /> : null}
-      <View style={{ alignItems: "flex-end", gap: 4 }}>
+      <View style={{ alignItems: "flex-end", gap: 2 }}>
         <Text style={styles.value}>{usd(position.value)}</Text>
-        {!isCash ? (
-          <View style={[styles.pill, { backgroundColor: up ? colors.gain : colors.loss }]}>
-            <Text style={styles.pillText}>
-              {up ? "+" : ""}
-              {pct.toFixed(1)}%
-            </Text>
-          </View>
-        ) : (
-          <Text style={styles.cashLabel}>cash</Text>
+        {/* Concentrated rows already carry the weight in the attention badge. */}
+        {concentrated ? null : (
+          <Text style={styles.weightLabel}>{isCash ? "cash" : `${weightPct}% of account`}</Text>
         )}
       </View>
     </Pressable>
-  );
-}
-
-const SPARK_W = 56;
-const SPARK_H = 26;
-
-// Static thumbnail chart, Apple Stocks-style: straight segments + gradient
-// wash under the line. No animation — many rows mount at once.
-function MiniSparkline({ values, color }: { values: number[]; color: string }) {
-  const uid = useId().replace(/:/g, "");
-  const fillId = `minispark-${uid}`;
-
-  const { line, area } = useMemo(() => {
-    const lo = Math.min(...values);
-    const hi = Math.max(...values);
-    const span = hi - lo || 1;
-    const x = (i: number) => (i / (values.length - 1)) * SPARK_W;
-    const y = (v: number) => SPARK_H - 2 - ((v - lo) / span) * (SPARK_H - 4);
-    const pts = values.map((v, i) => `${x(i)} ${y(v)}`);
-    const l = `M ${pts.join(" L ")}`;
-    return { line: l, area: `${l} L ${SPARK_W} ${SPARK_H} L 0 ${SPARK_H} Z` };
-  }, [values]);
-
-  if (values.length < 2) return null;
-  return (
-    <Svg width={SPARK_W} height={SPARK_H}>
-      <Defs>
-        <LinearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
-          <Stop offset="0" stopColor={color} stopOpacity={0.22} />
-          <Stop offset="1" stopColor={color} stopOpacity={0} />
-        </LinearGradient>
-      </Defs>
-      <Path d={area} fill={`url(#${fillId})`} />
-      <Path d={line} stroke={color} strokeWidth={1.5} fill="none" />
-    </Svg>
   );
 }
 
@@ -175,18 +125,10 @@ const styles = StyleSheet.create({
     color: colors.inkPrimary,
     fontVariant: ["tabular-nums"],
   },
-  pill: {
-    minWidth: 64,
-    alignItems: "flex-end",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 7,
-  },
-  pillText: {
-    fontSize: 13,
-    fontFamily: fonts.sansBold,
-    color: "#fff",
+  weightLabel: {
+    fontSize: 12,
+    fontFamily: fonts.sans,
+    color: colors.inkTertiary,
     fontVariant: ["tabular-nums"],
   },
-  cashLabel: { fontSize: 12, fontFamily: fonts.sans, color: colors.inkTertiary },
 });

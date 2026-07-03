@@ -101,6 +101,11 @@ All motion lives in `src/anim.tsx` — reuse `RiseIn` (fade + 14px rise, 420ms),
 
 ## Compliance-shaped copy (UI text)
 
+- **No combined-asset totals, performance deltas, or return charts at screen
+  level** (stakeholder rule). Screens show structure — managed vs held away vs
+  owed, allocation, share-of-account — and guide to chat/advisor. Performance
+  figures live only inside tapped-in detail sheets, with the synthetic-data
+  disclaimer. Advisor-facing screens are exempt.
 - The assistant is a **companion/assistant — never "advisor"**. Advice verbs
   ("recommend", "should") are reserved for the human advisor path.
 - Every substantive answer surface keeps the handoff affordance visible.

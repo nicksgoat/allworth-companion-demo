@@ -1,34 +1,23 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { RiseIn, useAnimatedValue } from "../anim";
 import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
 import { APP_HEADER_HEIGHT, AppHeader, TAB_BAR_HEIGHT } from "../components/Glass";
 import { AllocationCard } from "../components/AllocationCard";
-import { HeroNumber } from "../components/HeroNumber";
 import { AccountHoldingsSection } from "../components/Holdings";
 import { IncomeCard } from "../components/IncomeCard";
 import { BreakdownCard, CompletePictureCard } from "../components/NetWorthBreakdown";
-import { NetWorthDetail } from "../components/NetWorthDetail";
 import { NudgeCard } from "../components/NudgeCard";
-import { RangeChips } from "../components/RangeChips";
 import { RecurringCard } from "../components/RecurringCard";
 import { DisclaimerFooter, SectionHeader } from "../components/Rows";
 import { SegmentedControl } from "../components/SegmentedControl";
-import { Sparkline } from "../components/Sparkline";
-import { performanceDeltaLabel } from "../performance";
 import { useApp } from "../state";
 import { colors, fonts } from "../theme";
 import type { AssetClass, Dashboard, Nudge, Portfolio, Position } from "../types";
 import { ClassDetailSheet } from "./ClassDetailSheet";
 import { NudgeDetailSheet } from "./NudgeDetailSheet";
 import { PositionDetailSheet } from "./PositionDetailSheet";
-
-const RANGES: { label: string; points: number; deltaSuffix: string }[] = [
-  { label: "3M", points: 4, deltaSuffix: "past 3 months" },
-  { label: "6M", points: 7, deltaSuffix: "past 6 months" },
-  { label: "1Y", points: 12, deltaSuffix: "past year" },
-];
 
 export function InvestScreen() {
   const app = useApp();
@@ -113,6 +102,10 @@ export function InvestScreen() {
   );
 }
 
+// Compliance-shaped by design (stakeholder rules): no combined-total headline,
+// no performance deltas, no trajectory chart at screen level. The screen leads
+// with structure — managed vs held away vs owed — and guides toward the
+// advisor and chat. Performance detail lives only inside tapped-in sheets.
 function InvestContent({
   d,
   p,
@@ -127,52 +120,38 @@ function InvestContent({
   onClass: (c: AssetClass) => void;
 }) {
   const app = useApp();
-  const [range, setRange] = useState("1Y");
   const [segment, setSegment] = useState("Overview");
-  const [chartOpen, setChartOpen] = useState(false);
 
   const ask = (prompt: string) => {
     app.setChatPrefill(prompt);
     app.setSelectedTab("chat");
   };
 
-  const { slice, delta } = useMemo(() => {
-    const history = d.netWorthHistory;
-    const spec = RANGES.find((r) => r.label === range) ?? RANGES[RANGES.length - 1];
-    const sliced = history.length >= spec.points ? history.slice(-spec.points) : history;
-    if (sliced.length < 2) return { slice: sliced, delta: undefined };
-    const perf = performanceDeltaLabel(sliced, spec.deltaSuffix, d.performanceCashFlows ?? []);
-    return {
-      slice: sliced,
-      delta: perf ? { text: perf.text, positive: perf.positive } : undefined,
-    };
-  }, [d.netWorthHistory, d.performanceCashFlows, range]);
-
   const askRebalance = () => {
-    app.setChatPrefill(
-      "How does my current mix compare to my 60/40 plan, and what would rebalancing look like?",
-    );
-    app.setSelectedTab("chat");
+    ask("How does my current mix compare to my 60/40 plan, and what would rebalancing look like?");
   };
 
   const accounts = [...d.accounts.allworth, ...d.accounts.outside];
   const investedAccounts = accounts.filter((a) => p.byAccount[a.id]?.length);
   const concentrationNudges = d.nudges.filter((n) => n.type === "concentration");
+  const accountCount = accounts.length;
 
   return (
     <View style={{ gap: 24 }}>
       <RiseIn style={{ gap: 14 }}>
-        <Pressable
-          onPress={() => setChartOpen(true)}
-          style={({ pressed }) => pressed && { opacity: 0.7 }}
-        >
-          <HeroNumber label="Total net worth" value={d.netWorth} delta={delta} />
-        </Pressable>
-        <RangeChips options={RANGES.map((r) => r.label)} selected={range} onSelect={setRange} />
-        <Sparkline points={slice} />
+        <View style={{ gap: 6 }}>
+          <Text style={styles.leadTitle}>Where your money lives</Text>
+          <Text style={styles.leadSubtitle}>
+            Across {accountCount} accounts — what Allworth manages for you, what{"'"}s held away,
+            and what{"'"}s owed.
+          </Text>
+        </View>
+        <BreakdownCard
+          allworthTotal={d.allworthTotal}
+          heldAwayTotal={d.heldAwayTotal}
+          liabilitiesTotal={d.liabilitiesTotal}
+        />
       </RiseIn>
-
-      <NetWorthDetail visible={chartOpen} onClose={() => setChartOpen(false)} d={d} />
 
       <RiseIn delay={60}>
         <SegmentedControl
@@ -184,19 +163,7 @@ function InvestContent({
 
       {segment === "Overview" ? (
         <View key="overview" style={{ gap: 24 }}>
-          <RiseIn>
-            <BreakdownCard
-              allworthTotal={d.allworthTotal}
-              heldAwayTotal={d.heldAwayTotal}
-              liabilitiesTotal={d.liabilitiesTotal}
-            />
-          </RiseIn>
-
-          <RiseIn delay={60}>
-            <CompletePictureCard heldAwayTotal={d.heldAwayTotal} />
-          </RiseIn>
-
-          <RiseIn delay={120} style={{ gap: 12 }}>
+          <RiseIn style={{ gap: 12 }}>
             <SectionHeader>Your allocation</SectionHeader>
             <AllocationCard
               positions={p.positions}
@@ -207,12 +174,16 @@ function InvestContent({
           </RiseIn>
 
           {concentrationNudges.map((nudge, i) => (
-            <RiseIn key={nudge.id} delay={180 + i * 60}>
+            <RiseIn key={nudge.id} delay={60 + i * 60}>
               <NudgeCard nudge={nudge} onPress={() => onNudge(nudge)} />
             </RiseIn>
           ))}
 
-          <RiseIn delay={240} style={{ gap: 12 }}>
+          <RiseIn delay={120}>
+            <CompletePictureCard heldAwayTotal={d.heldAwayTotal} />
+          </RiseIn>
+
+          <RiseIn delay={180} style={{ gap: 12 }}>
             <SectionHeader>Automatic investing</SectionHeader>
             <RecurringCard
               onAsk={() => ask("Could I be investing more each month without hurting my plan?")}
@@ -273,13 +244,13 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 }
 
 const styles = StyleSheet.create({
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
+  leadTitle: { fontSize: 28, fontFamily: fonts.displayMedium, color: colors.allworthNavy },
+  leadSubtitle: {
+    fontSize: 15,
+    fontFamily: fonts.sans,
+    lineHeight: 21,
+    color: colors.inkSecondary,
   },
-  title: { fontSize: 28, fontFamily: fonts.display, color: colors.inkPrimary, flexShrink: 1 },
   skeletonBlock: { height: 72, borderRadius: 12, backgroundColor: colors.inkFaint },
   errorBox: { alignItems: "center", paddingTop: 120, gap: 10, paddingHorizontal: 20 },
   errorTitle: { fontSize: 20, fontFamily: fonts.displayMedium, color: colors.inkPrimary },

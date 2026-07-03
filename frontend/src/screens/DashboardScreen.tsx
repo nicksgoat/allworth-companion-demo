@@ -232,7 +232,7 @@ function WealthGuideCard({ onPress }: { onPress: () => void }) {
       <Ionicons name="pie-chart-outline" size={18} color={colors.allworthAccent} />
       <View style={{ flex: 1, gap: 2 }}>
         <Text style={styles.summaryText}>Your wealth</Text>
-        <Text style={styles.summarySub}>Accounts, allocation, and performance</Text>
+        <Text style={styles.summarySub}>Accounts, allocation, and what's held away</Text>
       </View>
       <Ionicons name="chevron-forward" size={16} color={colors.inkTertiary} />
     </Pressable>
