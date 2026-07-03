@@ -10,7 +10,7 @@
 window.ALW_CONTENT = {
   meta: {
     version: "1.0.0",
-    build: 12,
+    build: 13,
     channel: "TestFlight",
     model: "Azure OpenAI · GPT-4o",
   },
@@ -78,6 +78,18 @@ window.ALW_CONTENT = {
   ],
 
   releases: [
+    {
+      build: 13,
+      version: "1.0.0",
+      date: "2026-07-03",
+      channel: "TestFlight",
+      title: "Home as a guide + live goal planning",
+      notes: [
+        "Home now leads with what needs attention and quick actions; totals and charts live one tap away in Wealth.",
+        "Talk about a goal in chat and an adjustable plan appears — turn the timeline and contribution dials, watch the projection move.",
+        "Advisor concierge (book a time, request a topic), a document vault, chat history, and haptic polish throughout.",
+      ],
+    },
     {
       build: 12,
       version: "1.0.0",
