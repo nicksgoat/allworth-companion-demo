@@ -14,8 +14,9 @@ import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChatMessageView } from "../components/Chat";
 import { DisclaimerFooter } from "../components/Rows";
+import { AllworthMark } from "../components/Wordmark";
 import { useApp } from "../state";
-import { card, colors, fonts, radius, space, text } from "../theme";
+import { colors, fonts, radius, shadowSoft, space, text } from "../theme";
 import type { ChatEvent, ChatMessage, Dashboard } from "../types";
 
 let nextId = 1;
@@ -114,14 +115,21 @@ export function ChatScreen() {
   const [revealedId, setRevealedId] = useState<string | null>(null);
   const handleRevealed = useCallback((id: string) => setRevealedId(id), []);
   const scrollRef = useRef<ScrollView>(null);
+  const inputRef = useRef<TextInput>(null);
+  // A floating "scroll to bottom" pill (ChatGPT-style) shows once you've scrolled
+  // meaningfully up from the latest message.
+  const [showScrollDown, setShowScrollDown] = useState(false);
   // "Stick to bottom": follow a streaming answer only while you're already at
   // the bottom. The moment you scroll up to read, we stop following so the
   // text never yanks you back down mid-read.
   const pinnedToBottom = useRef(true);
   const lastCount = useRef(0);
+  // Bumped on "new chat" so an in-flight stream from the old thread can't
+  // write into the fresh one (applyEvent targets the last assistant message,
+  // which after a reset would be the new greeting).
+  const threadEpoch = useRef(0);
 
-  const loadProactive = async () => {
-    if (app.chatMessages.length > 0) return;
+  const buildGreeting = async (): Promise<ChatMessage> => {
     const clientFirstName = app.dashboard?.client?.name?.split(",")[0]?.split(" ")[0] ?? "there";
     let greeting = `Hi ${clientFirstName} — I can help you understand your accounts, spending, or plan. What's on your mind?`;
     let suggested: string[] = [];
@@ -130,20 +138,33 @@ export function ChatScreen() {
       greeting = res.message;
       suggested = res.suggested ?? [];
     } catch {}
-    app.setChatMessages((msgs) =>
-      msgs.length > 0
-        ? msgs
-        : [
-            newMessage({
-              role: "assistant",
-              text: greeting,
-              chips: [],
-              sources: [],
-              isStreaming: false,
-              suggested,
-            }),
-          ],
-    );
+    return newMessage({
+      role: "assistant",
+      text: greeting,
+      chips: [],
+      sources: [],
+      isStreaming: false,
+      suggested,
+    });
+  };
+
+  const loadProactive = async () => {
+    if (app.chatMessages.length > 0) return;
+    const greeting = await buildGreeting();
+    app.setChatMessages((msgs) => (msgs.length > 0 ? msgs : [greeting]));
+  };
+
+  // The header's compose button: wipe the thread and drop back to a fresh
+  // proactive greeting — the ChatGPT "new chat" gesture. Bumping the epoch
+  // orphans any answer still streaming into the old thread.
+  const startNewChat = async () => {
+    threadEpoch.current += 1;
+    setSending(false);
+    setDraft("");
+    setRevealedId(null);
+    app.setChatMessages([]);
+    const greeting = await buildGreeting();
+    app.setChatMessages([greeting]);
   };
 
   useEffect(() => {
@@ -167,6 +188,7 @@ export function ChatScreen() {
     const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
     const distanceFromBottom = contentSize.height - layoutMeasurement.height - contentOffset.y;
     pinnedToBottom.current = distanceFromBottom < 80;
+    setShowScrollDown(distanceFromBottom > 240);
   };
 
   // Content grows on every streamed token. Follow it only when pinned: a new
@@ -179,7 +201,14 @@ export function ChatScreen() {
     scrollRef.current?.scrollToEnd({ animated: isNewTurn });
   };
 
-  const canSend = draft.trim().length > 0 && !sending;
+  const hasText = draft.trim().length > 0;
+  const canSend = hasText && !sending;
+
+  const scrollToBottom = () => {
+    pinnedToBottom.current = true;
+    setShowScrollDown(false);
+    scrollRef.current?.scrollToEnd({ animated: true });
+  };
 
   const applyEvent = (event: ChatEvent) => {
     app.setChatMessages((msgs) => {
@@ -243,6 +272,7 @@ export function ChatScreen() {
     ]);
 
     const conversationId = `${app.clientId}:${app.session}`;
+    const epoch = threadEpoch.current;
     // Coalesce token deltas to one repaint per frame. GPT-4o streams tokens far
     // faster than 60fps, and each delta re-renders the whole ScrollView (no
     // virtualization) plus a scrollToEnd — applying every token individually
@@ -253,11 +283,18 @@ export function ChatScreen() {
     const flushText = () => {
       rafScheduled = false;
       if (!pendingText) return;
+      if (threadEpoch.current !== epoch) {
+        pendingText = "";
+        return;
+      }
       const delta = pendingText;
       pendingText = "";
       applyEvent({ kind: "text", delta });
     };
     for await (const event of app.api.chat(app.clientId, app.session, text, conversationId)) {
+      // New chat started mid-stream: abandon this answer (breaking closes the
+      // stream) and leave the fresh thread untouched.
+      if (threadEpoch.current !== epoch) break;
       if (event.kind === "text") {
         pendingText += event.delta;
         if (!rafScheduled) {
@@ -269,6 +306,7 @@ export function ChatScreen() {
         applyEvent(event);
       }
     }
+    if (threadEpoch.current !== epoch) return;
     flushText();
     app.setChatMessages((msgs) => {
       const last = msgs[msgs.length - 1];
@@ -301,70 +339,118 @@ export function ChatScreen() {
     } catch {}
   };
 
+  // Who you're talking to: the household's assigned advisor's assistant
+  // ("Nicole's Assistant"), falling back to the brand name if no advisor is set.
+  const advisorFullName = app.dashboard?.advisor?.name;
+  const assistantTitle = advisorFullName
+    ? `${advisorFullName.split(" ")[0]}'s Assistant`
+    : "Allworth Assistant";
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: colors.surfacePrimary }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ScrollView
-        ref={scrollRef}
-        contentContainerStyle={{
-          padding: space[5],
-          paddingTop: insets.top + space[2],
-          gap: space[5],
-        }}
-        keyboardDismissMode="interactive"
-        scrollEventThrottle={16}
-        onScroll={onScroll}
-        onContentSizeChange={onContentSizeChange}
-      >
-        <View style={styles.sessionHeader}>
-          <View style={styles.sessionLine} />
-          <Text style={styles.sessionText}>
-            {app.session === "wednesday" ? "Wednesday, June 10" : "Monday, June 8"}
-          </Text>
-          <View style={styles.sessionLine} />
-        </View>
-        {app.chatMessages.map((message, i) => (
-          <ChatMessageView
-            key={message.id}
-            message={message}
-            showIdentity={app.chatMessages[i - 1]?.role !== "assistant"}
-            onFeedback={sendFeedback}
-            handoffDisabled={sending}
-            onRevealed={handleRevealed}
+      <ChatHeader topInset={insets.top} title={assistantTitle} onNewChat={startNewChat} />
+      <View style={{ flex: 1 }}>
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={{ padding: space[5], paddingTop: space[3], gap: space[5] }}
+          keyboardDismissMode="interactive"
+          scrollEventThrottle={16}
+          onScroll={onScroll}
+          onContentSizeChange={onContentSizeChange}
+        >
+          <View style={styles.sessionHeader}>
+            <View style={styles.sessionLine} />
+            <Text style={styles.sessionText}>
+              {app.session === "wednesday" ? "Wednesday, June 10" : "Monday, June 8"}
+            </Text>
+            <View style={styles.sessionLine} />
+          </View>
+          {app.chatMessages.map((message) => (
+            <ChatMessageView
+              key={message.id}
+              message={message}
+              onFeedback={sendFeedback}
+              handoffDisabled={sending}
+              onRevealed={handleRevealed}
+            />
+          ))}
+          <SuggestionChips
+            messages={app.chatMessages}
+            sending={sending}
+            revealedId={revealedId}
+            onPick={send}
           />
-        ))}
-        <SuggestionChips
-          messages={app.chatMessages}
-          sending={sending}
-          revealedId={revealedId}
-          onPick={send}
-        />
-      </ScrollView>
+        </ScrollView>
+        {showScrollDown ? (
+          <Pressable onPress={scrollToBottom} style={styles.scrollDownBtn} hitSlop={6}>
+            <Ionicons name="arrow-down" size={20} color={colors.inkSecondary} />
+          </Pressable>
+        ) : null}
+      </View>
 
       <View style={styles.inputArea}>
         <DisclaimerFooter />
         <View style={styles.inputBar}>
           <TextInput
+            ref={inputRef}
             style={styles.input}
-            placeholder="Ask about your money…"
+            placeholder="Ask Allworth…"
             placeholderTextColor={colors.inkTertiary}
             value={draft}
             onChangeText={setDraft}
             multiline
             onSubmitEditing={() => send()}
           />
-          <Pressable onPress={() => send()} disabled={!canSend} style={{ paddingRight: 6 }}>
-            <Ionicons
-              name="arrow-up-circle"
-              size={30}
-              color={canSend ? colors.allworthAccent : colors.inkTertiary}
-            />
-          </Pressable>
+          {/* Send appears only once there's something to send — no attachments,
+              no voice affordance, just the one action that matters. */}
+          {hasText ? (
+            <Pressable
+              onPress={() => send()}
+              disabled={!canSend}
+              style={[styles.orb, !canSend && { opacity: 0.5 }]}
+            >
+              <Ionicons name="arrow-up" size={20} color="#FFFFFF" />
+            </Pressable>
+          ) : null}
         </View>
       </View>
     </KeyboardAvoidingView>
+  );
+}
+
+// ChatGPT-style top bar: brand mark + the advisor's-assistant identity on the
+// left ("Nicole's Assistant" — who you're talking to), a compose button on the
+// right that starts a fresh conversation.
+function ChatHeader({
+  topInset,
+  title,
+  onNewChat,
+}: {
+  topInset: number;
+  title: string;
+  onNewChat: () => void;
+}) {
+  return (
+    <View style={[styles.header, { paddingTop: topInset + 6 }]}>
+      <View style={styles.headerBrand}>
+        <View style={styles.headerMark}>
+          <AllworthMark size={18} color={colors.allworthNavy} />
+        </View>
+        <Text style={styles.headerTitle} numberOfLines={1}>
+          {title}
+        </Text>
+      </View>
+      <Pressable
+        onPress={onNewChat}
+        hitSlop={8}
+        style={({ pressed }) => [styles.headerBtn, pressed && { opacity: 0.6 }]}
+      >
+        <Ionicons name="create-outline" size={22} color={colors.inkPrimary} />
+      </Pressable>
+    </View>
   );
 }
 
@@ -401,6 +487,34 @@ function SuggestionChips({
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: space[4],
+    paddingBottom: space[2],
+    backgroundColor: colors.surfacePrimary,
+  },
+  headerBrand: { flexDirection: "row", alignItems: "center", gap: space[2] },
+  headerMark: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: colors.surfaceCard,
+    alignItems: "center",
+    justifyContent: "center",
+    ...shadowSoft,
+  },
+  headerTitle: { fontSize: 17, fontFamily: fonts.sansBold, color: colors.inkPrimary },
+  headerBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: colors.surfaceCard,
+    alignItems: "center",
+    justifyContent: "center",
+    ...shadowSoft,
+  },
   sessionHeader: { flexDirection: "row", alignItems: "center", gap: space[3] },
   sessionLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: colors.hairline },
   sessionText: {
@@ -409,7 +523,22 @@ const styles = StyleSheet.create({
     color: colors.inkTertiary,
     letterSpacing: 0.4,
   },
-  inputArea: { paddingHorizontal: space[5], paddingTop: 6, paddingBottom: space[3], gap: space[2] },
+  // Floating "jump to latest" pill, centered just above the composer.
+  scrollDownBtn: {
+    position: "absolute",
+    alignSelf: "center",
+    bottom: 10,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: colors.surfaceCard,
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    alignItems: "center",
+    justifyContent: "center",
+    ...shadowSoft,
+  },
+  inputArea: { paddingHorizontal: space[4], paddingTop: 6, paddingBottom: space[3], gap: space[2] },
   // Restrained chips: hairline border, no fill, smaller body type — they assist
   // the answer rather than compete with the accent-filled handoff action.
   suggestRow: { flexDirection: "row", flexWrap: "wrap", gap: space[2] },
@@ -421,14 +550,37 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   suggestText: { ...text.bodySm, color: colors.inkSecondary },
-  inputBar: { ...card, flexDirection: "row", alignItems: "center" },
+  // ChatGPT composer: a rounded pill that grows upward as the draft wraps, with
+  // a single send orb on the right that appears only once there's text.
+  inputBar: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 6,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: 26,
+    borderWidth: 1,
+    borderColor: colors.hairline,
+    paddingVertical: 5,
+    paddingHorizontal: 8,
+    ...shadowSoft,
+  },
   input: {
     flex: 1,
     fontSize: 17,
     fontFamily: fonts.sans,
     color: colors.inkPrimary,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    maxHeight: 100,
+    paddingLeft: 10,
+    paddingRight: 4,
+    paddingTop: Platform.OS === "ios" ? 8 : 4,
+    paddingBottom: Platform.OS === "ios" ? 8 : 4,
+    maxHeight: 120,
+  },
+  orb: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: colors.allworthNavy,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

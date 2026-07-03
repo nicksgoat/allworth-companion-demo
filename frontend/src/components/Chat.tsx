@@ -7,7 +7,6 @@ import { colors, fonts, radius, space, text } from "../theme";
 import type { ChatMessage, ToolChip } from "../types";
 import { AdvisorHandoffCard } from "./AdvisorHandoffCard";
 import { ChatToolWidget } from "./ChatToolWidget";
-import { AllworthMark } from "./Wordmark";
 
 export function ToolChipRow({
   chips,
@@ -163,17 +162,6 @@ function MarkdownText({ text, streaming }: { text: string; streaming: boolean })
           </Text>
         );
       })}
-    </View>
-  );
-}
-
-function AssistantIdentity() {
-  return (
-    <View style={styles.identityRow}>
-      <View style={styles.avatar}>
-        <AllworthMark size={14} color="#FFFFFF" />
-      </View>
-      <Text style={styles.identityName}>Allworth Assistant</Text>
     </View>
   );
 }
@@ -375,9 +363,6 @@ function FadeAnswer({ parsed, revealedCount }: { parsed: Parsed; revealedCount: 
 
 type ChatMessageViewProps = {
   message: ChatMessage;
-  // Only the first assistant message in a consecutive run shows the identity row,
-  // so a thread reads as one continuing voice rather than a repeating header.
-  showIdentity?: boolean;
   onFeedback?: (message: ChatMessage, rating: "positive" | "negative") => void;
   handoffDisabled?: boolean;
   // Fired once an answer has fully typed in — lets the parent hold follow-up
@@ -400,7 +385,6 @@ function ChatMessageViewImpl(props: ChatMessageViewProps) {
 
 function AssistantBubble({
   message,
-  showIdentity = true,
   onFeedback,
   handoffDisabled,
   onRevealed,
@@ -427,7 +411,6 @@ function AssistantBubble({
 
   return (
     <View style={styles.assistantBlock}>
-      {showIdentity ? <AssistantIdentity /> : null}
       <ToolChipRow
         chips={message.chips}
         sources={message.sources}
@@ -495,10 +478,7 @@ function AssistantBubble({
 // toggling at send boundaries) re-renders on those props anyway.
 export const ChatMessageView = React.memo(
   ChatMessageViewImpl,
-  (prev, next) =>
-    prev.message === next.message &&
-    prev.showIdentity === next.showIdentity &&
-    prev.handoffDisabled === next.handoffDisabled,
+  (prev, next) => prev.message === next.message && prev.handoffDisabled === next.handoffDisabled,
 );
 
 const webTextWrap =
@@ -588,17 +568,6 @@ const styles = StyleSheet.create({
   // Word-fade reveal: words flow + wrap like text, each fading in over the layout.
   fadeRow: { flexDirection: "row", flexWrap: "wrap", alignSelf: "stretch", maxWidth: "100%" },
   fadeBold: { fontFamily: fonts.sansBold },
-  identityRow: { flexDirection: "row", alignItems: "center", gap: 8 },
-  avatar: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: colors.allworthNavy,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarText: { fontSize: 12, fontFamily: fonts.sansBold, color: "#FFFFFF" },
-  identityName: { fontSize: 13, fontFamily: fonts.sansBold, color: colors.inkSecondary },
   // The single foot-of-answer action row: ghost thumbs + compact handoff.
   actionRow: {
     flexDirection: "row",
