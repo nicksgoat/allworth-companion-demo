@@ -4,17 +4,14 @@ import {
   Animated,
   Pressable,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
-  useWindowDimensions,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { RiseIn, useAnimatedValue } from "../anim";
 import { APP_HEADER_HEIGHT, AppHeader, TAB_BAR_HEIGHT } from "../components/Glass";
-import { NudgeCard } from "../components/NudgeCard";
 import { DisclaimerFooter, SectionHeader } from "../components/Rows";
 import { useApp } from "../state";
 import { card, colors, fonts, radius, space, text, usd } from "../theme";
@@ -84,13 +81,14 @@ function greetingForNow() {
 }
 
 // Home is a router, not a statement (stakeholder feedback): greeting, what
-// needs attention, quick actions into chat and features. Numbers, charts, and
-// totals live in Wealth — one tap away, never on the front door.
+// needs attention, quick actions into chat and features, the advisor within
+// reach. Numbers, charts, and totals live in Wealth — one tap away, never on
+// the front door. Composition is calm: full-width rows and a grid, nothing
+// cropped, nothing shouting.
 function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) => void }) {
   const app = useApp();
-  const { width: winW } = useWindowDimensions();
-  const nudgeW = Math.min(360, winW - 64); // fixed-width slides so the next card peeks
   const firstName = (d.client?.name ?? "Maya Tran").split(",")[0].split(" ")[0];
+  const advisorFirst = d.advisor?.name?.split(" ")[0] ?? "your advisor";
   const [conciergeOpen, setConciergeOpen] = useState(false);
   const [documentsOpen, setDocumentsOpen] = useState(false);
 
@@ -100,23 +98,6 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
     app.setSelectedTab("chat");
   };
 
-  // The outside-assets attention card is client-derived: allocation of
-  // held-away money is exactly the kind of thing that "actually needs
-  // attention", and its action is a conversation, not a dashboard.
-  const heldAwayNudge: Nudge | null =
-    d.heldAwayTotal > 0
-      ? {
-          id: "held-away-allocation",
-          type: "allocation",
-          title: "Outside assets",
-          headline: `${usd(d.heldAwayTotal)} held away`,
-          body: "",
-          cta: "Ask what this means",
-          advisorCta: "",
-          severity: "info",
-        }
-      : null;
-
   const quickActions: { icon: keyof typeof Ionicons.glyphMap; label: string; go: () => void }[] = [
     {
       icon: "chatbubble-outline",
@@ -124,17 +105,17 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
       go: () => askChat("How does this spending affect my plan?"),
     },
     {
+      icon: "flag-outline",
+      label: "My goals",
+      go: () => askChat("Am I on track for the lake house goal?"),
+    },
+    {
       icon: "calendar-outline",
-      label: `Book ${d.advisor?.name?.split(" ")[0] ?? "your advisor"}`,
+      label: `Book ${advisorFirst}`,
       go: () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         setConciergeOpen(true);
       },
-    },
-    {
-      icon: "flag-outline",
-      label: "My goals",
-      go: () => askChat("Am I on track for the lake house goal?"),
     },
     {
       icon: "folder-open-outline",
@@ -155,42 +136,39 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
 
       <RiseIn delay={40} style={{ gap: space[3] }}>
         <SectionHeader>Needs your attention</SectionHeader>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.carousel}
-          contentContainerStyle={styles.carouselContent}
-          snapToInterval={nudgeW + space[3]}
-          snapToAlignment="start"
-          decelerationRate="fast"
-        >
-          {d.nudges.map((nudge) => (
-            <View key={nudge.id} style={{ width: nudgeW }}>
-              <NudgeCard nudge={nudge} onPress={() => onNudge(nudge)} fill />
-            </View>
+        <View style={styles.attentionCard}>
+          {d.nudges.map((nudge, i) => (
+            <React.Fragment key={nudge.id}>
+              {i > 0 ? <View style={styles.attentionDivider} /> : null}
+              <AttentionRow
+                icon={nudge.type === "concentration" ? "pie-chart-outline" : "trending-up-outline"}
+                tone={nudge.severity === "info" ? "info" : "attention"}
+                title={nudge.title}
+                sub={nudge.headline}
+                onPress={() => onNudge(nudge)}
+              />
+            </React.Fragment>
           ))}
-          {heldAwayNudge ? (
-            <View key={heldAwayNudge.id} style={{ width: nudgeW }}>
-              <NudgeCard
-                nudge={heldAwayNudge}
+          {d.heldAwayTotal > 0 ? (
+            <>
+              {d.nudges.length > 0 ? <View style={styles.attentionDivider} /> : null}
+              <AttentionRow
+                icon="wallet-outline"
+                tone="info"
+                title="Money held outside your plan"
+                sub={`${usd(d.heldAwayTotal)} held away — worth a conversation`}
                 onPress={() =>
                   askChat("What should I be doing with the money I hold outside Allworth?")
                 }
-                fill
               />
-            </View>
+            </>
           ) : null}
-        </ScrollView>
+        </View>
       </RiseIn>
 
       <RiseIn delay={140} style={{ gap: space[3] }}>
         <SectionHeader>Quick actions</SectionHeader>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.carousel}
-          contentContainerStyle={styles.carouselContent}
-        >
+        <View style={styles.actionGrid}>
           {quickActions.map((a) => (
             <Pressable
               key={a.label}
@@ -198,13 +176,45 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
               style={({ pressed }) => [styles.quickAction, pressed && { opacity: 0.7 }]}
             >
               <Ionicons name={a.icon} size={18} color={colors.allworthNavy} />
-              <Text style={styles.quickActionText}>{a.label}</Text>
+              <Text style={styles.quickActionText} numberOfLines={1}>
+                {a.label}
+              </Text>
             </Pressable>
           ))}
-        </ScrollView>
+        </View>
       </RiseIn>
 
-      <RiseIn delay={220}>
+      <RiseIn delay={220} style={{ gap: space[3] }}>
+        <SectionHeader>Your advisor</SectionHeader>
+        <View style={styles.advisorCard}>
+          <View style={styles.advisorAvatar}>
+            <Text style={styles.advisorAvatarText}>{d.advisor?.avatarInitials ?? "A"}</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.advisorName}>{d.advisor?.name ?? "Your advisor"}</Text>
+            <Text style={styles.advisorTitle}>{d.advisor?.title ?? ""}</Text>
+          </View>
+          <Pressable
+            onPress={() => askChat(`Can you have ${advisorFirst} reach out to me?`)}
+            hitSlop={8}
+            style={({ pressed }) => [styles.advisorBtn, pressed && { opacity: 0.8 }]}
+          >
+            <Ionicons name="chatbubble-ellipses" size={18} color={colors.allworthAccent} />
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setConciergeOpen(true);
+            }}
+            hitSlop={8}
+            style={({ pressed }) => [styles.advisorBtn, pressed && { opacity: 0.8 }]}
+          >
+            <Ionicons name="calendar-outline" size={18} color={colors.allworthAccent} />
+          </Pressable>
+        </View>
+      </RiseIn>
+
+      <RiseIn delay={300}>
         <WealthGuideCard onPress={() => app.setSelectedTab("invest")} />
       </RiseIn>
 
@@ -219,6 +229,44 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
       />
       <DocumentsSheet visible={documentsOpen} onClose={() => setDocumentsOpen(false)} />
     </View>
+  );
+}
+
+// One calm row per attention item: tinted icon chip, plain-English line,
+// detail line, chevron. No hero numerals, nothing orange screaming.
+function AttentionRow({
+  icon,
+  tone,
+  title,
+  sub,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  tone: "attention" | "info";
+  title: string;
+  sub: string;
+  onPress: () => void;
+}) {
+  const tint = tone === "attention" ? colors.attention : colors.allworthAccent;
+  const wash = tone === "attention" ? "rgba(210,109,55,0.10)" : "rgba(62,113,183,0.10)";
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.attentionRow, pressed && { opacity: 0.7 }]}
+    >
+      <View style={[styles.attentionIcon, { backgroundColor: wash }]}>
+        <Ionicons name={icon} size={17} color={tint} />
+      </View>
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={styles.attentionTitle} numberOfLines={2}>
+          {title}
+        </Text>
+        <Text style={styles.attentionSub} numberOfLines={1}>
+          {sub}
+        </Text>
+      </View>
+      <Ionicons name="chevron-forward" size={15} color={colors.inkTertiary} />
+    </Pressable>
   );
 }
 
@@ -262,10 +310,45 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 }
 
 const styles = StyleSheet.create({
-  // Horizontal carousels bleed past the scroll container's 20px padding to the
-  // screen edges, while their content keeps a 20px inset so cards start aligned.
-  carousel: { marginHorizontal: -space[5] },
-  carouselContent: { paddingHorizontal: space[5], gap: space[3], alignItems: "stretch" },
+  attentionCard: { ...card, paddingHorizontal: space[4], paddingVertical: space[1] },
+  attentionRow: { flexDirection: "row", alignItems: "center", gap: space[3], paddingVertical: space[3] },
+  attentionDivider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.hairline },
+  attentionIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: radius.chip,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  attentionTitle: { fontSize: 15, fontFamily: fonts.sansBold, color: colors.inkPrimary },
+  attentionSub: { ...text.caption, color: colors.inkSecondary },
+  actionGrid: { flexDirection: "row", flexWrap: "wrap", gap: space[3] },
+  advisorCard: {
+    ...card,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[3],
+    padding: space[4],
+  },
+  advisorAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.allworthNavy,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  advisorAvatarText: { fontSize: 15, fontFamily: fonts.sansBold, color: "#FFFFFF", letterSpacing: 0.5 },
+  advisorName: { fontSize: 16, fontFamily: fonts.sansBold, color: colors.inkPrimary },
+  advisorTitle: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary, marginTop: 1 },
+  advisorBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: "rgba(62,113,183,0.12)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   summaryLine: {
     ...card,
     flexDirection: "row",
@@ -285,9 +368,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: space[2],
-    paddingHorizontal: space[4],
+    paddingHorizontal: space[3],
     paddingVertical: space[3],
-    borderRadius: radius.pill,
+    borderRadius: radius.card,
+    flexBasis: "47%",
+    flexGrow: 1,
   },
   quickActionText: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.allworthNavy },
   skeletonBlock: { height: 72, borderRadius: radius.card, backgroundColor: colors.inkFaint },
