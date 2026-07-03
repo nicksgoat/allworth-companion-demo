@@ -119,6 +119,9 @@ export function ChatScreen() {
   // A floating "scroll to bottom" pill (ChatGPT-style) shows once you've scrolled
   // meaningfully up from the latest message.
   const [showScrollDown, setShowScrollDown] = useState(false);
+  // Web-only composer auto-grow: native multiline TextInputs grow with the
+  // draft, react-native-web's stays fixed — mirror the native behavior there.
+  const [webInputHeight, setWebInputHeight] = useState(0);
   // "Stick to bottom": follow a streaming answer only while you're already at
   // the bottom. The moment you scroll up to read, we stop following so the
   // text never yanks you back down mid-read.
@@ -450,13 +453,21 @@ export function ChatScreen() {
         <View style={styles.inputBar}>
           <TextInput
             ref={inputRef}
-            style={styles.input}
+            style={[
+              styles.input,
+              Platform.OS === "web" && webInputHeight > 0 ? { height: webInputHeight } : null,
+            ]}
             placeholder="Ask Allworth…"
             placeholderTextColor={colors.inkTertiary}
             value={draft}
             onChangeText={setDraft}
             multiline
             onSubmitEditing={() => send()}
+            onContentSizeChange={
+              Platform.OS === "web"
+                ? (e) => setWebInputHeight(Math.min(120, e.nativeEvent.contentSize.height))
+                : undefined
+            }
           />
           {/* Send appears only once there's something to send — no attachments,
               no voice affordance, just the one action that matters. */}
@@ -628,6 +639,8 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "ios" ? 8 : 4,
     paddingBottom: Platform.OS === "ios" ? 8 : 4,
     maxHeight: 120,
+    // The pill border is the focus affordance; the browser ring fights it.
+    ...(Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : null),
   },
   orb: {
     width: 34,

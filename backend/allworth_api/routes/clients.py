@@ -53,7 +53,10 @@ def dashboard(client_id: str, household_id: str = Depends(get_current_household)
             "mode": mode,
             "label": "Live data" if is_live else "Synthetic demo data",
             "generatedAt": seed["generatedAt"],
-            "asOf": seed["generatedAt"],
+            # Only surface asOf when it's an actual date — the seed's
+            # placeholder ("deterministic") otherwise renders as the footer
+            # copy "synthetic data, as of deterministic".
+            "asOf": seed["generatedAt"] if any(c.isdigit() for c in str(seed["generatedAt"])) else None,
             "isSynthetic": not is_live,
             "isStale": False,
         },

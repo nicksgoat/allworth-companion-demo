@@ -4,6 +4,7 @@ import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navig
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -111,11 +112,14 @@ function BookScreen() {
 }
 
 function HouseholdRow({ household, onPress }: { household: Household; onPress: () => void }) {
+  // Skip the "&" in couple names: "Robert & Elaine Castillo" → RE, not R&.
   const initials = household.name
     .split(" ")
+    .filter((w) => /^[A-Za-z]/.test(w))
     .map((w) => w[0])
     .slice(0, 2)
-    .join("");
+    .join("")
+    .toUpperCase();
   const highlight = household.highlight === true;
   return (
     <Pressable
@@ -469,6 +473,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     maxHeight: 90,
+    // The bordered field is the focus affordance; the browser ring fights it.
+    ...(Platform.OS === "web" ? ({ outlineStyle: "none" } as any) : null),
   },
   convoSend: {
     width: 32,
