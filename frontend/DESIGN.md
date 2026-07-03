@@ -1,0 +1,106 @@
+# Allworth Companion — Design Rules
+
+The enforceable system behind every screen. Tokens live in `src/theme.ts`; brand
+values come from `ALW001_01_Brand_Dashboard_DEC2024.pdf` (via the
+`allworth-brand` skill) and always win over guesses. If a value isn't a token,
+it's a bug or it becomes a token.
+
+## Voice of the UI
+
+Sophisticated, calm, upmarket — a fiduciary, not a fintech toy. Nothing bounces,
+nothing shouts, nothing is clever at the reader's expense. When in doubt, remove.
+
+## Color
+
+- **Primaries**: `colors.allworthNavy` (#173D67, wordmark, filled actions),
+  `colors.allworthAccent` (#3E71B7, Iris — links, active accents, the advisor
+  presence color). White does the rest of the work.
+- **Surfaces**: `surfacePrimary` (Feather Gray) for screens, `surfaceCard`
+  (white) for cards, `surfaceHero` (Night Blue) for the one premium dark hero
+  per screen at most. Beige/Linen/Ice are available neutrals — use sparingly.
+- **Ink**: `inkPrimary` → `inkSecondary` → `inkTertiary` is the only text
+  hierarchy. Never place secondary-palette colors on body text.
+- **Secondary palette (`chart*`) is for charts and infographics only** — never
+  buttons, never backgrounds, never text. `gain`/`loss`/`attention` map money
+  semantics onto Evergreen/Pumpkin; on dark heroes use `gainOnDark`/`lossOnDark`.
+- One dark-gradient hero per screen maximum (Night Blue → Indigo). Everything
+  else stays light.
+
+## Typography
+
+- **Playfair Display** (`fonts.display*`): headlines, hero numerals, large
+  stats. Big numbers always use `text.display` (tabular figures — brand rule).
+- **Lato** (`fonts.sans*`): everything interactive and everything body-sized.
+- Use the `text.*` ladder — `display 48 / title 28 / heading 20 / body 15 /
+  bodySm 13 / caption 12` plus `sectionLabel` (11 uppercase, +0.6 tracking).
+  Do not invent sizes between rungs; if a design needs one, add it to the
+  ladder deliberately.
+- Chat is the one surface with its own body size (17pt) — conversation reads
+  bigger than UI. Keep that exception contained to chat bubbles/composer.
+
+## Spacing & shape
+
+- **4px scale only**: `space[1..12]` (4→48). Screen gutters are `space[5]`
+  (20). Card padding is `space[4]` (16). Never a bare magic number.
+- **Radii**: `radius.card` 16 for cards/sheets, `radius.chip` 10 for chips and
+  small inputs, `radius.pill` 999 for fully-round (pills, orbs, avatars).
+  Circular elements use a radius of exactly half their height (34px orb → 17).
+- **Elevation**: `shadowSoft` is the only shadow in the app — a tight
+  navy-tinted lift. Cards use the `card` token (white + hairline navy border +
+  shadowSoft). Never stack or invent shadows.
+- Hairlines: `colors.hairline` at `StyleSheet.hairlineWidth` or 1px.
+
+## Iconography
+
+- Ionicons only; **outline variants by default, filled only for the active
+  state** (see tab bar: `home-outline` ↔ `home`).
+- Sizes: 24 tab bar, 20–22 in-row actions, 12–13 inside section-header chips.
+- Icon colors: navy/accent/ink tones only, white on dark surfaces. One color
+  per icon (brand: 1-color, 1-stroke).
+- Tap targets ≥ 44×44pt — small visual icons get `hitSlop`.
+
+## Components (canonical implementations — reuse, don't fork)
+
+| Component | Source | Rule |
+|---|---|---|
+| Card | `theme.card` token | White, radius 16, hairline navy border, `shadowSoft`. |
+| Section header | `Rows.SectionHeader` | 11pt uppercase Lato Bold, `inkTertiary`. Sits `space[2]` above content. |
+| Hero number | `HeroNumber` | Playfair, tabular, count-up ≤800ms. One per screen. |
+| Glass bar | `Glass.tsx` (`glassStyle`, `TAB_BAR_HEIGHT`) | The only translucent surface. Content may scroll under it. |
+| Chips | hairline border, no fill, `bodySm` | Assistive, never competing with the primary action. |
+| Primary action | navy fill, white Lato Bold text, radius pill/12 | One per view. Secondary = ice/ghost fill, accent text. |
+| Chat: user bubble | `Chat.tsx` userBubble | Gray fill, right-aligned. |
+| Chat: assistant | `Chat.tsx` AssistantBubble | No bubble — bare text, word-fade reveal. |
+| Chat: advisor | `Chat.tsx` AdvisorBubble | White card, 3px accent left edge, initials avatar + name + Advisor pill, `RiseIn` entrance. |
+| Composer | `ChatScreen` inputBar | Rounded pill (26), grows with draft, navy send orb appears only with text. |
+| Disclaimer | `Rows.DisclaimerFooter` | On every client-facing screen bottom. |
+
+## Motion
+
+All motion lives in `src/anim.tsx` — reuse `RiseIn` (fade + 14px rise, 420ms),
+`FadeScaleIn` (chips), `usePulse` (thinking dot). Rules:
+
+- Easing out, 180–420ms. Nothing springs, bounces, or overshoots.
+- Native driver wherever the property allows.
+- Entrances animate **once** — on arrival, not on re-render (see the
+  `animate`-captured-once pattern in `AssistantBubble`).
+- Tab switches crossfade at 180ms (`App.tsx ClientTabs`). Screens never slide.
+- Charts draw in ≤800ms; count-ups settle before the user can read the number.
+
+## Haptics
+
+`expo-haptics`, called directly at the interaction site (existing idiom):
+
+- `ImpactFeedbackStyle.Light` — ambient: tab switch, chip select, send,
+  new-chat, scrubbing ticks.
+- `ImpactFeedbackStyle.Medium` — a human moment: advisor interjection arriving.
+- `NotificationFeedbackType.Success` — completed commitments only (handoff
+  sent). Never for passive events.
+- Web builds: expo-haptics no-ops — no platform gate needed.
+
+## Compliance-shaped copy (UI text)
+
+- The assistant is a **companion/assistant — never "advisor"**. Advice verbs
+  ("recommend", "should") are reserved for the human advisor path.
+- Every substantive answer surface keeps the handoff affordance visible.
+- Synthetic-data disclaimer stays on every client-facing screen.

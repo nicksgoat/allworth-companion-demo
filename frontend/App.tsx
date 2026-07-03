@@ -9,8 +9,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { ActivityIndicator, Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { glassStyle, TAB_BAR_HEIGHT } from "./src/components/Glass";
 import { AuthProvider, useAuth } from "./src/auth";
@@ -108,12 +108,23 @@ const TABS: {
 function ClientTabs() {
   const app = useApp();
   const insets = useSafeAreaInsets();
+  // Tabs hard-swap their content; a short fade-in on the incoming screen keeps
+  // the switch calm without delaying interaction (opacity only, native driver).
+  const contentFade = useRef(new Animated.Value(1)).current;
+  const prevTab = useRef(app.selectedTab);
+  useEffect(() => {
+    if (prevTab.current === app.selectedTab) return;
+    prevTab.current = app.selectedTab;
+    contentFade.setValue(0);
+    Animated.timing(contentFade, { toValue: 1, duration: 180, useNativeDriver: true }).start();
+  }, [app.selectedTab, contentFade]);
 
   return (
     <View style={{ flex: 1 }}>
-      <View
+      <Animated.View
         style={{
           flex: 1,
+          opacity: contentFade,
           // Chat pins its input to the bottom, so it can't run under the bar;
           // scrolling tabs go full-bleed and pad their own content instead.
           paddingBottom: app.selectedTab === "chat" ? TAB_BAR_HEIGHT + insets.bottom : 0,
@@ -128,7 +139,7 @@ function ClientTabs() {
         ) : (
           <ProfileScreen />
         )}
-      </View>
+      </Animated.View>
       <View
         style={[
           styles.tabBar,

@@ -1,7 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  Animated,
+  Easing,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -12,6 +15,8 @@ import {
 } from "react-native";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Haptics from "expo-haptics";
 import { ChatMessageView } from "../components/Chat";
 import { DisclaimerFooter } from "../components/Rows";
 import { AllworthMark } from "../components/Wordmark";
@@ -21,6 +26,18 @@ import type { ChatEvent, ChatMessage, Dashboard } from "../types";
 
 let nextId = 1;
 const newMessage = (m: Omit<ChatMessage, "id">): ChatMessage => ({ ...m, id: String(nextId++) });
+
+// A locally-archived conversation (the ChatGPT history drawer). Client-side
+// only: the server's LLM memory stays one rolling thread per (client, session),
+// so restoring an old thread restores what you SEE, not the model's context.
+type ArchivedThread = {
+  id: string;
+  title: string;
+  savedAt: number;
+  messages: ChatMessage[];
+};
+
+const MAX_ARCHIVED_THREADS = 20;
 
 const LEGACY_SUGGESTIONS = [
   "Am I on track for retirement?",
@@ -163,10 +180,53 @@ export function ChatScreen() {
     app.setChatMessages((msgs) => (msgs.length > 0 ? msgs : [greeting]));
   };
 
+  // ── Thread history (ChatGPT drawer) ────────────────────────────────────
+  const [threads, setThreads] = useState<ArchivedThread[]>([]);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const threadsKey = `chat_threads:${app.clientId}:${app.session}`;
+
+  useEffect(() => {
+    let cancelled = false;
+    AsyncStorage.getItem(threadsKey)
+      .then((raw) => {
+        if (cancelled || !raw) return;
+        try {
+          setThreads(JSON.parse(raw));
+        } catch {}
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [threadsKey]);
+
+  const persistThreads = (next: ArchivedThread[]) => {
+    setThreads(next);
+    AsyncStorage.setItem(threadsKey, JSON.stringify(next)).catch(() => {});
+  };
+
+  // Snapshot the live thread onto the archive pile — only if the user actually
+  // said something (a bare greeting isn't worth keeping).
+  const archiveCurrent = (): ArchivedThread[] => {
+    const msgs = app.chatMessages;
+    const firstUser = msgs.find((m) => m.role === "user");
+    if (!firstUser) return threads;
+    const entry: ArchivedThread = {
+      id: `t${Date.now()}`,
+      title: firstUser.text.slice(0, 48),
+      savedAt: Date.now(),
+      messages: msgs.map((m) => ({ ...m, isStreaming: false })),
+    };
+    return [entry, ...threads].slice(0, MAX_ARCHIVED_THREADS);
+  };
+
   // The header's compose button: wipe the thread and drop back to a fresh
   // proactive greeting — the ChatGPT "new chat" gesture. Bumping the epoch
   // orphans any answer still streaming into the old thread.
   const startNewChat = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    persistThreads(archiveCurrent());
+    setHistoryOpen(false);
     threadEpoch.current += 1;
     setSending(false);
     sendingRef.current = false;
@@ -175,6 +235,22 @@ export function ChatScreen() {
     app.setChatMessages([]);
     const greeting = await buildGreeting();
     app.setChatMessages([greeting]);
+  };
+
+  // Reopen an archived thread: the live one gets archived, the chosen one
+  // leaves the pile and becomes live (fresh client ids so keys never collide
+  // with this session's counter).
+  const openThread = (t: ArchivedThread) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    threadEpoch.current += 1;
+    setSending(false);
+    sendingRef.current = false;
+    setDraft("");
+    setRevealedId(null);
+    persistThreads(archiveCurrent().filter((x) => x.id !== t.id));
+    app.setChatMessages(t.messages.map((m) => newMessage({ ...m })));
+    pinnedToBottom.current = true;
+    setHistoryOpen(false);
   };
 
   useEffect(() => {
@@ -201,6 +277,9 @@ export function ChatScreen() {
         const fresh = advisorMsgs.filter((m) => !seenInterjections.current.has(m.id as string));
         if (fresh.length === 0) return;
         for (const m of fresh) seenInterjections.current.add(m.id as string);
+        // A human just stepped into the thread — the one moment that warrants
+        // a firmer tap than the ambient Light impacts.
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         pinnedToBottom.current = true;
         app.setChatMessages((msgs) => [
           ...msgs,
@@ -316,6 +395,7 @@ export function ChatScreen() {
   const send = async (textArg?: string) => {
     const text = (textArg ?? draft).trim();
     if (!text || sending) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setDraft("");
     setSending(true);
     sendingRef.current = true;
@@ -408,7 +488,23 @@ export function ChatScreen() {
       style={{ flex: 1, backgroundColor: colors.surfacePrimary }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <ChatHeader topInset={insets.top} title={assistantTitle} onNewChat={startNewChat} />
+      <ChatHeader
+        topInset={insets.top}
+        title={assistantTitle}
+        onNewChat={startNewChat}
+        onOpenHistory={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          setHistoryOpen(true);
+        }}
+      />
+      <ThreadHistorySheet
+        visible={historyOpen}
+        threads={threads}
+        topInset={insets.top}
+        onClose={() => setHistoryOpen(false)}
+        onNewChat={startNewChat}
+        onOpenThread={openThread}
+      />
       <View style={{ flex: 1 }}>
         <ScrollView
           ref={scrollRef}
@@ -486,24 +582,30 @@ export function ChatScreen() {
   );
 }
 
-// ChatGPT-style top bar: brand mark + the advisor's-assistant identity on the
-// left ("Nicole's Assistant" — who you're talking to), a compose button on the
-// right that starts a fresh conversation.
+// ChatGPT-style top bar: brand mark (opens the thread-history drawer) + the
+// advisor's-assistant identity on the left ("Nicole's Assistant" — who you're
+// talking to), a compose button on the right that starts a fresh conversation.
 function ChatHeader({
   topInset,
   title,
   onNewChat,
+  onOpenHistory,
 }: {
   topInset: number;
   title: string;
   onNewChat: () => void;
+  onOpenHistory: () => void;
 }) {
   return (
     <View style={[styles.header, { paddingTop: topInset + 6 }]}>
       <View style={styles.headerBrand}>
-        <View style={styles.headerMark}>
+        <Pressable
+          onPress={onOpenHistory}
+          hitSlop={8}
+          style={({ pressed }) => [styles.headerMark, pressed && { opacity: 0.6 }]}
+        >
           <AllworthMark size={18} color={colors.allworthNavy} />
-        </View>
+        </Pressable>
         <Text style={styles.headerTitle} numberOfLines={1}>
           {title}
         </Text>
@@ -516,6 +618,106 @@ function ChatHeader({
         <Ionicons name="create-outline" size={22} color={colors.inkPrimary} />
       </Pressable>
     </View>
+  );
+}
+
+// Left slide-over listing archived conversations — the ChatGPT sidebar,
+// scoped to demo needs. Scrim fades, panel slides 240ms out / 180ms in.
+function ThreadHistorySheet({
+  visible,
+  threads,
+  topInset,
+  onClose,
+  onNewChat,
+  onOpenThread,
+}: {
+  visible: boolean;
+  threads: ArchivedThread[];
+  topInset: number;
+  onClose: () => void;
+  onNewChat: () => void;
+  onOpenThread: (t: ArchivedThread) => void;
+}) {
+  const progress = useRef(new Animated.Value(0)).current;
+  const [mounted, setMounted] = useState(visible);
+  useEffect(() => {
+    if (visible) {
+      setMounted(true);
+      Animated.timing(progress, {
+        toValue: 1,
+        duration: 240,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(progress, {
+        toValue: 0,
+        duration: 180,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) setMounted(false);
+      });
+    }
+  }, [visible, progress]);
+  if (!mounted) return null;
+
+  return (
+    <Modal transparent visible animationType="none" onRequestClose={onClose}>
+      <Animated.View style={[styles.historyScrim, { opacity: progress }]}>
+        <Pressable style={{ flex: 1 }} onPress={onClose} />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.historyPanel,
+          {
+            paddingTop: topInset + space[3],
+            transform: [
+              {
+                translateX: progress.interpolate({ inputRange: [0, 1], outputRange: [-320, 0] }),
+              },
+            ],
+          },
+        ]}
+      >
+        <Text style={styles.historyHeading}>Chats</Text>
+        <Pressable
+          onPress={onNewChat}
+          style={({ pressed }) => [styles.historyRow, pressed && { opacity: 0.6 }]}
+        >
+          <Ionicons name="create-outline" size={20} color={colors.allworthNavy} />
+          <Text style={styles.historyNewText}>New chat</Text>
+        </Pressable>
+        <View style={styles.historyDivider} />
+        <ScrollView style={{ flex: 1 }}>
+          {threads.length === 0 ? (
+            <Text style={styles.historyEmpty}>
+              No saved chats yet. Start a new one and the current conversation lands here.
+            </Text>
+          ) : (
+            threads.map((t) => (
+              <Pressable
+                key={t.id}
+                onPress={() => onOpenThread(t)}
+                style={({ pressed }) => [styles.historyRow, pressed && { opacity: 0.6 }]}
+              >
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text style={styles.historyTitle} numberOfLines={1}>
+                    {t.title}
+                  </Text>
+                  <Text style={styles.historyDate}>
+                    {new Date(t.savedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </Text>
+                </View>
+              </Pressable>
+            ))
+          )}
+        </ScrollView>
+      </Animated.View>
+    </Modal>
   );
 }
 
@@ -580,6 +782,39 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     ...shadowSoft,
   },
+  // Thread-history drawer (left slide-over).
+  historyScrim: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(12, 46, 78, 0.35)",
+  },
+  historyPanel: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: 300,
+    backgroundColor: colors.surfaceCard,
+    borderRightWidth: 1,
+    borderRightColor: colors.hairline,
+    paddingHorizontal: space[4],
+    ...shadowSoft,
+  },
+  historyHeading: { ...text.heading, paddingVertical: space[2] },
+  historyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[3],
+    paddingVertical: space[3],
+  },
+  historyNewText: { fontSize: 15, fontFamily: fonts.sansBold, color: colors.allworthNavy },
+  historyDivider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.hairline },
+  historyTitle: { ...text.body, color: colors.inkPrimary },
+  historyDate: { ...text.caption },
+  historyEmpty: { ...text.bodySm, paddingVertical: space[4], color: colors.inkTertiary },
   sessionHeader: { flexDirection: "row", alignItems: "center", gap: space[3] },
   sessionLine: { flex: 1, height: StyleSheet.hairlineWidth, backgroundColor: colors.hairline },
   sessionText: {

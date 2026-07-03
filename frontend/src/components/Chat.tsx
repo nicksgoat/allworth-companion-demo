@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { TextStyle } from "react-native";
 import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from "react-native";
-import { FadeScaleIn, useAnimatedValue, usePulse } from "../anim";
+import { FadeScaleIn, RiseIn, useAnimatedValue, usePulse } from "../anim";
 import { colors, fonts, radius, space, text } from "../theme";
 import type { ChatMessage, ToolChip } from "../types";
 import { AdvisorHandoffCard } from "./AdvisorHandoffCard";
@@ -397,8 +397,10 @@ function AdvisorBubble({ message }: { message: ChatMessage }) {
     .join("")
     .slice(0, 2)
     .toUpperCase();
+  // Advisor messages only ever arrive live (polling), so the entrance always
+  // animates — the rise sells the "someone just stepped in" moment.
   return (
-    <View style={styles.advisorBlock}>
+    <RiseIn style={styles.advisorBlock}>
       <View style={styles.advisorIdentityRow}>
         <View style={styles.advisorAvatar}>
           <Text style={styles.advisorAvatarText}>{initials}</Text>
@@ -411,7 +413,7 @@ function AdvisorBubble({ message }: { message: ChatMessage }) {
       <View style={styles.advisorBubble}>
         <Text style={[styles.advisorText, webTextWrap]}>{message.text}</Text>
       </View>
-    </View>
+    </RiseIn>
   );
 }
 
