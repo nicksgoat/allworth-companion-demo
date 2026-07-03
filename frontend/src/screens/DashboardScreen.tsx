@@ -11,15 +11,16 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as Haptics from "expo-haptics";
 import { RiseIn, useAnimatedValue } from "../anim";
 import { GlassHeader, TAB_BAR_HEIGHT } from "../components/Glass";
-import { NetWorthHero } from "../components/NetWorthHero";
 import { NudgeCard } from "../components/NudgeCard";
 import { DisclaimerFooter, SectionHeader } from "../components/Rows";
-import { performanceDeltaLabel } from "../performance";
 import { useApp } from "../state";
 import { card, colors, fonts, radius, space, text, usd } from "../theme";
 import type { Dashboard, Nudge } from "../types";
+import { AdvisorConciergeSheet } from "./AdvisorConciergeSheet";
+import { DocumentsSheet } from "./DocumentsSheet";
 import { NudgeDetailSheet } from "./NudgeDetailSheet";
 
 export function DashboardScreen() {
@@ -82,91 +83,160 @@ function greetingForNow() {
   return "Good evening";
 }
 
+// Home is a router, not a statement (stakeholder feedback): greeting, what
+// needs attention, quick actions into chat and features. Numbers, charts, and
+// totals live in Wealth — one tap away, never on the front door.
 function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) => void }) {
   const app = useApp();
-  const insets = useSafeAreaInsets();
   const { width: winW } = useWindowDimensions();
   const nudgeW = Math.min(360, winW - 64); // fixed-width slides so the next card peeks
-  const fullName = d.client?.name ?? "Maya Tran";
-  const accountCount = d.accounts.allworth.length + d.accounts.outside.length;
+  const firstName = (d.client?.name ?? "Maya Tran").split(",")[0].split(" ")[0];
+  const [conciergeOpen, setConciergeOpen] = useState(false);
+  const [documentsOpen, setDocumentsOpen] = useState(false);
+
+  const askChat = (prompt: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    app.setChatPrefill(prompt);
+    app.setSelectedTab("chat");
+  };
+
+  // The outside-assets attention card is client-derived: allocation of
+  // held-away money is exactly the kind of thing that "actually needs
+  // attention", and its action is a conversation, not a dashboard.
+  const heldAwayNudge: Nudge | null =
+    d.heldAwayTotal > 0
+      ? {
+          id: "held-away-allocation",
+          type: "allocation",
+          title: "Outside assets",
+          headline: `${usd(d.heldAwayTotal)} held away`,
+          body: "",
+          cta: "Ask what this means",
+          advisorCta: "",
+          severity: "info",
+        }
+      : null;
+
+  const quickActions: { icon: keyof typeof Ionicons.glyphMap; label: string; go: () => void }[] = [
+    {
+      icon: "chatbubble-outline",
+      label: "Ask about spending",
+      go: () => askChat("How does this spending affect my plan?"),
+    },
+    {
+      icon: "calendar-outline",
+      label: `Book ${d.advisor?.name?.split(" ")[0] ?? "your advisor"}`,
+      go: () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setConciergeOpen(true);
+      },
+    },
+    {
+      icon: "flag-outline",
+      label: "My goals",
+      go: () => askChat("Am I on track for the lake house goal?"),
+    },
+    {
+      icon: "folder-open-outline",
+      label: "Documents",
+      go: () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setDocumentsOpen(true);
+      },
+    },
+  ];
+
   return (
     <View style={{ gap: space[6] }}>
-      <NetWorthHero
-        greeting={greetingForNow()}
-        name={fullName}
-        netWorth={d.netWorth}
-        delta={trajectory(d)}
-        history={d.netWorthHistory}
-        insetsTop={insets.top}
-        onOpenWealth={() => app.setSelectedTab("invest")}
-      />
+      <View style={styles.greetingBlock}>
+        <Text style={styles.greetingLead}>{greetingForNow()},</Text>
+        <Text style={styles.greetingName}>{firstName}</Text>
+      </View>
 
-      {d.nudges.length ? (
-        <RiseIn delay={80} style={{ gap: space[3] }}>
-          <SectionHeader>Needs your attention</SectionHeader>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.carousel}
-            contentContainerStyle={styles.carouselContent}
-            snapToInterval={nudgeW + space[3]}
-            snapToAlignment="start"
-            decelerationRate="fast"
-          >
-            {d.nudges.map((nudge) => (
-              <View key={nudge.id} style={{ width: nudgeW }}>
-                <NudgeCard nudge={nudge} onPress={() => onNudge(nudge)} fill />
-              </View>
-            ))}
-          </ScrollView>
-        </RiseIn>
-      ) : null}
+      <RiseIn delay={40} style={{ gap: space[3] }}>
+        <SectionHeader>Needs your attention</SectionHeader>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.carousel}
+          contentContainerStyle={styles.carouselContent}
+          snapToInterval={nudgeW + space[3]}
+          snapToAlignment="start"
+          decelerationRate="fast"
+        >
+          {d.nudges.map((nudge) => (
+            <View key={nudge.id} style={{ width: nudgeW }}>
+              <NudgeCard nudge={nudge} onPress={() => onNudge(nudge)} fill />
+            </View>
+          ))}
+          {heldAwayNudge ? (
+            <View key={heldAwayNudge.id} style={{ width: nudgeW }}>
+              <NudgeCard
+                nudge={heldAwayNudge}
+                onPress={() =>
+                  askChat("What should I be doing with the money I hold outside Allworth?")
+                }
+                fill
+              />
+            </View>
+          ) : null}
+        </ScrollView>
+      </RiseIn>
+
+      <RiseIn delay={140} style={{ gap: space[3] }}>
+        <SectionHeader>Quick actions</SectionHeader>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.carousel}
+          contentContainerStyle={styles.carouselContent}
+        >
+          {quickActions.map((a) => (
+            <Pressable
+              key={a.label}
+              onPress={a.go}
+              style={({ pressed }) => [styles.quickAction, pressed && { opacity: 0.7 }]}
+            >
+              <Ionicons name={a.icon} size={18} color={colors.allworthNavy} />
+              <Text style={styles.quickActionText}>{a.label}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </RiseIn>
 
       <RiseIn delay={220}>
-        <AccountsSummaryLine count={accountCount} onPress={() => app.setSelectedTab("invest")} />
+        <WealthGuideCard onPress={() => app.setSelectedTab("invest")} />
       </RiseIn>
 
       <View style={{ paddingVertical: space[2] }}>
         <DisclaimerFooter status={d.dataStatus} />
       </View>
+
+      <AdvisorConciergeSheet
+        visible={conciergeOpen}
+        advisor={d.advisor}
+        onClose={() => setConciergeOpen(false)}
+      />
+      <DocumentsSheet visible={documentsOpen} onClose={() => setDocumentsOpen(false)} />
     </View>
   );
 }
 
-// A single tappable line that hands off to the Wealth tab for the full
-// breakdown, instead of duplicating Invest's account/liability card here.
-function AccountsSummaryLine({ count, onPress }: { count: number; onPress: () => void }) {
+// The guide to the numbers — no totals on the front door, just the door.
+function WealthGuideCard({ onPress }: { onPress: () => void }) {
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [styles.summaryLine, pressed && { opacity: 0.7 }]}
     >
       <Ionicons name="pie-chart-outline" size={18} color={colors.allworthAccent} />
-      <Text style={styles.summaryText}>
-        Accounts · {count} · View in Wealth
-      </Text>
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={styles.summaryText}>Your wealth</Text>
+        <Text style={styles.summarySub}>Accounts, allocation, and performance</Text>
+      </View>
       <Ionicons name="chevron-forward" size={16} color={colors.inkTertiary} />
     </Pressable>
   );
-}
-
-// Lead with the long-horizon trajectory, not a one-month dip. A client shouldn't
-// log in to "you're down $7k this month" — over the year they're up, which is the
-// frame a good advisor uses. The sparkline still shows the recent shape honestly.
-function trajectory(d: Dashboard): { text: string; positive: boolean } | undefined {
-  const h = d.netWorthHistory;
-  if (h.length < 2) return undefined;
-  const backendPerf = d.performance?.netWorth;
-  if (backendPerf) {
-    const sign = backendPerf.gain_loss >= 0 ? "+" : "−";
-    return {
-      text: `${sign}${usd(Math.abs(backendPerf.gain_loss))} (${sign}${Math.abs(backendPerf.return_pct).toFixed(1)}%) past year`,
-      positive: backendPerf.gain_loss >= 0,
-    };
-  }
-  return {
-    ...performanceDeltaLabel(h, "past year", d.performanceCashFlows ?? [])!,
-  };
 }
 
 function Skeleton() {
@@ -205,7 +275,21 @@ const styles = StyleSheet.create({
     paddingVertical: space[4],
     borderRadius: radius.card,
   },
-  summaryText: { ...text.body, flex: 1, fontFamily: fonts.sansBold },
+  summaryText: { ...text.body, fontFamily: fonts.sansBold },
+  summarySub: { ...text.caption },
+  greetingBlock: { gap: 2, paddingTop: space[2] },
+  greetingLead: { ...text.body, color: colors.inkSecondary },
+  greetingName: { fontFamily: fonts.displayMedium, fontSize: 34, color: colors.inkPrimary },
+  quickAction: {
+    ...card,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space[2],
+    paddingHorizontal: space[4],
+    paddingVertical: space[3],
+    borderRadius: radius.pill,
+  },
+  quickActionText: { fontSize: 14, fontFamily: fonts.sansBold, color: colors.allworthNavy },
   skeletonBlock: { height: 72, borderRadius: radius.card, backgroundColor: colors.inkFaint },
   errorBox: { alignItems: "center", paddingTop: 120, gap: 10, paddingHorizontal: 20 },
   errorTitle: { fontSize: 20, fontFamily: fonts.displayMedium, color: colors.inkPrimary },
