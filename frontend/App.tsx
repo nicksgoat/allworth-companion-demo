@@ -12,7 +12,7 @@ import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useRef } from "react";
 import { ActivityIndicator, Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
-import { glassStyle, TAB_BAR_HEIGHT } from "./src/components/Glass";
+import { GlassSurface, TAB_BAR_HEIGHT } from "./src/components/Glass";
 import { AuthProvider, useAuth } from "./src/auth";
 import { AppProvider, ClientTab, useApp } from "./src/state";
 import { colors, fonts } from "./src/theme";
@@ -148,10 +148,9 @@ function ClientTabs() {
           <ProfileScreen />
         )}
       </Animated.View>
-      <View
+      <GlassSurface
         style={[
           styles.tabBar,
-          glassStyle,
           { paddingBottom: Math.max(insets.bottom, 6), height: TAB_BAR_HEIGHT + insets.bottom },
         ]}
       >
@@ -182,7 +181,7 @@ function ClientTabs() {
             </Pressable>
           );
         })}
-      </View>
+      </GlassSurface>
     </View>
   );
 }

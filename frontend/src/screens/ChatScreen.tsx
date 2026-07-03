@@ -257,6 +257,16 @@ export function ChatScreen() {
     loadProactive();
   }, [app.session]);
 
+  // Demo deep link (allworthdemo://demo/chat_history): open the thread drawer
+  // directly — headless UI verification can't reach the header tap target.
+  useEffect(() => {
+    if (app.demoScreen === "chat_history") {
+      setHistoryOpen(true);
+      app.clearDemoScreen();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [app.demoScreen]);
+
   // Demo-grade advisor presence: poll the server-stored thread and surface any
   // advisor interjection as its own bubble. Merges are skipped mid-stream
   // (applyEvent targets the last assistant message) and picked up next tick.

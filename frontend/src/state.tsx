@@ -89,6 +89,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           setMode("client");
           setSelectedTab("chat");
           break;
+        case "chat_history":
+          setMode("client");
+          setSelectedTab("chat");
+          setDemoScreen("chat_history");
+          break;
         case "invest":
           setMode("client");
           setSelectedTab("invest");
