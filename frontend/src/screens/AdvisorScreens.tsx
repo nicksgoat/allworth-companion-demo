@@ -12,7 +12,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { HeroNumber } from "../components/HeroNumber";
 import {
   AccountRow,
   DisclaimerFooter,
@@ -202,36 +201,52 @@ function ClientDetailScreen({ route }: NativeStackScreenProps<AdvisorStackParams
     >
       {brief ? (
         <>
-          <View style={{ gap: 4 }}>
-            <HeroNumber label="Held away — detected" value={brief.heldAwayDetected} />
-            <Text style={styles.managedCaption}>alongside {usd(brief.managedTotal)} managed</Text>
+          {/* Glance strip: the numbers an advisor scans in one second. */}
+          <View style={styles.statStrip}>
+            <StatBlock label="Managed" value={usd(brief.managedTotal)} />
+            <View style={styles.statDivider} />
+            <StatBlock
+              label="Held away"
+              value={usd(brief.heldAwayDetected)}
+              accent
+            />
+            <View style={styles.statDivider} />
+            <StatBlock
+              label="Open items"
+              value={String(brief.openNudges?.length ?? 0)}
+              attention={(brief.openNudges?.length ?? 0) > 0}
+            />
           </View>
 
-          <View>
-            <View style={{ paddingBottom: 4 }}>
-              <SectionHeader>Outside accounts</SectionHeader>
-            </View>
+          {/* The live thread is the reason you opened this screen. */}
+          <ConversationPreviewCard household={household} />
+
+          <CollapsibleCard
+            icon="sparkles"
+            title="Auto-prepared brief"
+            preview={brief.narrative.split("\n")[0]}
+          >
+            {brief.narrative
+              .split("\n")
+              .slice(1)
+              .map((paragraph, i) => (
+                <Text key={i} style={styles.briefText}>
+                  {paragraph}
+                </Text>
+              ))}
+          </CollapsibleCard>
+
+          <CollapsibleCard
+            icon="wallet-outline"
+            title={`Outside accounts · ${brief.heldAwayAccounts.length + brief.liabilities.length}`}
+          >
             {[...brief.heldAwayAccounts, ...brief.liabilities].map((account, i) => (
               <React.Fragment key={account.id}>
                 {i > 0 ? <HairlineDivider /> : null}
                 <AccountRow account={account} />
               </React.Fragment>
             ))}
-          </View>
-
-          <View style={styles.briefCard}>
-            <View style={styles.briefHeader}>
-              <Ionicons name="sparkles" size={12} color={colors.allworthAccent} />
-              <SectionHeader>Auto-prepared brief</SectionHeader>
-            </View>
-            {brief.narrative.split("\n").map((paragraph, i) => (
-              <Text key={i} style={styles.briefText}>
-                {paragraph}
-              </Text>
-            ))}
-          </View>
-
-          <ConversationPreviewCard household={household} />
+          </CollapsibleCard>
 
           {brief.reviewWorkflow ? (
             <ReviewWorkflowCard workflow={brief.reviewWorkflow} />
@@ -388,6 +403,79 @@ function ReviewWorkflowCard({
   );
 }
 
+// One number in the glance strip.
+function StatBlock({
+  label,
+  value,
+  accent,
+  attention,
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+  attention?: boolean;
+}) {
+  return (
+    <View style={styles.statBlock}>
+      <Text
+        style={[
+          styles.statValue,
+          accent && { color: colors.allworthAccent },
+          attention && { color: colors.attention },
+        ]}
+      >
+        {value}
+      </Text>
+      <Text style={styles.statLabel}>{label}</Text>
+    </View>
+  );
+}
+
+// Summary-first card: title (+ optional one-line preview) always visible,
+// body behind a tap — keeps the detail screen scannable without scrolling.
+function CollapsibleCard({
+  icon,
+  title,
+  preview,
+  children,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  preview?: string;
+  children: React.ReactNode;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <View style={styles.briefCard}>
+      <Pressable
+        onPress={() => setExpanded((v) => !v)}
+        hitSlop={6}
+        style={({ pressed }) => [styles.briefHeader, pressed && { opacity: 0.6 }]}
+      >
+        <Ionicons name={icon} size={13} color={colors.allworthAccent} />
+        <SectionHeader>{title}</SectionHeader>
+        <View style={{ flex: 1 }} />
+        <Ionicons
+          name={expanded ? "chevron-up" : "chevron-down"}
+          size={14}
+          color={colors.inkTertiary}
+        />
+      </Pressable>
+      {preview && !expanded ? (
+        <Text style={styles.briefText} numberOfLines={2}>
+          {preview}
+        </Text>
+      ) : null}
+      {expanded ? (
+        <View style={{ gap: space[3] }}>
+          {preview ? <Text style={styles.briefText}>{preview}</Text> : null}
+          {children}
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
 // A simple labeled bullet group — no inner bordered sub-card.
 function BulletList({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -432,12 +520,28 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   nudgeBadgeText: { color: "#fff", fontSize: 13, fontFamily: fonts.sansBold },
-  managedCaption: {
-    fontSize: 15,
-    fontFamily: fonts.sans,
-    color: colors.inkSecondary,
+  statStrip: {
+    ...card,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: space[3],
+    paddingHorizontal: space[2],
+  },
+  statBlock: { flex: 1, alignItems: "center", gap: 2 },
+  statValue: {
+    fontSize: 17,
+    fontFamily: fonts.sansBold,
+    color: colors.inkPrimary,
     fontVariant: ["tabular-nums"],
   },
+  statLabel: {
+    fontSize: 11,
+    fontFamily: fonts.sans,
+    color: colors.inkTertiary,
+    letterSpacing: 0.3,
+    textTransform: "uppercase",
+  },
+  statDivider: { width: StyleSheet.hairlineWidth, alignSelf: "stretch", backgroundColor: colors.hairline },
   briefCard: { ...card, padding: space[4], gap: space[3] },
   briefHeader: { flexDirection: "row", alignItems: "center", gap: space[2] },
   briefText: { ...text.body, lineHeight: 22 },
