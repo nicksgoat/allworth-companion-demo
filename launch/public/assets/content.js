@@ -19,12 +19,12 @@ window.ALW_CONTENT = {
     {
       tag: "Conversation",
       title: "Live GPT-4o chat with tool-use",
-      body: "A real LLM advisor that calls deterministic financial tools and streams grounded answers — never freeform guesses.",
+      body: "A live GPT-4o conversation that calls deterministic financial tools and streams grounded answers, never unsourced guesses.",
     },
     {
       tag: "Memory",
       title: "Multi-turn conversation memory",
-      body: "Redis-backed recall. Return days later and the assistant resumes the thread, unprompted, with provenance.",
+      body: "Redis-backed recall. A client can return days later and the assistant picks the thread back up, unprompted.",
     },
     {
       tag: "Analytics",
@@ -34,7 +34,7 @@ window.ALW_CONTENT = {
     {
       tag: "Planning",
       title: "Monte Carlo retirement",
-      body: "Success probability and downside cases for the question behind the question — “Can I retire in 2027?”",
+      body: "Success probability and downside cases for the real question: “Can I retire in 2027?”",
     },
     {
       tag: "Tax",
@@ -49,7 +49,7 @@ window.ALW_CONTENT = {
     {
       tag: "Presence",
       title: "Advisors inside the thread",
-      body: "An advisor can read a client's conversation and step in with their own message — a three-way thread the assistant treats as context.",
+      body: "Advisors see the conversation and can step into it with their own message. Client, advisor, and assistant share one thread.",
     },
     {
       tag: "Relationship",
@@ -59,12 +59,12 @@ window.ALW_CONTENT = {
     {
       tag: "Proactive",
       title: "Insight nudges",
-      body: "Glanceable alerts — spending running over plan, a concentrated position — each with the detail one tap away.",
+      body: "Alerts that matter: spending running over plan, a concentrated position. The detail is one tap away.",
     },
     {
       tag: "Households",
       title: "Two client profiles",
-      body: "Maya, semi-retired with an income focus, and Kenny, holding a concentrated NVDA position to diversify.",
+      body: "Maya, semi-retired and income-focused, and Kenny, working through a concentrated NVDA position.",
     },
   ],
 
@@ -83,11 +83,11 @@ window.ALW_CONTENT = {
       version: "1.0.0",
       date: "2026-07-03",
       channel: "TestFlight",
-      title: "Advisor presence + a ChatGPT-class chat",
+      title: "Advisor presence + a rebuilt chat",
       notes: [
-        "Advisors can now message directly inside a client's assistant thread — a live three-way conversation the assistant understands as context.",
-        "Rebuilt chat shell: assistant identity header, new-chat, growing composer, jump-to-latest — with smoother streaming.",
-        "Advisor view gains a live conversation transcript beside the auto-prepared brief.",
+        "Advisors can now message directly inside a client's assistant thread. It becomes a live three-way conversation the assistant understands as context.",
+        "Rebuilt chat shell: assistant identity header, new chat, a composer that grows with the draft, and jump-to-latest.",
+        "The advisor view adds a live conversation transcript beside the auto-prepared brief.",
       ],
     },
     {
