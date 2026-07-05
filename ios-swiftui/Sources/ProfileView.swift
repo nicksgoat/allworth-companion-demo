@@ -1,12 +1,20 @@
 import SwiftUI
 
 // Profile — 1:1 port of the RN ProfileScreen: navy identity hero, the advisor
-// block (card + three link rows), the two summary-first collapsible cards
-// (What I've learned / Meeting notes), the Demo advisor-switch row, disclaimer,
-// and the account/sign-out footer.
+// block (card + three link rows → concierge / goals / documents), the two
+// summary-first collapsible cards (What I've learned / Meeting notes, expanding
+// to the real fact groups + note rows, each tapping into its detail sheet), the
+// Demo advisor-switch row, disclaimer, and the account/sign-out footer.
 struct ProfileView: View {
     @State private var scrollY: CGFloat = 0
     @State private var appeared = false
+
+    @State private var selectedFact: Demo.LearnedFact?
+    @State private var selectedFactCategory = ""
+    @State private var selectedNote: Demo.MeetingNote?
+    @State private var conciergeOpen = false
+    @State private var goalsOpen = false
+    @State private var documentsOpen = false
 
     var body: some View {
         GeometryReader { proxy in
@@ -37,7 +45,29 @@ struct ProfileView: View {
                 GlassHeader(title: "Profile", scrollY: scrollY, onHero: true, safeTop: safeTop)
             }
         }
-        .onAppear { appeared = true }
+        .onAppear { appeared = true; autoPresent() }
+        .sheet(item: $selectedFact) { f in
+            FactDetailSheet(fact: f, categoryLabel: selectedFactCategory) { selectedFact = nil }
+        }
+        .sheet(item: $selectedNote) { n in
+            MeetingNoteDetailSheet(note: n) { selectedNote = nil }
+        }
+        .sheet(isPresented: $conciergeOpen) { AdvisorConciergeSheet { conciergeOpen = false } }
+        .sheet(isPresented: $goalsOpen) { GoalsSheet { goalsOpen = false } }
+        .sheet(isPresented: $documentsOpen) { DocumentsSheet { documentsOpen = false } }
+    }
+
+    // Debug-only: SIMCTL_CHILD_AUTO_SHEET=<name> auto-presents a sheet for the
+    // screenshot verify loop (simctl has no tap input). No-op in normal use.
+    private func autoPresent() {
+        switch ProcessInfo.processInfo.environment["AUTO_SHEET"] {
+        case "fact": selectedFactCategory = Demo.factGroups[0].label; selectedFact = Demo.factGroups[0].facts.first
+        case "note": selectedNote = Demo.meetingNotes.first
+        case "documents": documentsOpen = true
+        case "goals": goalsOpen = true
+        case "concierge": conciergeOpen = true
+        default: break
+        }
     }
 
     // MARK: identity hero
@@ -57,7 +87,7 @@ struct ProfileView: View {
         }
     }
 
-    // MARK: advisor block (section header + card + 3 link rows, tight 8pt gaps)
+    // MARK: advisor block
 
     private var advisorBlock: some View {
         VStack(alignment: .leading, spacing: Space.s2) {
@@ -81,42 +111,60 @@ struct ProfileView: View {
             .padding(14)
             .card()
 
-            linkRow("calendar", "Book a meeting or request a topic")
-            linkRow("flag", "Your goals")
-            linkRow("folder", "Documents")
+            linkRow("calendar", "Book a meeting or request a topic") { conciergeOpen = true }
+            linkRow("flag", "Your goals") { goalsOpen = true }
+            linkRow("folder", "Documents") { documentsOpen = true }
         }
         .entrance(0.2, appeared: appeared)
     }
 
-    private func linkRow(_ icon: String, _ label: String) -> some View {
-        HStack(spacing: Space.s3) {
-            Image(systemName: icon).font(.system(size: 18)).foregroundStyle(Color.allworthAccent).frame(width: 22)
-            Text(label).font(BrandFont.sansBold(14)).foregroundStyle(Color.inkPrimary)
-            Spacer()
-            Image(systemName: "chevron.right").font(.system(size: 15, weight: .semibold)).foregroundStyle(Color.inkTertiary)
+    private func linkRow(_ icon: String, _ label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: Space.s3) {
+                Image(systemName: icon).font(.system(size: 18)).foregroundStyle(Color.allworthAccent).frame(width: 22)
+                Text(label).font(BrandFont.sansBold(14)).foregroundStyle(Color.inkPrimary)
+                Spacer()
+                Image(systemName: "chevron.right").font(.system(size: 15, weight: .semibold)).foregroundStyle(Color.inkTertiary)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .card()
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .card()
+        .buttonStyle(.plain)
     }
 
-    // MARK: collapsible summary cards (rendered collapsed, matching first paint)
+    // MARK: collapsible cards (expand to the real content)
 
     private var learnedCard: some View {
-        CollapsibleCardView(
-            icon: "sparkles",
-            title: "What I've learned · \(Demo.factsCount)",
-            preview: Demo.learnedPreview
-        )
+        CollapsibleCardView(icon: "sparkles", title: "What I've learned · \(Demo.allFacts.count)", preview: Demo.learnedPreview) {
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(Demo.factGroups) { group in
+                    Text(group.label).font(BrandFont.sansBold(13)).foregroundStyle(Color.inkSecondary)
+                        .padding(.top, 6).padding(.bottom, 2)
+                    ForEach(Array(group.facts.enumerated()), id: \.element.id) { i, fact in
+                        if i > 0 { Hairline() }
+                        Button {
+                            selectedFactCategory = group.label
+                            selectedFact = fact
+                        } label: { LearnedFactRowView(fact: fact) }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
         .entrance(0.3, appeared: appeared)
     }
 
     private var notesCard: some View {
-        CollapsibleCardView(
-            icon: "doc.text",
-            title: "Meeting notes · \(Demo.notesCount)",
-            preview: "Latest: \(Demo.latestNote)"
-        )
+        CollapsibleCardView(icon: "doc.text", title: "Meeting notes · \(Demo.meetingNotes.count)", preview: "Latest: \(Demo.meetingNotes[0].title)") {
+            VStack(alignment: .leading, spacing: 2) {
+                ForEach(Array(Demo.meetingNotes.enumerated()), id: \.element.id) { i, note in
+                    if i > 0 { Hairline() }
+                    Button { selectedNote = note } label: { MeetingNoteRowView(note: note) }
+                        .buttonStyle(.plain)
+                }
+            }
+        }
         .entrance(0.36, appeared: appeared)
     }
 
@@ -161,13 +209,13 @@ struct ProfileView: View {
     }
 }
 
-// Summary-first collapsible card (RN CollapsibleCard) — icon + section-label
-// title + chevron, with a two-line preview. Tapping expands; here it renders
-// collapsed to match the screen's first paint.
-struct CollapsibleCardView: View {
+// Summary-first collapsible card (RN CollapsibleCard) — collapsed shows a 2-line
+// preview; expanded reveals the real content.
+struct CollapsibleCardView<Content: View>: View {
     let icon: String
     let title: String
     let preview: String
+    @ViewBuilder var content: () -> Content
     @State private var expanded = false
 
     var body: some View {
@@ -185,14 +233,58 @@ struct CollapsibleCardView: View {
             }
             .buttonStyle(.plain)
 
-            Text(preview)
-                .font(BrandFont.sans(15))
-                .foregroundStyle(Color.inkPrimary)
-                .lineSpacing(5)
-                .lineLimit(expanded ? nil : 2)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            if expanded {
+                content()
+            } else {
+                Text(preview)
+                    .font(BrandFont.sans(15))
+                    .foregroundStyle(Color.inkPrimary)
+                    .lineSpacing(5)
+                    .lineLimit(2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
         .padding(Space.s4)
         .card()
+    }
+}
+
+// MARK: - Rows (RN Rows.tsx)
+
+struct LearnedFactRowView: View {
+    let fact: Demo.LearnedFact
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(fact.fact).font(BrandFont.sans(17)).foregroundStyle(Color.inkPrimary).lineSpacing(6)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            HStack(alignment: .top, spacing: 8) {
+                RoundedRectangle(cornerRadius: 1).fill(Color.hairline).frame(width: 2)
+                Text("“\(fact.quote)”").font(BrandFont.sansItalic(15)).foregroundStyle(Color.inkSecondary).lineSpacing(6)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            Text("Learned \(fact.learned) · from your conversation")
+                .font(BrandFont.sans(13)).foregroundStyle(Color.inkTertiary)
+        }
+        .padding(.vertical, 12)
+        .contentShape(Rectangle())
+    }
+}
+
+struct MeetingNoteRowView: View {
+    let note: Demo.MeetingNote
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Text(note.title).font(BrandFont.sansBold(16)).foregroundStyle(Color.inkPrimary)
+                Spacer(minLength: 0)
+                Text(note.date).font(BrandFont.sans(13)).foregroundStyle(Color.inkTertiary)
+            }
+            Text(note.summary).font(BrandFont.sans(15)).foregroundStyle(Color.inkSecondary).lineSpacing(4).lineLimit(2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text("With \(note.advisor)").font(BrandFont.sans(13)).foregroundStyle(Color.inkTertiary)
+        }
+        .padding(.vertical, 12)
+        .contentShape(Rectangle())
     }
 }
