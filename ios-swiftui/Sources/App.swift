@@ -9,8 +9,18 @@ struct AllworthApp: App {
     @State private var app = AppModel()
     var body: some Scene {
         WindowGroup {
-            RootView()
-                .environment(app)
+            Group {
+                if app.loggedIn {
+                    RootView()
+                } else {
+                    LoginView()
+                }
+            }
+            .environment(app)
+            .onAppear {
+                // Screenshot hook: jump straight to the app past the login gate.
+                if ProcessInfo.processInfo.environment["SKIP_LOGIN"] == "1" { app.loggedIn = true }
+            }
         }
     }
 }

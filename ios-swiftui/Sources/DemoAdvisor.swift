@@ -3,6 +3,7 @@ import SwiftUI
 // App-wide mode (client tabs vs. the advisor's book). The RN app calls
 // app.setMode("advisor"/"client"); here it's one observable flag.
 @Observable final class AppModel {
+    var loggedIn = false
     var advisorMode = false
 }
 
