@@ -2,9 +2,20 @@ import SwiftUI
 
 // App-wide mode (client tabs vs. the advisor's book). The RN app calls
 // app.setMode("advisor"/"client"); here it's one observable flag.
+enum ViewMode { case client, advisor, vision }
+
 @Observable final class AppModel {
     var loggedIn = false
-    var advisorMode = false
+    var mode: ViewMode = .client
+    var locked = false
+    var showDemoControls = false
+    var session = "wednesday"     // "monday" | "wednesday"
+
+    // Back-compat shim for the advisor-mode callers.
+    var advisorMode: Bool {
+        get { mode == .advisor }
+        set { mode = newValue ? .advisor : .client }
+    }
 }
 
 // Advisor-mode data, ported from backend/tests/goldens/{book,brief}.json.

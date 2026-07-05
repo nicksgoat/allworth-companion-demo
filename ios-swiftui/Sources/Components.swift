@@ -82,6 +82,7 @@ struct NavyGradient: View {
 //                top and the compact header simply reveals on scroll.
 // - default:     solid light glass, always visible (Chat).
 struct GlassHeader: View {
+    @Environment(AppModel.self) private var app
     let title: String
     var scrollY: CGFloat = 0
     var onHero: Bool = false
@@ -129,6 +130,8 @@ struct GlassHeader: View {
                     .frame(width: 32, height: 32)
                 AllworthMark(color: mark, size: 18)
             }
+            .contentShape(Rectangle())
+            .onTapGesture(count: 3) { app.showDemoControls = true }
             Text(title)
                 .font(BrandFont.sansBold(17))
                 .foregroundStyle(ink)
