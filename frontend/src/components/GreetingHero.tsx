@@ -1,8 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
 import { colors, fonts, space } from "../theme";
+import { APP_HEADER_HEIGHT } from "./Glass";
+
+// The scroll-container gutter both tab screens use (contentContainer padding).
+// The band cancels it with negative margins to bleed to the screen edges.
+const GUTTER = space[5]; // 20
 
 // The brand's premium hero fill — Night Blue → Indigo gradient with a soft
 // cerulean glow, the surface treatment the design deck reserves for hero/premium
@@ -41,14 +47,38 @@ export function NavyGradient({ id }: { id: string }) {
   );
 }
 
-// The Home greeting hero — the brand's premium Night Blue → Indigo gradient
-// surface (adapted from the retired net-worth hero) carrying only the greeting,
-// advisor presence, and a way into Wealth. No net-worth figure or trajectory
-// chart lives here: both are barred at screen level (DESIGN.md). The combined
-// number + chart live in the tapped-in NetWorthDetail off Wealth.
-//
-// Sits below the retained light glass AppHeader as a rounded navy card (no
-// top-edge bleed) so the header stays light and the two don't collide.
+// Full-bleed navy hero band: the premium navy surface reaching the top and side
+// screen edges (not an inset card), with a rounded bottom lip. Used as the first
+// module on a tab screen. It cancels the scroll container's top + horizontal
+// padding to bleed to the edges, then re-adds inner padding so its content clears
+// the (transparent-over-hero) AppHeader. Pair with `<AppHeader onHero />` so the
+// header floats white over the navy and fades to glass on scroll.
+export function NavyHeroBand({ id, children }: { id: string; children: React.ReactNode }) {
+  const insets = useSafeAreaInsets();
+  return (
+    <View
+      style={[
+        styles.band,
+        {
+          // Cancel the scroll container's paddingTop (insets.top + header + 8)
+          // so the navy reaches the very top edge, behind the status bar.
+          marginTop: -(insets.top + APP_HEADER_HEIGHT + space[2]),
+          // Re-add that space inside so content sits below the header zone.
+          paddingTop: insets.top + APP_HEADER_HEIGHT + space[4],
+        },
+      ]}
+    >
+      <NavyGradient id={id} />
+      {children}
+    </View>
+  );
+}
+
+// The Home greeting hero — the brand's premium Night Blue → Indigo surface
+// carrying only the greeting, advisor presence, and a way into Wealth. No
+// net-worth figure or trajectory chart lives here: both are barred at screen
+// level (DESIGN.md). The combined number + chart live in the tapped-in
+// NetWorthDetail off Wealth.
 export function GreetingHero({
   greeting,
   name,
@@ -61,9 +91,7 @@ export function GreetingHero({
   onOpenWealth: () => void;
 }) {
   return (
-    <View style={styles.band}>
-      <NavyGradient id="homeHero" />
-
+    <NavyHeroBand id="homeHero">
       <View style={styles.greetingBlock}>
         <Text style={styles.salutation}>{greeting},</Text>
         <Text style={styles.name} numberOfLines={1} adjustsFontSizeToFit>
@@ -86,16 +114,18 @@ export function GreetingHero({
         <Text style={styles.linkText}>View your wealth</Text>
         <Ionicons name="chevron-forward" size={14} color="rgba(255,255,255,0.92)" />
       </Pressable>
-    </View>
+    </NavyHeroBand>
   );
 }
 
 const styles = StyleSheet.create({
   band: {
     backgroundColor: colors.chartNightBlue,
-    borderRadius: 24,
-    paddingHorizontal: space[5],
-    paddingVertical: space[5],
+    marginHorizontal: -GUTTER, // bleed to both side edges
+    paddingHorizontal: GUTTER, // keep content aligned with the rest of the screen
+    paddingBottom: space[5],
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
     overflow: "hidden",
     gap: space[3],
   },

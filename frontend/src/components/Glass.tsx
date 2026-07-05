@@ -56,17 +56,100 @@ export function AppHeader({
   scrollY,
   onPressMark,
   action,
+  onHero,
 }: {
   title: string;
   scrollY?: Animated.Value;
   // Optional tap on the brand mark (chat uses it for thread history).
   onPressMark?: () => void;
   action?: { icon: keyof typeof Ionicons.glyphMap; onPress: () => void };
+  // When the screen leads with a full-bleed navy hero (see NavyHeroBand): the
+  // header floats transparent + white over the navy, then cross-fades to the
+  // normal light glass header as the hero scrolls away.
+  onHero?: boolean;
 }) {
   const insets = useSafeAreaInsets();
-  // Closed = just the status-bar glass strip; open = strip + title row. The
-  // container's height animates between the two (clipping the row out), so
-  // the title can never slide into the status bar.
+
+  // The mark chip + title + optional action, tinted for a given surface.
+  const renderRow = (tint: {
+    title: string;
+    mark: string;
+    markChip: string;
+    action: string;
+  }) => (
+    <View style={styles.headerRow}>
+      <Pressable
+        onPress={onPressMark}
+        disabled={!onPressMark}
+        hitSlop={8}
+        style={({ pressed }) => [
+          styles.headerMark,
+          { backgroundColor: tint.markChip },
+          pressed && onPressMark ? { opacity: 0.6 } : null,
+        ]}
+      >
+        <AllworthMark size={18} color={tint.mark} />
+      </Pressable>
+      <Text style={[styles.headerTitle, { color: tint.title }]} numberOfLines={1}>
+        {title}
+      </Text>
+      {action ? (
+        <Pressable
+          onPress={action.onPress}
+          hitSlop={8}
+          style={({ pressed }) => [styles.headerBtn, pressed && { opacity: 0.6 }]}
+        >
+          <Ionicons name={action.icon} size={22} color={tint.action} />
+        </Pressable>
+      ) : (
+        <View style={styles.headerBtn} />
+      )}
+    </View>
+  );
+
+  const DARK = { title: colors.inkPrimary, mark: colors.allworthNavy, markChip: "rgba(255,255,255,0.85)", action: colors.inkPrimary };
+  const LIGHT = { title: "#FFFFFF", mark: "#FFFFFF", markChip: "rgba(255,255,255,0.16)", action: "#FFFFFF" };
+
+  // Hero mode: fixed height; the glass background + dark content fade IN as the
+  // navy hero scrolls away, while the white-on-navy content fades out. FADE is
+  // roughly the hero's on-screen depth below the header.
+  if (onHero) {
+    const FADE = 130;
+    const glass = scrollY
+      ? scrollY.interpolate({ inputRange: [0, FADE], outputRange: [0, 1], extrapolate: "clamp" })
+      : new Animated.Value(0);
+    const overHero = scrollY
+      ? scrollY.interpolate({ inputRange: [0, FADE], outputRange: [1, 0], extrapolate: "clamp" })
+      : new Animated.Value(1);
+    return (
+      <View style={[styles.header, { height: insets.top + APP_HEADER_HEIGHT }]}>
+        <Animated.View style={[StyleSheet.absoluteFill as ViewStyle, { opacity: glass }]}>
+          <GlassSurface
+            style={[
+              StyleSheet.absoluteFill as ViewStyle,
+              styles.headerSurface,
+              { paddingTop: insets.top },
+            ]}
+          />
+        </Animated.View>
+        {/* Dark row over the glass (appears once scrolled). Interactive. */}
+        <Animated.View style={[styles.headerLayer, { paddingTop: insets.top, opacity: glass }]}>
+          {renderRow(DARK)}
+        </Animated.View>
+        {/* White row over the navy hero. Non-interactive: taps fall through to
+            the dark row's Pressables underneath (same positions). */}
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.headerLayer, { paddingTop: insets.top, opacity: overHero }]}
+        >
+          {renderRow(LIGHT)}
+        </Animated.View>
+      </View>
+    );
+  }
+
+  // Default: light glass header that collapses on scroll-down, reopens on
+  // scroll-up (the title row clips out; the status-bar strip stays).
   // extrapolateLeft clamps out iOS rubber-band overscroll: without it, the
   // bounce settling back from negative to 0 reads as a scroll-down and closes
   // the header at the very top of the list.
@@ -144,6 +227,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "rgba(0,0,0,0.12)",
     overflow: "hidden",
+  },
+  headerLayer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
   },
   headerRow: {
     height: APP_HEADER_HEIGHT,

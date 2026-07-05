@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { RiseIn, useAnimatedValue } from "../anim";
 import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
 import { APP_HEADER_HEIGHT, AppHeader, TAB_BAR_HEIGHT } from "../components/Glass";
-import { NavyGradient } from "../components/GreetingHero";
+import { NavyHeroBand } from "../components/GreetingHero";
 import { NetWorthDetail } from "../components/NetWorthDetail";
 import { AllocationCard } from "../components/AllocationCard";
 import { AccountHoldingsSection } from "../components/Holdings";
@@ -85,7 +85,7 @@ export function InvestScreen() {
           <Skeleton />
         )}
       </Animated.ScrollView>
-      <AppHeader title="Your wealth" scrollY={scrollY} />
+      <AppHeader title="Your wealth" scrollY={scrollY} onHero />
       <NudgeDetailSheet nudge={selectedNudge} onClose={() => setSelectedNudge(null)} />
       <PositionDetailSheet
         position={selectedPosition}
@@ -149,27 +149,26 @@ function InvestContent({
 
   return (
     <View style={{ gap: 24 }}>
-      <RiseIn style={{ gap: 14 }}>
-        <View style={styles.navyBand}>
-          <NavyGradient id="wealthBand" />
-          <View style={{ gap: 6 }}>
-            <Text style={styles.bandTitle}>Where your money lives</Text>
-            <Text style={styles.bandSubtitle}>
-              {accountCount} accounts — managed, held away, and owed.
-            </Text>
-          </View>
-          <Pressable
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              onOpenNetWorth();
-            }}
-            hitSlop={8}
-            style={({ pressed }) => [styles.bandLink, pressed && { opacity: 0.7 }]}
-          >
-            <Text style={styles.bandLinkText}>Net worth</Text>
-            <Ionicons name="chevron-forward" size={15} color="rgba(255,255,255,0.92)" />
-          </Pressable>
+      <NavyHeroBand id="wealthBand">
+        <View style={{ gap: 6 }}>
+          <Text style={styles.bandTitle}>Where your money lives</Text>
+          <Text style={styles.bandSubtitle}>
+            {accountCount} accounts — managed, held away, and owed.
+          </Text>
         </View>
+        <Pressable
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            onOpenNetWorth();
+          }}
+          hitSlop={8}
+          style={({ pressed }) => [styles.bandLink, pressed && { opacity: 0.7 }]}
+        >
+          <Text style={styles.bandLinkText}>Net worth</Text>
+          <Ionicons name="chevron-forward" size={15} color="rgba(255,255,255,0.92)" />
+        </Pressable>
+      </NavyHeroBand>
+      <RiseIn>
         <BreakdownCard
           allworthTotal={d.allworthTotal}
           heldAwayTotal={d.heldAwayTotal}
@@ -268,14 +267,6 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 }
 
 const styles = StyleSheet.create({
-  navyBand: {
-    backgroundColor: colors.chartNightBlue,
-    borderRadius: 24,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    overflow: "hidden",
-    gap: 12,
-  },
   bandTitle: { fontSize: 26, fontFamily: fonts.displayMedium, color: "#FFFFFF" },
   bandSubtitle: {
     fontSize: 13,

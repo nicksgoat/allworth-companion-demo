@@ -69,7 +69,7 @@ export function DashboardScreen() {
           <Skeleton />
         )}
       </Animated.ScrollView>
-      <AppHeader title="Home" scrollY={scrollY} />
+      <AppHeader title="Home" scrollY={scrollY} onHero />
       <NudgeDetailSheet nudge={selectedNudge} onClose={() => setSelectedNudge(null)} />
     </>
   );
