@@ -1,9 +1,13 @@
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import React, { useEffect, useState } from "react";
 import { Animated, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { RiseIn, useAnimatedValue } from "../anim";
 import { AdvisorHandoffCard } from "../components/AdvisorHandoffCard";
 import { APP_HEADER_HEIGHT, AppHeader, TAB_BAR_HEIGHT } from "../components/Glass";
+import { NavyGradient } from "../components/GreetingHero";
+import { NetWorthDetail } from "../components/NetWorthDetail";
 import { AllocationCard } from "../components/AllocationCard";
 import { AccountHoldingsSection } from "../components/Holdings";
 import { IncomeCard } from "../components/IncomeCard";
@@ -26,6 +30,7 @@ export function InvestScreen() {
   const [selectedNudge, setSelectedNudge] = useState<Nudge | null>(null);
   const [selectedPosition, setSelectedPosition] = useState<Position | null>(null);
   const [selectedClass, setSelectedClass] = useState<AssetClass | null>(null);
+  const [netWorthOpen, setNetWorthOpen] = useState(false);
 
   useEffect(() => {
     if (!app.dashboard) app.loadDashboard();
@@ -72,6 +77,7 @@ export function InvestScreen() {
             onNudge={setSelectedNudge}
             onPosition={setSelectedPosition}
             onClass={setSelectedClass}
+            onOpenNetWorth={() => setNetWorthOpen(true)}
           />
         ) : error ? (
           <ErrorState message={error} onRetry={retry} />
@@ -98,6 +104,9 @@ export function InvestScreen() {
         accounts={d ? [...d.accounts.allworth, ...d.accounts.outside] : []}
         onClose={() => setSelectedClass(null)}
       />
+      {d ? (
+        <NetWorthDetail visible={netWorthOpen} onClose={() => setNetWorthOpen(false)} d={d} />
+      ) : null}
     </>
   );
 }
@@ -112,12 +121,14 @@ function InvestContent({
   onNudge,
   onPosition,
   onClass,
+  onOpenNetWorth,
 }: {
   d: Dashboard;
   p: Portfolio;
   onNudge: (n: Nudge) => void;
   onPosition: (pos: Position) => void;
   onClass: (c: AssetClass) => void;
+  onOpenNetWorth: () => void;
 }) {
   const app = useApp();
   const [segment, setSegment] = useState("Overview");
@@ -139,11 +150,25 @@ function InvestContent({
   return (
     <View style={{ gap: 24 }}>
       <RiseIn style={{ gap: 14 }}>
-        <View style={{ gap: 6 }}>
-          <Text style={styles.leadTitle}>Where your money lives</Text>
-          <Text style={styles.leadSubtitle}>
-            {accountCount} accounts — managed, held away, and owed.
-          </Text>
+        <View style={styles.navyBand}>
+          <NavyGradient id="wealthBand" />
+          <View style={{ gap: 6 }}>
+            <Text style={styles.bandTitle}>Where your money lives</Text>
+            <Text style={styles.bandSubtitle}>
+              {accountCount} accounts — managed, held away, and owed.
+            </Text>
+          </View>
+          <Pressable
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              onOpenNetWorth();
+            }}
+            hitSlop={8}
+            style={({ pressed }) => [styles.bandLink, pressed && { opacity: 0.7 }]}
+          >
+            <Text style={styles.bandLinkText}>Net worth</Text>
+            <Ionicons name="chevron-forward" size={15} color="rgba(255,255,255,0.92)" />
+          </Pressable>
         </View>
         <BreakdownCard
           allworthTotal={d.allworthTotal}
@@ -243,13 +268,23 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 }
 
 const styles = StyleSheet.create({
-  leadTitle: { fontSize: 28, fontFamily: fonts.displayMedium, color: colors.allworthNavy },
-  leadSubtitle: {
-    fontSize: 15,
-    fontFamily: fonts.sans,
-    lineHeight: 21,
-    color: colors.inkSecondary,
+  navyBand: {
+    backgroundColor: colors.chartNightBlue,
+    borderRadius: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    overflow: "hidden",
+    gap: 12,
   },
+  bandTitle: { fontSize: 26, fontFamily: fonts.displayMedium, color: "#FFFFFF" },
+  bandSubtitle: {
+    fontSize: 13,
+    fontFamily: fonts.sans,
+    lineHeight: 19,
+    color: "rgba(255,255,255,0.82)",
+  },
+  bandLink: { flexDirection: "row", alignItems: "center", gap: 3, marginTop: 2 },
+  bandLinkText: { fontSize: 14, fontFamily: fonts.sansBold, color: "rgba(255,255,255,0.92)" },
   skeletonBlock: { height: 72, borderRadius: 12, backgroundColor: colors.inkFaint },
   errorBox: { alignItems: "center", paddingTop: 120, gap: 10, paddingHorizontal: 20 },
   errorTitle: { fontSize: 20, fontFamily: fonts.displayMedium, color: colors.inkPrimary },
@@ -261,7 +296,7 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     marginTop: 6,
-    backgroundColor: colors.allworthAccent,
+    backgroundColor: colors.allworthNavy,
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 10,

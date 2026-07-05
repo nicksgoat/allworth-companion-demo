@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { RiseIn, useAnimatedValue } from "../anim";
 import { APP_HEADER_HEIGHT, AppHeader, TAB_BAR_HEIGHT } from "../components/Glass";
+import { GreetingHero } from "../components/GreetingHero";
 import { DisclaimerFooter, SectionHeader } from "../components/Rows";
 import { useApp } from "../state";
 import { card, colors, fonts, radius, space, text, usd } from "../theme";
@@ -134,10 +135,12 @@ function DashboardContent({ d, onNudge }: { d: Dashboard; onNudge: (n: Nudge) =>
 
   return (
     <View style={{ gap: space[6] }}>
-      <View style={styles.greetingBlock}>
-        <Text style={styles.greetingLead}>{greetingForNow()},</Text>
-        <Text style={styles.greetingName}>{firstName}</Text>
-      </View>
+      <GreetingHero
+        greeting={greetingForNow()}
+        name={firstName}
+        advisorLine={d.advisor ? `${d.advisor.name} · your advisor` : "your advisor"}
+        onOpenWealth={() => app.setSelectedTab("invest")}
+      />
 
       <RiseIn delay={40} style={{ gap: space[3] }}>
         <SectionHeader>Needs your attention</SectionHeader>
@@ -366,9 +369,6 @@ const styles = StyleSheet.create({
   },
   summaryText: { ...text.body, fontFamily: fonts.sansBold },
   summarySub: { ...text.caption },
-  greetingBlock: { gap: 2, paddingTop: space[2] },
-  greetingLead: { ...text.body, color: colors.inkSecondary },
-  greetingName: { fontFamily: fonts.displayMedium, fontSize: 34, color: colors.inkPrimary },
   quickAction: {
     ...card,
     flexDirection: "row",
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     marginTop: 6,
-    backgroundColor: colors.allworthAccent,
+    backgroundColor: colors.allworthNavy,
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 10,
