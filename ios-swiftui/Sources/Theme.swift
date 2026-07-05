@@ -33,7 +33,24 @@ extension Color {
 
     // Money / semantic (mapped onto the secondary palette)
     static let gain = Color(hex: 0x436434)      // Evergreen
+    static let loss = Color(hex: 0xD26D37)      // Pumpkin
     static let attention = Color(hex: 0xD26D37) // Pumpkin
+
+    // Secondary palette — charts/infographics only (brand deck p.7)
+    static let chartNightBlue = Color(hex: 0x0C2E4E)
+    static let chartSky = Color(hex: 0x289FDA)
+    static let chartEvergreen = Color(hex: 0x436434)
+    static let chartGold = Color(hex: 0xA99C6C)
+    static let chartLightGray = Color(hex: 0xBEBEBE)
+}
+
+// "$1,663,363" — negatives render as "-$310,000" (mirror of theme.ts usd()).
+func usd(_ n: Int) -> String {
+    let f = NumberFormatter()
+    f.numberStyle = .decimal
+    f.groupingSeparator = ","
+    let s = f.string(from: NSNumber(value: abs(n))) ?? String(abs(n))
+    return (n < 0 ? "-$" : "$") + s
 }
 
 // Playfair Display for display/headings, Lato for body — the two brand faces.
