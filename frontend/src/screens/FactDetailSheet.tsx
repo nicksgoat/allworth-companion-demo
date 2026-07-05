@@ -76,10 +76,12 @@ function FactDetailContent({
   return (
     <ScrollView
       style={{ backgroundColor: colors.surfacePrimary }}
-      contentContainerStyle={{ padding: 20, gap: 24, paddingTop: 0 }}
+      contentContainerStyle={{ padding: 20, gap: 24 }}
     >
-      <SheetHeader title={categoryLabel} onClose={onClose} />
-      <Text style={styles.fact}>{fact.fact}</Text>
+      <View style={{ gap: 6, paddingTop: 24 }}>
+        <SheetHeader title={categoryLabel} onClose={onClose} />
+        <Text style={styles.fact}>{fact.fact}</Text>
+      </View>
 
       <View style={{ gap: 12 }}>
         <SectionHeader>Why do I know this</SectionHeader>

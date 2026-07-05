@@ -508,7 +508,6 @@ export function ChatScreen() {
       <AppHeader
         title={assistantTitle}
         scrollY={scrollY}
-        solid
         onPressMark={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           setHistoryOpen(true);

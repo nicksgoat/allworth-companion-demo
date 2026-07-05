@@ -72,7 +72,7 @@ function ClassDetailContent({
   return (
     <ScrollView
       style={{ backgroundColor: colors.surfacePrimary }}
-      contentContainerStyle={{ padding: 20, gap: 20, paddingTop: 0 }}
+      contentContainerStyle={{ padding: 20, gap: 20, paddingTop: 24 }}
     >
       <SheetHeader title="Your allocation" onClose={onClose} />
 

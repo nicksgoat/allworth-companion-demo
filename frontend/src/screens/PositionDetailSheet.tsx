@@ -88,7 +88,7 @@ function PositionDetailContent({
   return (
     <ScrollView
       style={{ backgroundColor: colors.surfacePrimary }}
-      contentContainerStyle={{ padding: 20, gap: 20, paddingTop: 0 }}
+      contentContainerStyle={{ padding: 20, gap: 20, paddingTop: 24 }}
     >
       <SheetHeader
         title={account ? `${account.name} · ${account.institution}` : "Holding"}

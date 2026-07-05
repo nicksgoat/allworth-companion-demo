@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Modal, ScrollView, StyleSheet, Text, View } from "react-native";
-import { DisclaimerFooter, SectionHeader, SheetHeader } from "../components/Rows";
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { DisclaimerFooter, SectionHeader } from "../components/Rows";
 import { card, colors, fonts, space, text } from "../theme";
 
 // Document vault placeholder (stakeholder "maybe": Avantos-style doc vault).
@@ -20,14 +20,14 @@ export function DocumentsSheet({ visible, onClose }: { visible: boolean; onClose
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
       <ScrollView
         style={{ backgroundColor: colors.surfacePrimary }}
-        contentContainerStyle={{
-          padding: space[5],
-          gap: space[4],
-          paddingTop: 0,
-          paddingBottom: space[8],
-        }}
+        contentContainerStyle={{ padding: space[5], gap: space[4], paddingBottom: space[8] }}
       >
-        <SheetHeader title="Documents" onClose={onClose} />
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>Documents</Text>
+          <Pressable onPress={onClose} hitSlop={8} style={styles.closeBtn}>
+            <Ionicons name="close" size={20} color={colors.inkSecondary} />
+          </Pressable>
+        </View>
 
         <View style={{ gap: space[2] }}>
           <SectionHeader>Your vault</SectionHeader>

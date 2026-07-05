@@ -23,41 +23,38 @@ nothing shouts, nothing is clever at the reader's expense. When in doubt, remove
 - **Secondary palette (`chart*`) is for charts and infographics only** — never
   buttons, never backgrounds, never text. `gain`/`loss`/`attention` map money
   semantics onto Evergreen/Pumpkin; on dark heroes use `gainOnDark`/`lossOnDark`.
-- Navy is the app's header identity — see **Navy header system** below. Within a
-  screen's *body*, still at most one dark hero (the top one); everything below it
-  stays light so content reads.
+- Navy comes back as **heroes**, not chrome — see **Navy heroes** below. The
+  glass `AppHeader`, the Chat header, and every detail sheet/modal header stay
+  **light**. Within a screen's body, still at most one dark hero (the top one);
+  everything below it stays light so content reads.
 
-## Navy header system
+## Navy heroes
 
-Every header in the app is navy (Night Blue `chartNightBlue` → Indigo
-`allworthNavy` gradient for heroes; solid `chartNightBlue` for bars). Pick the
-tier by surface type — don't invent a fourth. Shared implementations live in
-`components/GreetingHero.tsx` (`NavyGradient`, `NavyHeroBand`), `components/
-Glass.tsx` (`AppHeader`), and `components/Rows.tsx` (`SheetHeader`).
+The brand's premium Night Blue `chartNightBlue` → Indigo `allworthNavy` gradient
+(with a cerulean glow) returns as one thing only: a **full-bleed hero** at the
+top of a lead screen. It is not applied to Chat or to detail sheets — those are
+light (a navy bar there reads heavy). Shared implementation in
+`components/GreetingHero.tsx` (`NavyGradient`, `NavyHeroBand`).
 
-- **Tier 1 — Navy hero** (full-bleed gradient band + adaptive header). For
-  screens that lead with identity/summary content: Home, Wealth, Profile,
-  advisor Book. Wrap the top module in `NavyHeroBand` (bleeds to the top + side
-  edges, rounded bottom lip, header-safe top padding) and render `<AppHeader …
-  onHero />` (floats transparent + white over the navy, cross-fades to light
-  glass as the hero scrolls past). Pass the screen's `scrollY`.
-- **Tier 2 — Solid navy bar** (`<AppHeader … solid />`). For surfaces with no
-  room for a hero: Chat (the conversation needs its height). White title + white
-  mark/action on solid navy; same collapse-on-scroll as the glass header. The
-  advisor native stack headers use the same navy via the navigator
-  `screenOptions` (navy `headerStyle`, white tint).
-- **Tier 3 — Navy sheet header** (`Rows.SheetHeader`). For every detail
-  sheet/modal: a full-bleed solid-navy bar (white title + optional subtitle + a
-  white close chip, or a custom `right` slot) sitting flush at the sheet top.
-  The sheet's scroll content keeps a 20px gutter and `paddingTop: 0` so the bar
-  bleeds to the edges; **content below the bar stays light** for readability.
-  Full-screen chart modals (NetWorthDetail, chat tool detail) are entirely navy
-  — that's the north-star surface Tier 3 echoes.
-
-Rules of thumb: heroes get the gradient + cerulean glow (`NavyGradient`); bars
-are solid navy. White (`#FFFFFF`) title/mark; `rgba(255,255,255,0.7)` for
-secondary text and `rgba(255,255,255,0.16)` for chip fills on navy. Money/severity
-accents on navy use the `*OnDark` variants or the saturated secondary colors.
+- **Where**: Home, Wealth, Profile, advisor Book — screens that lead with
+  identity/summary content. Wrap the top module in `NavyHeroBand` (bleeds to the
+  top + side edges, rounded bottom lip, header-safe top padding) and render
+  `<AppHeader … onHero />` (floats transparent + white over the navy, cross-fades
+  to light glass as the hero scrolls past). Pass the screen's `scrollY`.
+- **Home is special** — `<AppHeader … onHero heroReveal />` drops the white
+  over-hero row so the hero's big `AllworthLogo` is the sole brand mark at the
+  top; the compact header (Iris mark + title) simply reveals on scroll. Reads as
+  the big logo handing off to the small one (see **Motion**).
+- **Not here**: Chat keeps the light glass `AppHeader` (a hero would eat the
+  conversation); every detail sheet keeps the light `Rows.SheetHeader`
+  (Playfair title + light close chip). The one fully-navy exception is a
+  **full-screen chart modal** (NetWorthDetail, chat tool detail) — the
+  north-star premium surface where the number + chart live.
+- **Tokens on navy**: white (`#FFFFFF`) title/mark; `rgba(255,255,255,0.72)` for
+  secondary text; `rgba(255,255,255,0.16)` for chip fills. Money/severity accents
+  use the `*OnDark` variants or the saturated secondary colors. (`AppHeader` also
+  has an unused `solid` navy-bar variant — kept for future surfaces, not applied
+  anywhere today.)
 
 ## Typography
 
@@ -99,9 +96,9 @@ accents on navy use the `*OnDark` variants or the saturated secondary colors.
 | Card | `theme.card` token | White, radius 16, hairline navy border, `shadowSoft`. |
 | Section header | `Rows.SectionHeader` | 11pt uppercase Lato Bold, `inkTertiary`. Sits `space[2]` above content. |
 | Hero number | `HeroNumber` | Playfair, tabular, count-up ≤800ms. One per screen. |
-| **Global header** | `Glass.tsx AppHeader` | THE header — every top-level screen (see **Navy header system**). Mark chip + title left, ≤1 action right. Default = light glass that closes on scroll-down / reopens on scroll-up (diffClamp), status-bar strip stays. `onHero` = white-over-navy fading to glass (pair with `NavyHeroBand`); `solid` = solid navy bar. With a `scrollY`. Content scrolls under it (`paddingTop: insets.top + APP_HEADER_HEIGHT`). No per-screen title/logo rows. |
-| Navy hero band | `GreetingHero.tsx NavyHeroBand` | Tier-1 full-bleed navy hero: bleeds to top + side edges, rounded bottom lip, header-safe top padding. Wrap the top module; pair with `AppHeader onHero`. `NavyGradient` is the gradient+glow fill. |
-| Sheet header | `Rows.SheetHeader` | Tier-3 navy sheet bar: full-bleed solid navy, white title (+ optional `subtitle`, `right` slot) and white close. First child of the sheet's ScrollView; sheet content uses a 20px gutter + `paddingTop: 0`. Content below stays light. |
+| **Global header** | `Glass.tsx AppHeader` | THE header — every top-level screen. Mark chip + title left, ≤1 action right. Default = light glass that closes on scroll-down / reopens on scroll-up (diffClamp), status-bar strip stays. `onHero` = white-over-navy fading to glass (pair with `NavyHeroBand`); `heroReveal` = Home's logo-handoff variant (no white row; header reveals on scroll). With a `scrollY`. Content scrolls under it (`paddingTop: insets.top + APP_HEADER_HEIGHT`). No per-screen title/logo rows. |
+| Navy hero band | `GreetingHero.tsx NavyHeroBand` | Full-bleed navy hero (see **Navy heroes**): bleeds to top + side edges, rounded bottom lip, header-safe top padding. Wrap the top module; pair with `AppHeader onHero`. `NavyGradient` is the gradient+glow fill. |
+| Sheet header | `Rows.SheetHeader` | Light detail-sheet header: Playfair title + light close chip on `surfacePrimary`. Sheets stay light — navy is for heroes, not sheets. |
 | Glass surface | `Glass.tsx` (`GlassSurface`, `TAB_BAR_HEIGHT`) | The only translucent material (BlurView on iOS). Light glass header (default) + tab bar. |
 | Chips | hairline border, no fill, `bodySm` | Assistive, never competing with the primary action. |
 | Primary action | navy fill, white Lato Bold text, radius pill/12 | One per view. Secondary = ice/ghost fill, accent text. |
@@ -138,6 +135,15 @@ All motion lives in `src/anim.tsx` — reuse `RiseIn` (fade + 14px rise, 420ms),
   `animate`-captured-once pattern in `AssistantBubble`).
 - Tab switches crossfade at 180ms (`App.tsx ClientTabs`). Screens never slide.
 - Charts draw in ≤800ms; count-ups settle before the user can read the number.
+- **Home "hello"** (`GreetingHero`): on mount the hero fades up — logo first
+  (0ms), words a beat later (150ms) — then the section `RiseIn`s cascade
+  (240/340/440/540ms). It should read as a greeting, not a paint. The rest of the
+  hero screens land with the section `RiseIn`s alone; the staged hello is Home's.
+- **Home logo handoff** (`GreetingHero` + `AppHeader heroReveal`): the big
+  `AllworthLogo` in the hero scrolls away shrinking (scale 1→0.82) and fading
+  over the first ~90px while the compact header (Iris mark + title) reveals — one
+  logo becoming the other. Scroll-driven, so it's `useNativeDriver: false` (it
+  shares Home's `scrollY` with the header's layout interpolation).
 
 ## Haptics
 

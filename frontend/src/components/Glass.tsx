@@ -57,6 +57,7 @@ export function AppHeader({
   onPressMark,
   action,
   onHero,
+  heroReveal,
   solid,
 }: {
   title: string;
@@ -68,6 +69,10 @@ export function AppHeader({
   // header floats transparent + white over the navy, then cross-fades to the
   // normal light glass header as the hero scrolls away.
   onHero?: boolean;
+  // onHero variant for Home: no white row over the hero — the hero owns the
+  // brand (a big logo) at the top, and the compact header (mark + title) simply
+  // reveals on scroll. Reads as the big logo handing off to the small mark.
+  heroReveal?: boolean;
   // A solid navy header bar (white content) for surfaces without a hero band —
   // e.g. Chat, where a tall hero would eat the conversation. Same collapse
   // behavior as the default glass header.
@@ -142,13 +147,16 @@ export function AppHeader({
           {renderRow(DARK)}
         </Animated.View>
         {/* White row over the navy hero. Non-interactive: taps fall through to
-            the dark row's Pressables underneath (same positions). */}
-        <Animated.View
-          pointerEvents="none"
-          style={[styles.headerLayer, { paddingTop: insets.top, opacity: overHero }]}
-        >
-          {renderRow(LIGHT)}
-        </Animated.View>
+            the dark row's Pressables underneath (same positions). Suppressed in
+            heroReveal mode, where the hero's own big logo is the brand at top. */}
+        {heroReveal ? null : (
+          <Animated.View
+            pointerEvents="none"
+            style={[styles.headerLayer, { paddingTop: insets.top, opacity: overHero }]}
+          >
+            {renderRow(LIGHT)}
+          </Animated.View>
+        )}
       </View>
     );
   }

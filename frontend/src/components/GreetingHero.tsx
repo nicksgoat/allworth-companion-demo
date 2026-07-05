@@ -1,10 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
-import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Animated, Easing, LayoutChangeEvent, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from "react-native-svg";
+import { useAnimatedValue } from "../anim";
 import { colors, fonts, space } from "../theme";
 import { APP_HEADER_HEIGHT } from "./Glass";
+import { AllworthLogo } from "./Wordmark";
 
 // The scroll-container gutter both tab screens use (contentContainer padding).
 // The band cancels it with negative margins to bleed to the screen edges.
@@ -84,36 +86,84 @@ export function GreetingHero({
   name,
   advisorLine,
   onOpenWealth,
+  scrollY,
 }: {
   greeting: string;
   name: string;
   advisorLine: string;
   onOpenWealth: () => void;
+  // Home's scroll position — drives the logo "handoff" into the header mark.
+  scrollY?: Animated.Value;
 }) {
+  // "A real hello": on mount the hero fades up — the logo first, the words a
+  // beat later — so landing on Home feels like a greeting, not a paint.
+  const enterLogo = useAnimatedValue(0);
+  const enterText = useAnimatedValue(0);
+  useEffect(() => {
+    Animated.timing(enterLogo, {
+      toValue: 1,
+      duration: 560,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+    Animated.timing(enterText, {
+      toValue: 1,
+      duration: 560,
+      delay: 150,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }, [enterLogo, enterText]);
+
+  // The main logo hands off to the small header mark: as the hero scrolls away
+  // it shrinks up and fades over the first ~90px, right as `<AppHeader onHero
+  // heroReveal>` resolves its compact mark in. One logo becoming the other.
+  const sy = scrollY ?? new Animated.Value(0);
+  const logoScroll = sy.interpolate({ inputRange: [0, 90], outputRange: [1, 0], extrapolate: "clamp" });
+  const logoScale = sy.interpolate({ inputRange: [0, 90], outputRange: [1, 0.82], extrapolate: "clamp" });
+  const logoLift = sy.interpolate({ inputRange: [0, 90], outputRange: [0, -10], extrapolate: "clamp" });
+  const rise = (v: Animated.Value, from: number) =>
+    v.interpolate({ inputRange: [0, 1], outputRange: [from, 0] });
+
   return (
     <NavyHeroBand id="homeHero">
-      <View style={styles.greetingBlock}>
-        <Text style={styles.salutation}>{greeting},</Text>
-        <Text style={styles.name} numberOfLines={1} adjustsFontSizeToFit>
-          {name}
-        </Text>
-      </View>
-
-      <View style={styles.advisorRow}>
-        <Ionicons name="person-circle-outline" size={16} color="rgba(255,255,255,0.72)" />
-        <Text style={styles.advisorText} numberOfLines={1}>
-          {advisorLine}
-        </Text>
-      </View>
-
-      <Pressable
-        onPress={onOpenWealth}
-        hitSlop={8}
-        style={({ pressed }) => [styles.link, pressed && { opacity: 0.7 }]}
+      {/* The main brand logo — the hello, which recedes into the header mark. */}
+      <Animated.View
+        style={{
+          alignSelf: "flex-start",
+          opacity: Animated.multiply(enterLogo, logoScroll),
+          transform: [{ scale: logoScale }, { translateY: Animated.add(rise(enterLogo, 8), logoLift) }],
+        }}
       >
-        <Text style={styles.linkText}>View your wealth</Text>
-        <Ionicons name="chevron-forward" size={14} color="rgba(255,255,255,0.92)" />
-      </Pressable>
+        <AllworthLogo light width={150} />
+      </Animated.View>
+
+      <Animated.View
+        style={{ gap: space[3], opacity: enterText, transform: [{ translateY: rise(enterText, 14) }] }}
+      >
+        <View style={styles.greetingBlock}>
+          <Text style={styles.salutation}>{greeting},</Text>
+          <Text style={styles.name} numberOfLines={1} adjustsFontSizeToFit>
+            {name}
+          </Text>
+        </View>
+
+        <View style={styles.advisorRow}>
+          <Ionicons name="person-circle-outline" size={16} color="rgba(255,255,255,0.72)" />
+          <Text style={styles.advisorText} numberOfLines={1}>
+            {advisorLine}
+          </Text>
+        </View>
+
+        <Pressable
+          onPress={onOpenWealth}
+          hitSlop={8}
+          style={({ pressed }) => [styles.link, pressed && { opacity: 0.7 }]}
+        >
+          <Text style={styles.linkText}>View your wealth</Text>
+          <Ionicons name="chevron-forward" size={14} color="rgba(255,255,255,0.92)" />
+        </Pressable>
+      </Animated.View>
     </NavyHeroBand>
   );
 }
