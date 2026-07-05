@@ -45,7 +45,7 @@ enum Demo {
               title: "NVDA is a large share of your Robinhood account", sub: "54% of the account"),
         Nudge(icon: "chart.pie", tone: .info,
               title: "TSLA is a large share of your Robinhood account", sub: "26% of the account"),
-        Nudge(icon: "wallet.pass", tone: .info,
+        Nudge(icon: "wallet.bifold", tone: .info,
               title: "Money held outside your plan", sub: "$611,000 held away — worth a conversation"),
     ]
 
