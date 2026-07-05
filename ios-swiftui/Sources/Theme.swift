@@ -35,6 +35,8 @@ extension Color {
     static let gain = Color(hex: 0x436434)      // Evergreen
     static let loss = Color(hex: 0xD26D37)      // Pumpkin
     static let attention = Color(hex: 0xD26D37) // Pumpkin
+    static let gainOnDark = Color(hex: 0x86C67A) // legible green on the navy hero
+    static let lossOnDark = Color(hex: 0xE39B6F) // legible pumpkin on the navy hero
 
     // Secondary palette — charts/infographics only (brand deck p.7)
     static let chartNightBlue = Color(hex: 0x0C2E4E)

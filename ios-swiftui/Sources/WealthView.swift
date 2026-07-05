@@ -1,14 +1,20 @@
 import SwiftUI
 
-// Wealth — 1:1 port of the RN InvestScreen (Overview): navy band, the
-// managed/held-away/liabilities breakdown, the Overview/Holdings segment, the
-// allocation donut + legend, advisor handoff, concentration insights, the
-// complete-your-picture card, and automatic investing. Compliance-shaped: no
-// combined total at screen level (that lives in the tapped-in Net worth detail).
+// Wealth — 1:1 port of the RN InvestScreen: navy band (with a Net-worth tap into
+// the full navy detail), the managed/held-away/liabilities breakdown, the
+// Overview/Holdings segment, the allocation donut + legend (tap → class detail),
+// advisor handoff, concentration insights (tap → nudge detail), complete-your-
+// picture, automatic investing, and — under Holdings — the real per-account
+// sections (tap a position → position detail).
 struct WealthView: View {
     @State private var scrollY: CGFloat = 0
     @State private var appeared = false
     @State private var segment = "Overview"
+
+    @State private var netWorthOpen = false
+    @State private var selectedNudge: Demo.NudgeInfo?
+    @State private var selectedClass: Demo.ClassRef?
+    @State private var selectedPosition: Demo.Position?
 
     var body: some View {
         GeometryReader { proxy in
@@ -46,7 +52,32 @@ struct WealthView: View {
                 GlassHeader(title: "Your wealth", scrollY: scrollY, onHero: true, safeTop: safeTop)
             }
         }
-        .onAppear { appeared = true }
+        .onAppear { appeared = true; autoPresent() }
+        .fullScreenCover(isPresented: $netWorthOpen) {
+            NetWorthDetailSheet { netWorthOpen = false }
+        }
+        .sheet(item: $selectedNudge) { n in
+            NudgeDetailSheet(nudge: n) { selectedNudge = nil }
+        }
+        .sheet(item: $selectedClass) { c in
+            ClassDetailSheet(key: c.id) { selectedClass = nil }
+        }
+        .sheet(item: $selectedPosition) { p in
+            PositionDetailSheet(position: p) { selectedPosition = nil }
+        }
+    }
+
+    // Debug-only: SIMCTL_CHILD_AUTO_SHEET=<name> auto-presents a sheet so the
+    // verify loop can screenshot it (simctl has no tap input). No-op in normal use.
+    private func autoPresent() {
+        switch ProcessInfo.processInfo.environment["AUTO_SHEET"] {
+        case "networth": netWorthOpen = true
+        case "nudge": selectedNudge = Demo.homeNudges.first
+        case "class": selectedClass = Demo.ClassRef(id: "us_equity")
+        case "position": selectedPosition = Demo.account("acct_trust")?.positions.first
+        case "holdings": segment = "Holdings"
+        default: break
+        }
     }
 
     private func band(safeTop: CGFloat) -> some View {
@@ -57,11 +88,14 @@ struct WealthView: View {
                     Text("\(Demo.accountCount) accounts — managed, held away, and owed.")
                         .font(BrandFont.sans(13)).foregroundStyle(.white.opacity(0.82))
                 }
-                HStack(spacing: 3) {
-                    Text("Net worth").font(BrandFont.sansBold(14)).foregroundStyle(.white.opacity(0.92))
-                    Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(.white.opacity(0.92))
+                Button { netWorthOpen = true } label: {
+                    HStack(spacing: 3) {
+                        Text("Net worth").font(BrandFont.sansBold(14)).foregroundStyle(.white.opacity(0.92))
+                        Image(systemName: "chevron.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(.white.opacity(0.92))
+                    }
+                    .padding(.top, 2)
                 }
-                .padding(.top, 2)
+                .buttonStyle(.plain)
             }
             .entrance(0.1, appeared: appeared)
         }
@@ -71,11 +105,11 @@ struct WealthView: View {
         VStack(spacing: Space.s6) {
             VStack(alignment: .leading, spacing: Space.s3) {
                 SectionHeader("Your allocation")
-                AllocationCard()
+                AllocationCard { key in selectedClass = Demo.ClassRef(id: key) }
                 AdvisorHandoffCard()
             }
-            ForEach(Demo.concentration) { n in
-                NudgeCard(nudge: n)
+            ForEach(Demo.wealthConcentration) { n in
+                NudgeCard(nudge: n) { selectedNudge = n }
             }
             CompletePictureCard()
             RecurringCard()
@@ -83,16 +117,9 @@ struct WealthView: View {
     }
 
     private var holdings: some View {
-        VStack(alignment: .leading, spacing: Space.s3) {
-            ForEach(Array(Demo.allocation.enumerated()), id: \.element.id) { _, c in
-                HStack(spacing: Space.s3) {
-                    RoundedRectangle(cornerRadius: 3).fill(c.color).frame(width: 5, height: 34)
-                    Text(c.label).font(BrandFont.sansBold(15)).foregroundStyle(Color.inkPrimary)
-                    Spacer()
-                    Text(usd(c.value)).font(BrandFont.sansBold(15)).foregroundStyle(Color.inkPrimary).monospacedDigit()
-                }
-                .padding(14)
-                .card()
+        VStack(spacing: Space.s3) {
+            ForEach(Array(Demo.accountsInvested.enumerated()), id: \.element.id) { i, account in
+                AccountHoldingsSection(account: account, onSelect: { selectedPosition = $0 }, expanded: i == 0)
             }
         }
     }

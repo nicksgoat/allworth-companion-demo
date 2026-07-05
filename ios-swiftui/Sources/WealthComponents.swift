@@ -108,6 +108,7 @@ struct DonutChart: View {
 // MARK: - Allocation card (donut + legend + drift + ask)
 
 struct AllocationCard: View {
+    var onSelectClass: (String) -> Void = { _ in }
     var body: some View {
         VStack(spacing: 14) {
             ZStack {
@@ -133,6 +134,8 @@ struct AllocationCard: View {
                         Image(systemName: "chevron.right").font(.system(size: 14, weight: .semibold)).foregroundStyle(Color.inkTertiary)
                     }
                     .padding(.vertical, 12)
+                    .contentShape(Rectangle())
+                    .onTapGesture { onSelectClass(c.key) }
                 }
             }
 
@@ -186,7 +189,10 @@ struct AdvisorHandoffCard: View {
 // MARK: - Concentration nudge card
 
 struct NudgeCard: View {
-    let nudge: Demo.Concentration
+    let nudge: Demo.NudgeInfo
+    var onTap: () -> Void = {}
+
+    private var pct: Int { nudge.concentrationPct ?? 0 }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -202,14 +208,14 @@ struct NudgeCard: View {
                     .background(Capsule().fill(Color.allworthAccent.opacity(0.12)))
             }
             VStack(alignment: .leading, spacing: 6) {
-                Text("\(nudge.pct)% of the account")
+                Text("\(pct)% of the account")
                     .font(BrandFont.displayMedium(34)).foregroundStyle(Color.chartSky)
                 Text(nudge.title).font(BrandFont.sans(16)).foregroundStyle(Color.inkPrimary)
             }
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     Capsule().fill(Color.inkFaint)
-                    Capsule().fill(Color.chartSky).frame(width: geo.size.width * CGFloat(nudge.pct) / 100)
+                    Capsule().fill(Color.chartSky).frame(width: geo.size.width * CGFloat(pct) / 100)
                 }
             }
             .frame(height: 8)
@@ -221,6 +227,8 @@ struct NudgeCard: View {
         }
         .padding(16)
         .card()
+        .contentShape(Rectangle())
+        .onTapGesture(perform: onTap)
     }
 }
 
@@ -245,6 +253,89 @@ struct CompletePictureCard: View {
         }
         .padding(16)
         .card()
+    }
+}
+
+// MARK: - Account holdings section (Holdings segment)
+
+// Glance rule: the account header (name, institution, count, total) is always
+// visible; the position rows unfold on tap. Cash rows aren't tappable.
+struct AccountHoldingsSection: View {
+    let account: Demo.Account
+    var onSelect: (Demo.Position) -> Void = { _ in }
+    @State var expanded: Bool
+
+    private static let funds: Set<String> = ["VTI", "VXUS", "VTEB", "BND", "FXAIX", "FSPSX", "FXNAX", "SPAXX"]
+
+    private var sorted: [Demo.Position] { account.positions.sorted { $0.value > $1.value } }
+    private var total: Int { account.positions.reduce(0) { $0 + $1.value } }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Button { withAnimation(.easeInOut(duration: 0.2)) { expanded.toggle() } } label: {
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(account.name).font(BrandFont.sansBold(15)).foregroundStyle(Color.inkPrimary)
+                        Text("\(account.institution) · \(sorted.count) holding\(sorted.count == 1 ? "" : "s")")
+                            .font(BrandFont.sans(12)).foregroundStyle(Color.inkTertiary)
+                    }
+                    Spacer()
+                    Text(usd(total)).font(BrandFont.sansBold(15)).foregroundStyle(Color.inkSecondary).monospacedDigit()
+                    Image(systemName: expanded ? "chevron.up" : "chevron.down")
+                        .font(.system(size: 13, weight: .semibold)).foregroundStyle(Color.inkTertiary)
+                }
+                .padding(.vertical, 12)
+            }
+            .buttonStyle(.plain)
+
+            if expanded {
+                ForEach(sorted) { p in
+                    Hairline()
+                    holdingRow(p)
+                }
+            }
+        }
+        .padding(.horizontal, 16).padding(.vertical, 6)
+        .card()
+    }
+
+    private func isConcentrated(_ p: Demo.Position) -> Bool {
+        if p.assetClass == "cash" || p.symbol == "CASH" { return false }
+        if Self.funds.contains(p.symbol) { return false }
+        return total > 0 && Double(p.value) / Double(total) > 0.2
+    }
+
+    private func holdingRow(_ p: Demo.Position) -> some View {
+        let weight = total == 0 ? 0 : Int((Double(p.value) / Double(total) * 100).rounded())
+        let conc = isConcentrated(p)
+        let isCash = p.assetClass == "cash" || p.symbol == "CASH"
+        return Button { if !isCash { onSelect(p) } } label: {
+            HStack(spacing: 14) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(p.symbol).font(BrandFont.sansBold(16)).foregroundStyle(Color.inkPrimary)
+                    Text(p.name).font(BrandFont.sans(13)).foregroundStyle(Color.inkTertiary).lineLimit(1)
+                    if conc {
+                        Text("\(weight)% of account")
+                            .font(BrandFont.sansBold(11)).foregroundStyle(Color.attention)
+                            .padding(.horizontal, 7).padding(.vertical, 2)
+                            .background(RoundedRectangle(cornerRadius: 6).fill(Color.attention.opacity(0.12)))
+                            .padding(.top, 3)
+                    }
+                }
+                Spacer(minLength: 8)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text(usd(p.value)).font(BrandFont.sansBold(16)).foregroundStyle(Color.inkPrimary).monospacedDigit()
+                    if !conc {
+                        Text(isCash ? "cash" : "\(weight)% of account")
+                            .font(BrandFont.sans(12)).foregroundStyle(Color.inkTertiary).monospacedDigit()
+                    }
+                }
+            }
+            .padding(.vertical, 12)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .disabled(isCash)
     }
 }
 

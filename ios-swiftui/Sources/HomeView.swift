@@ -6,6 +6,7 @@ import SwiftUI
 struct HomeView: View {
     @State private var scrollY: CGFloat = 0
     @State private var appeared = false
+    @State private var sheetNudge: Demo.NudgeInfo?
 
     var body: some View {
         GeometryReader { proxy in
@@ -37,6 +38,9 @@ struct HomeView: View {
             }
         }
         .onAppear { appeared = true }
+        .sheet(item: $sheetNudge) { n in
+            NudgeDetailSheet(nudge: n) { sheetNudge = nil }
+        }
     }
 
     // MARK: hero
@@ -93,9 +97,11 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: Space.s3) {
             SectionHeader("Needs your attention")
             VStack(spacing: 0) {
-                ForEach(Array(Demo.nudges.enumerated()), id: \.element.id) { i, nudge in
+                ForEach(Array(Demo.homeNudges.enumerated()), id: \.element.id) { i, nudge in
                     if i > 0 { Divider().background(Color.hairline) }
                     AttentionRow(nudge: nudge)
+                        .contentShape(Rectangle())
+                        .onTapGesture { sheetNudge = nudge }
                 }
             }
             .padding(.horizontal, Space.s4)
@@ -165,9 +171,9 @@ struct HomeView: View {
 }
 
 struct AttentionRow: View {
-    let nudge: Nudge
+    let nudge: Demo.NudgeInfo
     var body: some View {
-        let tint = nudge.tone == .attention ? Color.attention : Color.allworthAccent
+        let tint = nudge.severity == .attention ? Color.attention : Color.allworthAccent
         HStack(spacing: Space.s3) {
             ZStack {
                 RoundedRectangle(cornerRadius: Radius.chip, style: .continuous)
