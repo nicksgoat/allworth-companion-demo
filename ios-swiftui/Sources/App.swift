@@ -6,9 +6,11 @@ import SwiftUI
 // and registered via UIAppFonts in Info.plist.
 @main
 struct AllworthApp: App {
+    @State private var app = AppModel()
     var body: some Scene {
         WindowGroup {
             RootView()
+                .environment(app)
         }
     }
 }

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct RootView: View {
+    @Environment(AppModel.self) private var app
     @State private var selection: Int
 
     init() {
@@ -17,20 +18,30 @@ struct RootView: View {
     }
 
     var body: some View {
-        TabView(selection: $selection) {
-            HomeView()
-                .tag(0)
-                .tabItem { Label("Home", systemImage: "house") }
-            WealthView()
-                .tag(1)
-                .tabItem { Label("Wealth", systemImage: "chart.pie") }
-            ChatView()
-                .tag(2)
-                .tabItem { Label("Chat", systemImage: "bubble.left") }
-            ProfileView()
-                .tag(3)
-                .tabItem { Label("Profile", systemImage: "person") }
+        Group {
+        if app.advisorMode {
+            AdvisorRootView()
+                .transition(.opacity)
+        } else {
+            TabView(selection: $selection) {
+                HomeView()
+                    .tag(0)
+                    .tabItem { Label("Home", systemImage: "house") }
+                WealthView()
+                    .tag(1)
+                    .tabItem { Label("Wealth", systemImage: "chart.pie") }
+                ChatView()
+                    .tag(2)
+                    .tabItem { Label("Chat", systemImage: "bubble.left") }
+                ProfileView()
+                    .tag(3)
+                    .tabItem { Label("Profile", systemImage: "person") }
+            }
+            .tint(.allworthNavy)
         }
-        .tint(.allworthNavy)
+        }
+        .onAppear {
+            if ProcessInfo.processInfo.environment["START_MODE"] == "advisor" { app.advisorMode = true }
+        }
     }
 }

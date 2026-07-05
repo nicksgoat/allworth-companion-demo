@@ -6,6 +6,7 @@ import SwiftUI
 // to the real fact groups + note rows, each tapping into its detail sheet), the
 // Demo advisor-switch row, disclaimer, and the account/sign-out footer.
 struct ProfileView: View {
+    @Environment(AppModel.self) private var app
     @State private var scrollY: CGFloat = 0
     @State private var appeared = false
 
@@ -173,19 +174,22 @@ struct ProfileView: View {
     private var demoBlock: some View {
         VStack(alignment: .leading, spacing: Space.s2) {
             SectionHeader("Demo")
-            HStack(spacing: Space.s3) {
-                Image(systemName: "person.2").font(.system(size: 18)).foregroundStyle(Color.allworthAccent).frame(width: 22)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Switch to advisor view").font(BrandFont.sansBold(14)).foregroundStyle(Color.inkPrimary)
-                    Text("See \(Demo.advisorFirst)'s book and live client conversations")
-                        .font(BrandFont.sans(12)).foregroundStyle(Color.inkTertiary)
+            Button { withAnimation(.easeInOut(duration: 0.25)) { app.advisorMode = true } } label: {
+                HStack(spacing: Space.s3) {
+                    Image(systemName: "person.2").font(.system(size: 18)).foregroundStyle(Color.allworthAccent).frame(width: 22)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Switch to advisor view").font(BrandFont.sansBold(14)).foregroundStyle(Color.inkPrimary)
+                        Text("See \(Demo.advisorFirst)'s book and live client conversations")
+                            .font(BrandFont.sans(12)).foregroundStyle(Color.inkTertiary)
+                    }
+                    Spacer(minLength: Space.s2)
+                    Image(systemName: "chevron.right").font(.system(size: 15, weight: .semibold)).foregroundStyle(Color.inkTertiary)
                 }
-                Spacer(minLength: Space.s2)
-                Image(systemName: "chevron.right").font(.system(size: 15, weight: .semibold)).foregroundStyle(Color.inkTertiary)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .card()
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 12)
-            .card()
+            .buttonStyle(.plain)
         }
         .entrance(0.42, appeared: appeared)
     }
@@ -235,7 +239,7 @@ struct CollapsibleCardView<Content: View>: View {
 
             if expanded {
                 content()
-            } else {
+            } else if !preview.isEmpty {
                 Text(preview)
                     .font(BrandFont.sans(15))
                     .foregroundStyle(Color.inkPrimary)
