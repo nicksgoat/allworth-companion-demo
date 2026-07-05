@@ -4,6 +4,7 @@ import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navig
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Animated,
   Platform,
   Pressable,
   ScrollView,
@@ -12,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAnimatedValue } from "../anim";
 import {
   AccountRow,
   DisclaimerFooter,
@@ -20,6 +22,7 @@ import {
 } from "../components/Rows";
 import { CollapsibleCard } from "../components/Collapsible";
 import { APP_HEADER_HEIGHT, AppHeader } from "../components/Glass";
+import { NavyHeroBand } from "../components/GreetingHero";
 import { AdvisorConversationView } from "./AdvisorConversationScreen";
 import { useApp } from "../state";
 import { card, colors, fonts, radius, space, text, usd } from "../theme";
@@ -41,7 +44,15 @@ const Stack = createNativeStackNavigator<AdvisorStackParams>();
 
 export function AdvisorNavigator() {
   return (
-    <Stack.Navigator id="AdvisorStack" screenOptions={{ headerTintColor: colors.allworthNavy }}>
+    <Stack.Navigator
+      id="AdvisorStack"
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.chartNightBlue },
+        headerTintColor: "#FFFFFF",
+        headerTitleStyle: { color: "#FFFFFF" },
+        headerShadowVisible: false,
+      }}
+    >
       <Stack.Screen name="Book" component={BookScreen} options={{ headerShown: false }} />
       <Stack.Screen
         name="ClientDetail"
@@ -98,17 +109,22 @@ function BookScreen() {
     }
   }, [book, app.demoScreen]);
 
+  const scrollY = useAnimatedValue(0);
+
   return (
     <>
-    <ScrollView
+    <Animated.ScrollView
       style={{ backgroundColor: colors.surfacePrimary }}
       contentContainerStyle={{ padding: 20, paddingTop: insets.top + APP_HEADER_HEIGHT + 8, gap: 20 }}
+      onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+        useNativeDriver: false,
+      })}
+      scrollEventThrottle={16}
     >
-      {book ? (
-        <Text style={styles.subtitle}>
-          {book.advisor.name} · {book.advisor.title}
-        </Text>
-      ) : null}
+      <NavyHeroBand id="bookHero">
+        <Text style={styles.heroName}>{book?.advisor.name ?? "Your book"}</Text>
+        {book ? <Text style={styles.heroSub}>{book.advisor.title}</Text> : null}
+      </NavyHeroBand>
 
       {book ? (
         <View>
@@ -129,9 +145,11 @@ function BookScreen() {
       <View style={{ paddingVertical: 8 }}>
         <DisclaimerFooter />
       </View>
-    </ScrollView>
+    </Animated.ScrollView>
     <AppHeader
       title="Your book"
+      scrollY={scrollY}
+      onHero
       action={{ icon: "swap-horizontal-outline", onPress: () => app.setMode("client") }}
     />
     </>
@@ -520,6 +538,8 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" },
   title: { fontSize: 28, fontFamily: fonts.display, color: colors.inkPrimary },
   subtitle: { fontSize: 13, fontFamily: fonts.sans, color: colors.inkSecondary },
+  heroName: { fontSize: 26, fontFamily: fonts.displayMedium, color: "#FFFFFF" },
+  heroSub: { fontSize: 13, fontFamily: fonts.sans, color: "rgba(255,255,255,0.72)" },
   householdRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 12 },
   householdAvatar: {
     width: 40,

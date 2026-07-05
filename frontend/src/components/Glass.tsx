@@ -57,6 +57,7 @@ export function AppHeader({
   onPressMark,
   action,
   onHero,
+  solid,
 }: {
   title: string;
   scrollY?: Animated.Value;
@@ -67,6 +68,10 @@ export function AppHeader({
   // header floats transparent + white over the navy, then cross-fades to the
   // normal light glass header as the hero scrolls away.
   onHero?: boolean;
+  // A solid navy header bar (white content) for surfaces without a hero band —
+  // e.g. Chat, where a tall hero would eat the conversation. Same collapse
+  // behavior as the default glass header.
+  solid?: boolean;
 }) {
   const insets = useSafeAreaInsets();
 
@@ -174,43 +179,22 @@ export function AppHeader({
     ? clamp.interpolate({ inputRange: [0, APP_HEADER_HEIGHT], outputRange: [1, 0] })
     : 1;
 
+  const surfaceStyle = [
+    StyleSheet.absoluteFill as ViewStyle,
+    styles.headerSurface,
+    { paddingTop: insets.top },
+  ];
+  const row = (
+    <Animated.View style={{ opacity: rowOpacity }}>{renderRow(solid ? LIGHT : DARK)}</Animated.View>
+  );
+
   return (
     <Animated.View style={[styles.header, { height }]}>
-      <GlassSurface
-        style={[
-          StyleSheet.absoluteFill as ViewStyle,
-          styles.headerSurface,
-          { paddingTop: insets.top },
-        ]}
-      >
-        <Animated.View style={[styles.headerRow, { opacity: rowOpacity }]}>
-          <Pressable
-            onPress={onPressMark}
-            disabled={!onPressMark}
-            hitSlop={8}
-            style={({ pressed }) => [
-              styles.headerMark,
-              pressed && onPressMark ? { opacity: 0.6 } : null,
-            ]}
-          >
-            <AllworthMark size={18} color={colors.allworthNavy} />
-          </Pressable>
-          <Text style={styles.headerTitle} numberOfLines={1}>
-            {title}
-          </Text>
-          {action ? (
-            <Pressable
-              onPress={action.onPress}
-              hitSlop={8}
-              style={({ pressed }) => [styles.headerBtn, pressed && { opacity: 0.6 }]}
-            >
-              <Ionicons name={action.icon} size={22} color={colors.inkPrimary} />
-            </Pressable>
-          ) : (
-            <View style={styles.headerBtn} />
-          )}
-        </Animated.View>
-      </GlassSurface>
+      {solid ? (
+        <View style={[surfaceStyle, styles.solidSurface]}>{row}</View>
+      ) : (
+        <GlassSurface style={surfaceStyle}>{row}</GlassSurface>
+      )}
     </Animated.View>
   );
 }
@@ -227,6 +211,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: "rgba(0,0,0,0.12)",
     overflow: "hidden",
+  },
+  solidSurface: {
+    backgroundColor: colors.chartNightBlue,
+    borderBottomColor: "rgba(255,255,255,0.10)",
   },
   headerLayer: {
     position: "absolute",

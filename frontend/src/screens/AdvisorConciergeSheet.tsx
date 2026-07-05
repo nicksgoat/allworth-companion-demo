@@ -11,7 +11,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { DisclaimerFooter, SectionHeader } from "../components/Rows";
+import { DisclaimerFooter, SectionHeader, SheetHeader } from "../components/Rows";
 import { useApp } from "../state";
 import { card, colors, fonts, radius, space, text } from "../theme";
 import type { Advisor, AvailabilityDay } from "../types";
@@ -139,21 +139,19 @@ export function AdvisorConciergeSheet({
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={close}>
       <ScrollView
         style={{ backgroundColor: colors.surfacePrimary }}
-        contentContainerStyle={{ padding: space[5], gap: space[5], paddingBottom: space[8] }}
+        contentContainerStyle={{
+          padding: space[5],
+          gap: space[5],
+          paddingTop: 0,
+          paddingBottom: space[8],
+        }}
         keyboardDismissMode="interactive"
       >
-        <View style={styles.headerRow}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{advisor?.avatarInitials ?? "NM"}</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.advisorName}>{advisor?.name ?? "Your advisor"}</Text>
-            <Text style={styles.advisorTitle}>{advisor?.title ?? "Financial Advisor"}</Text>
-          </View>
-          <Pressable onPress={close} hitSlop={8} style={styles.closeBtn}>
-            <Ionicons name="close" size={20} color={colors.inkSecondary} />
-          </Pressable>
-        </View>
+        <SheetHeader
+          title={advisor?.name ?? "Your advisor"}
+          subtitle={advisor?.title ?? "Financial Advisor"}
+          onClose={close}
+        />
 
         <View style={{ gap: space[3] }}>
           <SectionHeader>Book a meeting</SectionHeader>

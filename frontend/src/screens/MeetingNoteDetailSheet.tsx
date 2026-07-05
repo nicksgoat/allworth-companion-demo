@@ -30,10 +30,10 @@ function MeetingNoteDetailContent({ note, onClose }: { note: MeetingNote; onClos
   return (
     <ScrollView
       style={{ backgroundColor: colors.surfacePrimary }}
-      contentContainerStyle={{ padding: 20, gap: 24 }}
+      contentContainerStyle={{ padding: 20, gap: 24, paddingTop: 0 }}
     >
-      <View style={{ gap: 8, paddingTop: 24 }}>
-        <SheetHeader title="Meeting note" onClose={onClose} />
+      <SheetHeader title="Meeting note" onClose={onClose} />
+      <View style={{ gap: 8 }}>
         <Text style={styles.title}>{note.title}</Text>
         <Text style={styles.meta}>
           {shortDate(note.date)} · with {note.advisor}

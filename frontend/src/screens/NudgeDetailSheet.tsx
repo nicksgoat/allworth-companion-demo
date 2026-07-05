@@ -36,7 +36,6 @@ function NudgeDetailContent({ nudge, onClose }: { nudge: Nudge; onClose: () => v
 
   const sev = severityFor(nudge.severity);
   const pct = leadingPct(nudge.headline);
-  const tint = sev.color + "1A";
 
   const chatPrompt =
     nudge.type === "spending"
@@ -56,18 +55,18 @@ function NudgeDetailContent({ nudge, onClose }: { nudge: Nudge; onClose: () => v
       style={{ backgroundColor: colors.surfacePrimary }}
       contentContainerStyle={{ paddingBottom: 32 }}
     >
-      {/* Severity-tinted hero header */}
-      <View style={[styles.hero, { backgroundColor: tint }]}>
+      {/* Navy hero (navy header system) with the severity color kept as an accent. */}
+      <View style={styles.hero}>
         <View style={styles.heroTop}>
           <View style={[styles.iconChip, { backgroundColor: sev.color }]}>
             <Ionicons name={iconFor(nudge.type)} size={20} color="#FFFFFF" />
           </View>
           <Pressable onPress={onClose} hitSlop={10} style={styles.closeBtn}>
-            <Ionicons name="close" size={20} color={colors.inkSecondary} />
+            <Ionicons name="close" size={20} color="#FFFFFF" />
           </Pressable>
         </View>
-        <View style={[styles.tag, { backgroundColor: "rgba(255,255,255,0.6)" }]}>
-          <Text style={[styles.tagText, { color: sev.color }]}>{sev.label}</Text>
+        <View style={[styles.tag, { backgroundColor: "rgba(255,255,255,0.14)" }]}>
+          <Text style={[styles.tagText, { color: "#FFFFFF" }]}>{sev.label}</Text>
         </View>
         <Text style={[styles.heroMetric, { color: sev.color }]}>{nudge.headline}</Text>
         <Text style={styles.heroTitle}>{nudge.title}</Text>
@@ -155,6 +154,7 @@ function SpendingBars({ s }: { s: SpendingDetail }) {
 
 const styles = StyleSheet.create({
   hero: {
+    backgroundColor: colors.chartNightBlue,
     paddingTop: 22,
     paddingHorizontal: 20,
     paddingBottom: 22,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.7)",
+    backgroundColor: "rgba(255,255,255,0.16)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     fontVariant: ["tabular-nums"],
     marginTop: 2,
   },
-  heroTitle: { fontSize: 18, fontFamily: fonts.sans, color: colors.inkPrimary, lineHeight: 24 },
+  heroTitle: { fontSize: 18, fontFamily: fonts.sans, color: "#FFFFFF", lineHeight: 24 },
 
   bodyWrap: { padding: 20, gap: 20 },
   body: { fontSize: 17, fontFamily: fonts.sans, lineHeight: 24, color: colors.inkPrimary },

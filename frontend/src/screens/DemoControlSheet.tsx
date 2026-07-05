@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { Mode, useApp } from "../state";
 import { card, colors, fonts, shadowSoft } from "../theme";
-import { SectionHeader } from "../components/Rows";
+import { SectionHeader, SheetHeader } from "../components/Rows";
 
 const MODES: { value: Mode; label: string }[] = [
   { value: "client", label: "Client" },
@@ -39,13 +39,19 @@ export function DemoControlSheet() {
       onRequestClose={close}
     >
       <View style={styles.root}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Demo controls</Text>
-          <Pressable onPress={close} hitSlop={8}>
-            <Text style={styles.done}>Done</Text>
-          </Pressable>
-        </View>
-        <ScrollView contentContainerStyle={{ padding: 20, gap: 24 }}>
+        <ScrollView contentContainerStyle={{ padding: 20, gap: 24, paddingTop: 0 }}>
+          <SheetHeader
+            title="Demo controls"
+            right={
+              <Pressable
+                onPress={close}
+                hitSlop={8}
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
+              >
+                <Text style={styles.done}>Done</Text>
+              </Pressable>
+            }
+          />
           <Section header="View">
             <Segmented options={MODES} value={app.mode} onChange={(m) => app.setMode(m as Mode)} />
           </Section>
@@ -139,7 +145,7 @@ const styles = StyleSheet.create({
     paddingTop: 18,
   },
   title: { fontSize: 17, fontFamily: fonts.sansBold, color: colors.inkPrimary },
-  done: { fontSize: 17, fontFamily: fonts.sansBold, color: colors.allworthAccent },
+  done: { fontSize: 17, fontFamily: fonts.sansBold, color: "#FFFFFF" },
   segmented: {
     flexDirection: "row",
     backgroundColor: colors.inkFaint,

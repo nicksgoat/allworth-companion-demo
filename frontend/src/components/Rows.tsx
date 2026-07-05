@@ -8,20 +8,45 @@ export function SectionHeader({ children }: { children: React.ReactNode }) {
   return <Text style={styles.sectionHeader}>{children}</Text>;
 }
 
+// The shared navy sheet header (Tier 3 of the navy header system): a full-bleed
+// solid-navy bar with a white title (+ optional subtitle) and a white close
+// chip, sitting flush at the top of a sheet. Assumes the sheet's scroll content
+// uses a 20px horizontal gutter and `paddingTop: 0` (so this bleeds to the sheet
+// edges). Pass `right` to replace the close chip (e.g. a "Done" text button).
 // Sheets have no swipe-to-dismiss on web, so every sheet needs a visible close.
-export function SheetHeader({ title, onClose }: { title: string; onClose: () => void }) {
+export function SheetHeader({
+  title,
+  subtitle,
+  onClose,
+  right,
+}: {
+  title: string;
+  subtitle?: string;
+  onClose?: () => void;
+  right?: React.ReactNode;
+}) {
   return (
     <View style={styles.sheetHeader}>
-      <View style={{ flex: 1 }}>
-        <SectionHeader>{title}</SectionHeader>
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={styles.sheetTitle} numberOfLines={1}>
+          {title}
+        </Text>
+        {subtitle ? (
+          <Text style={styles.sheetSubtitle} numberOfLines={1}>
+            {subtitle}
+          </Text>
+        ) : null}
       </View>
-      <Pressable
-        onPress={onClose}
-        hitSlop={8}
-        style={({ pressed }) => [styles.sheetClose, pressed && { opacity: 0.6 }]}
-      >
-        <Ionicons name="close" size={18} color={colors.inkSecondary} />
-      </Pressable>
+      {right ??
+        (onClose ? (
+          <Pressable
+            onPress={onClose}
+            hitSlop={8}
+            style={({ pressed }) => [styles.sheetClose, pressed && { opacity: 0.6 }]}
+          >
+            <Ionicons name="close" size={20} color="#FFFFFF" />
+          </Pressable>
+        ) : null)}
     </View>
   );
 }
@@ -91,12 +116,26 @@ export function DisclaimerFooter({ status }: { status?: Dashboard["dataStatus"] 
 
 const styles = StyleSheet.create({
   sectionHeader: { ...sectionHeader },
-  sheetHeader: { flexDirection: "row", alignItems: "center", gap: 12 },
+  sheetHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: colors.chartNightBlue,
+    // Bleed to the sheet edges (sheets use a 20px gutter + paddingTop: 0).
+    marginHorizontal: -20,
+    paddingHorizontal: 20,
+    paddingTop: 18,
+    paddingBottom: 16,
+    borderBottomLeftRadius: 22,
+    borderBottomRightRadius: 22,
+  },
+  sheetTitle: { fontSize: 17, fontFamily: fonts.sansBold, color: "#FFFFFF" },
+  sheetSubtitle: { fontSize: 13, fontFamily: fonts.sans, color: "rgba(255,255,255,0.72)" },
   sheetClose: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: colors.inkFaint,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.16)",
     alignItems: "center",
     justifyContent: "center",
   },

@@ -3,7 +3,7 @@ import * as Haptics from "expo-haptics";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { GoalDials } from "../components/GoalPlanner";
-import { DisclaimerFooter, SectionHeader } from "../components/Rows";
+import { DisclaimerFooter, SectionHeader, SheetHeader } from "../components/Rows";
 import { useApp } from "../state";
 import { card, colors, fonts, space, text, usd } from "../theme";
 import type { FundedGoal } from "../types";
@@ -52,17 +52,14 @@ export function GoalsSheet({ visible, onClose }: { visible: boolean; onClose: ()
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
       <ScrollView
         style={{ backgroundColor: colors.surfacePrimary }}
-        contentContainerStyle={{ padding: space[5], gap: space[4], paddingBottom: space[8] }}
+        contentContainerStyle={{
+          padding: space[5],
+          gap: space[4],
+          paddingTop: 0,
+          paddingBottom: space[8],
+        }}
       >
-        <View style={styles.headerRow}>
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text style={styles.title}>My goals</Text>
-            {summary ? <Text style={styles.subtitle}>{summary}</Text> : null}
-          </View>
-          <Pressable onPress={onClose} hitSlop={8} style={styles.closeBtn}>
-            <Ionicons name="close" size={20} color={colors.inkSecondary} />
-          </Pressable>
-        </View>
+        <SheetHeader title="My goals" subtitle={summary || undefined} onClose={onClose} />
 
         {goals === null ? (
           <ActivityIndicator style={{ paddingTop: 60 }} />
