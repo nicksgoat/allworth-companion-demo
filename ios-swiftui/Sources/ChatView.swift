@@ -12,6 +12,7 @@ struct ChatMsg: Identifiable {
     var text: String
     var sources: [String] = []
     var thinking = false
+    var thinkingLabel = "Thinking…"
     enum Role { case user, assistant }
 }
 
@@ -23,6 +24,8 @@ struct ChatView: View {
     @State private var draft = ""
     @State private var sending = false
     @State private var lastTopic = "start"
+    @State private var dynamicChips: [String] = []
+    @State private var streamTask: Task<Void, Never>?
 
     var body: some View {
         GeometryReader { proxy in
@@ -50,6 +53,9 @@ struct ChatView: View {
                     .safeAreaInset(edge: .bottom) { composer }
                     .onChange(of: messages.count) { _, _ in
                         withAnimation { sr.scrollTo("bottom", anchor: .bottom) }
+                    }
+                    .onChange(of: messages.last?.text) { _, _ in
+                        sr.scrollTo("bottom", anchor: .bottom)
                     }
                 }
 
@@ -100,14 +106,16 @@ struct ChatView: View {
         .padding(.bottom, Space.s2)
     }
 
-    // Follow-up chips keyed to the last answer's topic (RN dynamicSuggestions).
+    // Follow-up chips: the backend's real suggestions when live; topic-keyed
+    // fallbacks when offline (RN dynamicSuggestions).
     private var suggestions: [String]? {
         guard messages.last?.role == .assistant, !(messages.last?.thinking ?? false) else { return nil }
+        if !dynamicChips.isEmpty { return dynamicChips }
         switch lastTopic {
         case "spending": return ["What spending level keeps the plan on track?", "Which categories are driving the overage?", "How does this affect the lake house timeline?"]
         case "concentration": return ["Show the tax impact in plain English", "Which holdings would be sold first?", "What if we limit realized gains?"]
         case "start": return ["How does this spending affect my plan?", "What are my options for NVDA?", "What are my options for TSLA?"]
-        default: return nil
+        default: return nil    // "live" answer with no backend suggestions
         }
     }
 
@@ -116,25 +124,51 @@ struct ChatView: View {
         guard !q.isEmpty, !sending else { return }
         draft = ""
         sending = true
+        dynamicChips = []
         messages.append(ChatMsg(role: .user, text: q))
-        let thinkingId = ChatMsg(role: .assistant, text: "", thinking: true)
-        messages.append(thinkingId)
-        let (answer, sources, topic) = reply(to: q)
-        Task {
-            try? await Task.sleep(nanoseconds: 950_000_000)
-            if let i = messages.lastIndex(where: { $0.thinking }) {
-                withAnimation(.easeOut(duration: 0.3)) {
-                    messages[i] = ChatMsg(role: .assistant, text: answer, sources: sources)
+        messages.append(ChatMsg(role: .assistant, text: "", thinking: true))
+        let idx = messages.count - 1     // the streaming assistant bubble
+
+        streamTask?.cancel()
+        streamTask = Task {
+            var gotText = false
+            for await ev in ChatService.stream(clientId: "maya", session: app.session, message: q) {
+                if Task.isCancelled { return }
+                switch ev {
+                case .toolStart(let label):
+                    if idx < messages.count { messages[idx].thinkingLabel = label }
+                case .toolEnd:
+                    break
+                case .text(let delta):
+                    guard idx < messages.count else { break }
+                    if !gotText { gotText = true; lastTopic = "live"; messages[idx].thinking = false; messages[idx].text = "" }
+                    messages[idx].text += delta
+                case .done(let sources, let suggested):
+                    guard idx < messages.count else { break }
+                    messages[idx].thinking = false
+                    messages[idx].sources = sources
+                    dynamicChips = suggested
+                case .error:
+                    // Backend unreachable — fall back to the offline canned answer.
+                    guard idx < messages.count, !gotText else { break }
+                    let (answer, sources, topic) = reply(to: q)
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        messages[idx].thinking = false
+                        messages[idx].text = answer
+                        messages[idx].sources = sources
+                    }
+                    lastTopic = topic
                 }
             }
-            lastTopic = topic
             sending = false
         }
     }
 
     private func newChat() {
+        streamTask?.cancel()
         messages = [ChatMsg(role: .assistant, text: "Hi Maya — I can help you understand your accounts, spending, or plan. What's on your mind?")]
         lastTopic = "start"
+        dynamicChips = []
         draft = ""; sending = false
     }
 
@@ -170,7 +204,7 @@ private struct MessageBubble: View {
             }
         case .assistant:
             if m.thinking {
-                ThinkingDots()
+                ThinkingDots(label: m.thinkingLabel)
             } else {
                 VStack(alignment: .leading, spacing: Space.s3) {
                     if !m.sources.isEmpty {
@@ -202,14 +236,18 @@ private struct MessageBubble: View {
 }
 
 private struct ThinkingDots: View {
+    var label: String = "Thinking…"
     @State private var on = false
     var body: some View {
-        HStack(spacing: 5) {
-            ForEach(0..<3) { i in
-                Circle().fill(Color.allworthAccent).frame(width: 7, height: 7)
-                    .opacity(on ? 1 : 0.3)
-                    .animation(.easeInOut(duration: 0.6).repeatForever().delay(Double(i) * 0.18), value: on)
+        HStack(spacing: 8) {
+            HStack(spacing: 5) {
+                ForEach(0..<3) { i in
+                    Circle().fill(Color.allworthAccent).frame(width: 7, height: 7)
+                        .opacity(on ? 1 : 0.3)
+                        .animation(.easeInOut(duration: 0.6).repeatForever().delay(Double(i) * 0.18), value: on)
+                }
             }
+            Text(label).font(BrandFont.sans(14)).foregroundStyle(Color.inkTertiary)
             Spacer()
         }
         .onAppear { on = true }

@@ -32,6 +32,13 @@ targets:
           - Lato_400Regular.ttf
           - Lato_400Regular_Italic.ttf
           - Lato_700Bold.ttf
+        # Allow the local dev backend (http://localhost:3000) — the live assistant.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+          NSExceptionDomains:
+            localhost:
+              NSExceptionAllowsInsecureHTTPLoads: true
+              NSIncludesSubdomains: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.allworth.companion.swiftui
