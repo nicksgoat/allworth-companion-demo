@@ -77,7 +77,9 @@ struct HomeView: View {
         let logoScale = 1 - 0.18 * t              // 1 → 0.82
         let logoLift = -10 * t
 
-        return NavyHeroBand(safeTop: safeTop) {
+        let advisorFirst = Demo.advisorName.split(separator: " ").first.map(String.init) ?? Demo.advisorName
+
+        return NavyHeroBand(safeTop: safeTop, supergraphic: true, breathe: true) {
             AllworthWordmark(light: true)
                 .scaleEffect(logoScale, anchor: .topLeading)
                 .offset(y: logoLift)
@@ -95,14 +97,29 @@ struct HomeView: View {
                         .font(BrandFont.displayMedium(30))
                         .foregroundStyle(.white)
                 }
+                // The reassurance line — the first thing a client sees. Answers
+                // "Am I okay?" by speaking to the plan's design (safe through a big
+                // month or a market dip), never a total or performance figure.
+                Text("Your plan is built to hold steady — through a big month or a market dip.")
+                    .font(BrandFont.sans(14))
+                    .foregroundStyle(.white.opacity(0.82))
+                    .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
+                // Stewardship attestation — a human is watching, stated as a fact.
                 HStack(spacing: 6) {
-                    Image(systemName: "person.crop.circle")
-                        .font(.system(size: 15))
-                        .foregroundStyle(.white.opacity(0.72))
-                    Text(Demo.advisorLine)
-                        .font(BrandFont.sans(13))
-                        .foregroundStyle(.white.opacity(0.82))
+                    Image(systemName: "checkmark.shield.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.allworthAccent)
+                    Text("Reviewed by \(advisorFirst) this week")
+                        .font(BrandFont.sansBold(12.5))
+                        .foregroundStyle(.white.opacity(0.9))
                 }
+                .padding(.horizontal, 11)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule().fill(.white.opacity(0.10))
+                        .overlay(Capsule().stroke(.white.opacity(0.16), lineWidth: 1))
+                )
                 Button { app.tab = 1 } label: {
                     HStack(spacing: 3) {
                         Text("View your wealth")

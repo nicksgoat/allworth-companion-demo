@@ -16,6 +16,8 @@ extension View {
 // `GlassHeader(onHero:)`. Content is padded to clear the header zone.
 struct NavyHeroBand<Content: View>: View {
     let safeTop: CGFloat
+    var supergraphic = false
+    var breathe = false
     @ViewBuilder var content: () -> Content
 
     var body: some View {
@@ -26,7 +28,7 @@ struct NavyHeroBand<Content: View>: View {
         .padding(.top, safeTop + 48 + Space.s4)
         .padding(.bottom, Space.s5)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(NavyGradient())
+        .background(NavyGradient(supergraphic: supergraphic, breathe: breathe))
         .clipShape(
             UnevenRoundedRectangle(
                 bottomLeadingRadius: Radius.hero,

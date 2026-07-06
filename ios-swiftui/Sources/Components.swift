@@ -55,6 +55,12 @@ struct SectionHeader: View {
 // The brand's premium fill: Night Blue → Indigo vertical gradient + a soft
 // cerulean glow in the upper-right. Reserved for hero surfaces (DESIGN.md).
 struct NavyGradient: View {
+    // Reassurance hero (Home): the brand marquee supergraphic + a single "breath"
+    // where the glow settles open on appear. Other heroes keep the flat gradient.
+    var supergraphic = false
+    var breathe = false
+    @State private var glow = 0.20
+
     var body: some View {
         GeometryReader { geo in
             ZStack {
@@ -64,13 +70,41 @@ struct NavyGradient: View {
                     endPoint: .bottom
                 )
                 RadialGradient(
-                    colors: [Color.allworthAccent.opacity(0.36), Color.allworthAccent.opacity(0)],
+                    colors: [Color.allworthAccent.opacity(breathe ? glow : 0.36), Color.allworthAccent.opacity(0)],
                     center: UnitPoint(x: 0.82, y: 0.12),
                     startRadius: 0,
                     endRadius: max(geo.size.width, geo.size.height) * 0.8
                 )
+                if supergraphic { IrisSupergraphic() }
             }
         }
+        .onAppear { if breathe { withAnimation(.easeOut(duration: 0.7)) { glow = 0.36 } } }
+    }
+}
+
+// The brand "marquee" — interlocking circles derived from the Iris geometry, the
+// deck's reserved treatment for premium navy surfaces. Anchored top-right and
+// feathered so it whispers rather than decorates.
+struct IrisSupergraphic: View {
+    var body: some View {
+        GeometryReader { geo in
+            let r = min(geo.size.width, geo.size.height) * 0.30
+            let cx = geo.size.width * 0.9
+            let cy = geo.size.height * 0.0
+            ZStack {
+                ForEach(0..<7, id: \.self) { i in
+                    let a = Double(i) / 6 * 2 * .pi
+                    Circle()
+                        .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                        .frame(width: r * 2, height: r * 2)
+                        .position(x: cx + (i == 0 ? 0 : cos(a) * r),
+                                  y: cy + (i == 0 ? 0 : sin(a) * r))
+                }
+            }
+            .mask(LinearGradient(colors: [.white, .white.opacity(0)],
+                                 startPoint: .topTrailing, endPoint: .bottomLeading))
+        }
+        .allowsHitTesting(false)
     }
 }
 

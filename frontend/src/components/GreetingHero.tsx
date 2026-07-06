@@ -125,6 +125,8 @@ export function GreetingHero({
   const rise = (v: Animated.Value, from: number) =>
     v.interpolate({ inputRange: [0, 1], outputRange: [from, 0] });
 
+  const advisorFirst = advisorLine.split(/[\s·]+/)[0] || advisorLine;
+
   return (
     <NavyHeroBand id="homeHero">
       {/* The main brand logo — the hello, which recedes into the header mark. */}
@@ -148,11 +150,16 @@ export function GreetingHero({
           </Text>
         </View>
 
-        <View style={styles.advisorRow}>
-          <Ionicons name="person-circle-outline" size={16} color="rgba(255,255,255,0.72)" />
-          <Text style={styles.advisorText} numberOfLines={1}>
-            {advisorLine}
-          </Text>
+        {/* The reassurance line — answers "Am I okay?" through the plan's design,
+            not a total or performance figure. */}
+        <Text style={styles.reassure}>
+          Your plan is built to hold steady — through a big month or a market dip.
+        </Text>
+
+        {/* Stewardship attestation — a named human is watching, stated as fact. */}
+        <View style={styles.chip}>
+          <Ionicons name="shield-checkmark" size={13} color={colors.allworthAccent} />
+          <Text style={styles.chipText}>Reviewed by {advisorFirst} this week</Text>
         </View>
 
         <Pressable
@@ -189,6 +196,25 @@ const styles = StyleSheet.create({
   name: { fontSize: 30, fontFamily: fonts.displayMedium, color: "#FFFFFF" },
   advisorRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   advisorText: { fontSize: 13, fontFamily: fonts.sans, color: "rgba(255,255,255,0.82)" },
+  reassure: {
+    fontSize: 14,
+    fontFamily: fonts.sans,
+    color: "rgba(255,255,255,0.82)",
+    lineHeight: 20,
+  },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    alignSelf: "flex-start",
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: "rgba(255,255,255,0.10)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.16)",
+  },
+  chipText: { fontSize: 12.5, fontFamily: fonts.sansBold, color: "rgba(255,255,255,0.9)" },
   link: { flexDirection: "row", alignItems: "center", gap: 3, marginTop: space[1] },
   linkText: { fontSize: 14, fontFamily: fonts.sansBold, color: "rgba(255,255,255,0.92)" },
 });
