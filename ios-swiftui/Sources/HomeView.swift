@@ -50,12 +50,13 @@ struct HomeView: View {
                         hero(safeTop: safeTop)
 
                         VStack(spacing: Space.s6) {
-                            // The rest cascades in only after the hello has landed.
-                            attention.entrance(1.2, appeared: appeared)
-                            quickActions.entrance(1.32, appeared: appeared)
-                            advisor.entrance(1.44, appeared: appeared)
-                            wealthGuide.entrance(1.54, appeared: appeared)
-                            DisclaimerFooter().entrance(1.62, appeared: appeared)
+                            // The hello lands, the chip arrives, a half-second beat —
+                            // then the rest of the page cascades in together.
+                            attention.entrance(2.4, appeared: appeared)
+                            quickActions.entrance(2.5, appeared: appeared)
+                            advisor.entrance(2.6, appeared: appeared)
+                            wealthGuide.entrance(2.7, appeared: appeared)
+                            DisclaimerFooter().entrance(2.78, appeared: appeared)
                         }
                         .padding(.horizontal, Space.s5)
                         .padding(.top, Space.s6)
@@ -126,35 +127,36 @@ struct HomeView: View {
                                  startDelay: 0.70, perLetter: 0.06, appeared: appeared)
                 }
 
-                // Everything after the greeting arrives once the hello has landed.
-                VStack(alignment: .leading, spacing: Space.s3) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "checkmark.shield.fill")
-                            .font(.system(size: 12))
-                            .foregroundStyle(Color.allworthAccent)
-                        Text("Reviewed by \(advisorFirst) this week")
-                            .font(BrandFont.sansBold(12.5))
-                            .foregroundStyle(.white.opacity(0.9))
-                    }
-                    .padding(.horizontal, 11)
-                    .padding(.vertical, 6)
-                    .background(
-                        Capsule().fill(.white.opacity(0.10))
-                            .overlay(Capsule().stroke(.white.opacity(0.16), lineWidth: 1))
-                    )
-                    Button { app.tab = 1 } label: {
-                        HStack(spacing: 3) {
-                            Text("View your wealth")
-                                .font(BrandFont.sansBold(14))
-                                .foregroundStyle(.white.opacity(0.92))
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(.white.opacity(0.92))
-                        }
-                    }
-                    .buttonStyle(.plain)
+                // Once "Good morning, Maya" has fully landed, the chip arrives.
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.shield.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.allworthAccent)
+                    Text("Reviewed by \(advisorFirst) this week")
+                        .font(BrandFont.sansBold(12.5))
+                        .foregroundStyle(.white.opacity(0.9))
                 }
-                .entrance(1.05, appeared: appeared)
+                .padding(.horizontal, 11)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule().fill(.white.opacity(0.10))
+                        .overlay(Capsule().stroke(.white.opacity(0.16), lineWidth: 1))
+                )
+                .entrance(1.35, appeared: appeared)
+
+                // …then a half-second beat, and "View your wealth" joins the rest.
+                Button { app.tab = 1 } label: {
+                    HStack(spacing: 3) {
+                        Text("View your wealth")
+                            .font(BrandFont.sansBold(14))
+                            .foregroundStyle(.white.opacity(0.92))
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.92))
+                    }
+                }
+                .buttonStyle(.plain)
+                .entrance(2.35, appeared: appeared)
             }
         }
     }
