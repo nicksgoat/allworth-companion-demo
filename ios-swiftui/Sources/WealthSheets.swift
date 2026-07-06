@@ -128,10 +128,9 @@ struct NudgeDetailSheet: View {
                 }
                 Spacer()
                 Button(action: onClose) {
-                    ZStack {
-                        Circle().fill(.white.opacity(0.7)).frame(width: 32, height: 32)
-                        Image(systemName: "xmark").font(.system(size: 18, weight: .medium)).foregroundStyle(Color.inkSecondary)
-                    }
+                    Image(systemName: "xmark").font(.system(size: 18, weight: .medium)).foregroundStyle(Color.inkSecondary)
+                        .frame(width: 32, height: 32)
+                        .glassEffect(.regular.interactive(), in: Circle())
                 }
                 .buttonStyle(.plain)
             }

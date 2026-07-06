@@ -325,10 +325,9 @@ struct AdvisorConciergeSheet: View {
 
 func closeChip(_ onClose: @escaping () -> Void) -> some View {
     Button(action: onClose) {
-        ZStack {
-            Circle().fill(Color.inkFaint).frame(width: 32, height: 32)
-            Image(systemName: "xmark").font(.system(size: 16, weight: .medium)).foregroundStyle(Color.inkSecondary)
-        }
+        Image(systemName: "xmark").font(.system(size: 16, weight: .medium)).foregroundStyle(Color.inkSecondary)
+            .frame(width: 32, height: 32)
+            .glassEffect(.regular.interactive(), in: Circle())
     }
     .buttonStyle(.plain)
 }

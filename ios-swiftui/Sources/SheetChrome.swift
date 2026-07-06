@@ -13,12 +13,11 @@ struct SheetHeaderView: View {
         HStack(spacing: Space.s3) {
             SectionHeader(title)
             Button(action: onClose) {
-                ZStack {
-                    Circle().fill(Color.inkFaint).frame(width: 30, height: 30)
-                    Image(systemName: "xmark")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(Color.inkSecondary)
-                }
+                Image(systemName: "xmark")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color.inkSecondary)
+                    .frame(width: 30, height: 30)
+                    .glassEffect(.regular.interactive(), in: Circle())
             }
             .buttonStyle(.plain)
         }

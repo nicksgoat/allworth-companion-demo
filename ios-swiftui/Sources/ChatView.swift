@@ -85,8 +85,7 @@ struct ChatView: View {
             }
         }
         .padding(5)
-        .background(Capsule().fill(Color.white).overlay(Capsule().stroke(Color.hairline, lineWidth: 1))
-            .shadow(color: Color.nightBlue.opacity(0.06), radius: 8, y: 2))
+        .glassEffect(.regular, in: Capsule())
         .padding(.horizontal, Space.s4)
         .padding(.bottom, Space.s2)
     }
@@ -209,7 +208,7 @@ private struct SuggestionChips: View {
                 Button { onPick(s) } label: {
                     Text(s).font(BrandFont.sans(15)).foregroundStyle(Color.inkSecondary)
                         .padding(.horizontal, Space.s3).padding(.vertical, 6)
-                        .overlay(Capsule().stroke(Color.hairline, lineWidth: 1))
+                        .glassEffect(.regular.interactive(), in: Capsule())
                 }
                 .buttonStyle(.plain)
             }

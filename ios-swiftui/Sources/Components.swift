@@ -96,11 +96,10 @@ struct GlassHeader: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            // Glass material (fades in over the hero; always on elsewhere).
-            Rectangle()
-                .fill(.ultraThinMaterial)
-                .overlay(Color.surfacePrimary.opacity(0.55))
-                .overlay(alignment: .bottom) { Divider().opacity(0.5) }
+            // Real iOS 26 Liquid Glass (fades in over the hero; always on elsewhere).
+            Color.clear
+                .glassEffect(.regular, in: Rectangle())
+                .overlay(alignment: .bottom) { Divider().opacity(0.4) }
                 .opacity(glassOpacity)
 
             // Dark row (ink on light) — the resolved/scrolled state.
