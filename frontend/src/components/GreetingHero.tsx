@@ -150,13 +150,8 @@ export function GreetingHero({
           </Text>
         </View>
 
-        {/* The reassurance line — answers "Am I okay?" through the plan's design,
-            not a total or performance figure. */}
-        <Text style={styles.reassure}>
-          Your plan is built to hold steady — through a big month or a market dip.
-        </Text>
-
-        {/* Stewardship attestation — a named human is watching, stated as fact. */}
+        {/* Reassurance is carried by the warm surface + the human attestation,
+            not a literal "you're safe" line. */}
         <View style={styles.chip}>
           <Ionicons name="shield-checkmark" size={13} color={colors.allworthAccent} />
           <Text style={styles.chipText}>Reviewed by {advisorFirst} this week</Text>
@@ -196,12 +191,6 @@ const styles = StyleSheet.create({
   name: { fontSize: 30, fontFamily: fonts.displayMedium, color: "#FFFFFF" },
   advisorRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   advisorText: { fontSize: 13, fontFamily: fonts.sans, color: "rgba(255,255,255,0.82)" },
-  reassure: {
-    fontSize: 14,
-    fontFamily: fonts.sans,
-    color: "rgba(255,255,255,0.82)",
-    lineHeight: 20,
-  },
   chip: {
     flexDirection: "row",
     alignItems: "center",

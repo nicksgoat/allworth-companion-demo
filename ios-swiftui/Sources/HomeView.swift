@@ -97,15 +97,8 @@ struct HomeView: View {
                         .font(BrandFont.displayMedium(30))
                         .foregroundStyle(.white)
                 }
-                // The reassurance line — the first thing a client sees. Answers
-                // "Am I okay?" by speaking to the plan's design (safe through a big
-                // month or a market dip), never a total or performance figure.
-                Text("Your plan is built to hold steady — through a big month or a market dip.")
-                    .font(BrandFont.sans(14))
-                    .foregroundStyle(.white.opacity(0.82))
-                    .lineSpacing(3)
-                    .fixedSize(horizontal: false, vertical: true)
-                // Stewardship attestation — a human is watching, stated as a fact.
+                // Reassurance is carried by the warm surface (supergraphic + settle)
+                // and the human attestation — not a literal "you're safe" line.
                 HStack(spacing: 6) {
                     Image(systemName: "checkmark.shield.fill")
                         .font(.system(size: 12))
