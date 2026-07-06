@@ -11,6 +11,17 @@ enum ViewMode { case client, advisor, vision }
     var showDemoControls = false
     var session = "wednesday"     // "monday" | "wednesday"
 
+    // Client tab selection (0 home · 1 wealth · 2 chat · 3 profile), lifted here
+    // so any screen/sheet can jump tabs. `pendingChatSend` lets a button on one
+    // tab hand a question to the Chat tab, which sends it on arrival.
+    var tab = 0
+    var pendingChatSend: String?
+
+    func goToChat(sending text: String) {
+        pendingChatSend = text
+        tab = 2
+    }
+
     // Back-compat shim for the advisor-mode callers.
     var advisorMode: Bool {
         get { mode == .advisor }

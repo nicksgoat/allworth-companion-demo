@@ -64,11 +64,15 @@ struct SimpleHero: View {
 // Small round accent button used on cards (advisor row).
 struct CircleIconButton: View {
     let icon: String
+    var action: () -> Void = {}
     var body: some View {
-        Image(systemName: icon)
-            .font(.system(size: 18))
-            .foregroundStyle(Color.allworthAccent)
-            .frame(width: 38, height: 38)
-            .background(Circle().fill(Color.allworthAccent.opacity(0.12)))
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 18))
+                .foregroundStyle(Color.allworthAccent)
+                .frame(width: 38, height: 38)
+                .background(Circle().fill(Color.allworthAccent.opacity(0.12)))
+        }
+        .buttonStyle(.plain)
     }
 }

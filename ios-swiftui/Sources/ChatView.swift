@@ -16,6 +16,7 @@ struct ChatMsg: Identifiable {
 }
 
 struct ChatView: View {
+    @Environment(AppModel.self) private var app
     @State private var messages: [ChatMsg] = [
         ChatMsg(role: .assistant, text: "Welcome back, Maya. I've refreshed your full picture — plan, portfolio, and goals. A couple of things stand out worth a closer look. Where would you like to start?"),
     ]
@@ -59,7 +60,16 @@ struct ChatView: View {
             if ProcessInfo.processInfo.environment["AUTO_CHAT"] == "1", messages.count == 1 {
                 send("How does this spending affect my plan?")
             }
+            consumePending()
         }
+        .onChange(of: app.pendingChatSend) { _, _ in consumePending() }
+    }
+
+    // A question handed over from another tab (e.g. Home's "Ask about spending").
+    private func consumePending() {
+        guard let q = app.pendingChatSend else { return }
+        app.pendingChatSend = nil
+        send(q)
     }
 
     private var sessionDivider: some View {
@@ -148,6 +158,7 @@ struct ChatView: View {
 
 private struct MessageBubble: View {
     let m: ChatMsg
+    @State private var vote = 0   // 0 none · 1 up · -1 down
     var body: some View {
         switch m.role {
         case .user:
@@ -172,8 +183,14 @@ private struct MessageBubble: View {
                     Text(boldMarkdown(m.text)).font(BrandFont.sans(17)).foregroundStyle(Color.inkPrimary).lineSpacing(6)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     HStack(spacing: Space.s4) {
-                        Image(systemName: "hand.thumbsup").foregroundStyle(Color.inkTertiary)
-                        Image(systemName: "hand.thumbsdown").foregroundStyle(Color.inkTertiary)
+                        Button { vote = vote == 1 ? 0 : 1 } label: {
+                            Image(systemName: vote == 1 ? "hand.thumbsup.fill" : "hand.thumbsup")
+                                .foregroundStyle(vote == 1 ? Color.allworthAccent : Color.inkTertiary)
+                        }.buttonStyle(.plain)
+                        Button { vote = vote == -1 ? 0 : -1 } label: {
+                            Image(systemName: vote == -1 ? "hand.thumbsdown.fill" : "hand.thumbsdown")
+                                .foregroundStyle(vote == -1 ? Color.allworthAccent : Color.inkTertiary)
+                        }.buttonStyle(.plain)
                         Spacer()
                     }
                     .font(.system(size: 15))

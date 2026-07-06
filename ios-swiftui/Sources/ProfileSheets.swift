@@ -143,6 +143,7 @@ struct DocumentsSheet: View {
 
 struct GoalsSheet: View {
     let onClose: () -> Void
+    @State private var expanded: Set<String> = []
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -158,6 +159,13 @@ struct GoalsSheet: View {
                 ForEach(Demo.goals) { g in
                     VStack(alignment: .leading, spacing: 12) {
                         goalHeader(g)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                guard !g.income else { return }
+                                withAnimation(.easeInOut(duration: 0.22)) {
+                                    if expanded.contains(g.id) { expanded.remove(g.id) } else { expanded.insert(g.id) }
+                                }
+                            }
                         if g.income {
                             Text(g.plan).font(BrandFont.sans(14)).foregroundStyle(Color.inkSecondary).lineSpacing(4)
                         } else {
@@ -171,6 +179,7 @@ struct GoalsSheet: View {
                             .frame(height: 8)
                             Text("\(usd(g.currentFunded)) of \(usd(g.target)) · \(g.plan)")
                                 .font(BrandFont.sans(14)).foregroundStyle(Color.inkSecondary).monospacedDigit()
+                            if expanded.contains(g.id) { goalDetail(g) }
                         }
                     }
                     .padding(16).card()
@@ -195,8 +204,31 @@ struct GoalsSheet: View {
                 .font(BrandFont.sansBold(12)).foregroundStyle(g.onTrack ? Color.gain : Color.attention)
             if !g.income {
                 Image(systemName: "chevron.down").font(.system(size: 13, weight: .semibold)).foregroundStyle(Color.inkTertiary)
+                    .rotationEffect(.degrees(expanded.contains(g.id) ? 180 : 0))
             }
         }
+    }
+
+    // Funding breakdown revealed when a lump-sum goal is tapped open.
+    private func goalDetail(_ g: Demo.Goal) -> some View {
+        let remaining = max(0, g.target - g.currentFunded)
+        return VStack(spacing: 0) {
+            Hairline().padding(.vertical, 4)
+            detailRow("Target", usd(g.target))
+            detailRow("Funded so far", "\(usd(g.currentFunded)) · \(g.fundedPct)%")
+            detailRow("Still to fund", usd(remaining))
+            detailRow("Status", g.onTrack ? "On track" : "Needs attention",
+                      color: g.onTrack ? .gain : .attention)
+        }
+    }
+
+    private func detailRow(_ label: String, _ value: String, color: Color = .inkPrimary) -> some View {
+        HStack {
+            Text(label).font(BrandFont.sans(14)).foregroundStyle(Color.inkTertiary)
+            Spacer()
+            Text(value).font(BrandFont.sansBold(14)).foregroundStyle(color).monospacedDigit()
+        }
+        .padding(.vertical, 7)
     }
 }
 

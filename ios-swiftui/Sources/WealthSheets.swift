@@ -84,6 +84,7 @@ struct NetWorthDetailSheet: View {
 // MARK: - Nudge detail (severity-tinted hero)
 
 struct NudgeDetailSheet: View {
+    @Environment(AppModel.self) private var app
     let nudge: Demo.NudgeInfo
     let onClose: () -> Void
 
@@ -103,12 +104,15 @@ struct NudgeDetailSheet: View {
                         ConcentrationBar(pct: pct, color: sevColor, headline: nudge.headline)
                     }
 
-                    HStack(spacing: 8) {
-                        Image(systemName: "bubble.left.and.bubble.right").font(.system(size: 18)).foregroundStyle(.white)
-                        Text(nudge.cta).font(BrandFont.sansBold(17)).foregroundStyle(.white)
+                    Button { onClose(); app.goToChat(sending: nudge.title) } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "bubble.left.and.bubble.right").font(.system(size: 18)).foregroundStyle(.white)
+                            Text(nudge.cta).font(BrandFont.sansBold(17)).foregroundStyle(.white)
+                        }
+                        .frame(maxWidth: .infinity).padding(.vertical, 15)
+                        .background(RoundedRectangle(cornerRadius: 12).fill(Color.allworthAccent))
                     }
-                    .frame(maxWidth: .infinity).padding(.vertical, 15)
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Color.allworthAccent))
+                    .buttonStyle(.plain)
 
                     AdvisorHandoffCard()
                     DisclaimerFooter()
@@ -199,6 +203,7 @@ private struct ConcentrationBar: View {
 // MARK: - Asset class detail
 
 struct ClassDetailSheet: View {
+    @Environment(AppModel.self) private var app
     let key: String
     let onClose: () -> Void
 
@@ -249,7 +254,9 @@ struct ClassDetailSheet: View {
                     }
                 }
 
-                sheetCTA("Ask how this fits my plan")
+                sheetCTA("Ask how this fits my plan") {
+                    onClose(); app.goToChat(sending: "How does my \(meta.label) allocation fit my plan?")
+                }
                 DisclaimerFooter()
             }
             .padding(20)
@@ -261,6 +268,7 @@ struct ClassDetailSheet: View {
 // MARK: - Position detail
 
 struct PositionDetailSheet: View {
+    @Environment(AppModel.self) private var app
     let position: Demo.Position
     let onClose: () -> Void
     @State private var range = "1Y"
@@ -339,7 +347,12 @@ struct PositionDetailSheet: View {
                         .font(BrandFont.sans(13)).foregroundStyle(Color.attention).lineSpacing(6)
                 }
 
-                sheetCTA(hasTax ? "Ask about the tax impact" : "Ask how this fits my plan")
+                sheetCTA(hasTax ? "Ask about the tax impact" : "Ask how this fits my plan") {
+                    onClose()
+                    app.goToChat(sending: hasTax
+                        ? "What's the tax impact of trimming \(position.symbol)?"
+                        : "How does \(position.symbol) fit my plan?")
+                }
                 AdvisorHandoffCard()
 
                 Text("Chart and gains are illustrative, generated for this demo — not market data. Past performance doesn't guarantee future results.")
@@ -378,13 +391,16 @@ func usdExact(_ n: Double) -> String {
     return "$" + (f.string(from: NSNumber(value: n)) ?? String(format: "%.2f", n))
 }
 
-func sheetCTA(_ title: String) -> some View {
-    HStack(spacing: 8) {
-        Image(systemName: "bubble.left.and.bubble.right").font(.system(size: 18)).foregroundStyle(.white)
-        Text(title).font(BrandFont.sansBold(17)).foregroundStyle(.white)
+func sheetCTA(_ title: String, action: @escaping () -> Void) -> some View {
+    Button(action: action) {
+        HStack(spacing: 8) {
+            Image(systemName: "bubble.left.and.bubble.right").font(.system(size: 18)).foregroundStyle(.white)
+            Text(title).font(BrandFont.sansBold(17)).foregroundStyle(.white)
+        }
+        .frame(maxWidth: .infinity).padding(.vertical, 14)
+        .background(RoundedRectangle(cornerRadius: 12).fill(Color.allworthAccent))
     }
-    .frame(maxWidth: .infinity).padding(.vertical, 14)
-    .background(RoundedRectangle(cornerRadius: 12).fill(Color.allworthAccent))
+    .buttonStyle(.plain)
 }
 
 struct RangeChipsRow: View {

@@ -157,6 +157,10 @@ struct AllocationCard: View {
 // MARK: - Advisor handoff ("Bring this to Nicole")
 
 struct AdvisorHandoffCard: View {
+    @Environment(AppModel.self) private var app
+    @Environment(\.dismiss) private var dismiss
+    @State private var scheduleOpen = false
+
     var body: some View {
         VStack(spacing: 14) {
             HStack(spacing: 12) {
@@ -171,18 +175,25 @@ struct AdvisorHandoffCard: View {
                 Spacer(minLength: 0)
             }
             HStack(spacing: 10) {
-                Text("Message")
-                    .font(BrandFont.sansBold(15)).foregroundStyle(.white)
-                    .frame(maxWidth: .infinity).padding(.vertical, 13)
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Color.allworthAccent))
-                Text("Schedule")
-                    .font(BrandFont.sansBold(15)).foregroundStyle(Color.allworthAccent)
-                    .frame(maxWidth: .infinity).padding(.vertical, 13)
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Color.allworthAccent.opacity(0.12)))
+                Button { dismiss(); app.tab = 2 } label: {
+                    Text("Message")
+                        .font(BrandFont.sansBold(15)).foregroundStyle(.white)
+                        .frame(maxWidth: .infinity).padding(.vertical, 13)
+                        .background(RoundedRectangle(cornerRadius: 12).fill(Color.allworthAccent))
+                }
+                .buttonStyle(.plain)
+                Button { scheduleOpen = true } label: {
+                    Text("Schedule")
+                        .font(BrandFont.sansBold(15)).foregroundStyle(Color.allworthAccent)
+                        .frame(maxWidth: .infinity).padding(.vertical, 13)
+                        .background(RoundedRectangle(cornerRadius: 12).fill(Color.allworthAccent.opacity(0.12)))
+                }
+                .buttonStyle(.plain)
             }
         }
         .padding(16)
         .card()
+        .sheet(isPresented: $scheduleOpen) { AdvisorConciergeSheet { scheduleOpen = false } }
     }
 }
 
@@ -342,16 +353,48 @@ struct AccountHoldingsSection: View {
 // MARK: - Recurring / automatic investing card
 
 struct RecurringCard: View {
+    @Environment(AppModel.self) private var app
+    @State private var expanded = false
+
     var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "arrow.triangle.2.circlepath").font(.system(size: 18)).foregroundStyle(Color.allworthAccent).frame(width: 22)
-            VStack(alignment: .leading, spacing: 1) {
-                Text("Automatic investing").font(BrandFont.sansBold(16)).foregroundStyle(Color.inkPrimary)
-                Text(Demo.recurringNext).font(BrandFont.sans(13)).foregroundStyle(Color.inkTertiary)
+        VStack(spacing: 0) {
+            Button { withAnimation(.easeInOut(duration: 0.22)) { expanded.toggle() } } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "arrow.triangle.2.circlepath").font(.system(size: 18)).foregroundStyle(Color.allworthAccent).frame(width: 22)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Automatic investing").font(BrandFont.sansBold(16)).foregroundStyle(Color.inkPrimary)
+                        Text(Demo.recurringNext).font(BrandFont.sans(13)).foregroundStyle(Color.inkTertiary)
+                    }
+                    Spacer()
+                    Text(Demo.recurringMonthly).font(BrandFont.sansBold(16)).foregroundStyle(Color.inkPrimary).monospacedDigit()
+                    Image(systemName: "chevron.down").font(.system(size: 13, weight: .semibold)).foregroundStyle(Color.inkTertiary)
+                        .rotationEffect(.degrees(expanded ? 180 : 0))
+                }
             }
-            Spacer()
-            Text(Demo.recurringMonthly).font(BrandFont.sansBold(16)).foregroundStyle(Color.inkPrimary).monospacedDigit()
-            Image(systemName: "chevron.down").font(.system(size: 13, weight: .semibold)).foregroundStyle(Color.inkTertiary)
+            .buttonStyle(.plain)
+
+            if expanded {
+                Hairline().padding(.vertical, 12)
+                VStack(spacing: 10) {
+                    ForEach(Demo.recurringPlans) { p in
+                        HStack {
+                            Text(p.account).font(BrandFont.sans(14)).foregroundStyle(Color.inkSecondary)
+                            Spacer()
+                            Text(p.amount).font(BrandFont.sansBold(14)).foregroundStyle(Color.inkPrimary).monospacedDigit()
+                        }
+                    }
+                }
+                Button { app.goToChat(sending: "Could I be investing more each month?") } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "bubble.left.and.bubble.right").font(.system(size: 15)).foregroundStyle(Color.allworthAccent)
+                        Text("Could I be investing more each month?")
+                            .font(BrandFont.sansBold(14)).foregroundStyle(Color.allworthAccent)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.top, 12)
+                }
+                .buttonStyle(.plain)
+            }
         }
         .padding(16)
         .card()

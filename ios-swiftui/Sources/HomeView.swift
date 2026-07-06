@@ -4,9 +4,13 @@ import SwiftUI
 // mark on scroll, then a calm cascade of: what needs attention, quick actions,
 // the advisor, and the way into Wealth. No totals here (they live in Wealth).
 struct HomeView: View {
+    @Environment(AppModel.self) private var app
     @State private var scrollY: CGFloat = 0
     @State private var appeared = false
     @State private var sheetNudge: Demo.NudgeInfo?
+    @State private var goalsOpen = false
+    @State private var documentsOpen = false
+    @State private var conciergeOpen = false
 
     var body: some View {
         GeometryReader { proxy in
@@ -37,9 +41,31 @@ struct HomeView: View {
                 GlassHeader(title: "Home", scrollY: scrollY, onHero: true, heroReveal: true, safeTop: safeTop)
             }
         }
-        .onAppear { appeared = true }
+        .onAppear {
+            appeared = true
+            // Debug-only: screenshot the quick-action wiring (simctl has no tap).
+            switch ProcessInfo.processInfo.environment["AUTO_QUICK"] {
+            case "spending": runQuickAction(.askSpending)
+            case "goals": runQuickAction(.goals)
+            case "book": runQuickAction(.book)
+            case "documents": runQuickAction(.documents)
+            default: break
+            }
+        }
         .sheet(item: $sheetNudge) { n in
             NudgeDetailSheet(nudge: n) { sheetNudge = nil }
+        }
+        .sheet(isPresented: $goalsOpen) { GoalsSheet { goalsOpen = false } }
+        .sheet(isPresented: $documentsOpen) { DocumentsSheet { documentsOpen = false } }
+        .sheet(isPresented: $conciergeOpen) { AdvisorConciergeSheet { conciergeOpen = false } }
+    }
+
+    private func runQuickAction(_ kind: QuickActionKind) {
+        switch kind {
+        case .askSpending: app.goToChat(sending: "How is my spending tracking against my plan?")
+        case .goals: goalsOpen = true
+        case .book: conciergeOpen = true
+        case .documents: documentsOpen = true
         }
     }
 
@@ -77,14 +103,17 @@ struct HomeView: View {
                         .font(BrandFont.sans(13))
                         .foregroundStyle(.white.opacity(0.82))
                 }
-                HStack(spacing: 3) {
-                    Text("View your wealth")
-                        .font(BrandFont.sansBold(14))
-                        .foregroundStyle(.white.opacity(0.92))
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.92))
+                Button { app.tab = 1 } label: {
+                    HStack(spacing: 3) {
+                        Text("View your wealth")
+                            .font(BrandFont.sansBold(14))
+                            .foregroundStyle(.white.opacity(0.92))
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.92))
+                    }
                 }
+                .buttonStyle(.plain)
                 .padding(.top, 2)
             }
             .entrance(0.15, appeared: appeared)
@@ -118,15 +147,18 @@ struct HomeView: View {
                 spacing: Space.s3
             ) {
                 ForEach(Demo.quickActions) { a in
-                    HStack(spacing: Space.s2) {
-                        Image(systemName: a.icon).font(.system(size: 18)).foregroundStyle(Color.allworthNavy)
-                        Text(a.label).font(BrandFont.sansBold(14)).foregroundStyle(Color.allworthNavy).lineLimit(1)
-                        Spacer(minLength: 0)
+                    Button { runQuickAction(a.kind) } label: {
+                        HStack(spacing: Space.s2) {
+                            Image(systemName: a.icon).font(.system(size: 18)).foregroundStyle(Color.allworthNavy)
+                            Text(a.label).font(BrandFont.sansBold(14)).foregroundStyle(Color.allworthNavy).lineLimit(1)
+                            Spacer(minLength: 0)
+                        }
+                        .padding(.horizontal, Space.s3)
+                        .padding(.vertical, Space.s3)
+                        .frame(maxWidth: .infinity)
+                        .card()
                     }
-                    .padding(.horizontal, Space.s3)
-                    .padding(.vertical, Space.s3)
-                    .frame(maxWidth: .infinity)
-                    .card()
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -145,8 +177,8 @@ struct HomeView: View {
                     Text(Demo.advisorTitle).font(BrandFont.sans(13)).foregroundStyle(Color.inkSecondary)
                 }
                 Spacer(minLength: Space.s2)
-                CircleIconButton(icon: "bubble.left.fill")
-                CircleIconButton(icon: "calendar")
+                CircleIconButton(icon: "bubble.left.fill") { app.tab = 2 }
+                CircleIconButton(icon: "calendar") { conciergeOpen = true }
             }
             .padding(Space.s4)
             .card()
@@ -154,19 +186,22 @@ struct HomeView: View {
     }
 
     private var wealthGuide: some View {
-        HStack(spacing: Space.s3) {
-            Image(systemName: "chart.pie").font(.system(size: 18)).foregroundStyle(Color.allworthAccent)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Your wealth").font(BrandFont.sansBold(15)).foregroundStyle(Color.inkPrimary)
-                Text("Accounts, allocation, and what's held away")
-                    .font(BrandFont.sans(12)).foregroundStyle(Color.inkTertiary)
+        Button { app.tab = 1 } label: {
+            HStack(spacing: Space.s3) {
+                Image(systemName: "chart.pie").font(.system(size: 18)).foregroundStyle(Color.allworthAccent)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Your wealth").font(BrandFont.sansBold(15)).foregroundStyle(Color.inkPrimary)
+                    Text("Accounts, allocation, and what's held away")
+                        .font(BrandFont.sans(12)).foregroundStyle(Color.inkTertiary)
+                }
+                Spacer(minLength: Space.s2)
+                Image(systemName: "chevron.right").font(.system(size: 14, weight: .semibold)).foregroundStyle(Color.inkTertiary)
             }
-            Spacer(minLength: Space.s2)
-            Image(systemName: "chevron.right").font(.system(size: 14, weight: .semibold)).foregroundStyle(Color.inkTertiary)
+            .padding(.horizontal, Space.s4)
+            .padding(.vertical, Space.s4)
+            .card()
         }
-        .padding(.horizontal, Space.s4)
-        .padding(.vertical, Space.s4)
-        .card()
+        .buttonStyle(.plain)
     }
 }
 

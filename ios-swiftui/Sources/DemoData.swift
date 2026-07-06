@@ -3,10 +3,13 @@ import SwiftUI
 // Static demo content mirroring the RN app's synthetic data (Maya Tran / Nicole
 // Mayer). No backend — this is a UI copy, so everything is hard-coded here.
 
+enum QuickActionKind { case askSpending, goals, book, documents }
+
 struct QuickAction: Identifiable {
     let id = UUID()
     let icon: String
     let label: String
+    let kind: QuickActionKind
 }
 
 enum Demo {
@@ -30,10 +33,10 @@ enum Demo {
     static let latestNote = "Spring review & lake house planning"
 
     static let quickActions: [QuickAction] = [
-        QuickAction(icon: "bubble.left", label: "Ask about spending"),
-        QuickAction(icon: "flag", label: "My goals"),
-        QuickAction(icon: "calendar", label: "Book Nicole"),
-        QuickAction(icon: "folder", label: "Documents"),
+        QuickAction(icon: "bubble.left", label: "Ask about spending", kind: .askSpending),
+        QuickAction(icon: "flag", label: "My goals", kind: .goals),
+        QuickAction(icon: "calendar", label: "Book Nicole", kind: .book),
+        QuickAction(icon: "folder", label: "Documents", kind: .documents),
     ]
 
     // Wealth — breakdown
@@ -64,6 +67,11 @@ enum Demo {
 
     static let recurringMonthly = "$3,667/mo"
     static let recurringNext = "Next deposit Aug 1"
+    struct RecurringPlan: Identifiable { let id = UUID(); let account: String; let amount: String }
+    static let recurringPlans: [RecurringPlan] = [
+        RecurringPlan(account: "Trust Brokerage", amount: "$3,000/mo"),
+        RecurringPlan(account: "Roth IRA", amount: "$667/mo"),
+    ]
 
     static func greetingForNow() -> String {
         let h = Calendar.current.component(.hour, from: Date())

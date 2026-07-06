@@ -3,14 +3,6 @@ import SwiftUI
 struct RootView: View {
     @Environment(AppModel.self) private var app
     @Environment(\.scenePhase) private var scenePhase
-    @State private var selection: Int
-
-    init() {
-        // iOS 26 renders the standard TabView as a floating Liquid Glass bar —
-        // no appearance override, so the glass shows through.
-        let tab = ProcessInfo.processInfo.environment["START_TAB"] ?? "home"
-        _selection = State(initialValue: ["home": 0, "wealth": 1, "chat": 2, "profile": 3][tab] ?? 0)
-    }
 
     var body: some View {
         @Bindable var app = app
@@ -24,6 +16,9 @@ struct RootView: View {
         }
         .sheet(isPresented: $app.showDemoControls) { DemoControlView() }
         .onAppear {
+            if let t = ProcessInfo.processInfo.environment["START_TAB"] {
+                app.tab = ["home": 0, "wealth": 1, "chat": 2, "profile": 3][t] ?? 0
+            }
             switch ProcessInfo.processInfo.environment["START_MODE"] {
             case "advisor": app.mode = .advisor
             case "vision": app.mode = .vision
@@ -40,7 +35,8 @@ struct RootView: View {
     }
 
     private var tabs: some View {
-        TabView(selection: $selection) {
+        @Bindable var app = app
+        return TabView(selection: $app.tab) {
             Tab("Home", systemImage: "house", value: 0) { HomeView() }
             Tab("Wealth", systemImage: "chart.pie", value: 1) { WealthView() }
             Tab("Chat", systemImage: "bubble.left", value: 2) { ChatView() }
