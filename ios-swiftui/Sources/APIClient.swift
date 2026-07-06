@@ -46,6 +46,26 @@ enum APIClient {
     static func saveGoalPlan(goalId: String, monthly: Double, years: Int) async throws -> SavePlanResponse {
         try await post("/api/clients/\(clientId)/goals/\(goalId)/plan", body: ["monthly": monthly, "years": years])
     }
+
+    // MARK: Conversation + advisor interjection (three-way chat)
+    static func conversation(session: String) async throws -> ConversationResponse {
+        try await get("/api/clients/\(clientId)/conversation?session=\(session)")
+    }
+    struct InterjectResponse: Decodable { let message: ConvMessage }
+    @discardableResult
+    static func interject(session: String, text: String) async throws -> InterjectResponse {
+        try await post("/api/advisors/clients/\(clientId)/interject", body: ["session": session, "text": text])
+    }
+}
+
+struct ConversationResponse: Decodable { let messages: [ConvMessage] }
+struct ConvMessage: Decodable {
+    let id: String?
+    let seq: Int?
+    let role: String            // "user" | "assistant" | "advisor"
+    let text: String
+    let advisorName: String?
+    var key: String { id ?? "seq-\(seq ?? -1)" }
 }
 
 struct GoalsResponse: Decodable {

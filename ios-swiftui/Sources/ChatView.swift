@@ -13,7 +13,8 @@ struct ChatMsg: Identifiable {
     var sources: [String] = []
     var thinking = false
     var thinkingLabel = "Thinking…"
-    enum Role { case user, assistant }
+    var advisorName = Demo.advisorName
+    enum Role { case user, assistant, advisor }
 }
 
 struct ChatView: View {
@@ -26,6 +27,8 @@ struct ChatView: View {
     @State private var lastTopic = "start"
     @State private var dynamicChips: [String] = []
     @State private var streamTask: Task<Void, Never>?
+    @State private var seenAdvisorKeys: Set<String> = []
+    @State private var primedInterjections = false
 
     var body: some View {
         GeometryReader { proxy in
@@ -69,6 +72,26 @@ struct ChatView: View {
             consumePending()
         }
         .onChange(of: app.pendingChatSend) { _, _ in consumePending() }
+        .task { await pollInterjections() }
+    }
+
+    // Three-way chat: poll the conversation feed and surface any NEW advisor
+    // interjection (posted from advisor mode) as an advisor bubble in the thread.
+    private func pollInterjections() async {
+        while !Task.isCancelled {
+            if let conv = try? await APIClient.conversation(session: app.session) {
+                for m in conv.messages where m.role == "advisor" {
+                    if seenAdvisorKeys.insert(m.key).inserted, primedInterjections {
+                        withAnimation(.easeOut(duration: 0.3)) {
+                            messages.append(ChatMsg(role: .advisor, text: m.text,
+                                                    advisorName: m.advisorName ?? Demo.advisorName))
+                        }
+                    }
+                }
+                primedInterjections = true    // first pass just marks history as seen
+            }
+            try? await Task.sleep(nanoseconds: 4_000_000_000)
+        }
     }
 
     // A question handed over from another tab (e.g. Home's "Ask about spending").
@@ -193,6 +216,9 @@ struct ChatView: View {
 private struct MessageBubble: View {
     let m: ChatMsg
     @State private var vote = 0   // 0 none · 1 up · -1 down
+    private func initials(_ name: String) -> String {
+        name.split(separator: " ").prefix(2).compactMap { $0.first.map(String.init) }.joined().uppercased()
+    }
     var body: some View {
         switch m.role {
         case .user:
@@ -201,6 +227,31 @@ private struct MessageBubble: View {
                 Text(m.text).font(BrandFont.sans(17)).foregroundStyle(Color.inkPrimary)
                     .padding(.horizontal, 14).padding(.vertical, 10)
                     .background(RoundedRectangle(cornerRadius: 16).fill(Color.inkFaint))
+            }
+        case .advisor:
+            // Human advisor dropping into the thread (RN AdvisorBubble).
+            HStack(alignment: .top, spacing: 10) {
+                ZStack {
+                    Circle().fill(Color.allworthNavy).frame(width: 30, height: 30)
+                    Text(initials(m.advisorName)).font(BrandFont.sansBold(12)).foregroundStyle(.white)
+                }
+                VStack(alignment: .leading, spacing: 5) {
+                    HStack(spacing: 6) {
+                        Text(m.advisorName).font(BrandFont.sansBold(14)).foregroundStyle(Color.inkPrimary)
+                        Text("Advisor").font(BrandFont.sansBold(11)).foregroundStyle(Color.allworthAccent)
+                            .padding(.horizontal, 7).padding(.vertical, 2)
+                            .background(Capsule().fill(Color.allworthAccent.opacity(0.12)))
+                    }
+                    Text(m.text).font(BrandFont.sans(16)).foregroundStyle(Color.inkPrimary).lineSpacing(5)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 14).padding(.vertical, 11)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14).fill(Color.white)
+                                .overlay(alignment: .leading) { Rectangle().fill(Color.allworthAccent).frame(width: 3) }
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                        )
+                        .shadow(color: Color.nightBlue.opacity(0.05), radius: 6, y: 2)
+                }
             }
         case .assistant:
             if m.thinking {

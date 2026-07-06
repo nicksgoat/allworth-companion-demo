@@ -215,6 +215,7 @@ private struct ConversationPreviewCard: View {
 // MARK: - Client conversation (transcript + interject)
 
 private struct ClientConversationView: View {
+    @Environment(AppModel.self) private var app
     let convo: Demo.ConvRef
     @State private var messages = Demo.conversation
     @State private var draft = ""
@@ -246,6 +247,8 @@ private struct ClientConversationView: View {
                     guard !body.isEmpty else { return }
                     messages.append(Demo.ConvMsg(role: .advisor, text: body, advisorName: Demo.advisorName))
                     draft = ""
+                    // Post into the client's live thread — their Chat tab picks it up.
+                    Task { try? await APIClient.interject(session: app.session, text: body) }
                 } label: {
                     Image(systemName: "arrow.up").font(.system(size: 18, weight: .semibold)).foregroundStyle(.white)
                         .frame(width: 38, height: 38).background(Circle().fill(Color.allworthNavy))
