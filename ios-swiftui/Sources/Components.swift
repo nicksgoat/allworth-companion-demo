@@ -61,8 +61,24 @@ struct NavyGradient: View {
     var breathe = false
     @State private var glow = 0.20
 
+    // Time-of-day light (Home hero only): navy stays constant; only the glow's
+    // colour + peak shift, so opening the app feels like the right hour — warm
+    // gold at dawn, bright cerulean midday, amber dusk, calm dim night.
+    private var daypart: (color: Color, peak: Double) {
+        let h = ProcessInfo.processInfo.environment["HERO_HOUR"].flatMap { Int($0) }
+            ?? Calendar.current.component(.hour, from: Date())
+        switch h {
+        case 5..<10:  return (Color(hex: 0xE6C87E), 0.34)   // dawn — warm gold
+        case 10..<17: return (.allworthAccent, 0.40)        // midday — cerulean
+        case 17..<21: return (Color(hex: 0xE39B6F), 0.30)   // dusk — warm amber
+        default:      return (.allworthAccent, 0.20)        // night — calm, dim
+        }
+    }
+
     var body: some View {
-        GeometryReader { geo in
+        let glowColor: Color = breathe ? daypart.color : .allworthAccent
+        let peak: Double = breathe ? daypart.peak : 0.36
+        return GeometryReader { geo in
             ZStack {
                 LinearGradient(
                     colors: [.nightBlue, .allworthNavy],
@@ -70,7 +86,7 @@ struct NavyGradient: View {
                     endPoint: .bottom
                 )
                 RadialGradient(
-                    colors: [Color.allworthAccent.opacity(breathe ? glow : 0.36), Color.allworthAccent.opacity(0)],
+                    colors: [glowColor.opacity(breathe ? glow : peak), glowColor.opacity(0)],
                     center: UnitPoint(x: 0.82, y: 0.12),
                     startRadius: 0,
                     endRadius: max(geo.size.width, geo.size.height) * 0.8
@@ -78,7 +94,7 @@ struct NavyGradient: View {
                 if supergraphic { IrisSupergraphic() }
             }
         }
-        .onAppear { if breathe { withAnimation(.easeOut(duration: 0.7)) { glow = 0.36 } } }
+        .onAppear { if breathe { withAnimation(.easeOut(duration: 0.7)) { glow = peak } } }
     }
 }
 
