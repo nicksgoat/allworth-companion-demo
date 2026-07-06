@@ -27,6 +27,10 @@ struct AllworthApp: App {
             }
             .environment(app)
             .environment(live)
+            // The brand system is a fixed light palette (Feather-Gray surfaces,
+            // white cards, navy heroes). Lock to light so native Liquid Glass
+            // (header, tab bar, composer) doesn't render dark in system dark mode.
+            .preferredColorScheme(.light)
             .task { await live.load() }
             .onAppear {
                 // Screenshot hook: auto-login (real token) and jump past the gate.
