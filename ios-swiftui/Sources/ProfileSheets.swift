@@ -260,7 +260,7 @@ struct GoalsSheet: View {
 // Interactive goal planning: drag the monthly contribution / horizon, watch the
 // projection reproject live (matches the backend growth model), and save the
 // plan back to the backend (POST /goals/{id}/plan).
-private struct GoalDials: View {
+struct GoalDials: View {
     let goal: APIGoal
     let rate: Double
     @State private var monthly: Double

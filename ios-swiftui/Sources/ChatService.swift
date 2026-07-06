@@ -5,7 +5,7 @@ import Foundation
 // text (token deltas) / done (sources + suggested chips) / error.
 enum ChatStreamEvent {
     case toolStart(label: String)
-    case toolEnd
+    case toolEnd(ToolWidget?)          // carries the structured result for visual tools
     case text(String)
     case done(sources: [String], suggested: [String])
     case error(String)
@@ -64,7 +64,7 @@ enum ChatService {
               let obj = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return nil }
         switch event {
         case "tool_start": return .toolStart(label: obj["label"] as? String ?? "Working…")
-        case "tool_end": return .toolEnd
+        case "tool_end": return .toolEnd(ToolWidget.from(obj["result"] as? [String: Any]))
         case "text": return .text(obj["delta"] as? String ?? "")
         case "done": return .done(sources: strings(obj["sources"]), suggested: strings(obj["suggested"]))
         case "error": return .error(obj["message"] as? String ?? "Something went wrong.")

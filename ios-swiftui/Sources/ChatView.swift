@@ -14,6 +14,7 @@ struct ChatMsg: Identifiable {
     var thinking = false
     var thinkingLabel = "Thinking…"
     var advisorName = Demo.advisorName
+    var widgets: [ToolWidget] = []       // inline tool-result cards (Monte Carlo, rebalance, goals)
     enum Role { case user, assistant, advisor }
 }
 
@@ -67,7 +68,7 @@ struct ChatView: View {
         }
         .task {
             if ProcessInfo.processInfo.environment["AUTO_CHAT"] == "1", messages.count == 1 {
-                send("How does this spending affect my plan?")
+                send(ProcessInfo.processInfo.environment["AUTO_ASK"] ?? "How does this spending affect my plan?")
             }
             consumePending()
         }
@@ -160,8 +161,10 @@ struct ChatView: View {
                 switch ev {
                 case .toolStart(let label):
                     if idx < messages.count { messages[idx].thinkingLabel = label }
-                case .toolEnd:
-                    break
+                case .toolEnd(let widget):
+                    if let widget, idx < messages.count {
+                        withAnimation(.easeOut(duration: 0.35)) { messages[idx].widgets.append(widget) }
+                    }
                 case .text(let delta):
                     guard idx < messages.count else { break }
                     if !gotText { gotText = true; lastTopic = "live"; messages[idx].thinking = false; messages[idx].text = "" }
@@ -254,10 +257,14 @@ private struct MessageBubble: View {
                 }
             }
         case .assistant:
-            if m.thinking {
-                ThinkingDots(label: m.thinkingLabel)
-            } else {
-                VStack(alignment: .leading, spacing: Space.s3) {
+            VStack(alignment: .leading, spacing: Space.s3) {
+                // Inline tool-result cards stream in above the explanatory text.
+                ForEach(Array(m.widgets.enumerated()), id: \.offset) { _, w in
+                    ChatToolWidgetView(widget: w)
+                }
+                if m.thinking && m.text.isEmpty {
+                    ThinkingDots(label: m.thinkingLabel)
+                } else if !m.text.isEmpty {
                     if !m.sources.isEmpty {
                         HStack(spacing: 6) {
                             Image(systemName: "magnifyingglass").font(.system(size: 12)).foregroundStyle(Color.inkTertiary)
@@ -280,8 +287,8 @@ private struct MessageBubble: View {
                     }
                     .font(.system(size: 15))
                 }
-                .transition(.opacity)
             }
+            .transition(.opacity)
         }
     }
 }

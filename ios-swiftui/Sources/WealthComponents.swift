@@ -86,6 +86,8 @@ struct DonutChart: View {
     let segments: [(value: Double, color: Color)]
     var size: CGFloat = 196
     var thickness: CGFloat = 22
+    // Clockwise draw-on sweep (ease-out cubic), matching the line charts' reveal.
+    @State private var progress: Double = 0
 
     var body: some View {
         let total = max(segments.reduce(0) { $0 + $1.value }, 1)
@@ -94,14 +96,17 @@ struct DonutChart: View {
             ForEach(Array(segments.enumerated()), id: \.offset) { i, seg in
                 let start = segments[0..<i].reduce(0) { $0 + $1.value } / total
                 let frac = seg.value / total
+                let from = start + gap
+                let to = max(from, min(start + frac - gap, progress))   // reveal up to the sweep front
                 Circle()
-                    .trim(from: start + gap, to: start + frac - gap)
+                    .trim(from: from, to: to)
                     .stroke(seg.color, style: StrokeStyle(lineWidth: thickness, lineCap: .butt))
                     .rotationEffect(.degrees(-90))
                     .padding(thickness / 2)
             }
         }
         .frame(width: size, height: size)
+        .onAppear { withAnimation(.easeOut(duration: 0.9)) { progress = 1 } }
     }
 }
 
