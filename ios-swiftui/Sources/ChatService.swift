@@ -12,9 +12,9 @@ enum ChatStreamEvent {
 }
 
 enum ChatService {
-    // Defaults to the local dev backend; override with BACKEND_URL for a demo host.
+    // Defaults to the deployed HTTPS backend; override with BACKEND_URL for local dev.
     static var baseURL: String {
-        ProcessInfo.processInfo.environment["BACKEND_URL"] ?? "http://localhost:3000"
+        ProcessInfo.processInfo.environment["BACKEND_URL"] ?? "https://allworth-demo-api.fly.dev"
     }
 
     static func stream(clientId: String, session: String, message: String,
@@ -28,6 +28,7 @@ enum ChatService {
                 req.httpMethod = "POST"
                 req.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 req.setValue("text/event-stream", forHTTPHeaderField: "Accept")
+                if let t = APIClient.token { req.setValue("Bearer \(t)", forHTTPHeaderField: "Authorization") }
                 req.timeoutInterval = 90
                 var payload: [String: Any] = ["clientId": clientId, "session": session, "message": message]
                 if let conversationId { payload["conversationId"] = conversationId }

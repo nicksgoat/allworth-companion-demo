@@ -2,11 +2,13 @@ import SwiftUI
 
 // The front door — 1:1 port of LoginScreen: the brand's Night Blue → Indigo hero
 // with a soft cerulean glow, the horizontal lockup + promise, and a passwordless
-// email sign-in. Any valid-looking email continues (no backend).
+// email sign-in that authenticates against the backend (POST /auth/login/email).
 struct LoginView: View {
     @Environment(AppModel.self) private var app
-    @State private var email = ""
+    @Environment(LiveStore.self) private var live
+    @State private var email = "nicole@demo.com"   // demo persona — one-tap Continue
     @State private var error: String?
+    @State private var busy = false
 
     var body: some View {
         GeometryReader { proxy in
@@ -54,10 +56,12 @@ struct LoginView: View {
                         }
 
                         Button(action: submit) {
-                            Text("Continue").font(BrandFont.sansBold(16)).foregroundStyle(Color.allworthNavy)
+                            Text(busy ? "Signing in…" : "Continue").font(BrandFont.sansBold(16)).foregroundStyle(Color.allworthNavy)
                                 .frame(maxWidth: .infinity).frame(height: 54)
                                 .background(RoundedRectangle(cornerRadius: 12).fill(.white))
+                                .opacity(busy ? 0.7 : 1)
                         }
+                        .disabled(busy)
                         .padding(.top, 18)
                     }
                     .padding(.top, 56)
@@ -85,7 +89,18 @@ struct LoginView: View {
     private func submit() {
         let e = email.trimmingCharacters(in: .whitespaces).lowercased()
         guard e.contains("@") else { error = "Please enter a valid email address."; return }
-        error = nil
-        withAnimation(.easeOut(duration: 0.3)) { app.loggedIn = true }
+        error = nil; busy = true
+        Task {
+            do {
+                let res = try await APIClient.login(email: e)
+                APIClient.token = res.token
+                await live.load()               // refresh tabs with authed data
+                busy = false
+                withAnimation(.easeOut(duration: 0.3)) { app.loggedIn = true }
+            } catch {
+                busy = false
+                self.error = "We couldn't find an account for that email."
+            }
+        }
     }
 }

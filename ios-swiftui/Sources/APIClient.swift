@@ -4,37 +4,50 @@ import Foundation
 // for the tabs, goal planning, and advisor interjection all go through here.
 // Defaults to the local dev backend; override with BACKEND_URL.
 enum APIClient {
+    // Demoable anywhere: defaults to the deployed HTTPS backend. Override with
+    // BACKEND_URL (e.g. http://localhost:3000) for local development.
     static var baseURL: String {
-        ProcessInfo.processInfo.environment["BACKEND_URL"] ?? "http://localhost:3000"
+        ProcessInfo.processInfo.environment["BACKEND_URL"] ?? "https://allworth-demo-api.fly.dev"
     }
     static let clientId = "maya"
     static let advisorId = "nicole"
+    static var token: String?          // set after login; sent as Bearer
 
     struct APIError: Error { let message: String }
 
-    static func get<T: Decodable>(_ path: String) async throws -> T {
+    private static func request(_ path: String, method: String, body: Data? = nil) throws -> URLRequest {
         guard let url = URL(string: baseURL + path) else { throw APIError(message: "bad url") }
-        let (data, resp) = try await URLSession.shared.data(from: url)
+        var req = URLRequest(url: url)
+        req.httpMethod = method
+        if let body { req.httpBody = body; req.setValue("application/json", forHTTPHeaderField: "Content-Type") }
+        if let token { req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization") }
+        return req
+    }
+
+    static func get<T: Decodable>(_ path: String) async throws -> T {
+        let (data, resp) = try await URLSession.shared.data(for: request(path, method: "GET"))
         try check(resp, data)
         return try JSONDecoder().decode(T.self, from: data)
     }
 
     @discardableResult
     static func post<T: Decodable>(_ path: String, body: [String: Any]) async throws -> T {
-        guard let url = URL(string: baseURL + path) else { throw APIError(message: "bad url") }
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        req.httpBody = try JSONSerialization.data(withJSONObject: body)
-        let (data, resp) = try await URLSession.shared.data(for: req)
-        try check(resp, data)
-        return try JSONDecoder().decode(T.self, from: data)
+        let data = try JSONSerialization.data(withJSONObject: body)
+        let (out, resp) = try await URLSession.shared.data(for: request(path, method: "POST", body: data))
+        try check(resp, out)
+        return try JSONDecoder().decode(T.self, from: out)
     }
 
     private static func check(_ resp: URLResponse, _ data: Data) throws {
         guard let http = resp as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
             throw APIError(message: "HTTP \((resp as? HTTPURLResponse)?.statusCode ?? -1)")
         }
+    }
+
+    // MARK: Auth
+    struct LoginResponse: Decodable { let token: String; let householdId: String?; let contactName: String? }
+    static func login(email: String) async throws -> LoginResponse {
+        try await post("/api/auth/login/email", body: ["email": email])
     }
 
     // MARK: Goals

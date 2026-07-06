@@ -30,6 +30,7 @@ struct LockView: View {
                 }
                 .buttonStyle(.plain)
                 Button {
+                    APIClient.token = nil
                     app.locked = false; app.mode = .client; app.loggedIn = false
                 } label: {
                     Text("Sign in with email instead").font(BrandFont.sans(13)).foregroundStyle(.white.opacity(0.7))

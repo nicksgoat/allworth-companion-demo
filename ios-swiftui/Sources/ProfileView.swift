@@ -203,6 +203,7 @@ struct ProfileView: View {
         VStack(spacing: Space.s3) {
             Text(Demo.userEmail).font(BrandFont.sans(13)).foregroundStyle(Color.inkTertiary)
             Button {
+                APIClient.token = nil
                 withAnimation(.easeOut(duration: 0.3)) {
                     app.mode = .client; app.locked = false; app.loggedIn = false
                 }

@@ -21,8 +21,16 @@ struct AllworthApp: App {
             .environment(live)
             .task { await live.load() }
             .onAppear {
-                // Screenshot hook: jump straight to the app past the login gate.
-                if ProcessInfo.processInfo.environment["SKIP_LOGIN"] == "1" { app.loggedIn = true }
+                // Screenshot hook: auto-login (real token) and jump past the gate.
+                if ProcessInfo.processInfo.environment["SKIP_LOGIN"] == "1" {
+                    Task {
+                        if let r = try? await APIClient.login(email: "nicole@demo.com") {
+                            APIClient.token = r.token
+                            await live.load()
+                        }
+                        app.loggedIn = true
+                    }
+                }
             }
         }
     }
