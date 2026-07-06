@@ -6,13 +6,15 @@ import SwiftUI
 // MARK: - Net worth detail (full navy modal)
 
 struct NetWorthDetailSheet: View {
+    @Environment(LiveStore.self) private var live
     let onClose: () -> Void
     @State private var range = "1Y"
 
     private let ranges = ["3M", "6M", "1Y"]
+    private var netWorth: Int { live.netWorth ?? Demo.netWorth }
 
     private var slice: [Double] {
-        let h = Demo.netWorthHistory
+        let h = live.netWorthHistory.isEmpty ? Demo.netWorthHistory : live.netWorthHistory
         switch range {
         case "3M": return Array(h.suffix(3))
         case "6M": return Array(h.suffix(6))
@@ -47,7 +49,7 @@ struct NetWorthDetailSheet: View {
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Text(usd(Demo.netWorth)).font(BrandFont.display(44)).foregroundStyle(.white).monospacedDigit()
+                Text(usd(netWorth)).font(BrandFont.display(44)).foregroundStyle(.white).monospacedDigit()
                 Text(deltaText).font(BrandFont.sansBold(17)).foregroundStyle(Color.gainOnDark).monospacedDigit()
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -153,12 +155,17 @@ struct NudgeDetailSheet: View {
 }
 
 private struct SpendingBars: View {
+    @Environment(LiveStore.self) private var live
+    private var months: [Demo.SpendMonth] { live.spendMonths.isEmpty ? Demo.spendMonths : live.spendMonths }
+    private var plan: Int { live.spendPlan ?? Demo.spendPlan }
+    private var avg: Int { live.spendAvg3mo ?? Demo.spendAvg3mo }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            SectionHeader("Last \(Demo.spendMonths.count) months vs plan")
-            ForEach(Demo.spendMonths) { m in
-                let ratio = min(1.0, Double(m.total) / Double(Demo.spendPlan) / 1.4)
-                let over = m.total > Demo.spendPlan
+            SectionHeader("Last \(months.count) months vs plan")
+            ForEach(months) { m in
+                let ratio = min(1.0, Double(m.total) / Double(plan) / 1.4)
+                let over = m.total > plan
                 HStack(spacing: 10) {
                     Text(m.month).font(BrandFont.sans(13)).foregroundStyle(Color.inkTertiary).monospacedDigit().frame(width: 30, alignment: .leading)
                     GeometryReader { geo in
@@ -171,7 +178,7 @@ private struct SpendingBars: View {
                     Text(usd(m.total)).font(BrandFont.sans(13)).foregroundStyle(Color.inkSecondary).monospacedDigit().frame(width: 64, alignment: .trailing)
                 }
             }
-            Text("Plan: \(usd(Demo.spendPlan))/mo · Recent average: \(usd(Demo.spendAvg3mo))/mo")
+            Text("Plan: \(usd(plan))/mo · Recent average: \(usd(avg))/mo")
                 .font(BrandFont.sans(13)).foregroundStyle(Color.inkTertiary)
         }
     }

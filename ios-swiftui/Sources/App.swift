@@ -7,6 +7,7 @@ import SwiftUI
 @main
 struct AllworthApp: App {
     @State private var app = AppModel()
+    @State private var live = LiveStore()
     var body: some Scene {
         WindowGroup {
             Group {
@@ -17,6 +18,8 @@ struct AllworthApp: App {
                 }
             }
             .environment(app)
+            .environment(live)
+            .task { await live.load() }
             .onAppear {
                 // Screenshot hook: jump straight to the app past the login gate.
                 if ProcessInfo.processInfo.environment["SKIP_LOGIN"] == "1" { app.loggedIn = true }
