@@ -148,45 +148,25 @@ struct DocumentsSheet: View {
 struct GoalsSheet: View {
     let onClose: () -> Void
     @State private var expanded: Set<String> = []
+    @State private var live: GoalsResponse?
+    private var rate: Double { live?.assumedGrowthRate ?? 0.06 }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .top, spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("My goals").font(BrandFont.displayMedium(26)).foregroundStyle(Color.allworthNavy)
-                        Text(Demo.goalsSummary).font(BrandFont.sans(14)).foregroundStyle(Color.inkSecondary)
+                        Text(live?.summary ?? Demo.goalsSummary).font(BrandFont.sans(14)).foregroundStyle(Color.inkSecondary)
                     }
                     Spacer()
                     closeChip(onClose)
                 }
 
-                ForEach(Demo.goals) { g in
-                    VStack(alignment: .leading, spacing: 12) {
-                        goalHeader(g)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                guard !g.income else { return }
-                                withAnimation(.easeInOut(duration: 0.22)) {
-                                    if expanded.contains(g.id) { expanded.remove(g.id) } else { expanded.insert(g.id) }
-                                }
-                            }
-                        if g.income {
-                            Text(g.plan).font(BrandFont.sans(14)).foregroundStyle(Color.inkSecondary).lineSpacing(4)
-                        } else {
-                            GeometryReader { geo in
-                                ZStack(alignment: .leading) {
-                                    Capsule().fill(Color.inkFaint)
-                                    Capsule().fill(g.onTrack ? Color.chartEvergreen : Color.attention)
-                                        .frame(width: geo.size.width * CGFloat(min(100, g.fundedPct)) / 100)
-                                }
-                            }
-                            .frame(height: 8)
-                            Text("\(usd(g.currentFunded)) of \(usd(g.target)) · \(g.plan)")
-                                .font(BrandFont.sans(14)).foregroundStyle(Color.inkSecondary).monospacedDigit()
-                            if expanded.contains(g.id) { goalDetail(g) }
-                        }
-                    }
-                    .padding(16).card()
+                if let live {
+                    ForEach(live.goals) { goalCard($0) }
+                } else {
+                    ForEach(Demo.goals) { staticGoalCard($0) }   // offline fallback (read-only)
                 }
 
                 SectionHeader("How this works")
@@ -197,42 +177,162 @@ struct GoalsSheet: View {
             .padding(20)
         }
         .background(Color.surfacePrimary.ignoresSafeArea())
-    }
-
-    private func goalHeader(_ g: Demo.Goal) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: "flag").font(.system(size: 15)).foregroundStyle(Color.allworthAccent)
-            Text(g.label).font(BrandFont.sansBold(16)).foregroundStyle(Color.inkPrimary).lineLimit(1)
-            Spacer(minLength: 6)
-            Text(g.onTrack ? "On track" : "Needs attention")
-                .font(BrandFont.sansBold(12)).foregroundStyle(g.onTrack ? Color.gain : Color.attention)
-            if !g.income {
-                Image(systemName: "chevron.down").font(.system(size: 13, weight: .semibold)).foregroundStyle(Color.inkTertiary)
-                    .rotationEffect(.degrees(expanded.contains(g.id) ? 180 : 0))
+        .task {
+            live = try? await APIClient.goals()
+            if ProcessInfo.processInfo.environment["EXPAND_GOAL"] == "1",
+               let first = live?.goals.first(where: { !$0.isIncome }) {
+                expanded.insert(first.id)
             }
         }
     }
 
-    // Funding breakdown revealed when a lump-sum goal is tapped open.
-    private func goalDetail(_ g: Demo.Goal) -> some View {
-        let remaining = max(0, g.target - g.currentFunded)
-        return VStack(spacing: 0) {
-            Hairline().padding(.vertical, 4)
-            detailRow("Target", usd(g.target))
-            detailRow("Funded so far", "\(usd(g.currentFunded)) · \(g.fundedPct)%")
-            detailRow("Still to fund", usd(remaining))
-            detailRow("Status", g.onTrack ? "On track" : "Needs attention",
-                      color: g.onTrack ? .gain : .attention)
+    // Live goal — lump-sum goals expand into interactive planning dials.
+    @ViewBuilder private func goalCard(_ g: APIGoal) -> some View {
+        let onTrack = g.onTrackWithPlan ?? g.onTrack ?? true
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: g.isIncome ? "dollarsign.circle" : "flag").font(.system(size: 15)).foregroundStyle(Color.allworthAccent)
+                Text(g.label).font(BrandFont.sansBold(16)).foregroundStyle(Color.inkPrimary).lineLimit(1)
+                Spacer(minLength: 6)
+                Text(onTrack ? "On track" : "Needs attention")
+                    .font(BrandFont.sansBold(12)).foregroundStyle(onTrack ? Color.gain : Color.attention)
+                if !g.isIncome {
+                    Image(systemName: "chevron.down").font(.system(size: 13, weight: .semibold)).foregroundStyle(Color.inkTertiary)
+                        .rotationEffect(.degrees(expanded.contains(g.id) ? 180 : 0))
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                guard !g.isIncome else { return }
+                withAnimation(.easeInOut(duration: 0.22)) {
+                    if expanded.contains(g.id) { expanded.remove(g.id) } else { expanded.insert(g.id) }
+                }
+            }
+            if g.isIncome {
+                Text(g.detail ?? "").font(BrandFont.sans(14)).foregroundStyle(Color.inkSecondary).lineSpacing(4)
+            } else {
+                let target = g.target ?? 0, funded = g.currentFunded ?? 0, pct = g.fundedPct ?? 0
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(Color.inkFaint)
+                        Capsule().fill(onTrack ? Color.chartEvergreen : Color.attention)
+                            .frame(width: geo.size.width * CGFloat(min(100, pct)) / 100)
+                    }
+                }
+                .frame(height: 8)
+                Text("\(usd(funded)) of \(usd(target)) — tap to adjust your plan")
+                    .font(BrandFont.sans(14)).foregroundStyle(Color.inkSecondary).monospacedDigit()
+                if expanded.contains(g.id) { GoalDials(goal: g, rate: rate) }
+            }
         }
+        .padding(16).card()
     }
 
-    private func detailRow(_ label: String, _ value: String, color: Color = .inkPrimary) -> some View {
-        HStack {
-            Text(label).font(BrandFont.sans(14)).foregroundStyle(Color.inkTertiary)
-            Spacer()
-            Text(value).font(BrandFont.sansBold(14)).foregroundStyle(color).monospacedDigit()
+    // Read-only static card shown only if the backend is unreachable.
+    @ViewBuilder private func staticGoalCard(_ g: Demo.Goal) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: "flag").font(.system(size: 15)).foregroundStyle(Color.allworthAccent)
+                Text(g.label).font(BrandFont.sansBold(16)).foregroundStyle(Color.inkPrimary).lineLimit(1)
+                Spacer(minLength: 6)
+                Text(g.onTrack ? "On track" : "Needs attention")
+                    .font(BrandFont.sansBold(12)).foregroundStyle(g.onTrack ? Color.gain : Color.attention)
+            }
+            if g.income {
+                Text(g.plan).font(BrandFont.sans(14)).foregroundStyle(Color.inkSecondary).lineSpacing(4)
+            } else {
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(Color.inkFaint)
+                        Capsule().fill(g.onTrack ? Color.chartEvergreen : Color.attention)
+                            .frame(width: geo.size.width * CGFloat(min(100, g.fundedPct)) / 100)
+                    }
+                }
+                .frame(height: 8)
+                Text("\(usd(g.currentFunded)) of \(usd(g.target)) · \(g.plan)")
+                    .font(BrandFont.sans(14)).foregroundStyle(Color.inkSecondary).monospacedDigit()
+            }
         }
-        .padding(.vertical, 7)
+        .padding(16).card()
+    }
+}
+
+// Interactive goal planning: drag the monthly contribution / horizon, watch the
+// projection reproject live (matches the backend growth model), and save the
+// plan back to the backend (POST /goals/{id}/plan).
+private struct GoalDials: View {
+    let goal: APIGoal
+    let rate: Double
+    @State private var monthly: Double
+    @State private var years: Int
+    @State private var saving = false
+    @State private var saved = false
+
+    init(goal: APIGoal, rate: Double) {
+        self.goal = goal
+        self.rate = rate
+        _monthly = State(initialValue: goal.committedMonthly ?? Double(goal.monthlyContributionToClose ?? 500))
+        _years = State(initialValue: goal.committedYears ?? goal.horizonYears ?? 6)
+    }
+
+    private var projected: Double {
+        projectGoal(current: Double(goal.currentFunded ?? 0), monthly: monthly, years: years, annualRate: rate)
+    }
+    private var onTrack: Bool { projected >= Double(goal.target ?? 0) }
+    private var sliderMax: Double { max(2000, (goal.committedMonthly ?? 3000) * 2.5, Double(goal.monthlyContributionToClose ?? 1000) * 2) }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Hairline().padding(.vertical, 2)
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Projected in \(years) year\(years == 1 ? "" : "s")").font(BrandFont.sans(12)).foregroundStyle(Color.inkTertiary)
+                    Text(usd(Int(projected))).font(BrandFont.displayMedium(28)).foregroundStyle(onTrack ? Color.gain : Color.attention).monospacedDigit()
+                }
+                Spacer()
+                Text(onTrack ? "Funds the goal" : "Short of target")
+                    .font(BrandFont.sansBold(12)).foregroundStyle(onTrack ? Color.gain : Color.attention)
+                    .padding(.horizontal, 10).padding(.vertical, 5)
+                    .background(Capsule().fill((onTrack ? Color.gain : Color.attention).opacity(0.12)))
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text("Monthly contribution").font(BrandFont.sans(13)).foregroundStyle(Color.inkSecondary)
+                    Spacer()
+                    Text("\(usd(Int(monthly)))/mo").font(BrandFont.sansBold(14)).foregroundStyle(Color.inkPrimary).monospacedDigit()
+                }
+                Slider(value: $monthly, in: 0...sliderMax, step: 250) { editing in if editing { saved = false } }
+                    .tint(Color.allworthNavy)
+            }
+
+            Stepper(value: $years, in: 1...30) {
+                HStack {
+                    Text("Time horizon").font(BrandFont.sans(13)).foregroundStyle(Color.inkSecondary)
+                    Spacer()
+                    Text("\(years) years").font(BrandFont.sansBold(14)).foregroundStyle(Color.inkPrimary).monospacedDigit()
+                }
+            }
+            .onChange(of: years) { _, _ in saved = false }
+
+            Button {
+                Task {
+                    saving = true
+                    try? await APIClient.saveGoalPlan(goalId: goal.id, monthly: monthly, years: years)
+                    saving = false
+                    withAnimation { saved = true }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    if saved { Image(systemName: "checkmark.circle.fill"); Text("Plan saved") }
+                    else { Text(saving ? "Saving…" : "Save this plan") }
+                }
+                .font(BrandFont.sansBold(15)).foregroundStyle(.white)
+                .frame(maxWidth: .infinity).padding(.vertical, 12)
+                .background(RoundedRectangle(cornerRadius: 12).fill(saved ? Color.gain : Color.allworthNavy))
+            }
+            .buttonStyle(.plain)
+        }
     }
 }
 
