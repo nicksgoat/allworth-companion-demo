@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // SwiftUI copy of the Allworth companion app. Design system, navy heroes, the
 // glass header, and the Home logo "hello" + scroll handoff are ported from the
@@ -8,6 +9,13 @@ import SwiftUI
 struct AllworthApp: App {
     @State private var app = AppModel()
     @State private var live = LiveStore()
+
+    init() {
+        // No rubber-band overscroll: you can't pull the navy header down past the
+        // top edge (which exposed a gray gap and read as low-quality). Global.
+        UIScrollView.appearance().bounces = false
+        UIScrollView.appearance().alwaysBounceVertical = false
+    }
     var body: some Scene {
         WindowGroup {
             Group {
