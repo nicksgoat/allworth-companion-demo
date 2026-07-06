@@ -1,5 +1,31 @@
 import SwiftUI
 
+// A letter-by-letter reveal — each character fades + rises (with a soft focus-in)
+// in sequence, so the greeting "arrives" like a real hello rather than painting.
+private struct LetterReveal: View {
+    let text: String
+    let font: Font
+    let color: Color
+    var startDelay: Double = 0
+    var perLetter: Double = 0.04
+    var appeared: Bool
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(Array(text.enumerated()), id: \.offset) { i, ch in
+                Text(ch == " " ? "\u{00A0}" : String(ch))
+                    .font(font)
+                    .foregroundStyle(color)
+                    .fixedSize()
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 8)
+                    .blur(radius: appeared ? 0 : 3)
+                    .animation(.easeOut(duration: 0.42).delay(startDelay + Double(i) * perLetter), value: appeared)
+            }
+        }
+    }
+}
+
 // Home — the front door. Big Allworth logo "hello" that hands off to the header
 // mark on scroll, then a calm cascade of: what needs attention, quick actions,
 // the advisor, and the way into Wealth. No totals here (they live in Wealth).
@@ -24,11 +50,12 @@ struct HomeView: View {
                         hero(safeTop: safeTop)
 
                         VStack(spacing: Space.s6) {
-                            attention.entrance(0.24, appeared: appeared)
-                            quickActions.entrance(0.34, appeared: appeared)
-                            advisor.entrance(0.44, appeared: appeared)
-                            wealthGuide.entrance(0.54, appeared: appeared)
-                            DisclaimerFooter().entrance(0.6, appeared: appeared)
+                            // The rest cascades in only after the hello has landed.
+                            attention.entrance(1.2, appeared: appeared)
+                            quickActions.entrance(1.32, appeared: appeared)
+                            advisor.entrance(1.44, appeared: appeared)
+                            wealthGuide.entrance(1.54, appeared: appeared)
+                            DisclaimerFooter().entrance(1.62, appeared: appeared)
                         }
                         .padding(.horizontal, Space.s5)
                         .padding(.top, Space.s6)
@@ -89,44 +116,46 @@ struct HomeView: View {
                 .padding(.bottom, Space.s1)
 
             VStack(alignment: .leading, spacing: Space.s3) {
+                // The hello: greeting then name, each cascading in letter by letter.
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("\(Demo.greetingForNow()),")
-                        .font(BrandFont.sans(14))
-                        .foregroundStyle(.white.opacity(0.72))
-                    Text(Demo.clientFirstName)
-                        .font(BrandFont.displayMedium(30))
-                        .foregroundStyle(.white)
+                    LetterReveal(text: "\(Demo.greetingForNow()),",
+                                 font: BrandFont.sans(14), color: .white.opacity(0.72),
+                                 startDelay: 0.30, perLetter: 0.035, appeared: appeared)
+                    LetterReveal(text: Demo.clientFirstName,
+                                 font: BrandFont.displayMedium(30), color: .white,
+                                 startDelay: 0.70, perLetter: 0.06, appeared: appeared)
                 }
-                // Reassurance is carried by the warm surface (supergraphic + settle)
-                // and the human attestation — not a literal "you're safe" line.
-                HStack(spacing: 6) {
-                    Image(systemName: "checkmark.shield.fill")
-                        .font(.system(size: 12))
-                        .foregroundStyle(Color.allworthAccent)
-                    Text("Reviewed by \(advisorFirst) this week")
-                        .font(BrandFont.sansBold(12.5))
-                        .foregroundStyle(.white.opacity(0.9))
-                }
-                .padding(.horizontal, 11)
-                .padding(.vertical, 6)
-                .background(
-                    Capsule().fill(.white.opacity(0.10))
-                        .overlay(Capsule().stroke(.white.opacity(0.16), lineWidth: 1))
-                )
-                Button { app.tab = 1 } label: {
-                    HStack(spacing: 3) {
-                        Text("View your wealth")
-                            .font(BrandFont.sansBold(14))
-                            .foregroundStyle(.white.opacity(0.92))
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundStyle(.white.opacity(0.92))
+
+                // Everything after the greeting arrives once the hello has landed.
+                VStack(alignment: .leading, spacing: Space.s3) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "checkmark.shield.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color.allworthAccent)
+                        Text("Reviewed by \(advisorFirst) this week")
+                            .font(BrandFont.sansBold(12.5))
+                            .foregroundStyle(.white.opacity(0.9))
                     }
+                    .padding(.horizontal, 11)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule().fill(.white.opacity(0.10))
+                            .overlay(Capsule().stroke(.white.opacity(0.16), lineWidth: 1))
+                    )
+                    Button { app.tab = 1 } label: {
+                        HStack(spacing: 3) {
+                            Text("View your wealth")
+                                .font(BrandFont.sansBold(14))
+                                .foregroundStyle(.white.opacity(0.92))
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.92))
+                        }
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
-                .padding(.top, 2)
+                .entrance(1.05, appeared: appeared)
             }
-            .entrance(0.15, appeared: appeared)
         }
     }
 
