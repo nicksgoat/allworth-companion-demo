@@ -101,6 +101,7 @@ struct MeetingNoteDetailSheet: View {
 // MARK: - Documents (vault)
 
 struct DocumentsSheet: View {
+    @Environment(AppModel.self) private var app
     let onClose: () -> Void
     var body: some View {
         ScrollView {
@@ -113,20 +114,23 @@ struct DocumentsSheet: View {
                 VStack(spacing: 8) {
                     SectionHeader("Your vault")
                     ForEach(Demo.documents) { doc in
-                        HStack(spacing: 12) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 10).fill(Color.ice).frame(width: 36, height: 36)
-                                Image(systemName: doc.icon).font(.system(size: 18)).foregroundStyle(Color.allworthNavy)
+                        Button { onClose(); app.goToChat(sending: "Can you summarize my \(doc.name)?") } label: {
+                            HStack(spacing: 12) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 10).fill(Color.ice).frame(width: 36, height: 36)
+                                    Image(systemName: doc.icon).font(.system(size: 18)).foregroundStyle(Color.allworthNavy)
+                                }
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(doc.name).font(BrandFont.sansBold(15)).foregroundStyle(Color.inkPrimary)
+                                    Text(doc.meta).font(BrandFont.sans(12)).foregroundStyle(Color.inkTertiary)
+                                }
+                                Spacer(minLength: 8)
+                                Image(systemName: "chevron.right").font(.system(size: 15, weight: .semibold)).foregroundStyle(Color.inkTertiary)
                             }
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(doc.name).font(BrandFont.sansBold(15)).foregroundStyle(Color.inkPrimary)
-                                Text(doc.meta).font(BrandFont.sans(12)).foregroundStyle(Color.inkTertiary)
-                            }
-                            Spacer(minLength: 8)
-                            Image(systemName: "chevron.right").font(.system(size: 15, weight: .semibold)).foregroundStyle(Color.inkTertiary)
+                            .padding(.horizontal, 16).padding(.vertical, 12)
+                            .card()
                         }
-                        .padding(.horizontal, 16).padding(.vertical, 12)
-                        .card()
+                        .buttonStyle(.plain)
                     }
                 }
                 Text("Vault synced with your advisor's records. Ask in chat about any document — the assistant knows what's here.")

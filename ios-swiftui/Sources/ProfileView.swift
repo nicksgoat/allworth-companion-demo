@@ -103,11 +103,14 @@ struct ProfileView: View {
                     Text(Demo.advisorTitle).font(BrandFont.sans(13)).foregroundStyle(Color.inkSecondary)
                 }
                 Spacer(minLength: Space.s2)
-                Image(systemName: "ellipsis.message.fill")
-                    .font(.system(size: 18))
-                    .foregroundStyle(Color.allworthAccent)
-                    .frame(width: 40, height: 40)
-                    .background(Circle().fill(Color.allworthAccent.opacity(0.12)))
+                Button { app.tab = 2 } label: {
+                    Image(systemName: "ellipsis.message.fill")
+                        .font(.system(size: 18))
+                        .foregroundStyle(Color.allworthAccent)
+                        .frame(width: 40, height: 40)
+                        .background(Circle().fill(Color.allworthAccent.opacity(0.12)))
+                }
+                .buttonStyle(.plain)
             }
             .padding(14)
             .card()
@@ -199,12 +202,19 @@ struct ProfileView: View {
     private var accountFooter: some View {
         VStack(spacing: Space.s3) {
             Text(Demo.userEmail).font(BrandFont.sans(13)).foregroundStyle(Color.inkTertiary)
-            Text("Sign out")
-                .font(BrandFont.sansBold(14))
-                .foregroundStyle(Color.inkSecondary)
-                .padding(.horizontal, Space.s6)
-                .padding(.vertical, 10)
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.hairline, lineWidth: 1))
+            Button {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    app.mode = .client; app.locked = false; app.loggedIn = false
+                }
+            } label: {
+                Text("Sign out")
+                    .font(BrandFont.sansBold(14))
+                    .foregroundStyle(Color.inkSecondary)
+                    .padding(.horizontal, Space.s6)
+                    .padding(.vertical, 10)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.hairline, lineWidth: 1))
+            }
+            .buttonStyle(.plain)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, Space.s2)
