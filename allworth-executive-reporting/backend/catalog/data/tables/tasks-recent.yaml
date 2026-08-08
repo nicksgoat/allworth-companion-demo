@@ -1,0 +1,244 @@
+id: tasks-recent
+name: Tasks_Recent
+schema: tho
+db: DataWarehouse
+db_table: Tasks
+guid: 315c5510-b315-4b7d-ae83-88e781a94c7f
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Activity
+deprecated: true
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Tasks (Migrate to Activities Model)
+column_count: 20
+columns:
+- name: Id
+  db_column_name: Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Owner_Client_Service_Type__c
+  db_column_name: Owner_Client_Service_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CreatedById
+  db_column_name: CreatedById
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Completed_By__c
+  db_column_name: Completed_By__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Task URL
+  db_column_name: Task URL
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Subject
+  db_column_name: Subject
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LeadID
+  db_column_name: LeadID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ActivityDate
+  db_column_name: ActivityDate
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Status
+  db_column_name: Status
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Priority
+  db_column_name: Priority
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: IsHighPriority
+  db_column_name: IsHighPriority
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: OwnerId
+  db_column_name: OwnerId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CreatedDate
+  db_column_name: CreatedDate
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: TaskSubType
+  db_column_name: TaskSubType
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CompletedDateTime
+  db_column_name: CompletedDateTime
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Process__c
+  db_column_name: Process__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Process_Type__c
+  db_column_name: Process_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Service_Type__c
+  db_column_name: Service_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Operations_Team__c
+  db_column_name: Operations_Team__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Is_High_Priority_Client__c
+  db_column_name: Is_High_Priority_Client__c
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: Task Assigned To
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Tasks_Recent::OwnerId] = [User::User ID]'
+  pairs:
+  - from_table: Tasks_Recent
+    from_col: OwnerId
+    to_table: User
+    to_col: User ID
+- join_name: TaskCreatedBy
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Tasks_Recent::CreatedById] = [User::User ID]'
+  pairs:
+  - from_table: Tasks_Recent
+    from_col: CreatedById
+    to_table: User
+    to_col: User ID
+- join_name: Tasks Completed By
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Tasks_Recent::Completed_By__c] = [User::Name]'
+  pairs:
+  - from_table: Tasks_Recent
+    from_col: Completed_By__c
+    to_table: User
+    to_col: Name
+- join_name: Tasks to HH Fact
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Tasks_Recent::LeadID] = [Current_Household_Fact::LeadId]'
+  pairs:
+  - from_table: Tasks_Recent
+    from_col: LeadID
+    to_table: Current_Household_Fact
+    to_col: LeadId

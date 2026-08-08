@@ -1,0 +1,437 @@
+id: household-rollforward-trade-date
+name: Household_Rollforward(Trade Date)
+schema: tho
+db: DataWarehouse
+db_table: Household_Rollforward(Trade Date)
+guid: 315800bf-755c-495f-90b2-5003a8ec57c2
+business_name: Monthly AUM rollforward (trade-date basis)
+grain: avhhid x reportingperiod
+pk: RF_ID
+synonyms:
+- trade date rollforward
+- TD RF
+domain: Household
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: Use only when user asks for trade-date numbers explicitly.
+worksheets:
+- Comparison Rollforward - Trade Date
+- CRP Reps with Flows
+- Trade Date Rollforward
+column_count: 29
+columns:
+- name: Reporting Period
+  db_column_name: reportingperiod
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Advisor_Change_Date
+  db_column_name: Advisor_Change_Date
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: NCNM
+  db_column_name: NCNM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: cashwithdrawal
+  db_column_name: cashwithdrawal
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Advisor_Assist_Addition
+  db_column_name: Advisor_Assist_Addition
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Advisor_Assist
+  db_column_name: Advisor_Assist
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: income
+  db_column_name: income
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: NFBC_Adjustment
+  db_column_name: NFBC_Adjustment
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: AdvisorId
+  db_column_name: AdvisorId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Attrition
+  db_column_name: Attrition
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Id
+  db_column_name: Id
+  data_type: INT64
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Acquisition
+  db_column_name: Acquisition
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: expenses
+  db_column_name: expenses
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Reporting_Period_Key
+  db_column_name: Reporting_Period_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Flow_Protection_Flag
+  db_column_name: Flow_Protection_Flag
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: BoP_AUM
+  db_column_name: BoP_AUM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: avhhid
+  db_column_name: avhhid
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: NFBC_PreviousAdvisorID
+  db_column_name: NFBC_PreviousAdvisorID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: cashdeposit
+  db_column_name: cashdeposit
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Distribution
+  db_column_name: Distribution
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: RF_Max_Date_Key
+  db_column_name: RF_Max_Date_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: total account value
+  db_column_name: total account value
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Transitioned_Client_Adjustment
+  db_column_name: Transitioned_Client_Adjustment
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: EOMONTH_Key
+  db_column_name: EOMONTH_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ECNM
+  db_column_name: ECNM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: receiptsecurities
+  db_column_name: receiptsecurities
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: withdrawalsecurities
+  db_column_name: withdrawalsecurities
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: mgntfee
+  db_column_name: mgntfee
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: RF_ID
+  db_column_name: RF_ID
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: HH Fact to RF Trade Date
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward(Trade Date)::avhhid] = [Current_Household_Fact::AVHHID]'
+  pairs:
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: avhhid
+    to_table: Current_Household_Fact
+    to_col: AVHHID
+- join_name: NFBC_Previous_Advisor
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward(Trade Date)::NFBC_PreviousAdvisorID] = [User::User ID]'
+  pairs:
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: NFBC_PreviousAdvisorID
+    to_table: User
+    to_col: User ID
+- join_name: RD_NetFlows_Goals_2024_to_Household_Rollforward(Trade Date)
+  to: RD_NetFlows_Goals_2024
+  to_id: rd-netflows-goals-2024
+  type: RIGHT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward(Trade Date)::AdvisorId] = [RD_NetFlows_Goals_2024::advisorid] AND [Household_Rollforward(Trade
+    Date)::EOMONTH_Key] = [RD_NetFlows_Goals_2024::reporting_period_key]'
+  pairs:
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: AdvisorId
+    to_table: RD_NetFlows_Goals_2024
+    to_col: advisorid
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: EOMONTH_Key
+    to_table: RD_NetFlows_Goals_2024
+    to_col: reporting_period_key
+- join_name: RD_NetFlows_Goals_2025_NEW_to_Household_Rollforward(Trade Date)
+  to: RD_NetFlows_Goals_2025_NEW
+  to_id: rd-netflows-goals-2025-new
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward(Trade Date)::AdvisorId] = [RD_NetFlows_Goals_2025_NEW::user id] AND [Household_Rollforward(Trade
+    Date)::EOMONTH_Key] = [RD_NetFlows_Goals_2025_NEW::reporting_period_key]'
+  pairs:
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: AdvisorId
+    to_table: RD_NetFlows_Goals_2025_NEW
+    to_col: user id
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: EOMONTH_Key
+    to_table: RD_NetFlows_Goals_2025_NEW
+    to_col: reporting_period_key
+- join_name: RD_Netflows_Goals_2025_to_Household_Rollforward(Trade Date)
+  to: RD_Netflows_Goals_2025
+  to_id: rd-netflows-goals-2025
+  type: RIGHT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward(Trade Date)::EOMONTH_Key] = [RD_Netflows_Goals_2025::reporting_period_key]
+    AND [Household_Rollforward(Trade Date)::AdvisorId] = [RD_Netflows_Goals_2025::advisorid]'
+  pairs:
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: EOMONTH_Key
+    to_table: RD_Netflows_Goals_2025
+    to_col: reporting_period_key
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: AdvisorId
+    to_table: RD_Netflows_Goals_2025
+    to_col: advisorid
+- join_name: RF Fact(Trade Date)_to_Historical_Household_Demographic
+  to: Historical_Household_Demographic
+  to_id: historical-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward(Trade Date)::Reporting Period] = [Historical_Household_Demographic::Reporting
+    Period] AND [Household_Rollforward(Trade Date)::avhhid] = [Historical_Household_Demographic::avhhid]'
+  pairs:
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: Reporting Period
+    to_table: Historical_Household_Demographic
+    to_col: Reporting Period
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: avhhid
+    to_table: Historical_Household_Demographic
+    to_col: avhhid
+- join_name: RF Trade Date to Current HH Dim
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward(Trade Date)::avhhid] = [Current_Household_Demographic::AVHHID]'
+  pairs:
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: avhhid
+    to_table: Current_Household_Demographic
+    to_col: AVHHID
+- join_name: RF Trade Date to DateDim
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward(Trade Date)::Reporting_Period_Key] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: Reporting_Period_Key
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: RF Trade Date to Max RF Date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward(Trade Date)::RF_Max_Date_Key] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: RF_Max_Date_Key
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Trade Date Advisor Assist
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward(Trade Date)::Advisor_Assist] = [User::User ID]'
+  pairs:
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: Advisor_Assist
+    to_table: User
+    to_col: User ID
+- join_name: Trade Date Advisor RLS
+  to: RLS
+  to_id: rls
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward(Trade Date)::AdvisorId] = [RLS::User Id]'
+  pairs:
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: AdvisorId
+    to_table: RLS
+    to_col: User Id
+- join_name: Trade Date Historical Advisor
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward(Trade Date)::AdvisorId] = [User::User ID]'
+  pairs:
+  - from_table: Household_Rollforward(Trade Date)
+    from_col: AdvisorId
+    to_table: User
+    to_col: User ID

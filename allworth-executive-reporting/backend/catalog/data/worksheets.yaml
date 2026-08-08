@@ -1,0 +1,615 @@
+worksheets:
+- name: Account Rollforward
+  guid: 971714d9-5e71-436c-a72f-b7dcd6eb9abe
+  description: Also used for ADV reporting
+  tables:
+  - Account_Rollforward
+  - Current_Household_Fact
+  - Current_Account_Demographic
+  - Campaign
+  - Historical_Household_Demographic
+  - Current_Household_Demographic
+  - DateDimension
+  - User
+  - Contact_Demographic
+  column_count: 87
+- name: Account Setups
+  guid: 739e4ffe-fcce-4c0a-978a-47e4eb4469a0
+  description: The "Account Setups" worksheet provides a comprehensive overview of the account setup process
+    for clients, including details on funding, paperwork, and operational assignments. It tracks the progression
+    of account setups through various stages, from creation to funding, and includes metrics such as the
+    number of setups, incoming funds, and overdue tasks. Additionally, the worksheet captures information
+    related to the advisors, teams involved, and the duration each account spends in specific stages,
+    offering insights into the efficiency of the account setup process. (AI generated)
+  tables:
+  - AccountSetups
+  - IncomingFunds
+  - Current_Household_Demographic
+  - User
+  - Acquisition
+  - DateDimension
+  - Current_Account_Demographic
+  - Current_Household_Fact
+  column_count: 81
+- name: Account Team Member
+  guid: a92b3f7a-578c-4592-8f1c-3b2040c661ba
+  description: ''
+  tables:
+  - AccountTeamMember
+  - Current_Household_Demographic
+  - Current_Household_Fact
+  - User
+  column_count: 18
+- name: Activities
+  guid: fe435211-5d9e-47e6-81b7-5cdab6598270
+  description: Includes tasks, events, emails and calls (from Salesforce)
+  tables:
+  - Activity_Fact
+  - Activity_Dim
+  - Current_Household_Demographic
+  - DateDimension
+  - User
+  - Current_Household_Fact
+  - Campaign
+  - RLS
+  - Contact_Demographic
+  - hh_fact
+  column_count: 186
+- name: Advisor 360
+  guid: bd2b3411-3c7c-451c-8e28-74614a1fe15d
+  description: Used to identify advisor data. For example, which partner and region is a specific advisor
+    associated with?
+  tables:
+  - User
+  - Acquisition
+  - user_fact
+  column_count: 30
+- name: Advisor Conversion Worksheet
+  guid: dafd4628-fe4c-42aa-8aeb-f446b1bd3769
+  description: Row Level Security designed so that Advisors can see the clients where they are listed
+    as the 1st appt advisor.
+  tables:
+  - Current_Household_Demographic
+  - Current_Household_Fact
+  - DateDimension
+  - User
+  - RLS
+  column_count: 22
+- name: Advisor CSAT
+  guid: 34bba742-649e-4014-85a0-2890087314cb
+  description: ''
+  tables:
+  - Advisor_CSAT
+  column_count: 0
+- name: Allworth 360
+  guid: ca0217f1-6409-4e7c-8cb5-681241946d78
+  description: The Allworth 360 worksheet is a comprehensive dataset that captures a wide array of information
+    related to client management and advisor performance. It includes details about client acquisition,
+    appointment tracking, and financial metrics such as assets under management (AUM). Additionally, the
+    worksheet provides insights into client demographics, advisor assignments, and conversion rates, which
+    are crucial for strategic decision-making and operational assessments within the company. (AI generated)
+  tables:
+  - User
+  - Current_Household_Fact
+  - Campaign_Demographic
+  - Activity_Fact
+  - Current_Household_Demographic
+  - DateDimension
+  - Acquisition
+  - Contact_Demographic
+  - RLS
+  - Current Clients by Advisor_New
+  - 1stAppt_Routed_Advisors
+  - Term_Prediction_Scoring_Model
+  - Household Performance Inception Date
+  - SurveyMonkey_CX_Metrics
+  - hh_fact
+  - Custodian_Reps
+  - Tax Opportunity Details
+  - Opportunity
+  column_count: 325
+- name: Campaigns
+  guid: 6524dbb5-8857-4043-a865-ec897f59f77c
+  description: Campaigns with members and recent activity
+  tables:
+  - Campaign_Demographic
+  - Activity_Fact
+  - Current_Household_Fact
+  - Current_Household_Demographic
+  - RLS
+  - User
+  - Activity_Dim
+  - DateDimension
+  - Contact_Demographic
+  - Days In Current Stage
+  column_count: 160
+- name: Case
+  guid: a62aa215-8dbb-4286-adfb-aed06286bec2
+  description: ''
+  tables:
+  - Case
+  - User
+  - Current_Household_Demographic
+  column_count: 41
+- name: Cash Reserves
+  guid: 6e4d75b7-bde7-4955-aa8e-b42061657340
+  description: by financial account
+  tables:
+  - Cash_Reserve_Report
+  - Current_Account_Demographic
+  - Current_Household_Demographic
+  - Current_Household_Fact
+  - User
+  - RLS
+  column_count: 50
+- name: Client Count Rollforward
+  guid: a2b7bc7c-13fd-4107-9bec-71c7d771e60d
+  description: Tracks changes in count of clients month over month
+  tables:
+  - Client_Count_Rollforward
+  - Historical_Household_Demographic
+  - DateDimension
+  - Current_Household_Demographic
+  - User
+  - Household_Rollforward
+  column_count: 20
+- name: Comparison 360
+  guid: c6a3114d-e3ce-43a2-a97b-bc5e6ec59b25
+  description: Used for Advisor Liveboards involving Comparisons to larger groups
+  tables:
+  - User
+  - Current_Household_Fact
+  - Current_Household_Demographic
+  - DateDimension
+  - Acquisition
+  - Contact_Demographic
+  column_count: 49
+- name: Comparison Rollforward - Trade Date
+  guid: b6ecdc24-1b49-43af-aae5-42761a415005
+  description: Used for Advisor Liveboards involving Comparisons to larger groups
+  tables:
+  - User
+  - Household_Rollforward(Trade Date)
+  - DateDimension
+  - Current_Household_Fact
+  - Historical_Household_Demographic
+  - Current_Household_Demographic
+  - Acquisition
+  column_count: 63
+- name: Contact 360
+  guid: 2a672c48-dc07-402c-85ac-d2538aab28f9
+  description: One row per contact, multiple rows per household
+  tables:
+  - Contact_Demographic
+  - Current_Household_Demographic
+  - Current_Household_Fact
+  - DateDimension
+  - User
+  - RLS
+  column_count: 62
+- name: CRP Reps with Flows
+  guid: 1144e4dc-d1d2-44d3-b3c9-47d46cdb8c1e
+  description: Schwab and Fidelity Rep and Branch details with Flows info
+  tables:
+  - Opportunity
+  - Referral
+  - User
+  - Current_Household_Demographic
+  - DateDimension
+  - Current_Household_Fact
+  - Household_Rollforward(Trade Date)
+  - Custodian_Reps
+  column_count: 32
+- name: Diff Advisor
+  guid: b25830d1-f38f-4615-9ec2-676461f109a4
+  description: ''
+  tables:
+  - Dif_Advisors
+  column_count: 33
+- name: Distribution Requests
+  guid: 0aa1b1d1-7a3e-41f3-80ed-d852882b51b4
+  description: Includes Periodics
+  tables:
+  - Distribution_SF_Fact
+  - Current_Household_Fact
+  - Current_Household_Demographic
+  - User
+  - DateDimension
+  column_count: 50
+- name: Download Version of 360
+  guid: 1215a5d3-31bb-417c-a84c-067db252f524
+  description: ''
+  tables:
+  - User
+  - Current_Household_Fact
+  - Campaign_Demographic
+  - Current_Household_Demographic
+  - DateDimension
+  - Acquisition
+  - Contact_Demographic
+  - RLS
+  column_count: 107
+- name: Events Worksheet (Migrate to Activities Model)
+  guid: 5b37a48d-dc57-4978-844e-990a04193cbe
+  description: The Events Worksheet is designed to capture and organize key information related to various
+    events, focusing on attributes such as the event's creation, completion, ownership, and associated
+    advisory details. It includes data on the financial aspects, such as assets under management, and
+    client-related information, including acquisition sources and client tenure. Additionally, the worksheet
+    tracks the performance and involvement of different teams and advisors, providing insights into the
+    operational and regional aspects of event management. (AI generated)
+  tables:
+  - User
+  - Current_Household_Fact
+  - Events
+  - Current_Household_Demographic
+  - DateDimension
+  - RLS
+  column_count: 36
+- name: Financial Account 360
+  guid: 0641437d-2786-4311-9594-3795cc525fdb
+  description: ''
+  tables:
+  - Contact_Demographic
+  - Current_Account_Demographic
+  - Current_Household_Demographic
+  - Current_Household_Fact
+  - User
+  - DateDimension
+  - RLS
+  - Acquisition
+  - Custodian_Reps
+  column_count: 169
+- name: Incoming Funds
+  guid: af166684-c1fd-4f68-8833-d3bbbbaf858e
+  description: ''
+  tables:
+  - IncomingFunds
+  - User
+  - AccountSetups
+  - Current_Household_Fact
+  - RLS
+  - Current_Household_Demographic
+  - DateDimension
+  column_count: 45
+- name: Integrated Services
+  guid: 0cb9784d-3217-43b8-be65-1304cd1c7b31
+  description: The "Integrated Services" worksheet provides a comprehensive overview of various aspects
+    related to client management and project tracking. It includes detailed information on client acquisition,
+    project timelines, financial metrics, and service details. The worksheet is designed to assist in
+    monitoring the progress and status of projects, client relationships, and business performance metrics,
+    ensuring effective management and strategic decision-making. (AI generated)
+  tables:
+  - Current_Household_Fact
+  - Current_Household_Demographic
+  - Projects
+  - Opportunity
+  - User
+  - DateDimension
+  - Tax_Time_Tracking
+  - Contact_Demographic
+  - Projects_Fact
+  - hh_fact
+  - Project_Stages
+  column_count: 90
+- name: Integration Tracker
+  guid: 33569087-bd73-4fe9-8ffc-0538e89b881a
+  description: ''
+  tables:
+  - integration_tracker
+  - Current_Account_Demographic
+  - Current_Household_Demographic
+  column_count: 44
+- name: IS Referrals
+  guid: ee493930-b065-4ade-b575-2c563a9810df
+  description: Referrals to and from Integrated Services
+  tables:
+  - Opportunity
+  - Referral
+  - User
+  - Current_Household_Demographic
+  - DateDimension
+  - Current_Household_Fact
+  - hh_fact
+  column_count: 41
+- name: Jira FSI
+  guid: 9a958ac3-a417-4404-83d5-439028bf16c8
+  description: ''
+  tables:
+  - Jira
+  - DateDimension
+  - User
+  - Current_Household_Demographic
+  column_count: 43
+- name: KPI Worksheet
+  guid: 5dd3d332-8877-428e-8ebb-54a770a18cbd
+  description: The KPI Worksheet provides a comprehensive overview of key performance indicators related
+    to asset management and advisor performance. It includes data on assets under management, conversion
+    rates, and goal achievement percentages, along with detailed advisor information such as names, emails,
+    and regional affiliations. Additionally, the worksheet tracks lead generation details, marketing channels,
+    client relationships, and financial targets to support strategic decision-making and performance evaluation.
+    (AI generated)
+  tables:
+  - AWF_New_Plan_Tracker_V2
+  column_count: 0
+- name: Outflow/Term Reason Audit
+  guid: 44cbd2a9-9be7-4de2-bbda-362854baecfc
+  description: Used for advisors to see where reasons need to be entered
+  tables:
+  - Outflow_Reasons
+  - Current_Household_Demographic
+  - Current_Household_Fact
+  - RLS
+  - DateDimension
+  - User
+  column_count: 21
+- name: Partner Program Opportunities
+  guid: ab52a2b2-c5e0-435d-aed8-0b334e1a549a
+  description: The worksheet titled "Partner Program Opportunities" provides a comprehensive overview
+    of various business opportunities, including financial metrics, timelines, and descriptive details.
+    It captures essential information such as the type of firm, geographical area, and the source of the
+    lead, alongside key dates like when agreements were signed or board approvals were obtained. Additionally,
+    it evaluates the opportunities by detailing expected outcomes, potential issues, and the current stage
+    of each opportunity, helping stakeholders understand the progress and forecast future developments.
+    (AI generated)
+  tables:
+  - sfb2b_Opp
+  column_count: 33
+- name: Partner Program Tasks
+  guid: 0eb1362c-5882-4618-a722-30cfe4f6b1ac
+  description: The "Partner Program Tasks" worksheet provides a comprehensive overview of tasks assigned
+    to various team members, including the number of tasks, their status, and due dates. It also details
+    the types of tasks, such as discovery calls, and flags meetings that require further attention. Additionally,
+    the worksheet tracks performance indicators and organizes due dates on a weekly basis to ensure timely
+    completion and review. (AI generated)
+  tables:
+  - sfb2b_Task
+  - DateDimension
+  - sfb2b_Opp
+  column_count: 16
+- name: Partner Program
+  guid: f17836e1-4a5c-4a30-92dc-ab53f2e6c7ff
+  description: Includes Activities, Accounts, Opps
+  tables:
+  - sfb2b_Task
+  - sfb2b_Account
+  - sfb2b_Opp
+  column_count: 35
+- name: Performance Tracking
+  guid: 30f58e5f-bc7f-4955-aef3-87d0ce27dc04
+  description: goals vs actual by channel
+  tables:
+  - goals_20260109
+  - Combined_Fact
+  - Current_Household_Demographic
+  - Historical_Household_Demographic
+  - Prorated Month
+  - User
+  - Current_Household_Fact
+  column_count: 35
+- name: Pipeline 360
+  guid: a49d17c2-a154-4f00-a7be-9dd12b621280
+  description: ''
+  tables:
+  - Pipeline_Fact
+  - Current_Household_Demographic
+  - DateDimension
+  - Current_Household_Fact
+  - User
+  - hh_fact
+  column_count: 32
+- name: Position Reconciliation
+  guid: f7a3c528-f5f2-477d-8617-e38f733d9c3a
+  description: ''
+  tables:
+  - positions
+  - Current_Account_Demographic
+  column_count: 18
+- name: Practice Management External Sources
+  guid: 7e0a83b4-0c0a-4ba8-a226-2fa25df324e8
+  description: eMoney, MGP, Holistiplan, Wealth.com
+  tables:
+  - pm_external_fact
+  - DateDimension
+  - User
+  - Current_Household_Demographic
+  - Current_Household_Fact
+  - RLS
+  column_count: 18
+- name: Practice Management
+  guid: 74d9bb95-7284-4c20-b2cc-eab17dc7d6d6
+  description: The Practice Management worksheet provides a comprehensive overview of client management
+    and advisory services within a financial practice. It includes detailed records on assets under management
+    (AUM) across various services such as estate planning, financial planning, insurance, and tax services.
+    Additionally, the worksheet tracks client satisfaction, service utilization, and advisor activity,
+    offering insights into client relationships and service effectiveness over time. (AI generated)
+  tables:
+  - Practice_Management
+  - Current_Household_Fact
+  - User
+  - Current_Household_Demographic
+  - DateDimension
+  - pm_external_fact
+  - Activity_Fact
+  - Activity_Dim
+  - RLS
+  - Acquisition
+  - Netflows Snapshot
+  column_count: 111
+- name: Projected NCNM
+  guid: e8e850dd-837d-499f-9adf-d06f46301f57
+  description: ''
+  tables:
+  - Projected_NCNM
+  - Current_Household_Demographic
+  - hh_fact
+  column_count: 11
+- name: RF Column View 12-31-2025
+  guid: c8bdf461-5ada-4460-ad3d-b2c8926d0afc
+  description: Only Use for Elevate
+  tables:
+  - RF_Part1
+  - RF_Part2
+  - RF_Part3
+  - RF_Part4
+  column_count: 572
+- name: RMD Model
+  guid: c3e535b5-0507-42b3-8e73-2270724356a1
+  description: ''
+  tables:
+  - RMD
+  - Current_Account_Demographic
+  - Current_Household_Fact
+  - Current_Household_Demographic
+  - User
+  - Contact_Demographic
+  column_count: 50
+- name: Rollforward Historical
+  guid: 48ee3ce0-80c8-4ad8-a1f8-22ef8b45d95e
+  description: The "Rollforward Historical" worksheet provides a comprehensive overview of various financial
+    and client-related metrics. It includes data on acquisitions, advisor details, client demographics,
+    and financial performance indicators such as inflows, outflows, and net flows. Additionally, it tracks
+    the performance and classification of different business units, regions, and advisors, offering insights
+    into trends and patterns over time. This worksheet is instrumental in analyzing historical data to
+    inform strategic decisions and optimize business operations. (AI generated)
+  tables:
+  - Acquisition
+  - Campaign
+  - Historical_Household_Demographic
+  - Household_Rollforward
+  - DateDimension
+  - User
+  - RLS
+  - Current_Household_Demographic
+  - Current_Household_Fact
+  - Term_Prediction_Probability
+  - MarketingGoals_2025
+  - Term_Prediction_Scoring_Model
+  - Contact_Demographic
+  - Goals_Net_Flows_2025
+  - Tax Opportunity Details
+  - Opportunity
+  column_count: 176
+- name: Stage Change History
+  guid: 2fcf97ae-5c1b-4e32-a928-3e5f253437ed
+  description: ''
+  tables:
+  - DateDimension
+  - stage_change_history
+  - Current_Household_Demographic
+  - hh_fact
+  - Current_Household_Fact
+  - User
+  column_count: 38
+- name: Stored Proc Log
+  guid: 86c4bdf9-65f0-4d2e-8505-87e5bf857551
+  description: ''
+  tables:
+  - StoreProcRunLog
+  column_count: 12
+- name: Survey Monkey Results
+  guid: e4f0832c-4dad-4f9e-9ee7-7ef0ac827248
+  description: This worksheet contains the results of various surveys, capturing the responses and scores
+    given by participants. Each entry includes details such as the date the survey was taken, the specific
+    survey name, and the associated questions and answers. Additionally, it records the unique identifiers
+    for each respondent and the type of scoring system used for their responses. (AI generated)
+  tables:
+  - SurveyMonkey_CX_Metrics
+  - SurveyMonkeyEmail
+  - Contact_Demographic
+  - Current_Household_Demographic
+  - User
+  - Current_Household_Fact
+  column_count: 16
+- name: Tasks (Migrate to Activities Model)
+  guid: 4193e6e3-2520-4726-bae5-67b9d4ea9eef
+  description: Tasks Only (no email or calls)
+  tables:
+  - Tasks_Recent
+  - User
+  - DateDimension
+  - Current_Household_Fact
+  - Current_Household_Demographic
+  column_count: 42
+- name: Tax Clients
+  guid: a56a525b-e2dc-45cc-bf83-ad9ca43bc193
+  description: ''
+  tables:
+  - Opportunity
+  - Contact_Demographic
+  - Current_Household_Demographic
+  column_count: 23
+- name: Tax Retention
+  guid: c306407d-f563-40b3-8ef2-f15f0659352a
+  description: ''
+  tables:
+  - Opportunity
+  - Current_Household_Demographic
+  - Current_Household_Fact
+  - DateDimension
+  - Projects
+  - User
+  - Tax Opportunity Details
+  column_count: 31
+- name: Trade Date Rollforward
+  guid: f3d1a710-582e-48d1-8b85-c6629534d062
+  description: For Advisor Specific reporting. Calculated differently and does not tie to other Rollforward
+    data
+  tables:
+  - Household_Rollforward(Trade Date)
+  - Historical_Household_Demographic
+  - DateDimension
+  - Current_Household_Demographic
+  - User
+  - Current_Household_Fact
+  - RLS
+  - Acquisition
+  - Term_Prediction_Probability
+  - RD_NetFlows_Goals_2025_NEW
+  - Term_Prediction_Scoring_Model
+  - Goals_Net_Flows_2025
+  - Referral
+  - RD_NetFlows_Goals_Summary
+  - user_fact
+  column_count: 109
+- name: Trade Requests
+  guid: e9b049da-8dd6-4c36-a5eb-03614c109af5
+  description: The "Trade Requests" worksheet provides a comprehensive overview of various trade-related
+    activities and requests. It includes details about the type of account, the business unit involved,
+    and the custodian managing the trade. The worksheet also tracks the lifecycle of each trade request,
+    from creation to completion, including dates for execution, verification, and confirmation, as well
+    as information on any delays or cancellations. (AI generated)
+  tables:
+  - Trade_Request_Fact
+  - User
+  - Current_Account_Demographic
+  - Current_Household_Demographic
+  column_count: 37
+- name: Transactions
+  guid: ed0e29f9-cc97-462a-94ad-12c9d541cd01
+  description: This worksheet, named "Transactions," provides a comprehensive overview of financial transactions
+    associated with various accounts. It includes details about the account holders, such as their names,
+    categories, and types, as well as the advisors and teams involved. Additionally, the worksheet captures
+    transaction-specific information like amounts, dates, reasons for inflows and outflows, and associated
+    employer details, offering a holistic view of each transaction's context and background. (AI generated)
+  tables:
+  - Current_Household_Demographic
+  - Current_Household_Fact
+  - Transaction_Activity_Type
+  - Transaction_Fact
+  - User
+  - Current_Account_Demographic
+  - DateDimension
+  - Outflow_Reasons
+  - Historical_Household_Demographic
+  column_count: 48
+- name: Zoom Call Log External
+  guid: 6ce8937f-8e2d-47a7-b9fc-8b72e5f5ea8e
+  description: Excludes calls between AWF associates
+  tables:
+  - User
+  - ZoomCallLog2
+  - Current_Household_Fact
+  - DateDimension
+  - Current_Household_Demographic
+  - Contact_Demographic
+  column_count: 33

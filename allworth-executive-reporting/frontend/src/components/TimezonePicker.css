@@ -1,0 +1,36 @@
+/* TimezonePicker.css — shared timezone <select> chrome. Moved out of
+   Tamarac.css so both the pipeline (dark) and App Usage (glass) views can
+   reuse it. Colors are driven by --tz-* custom properties; the defaults match
+   the dark pipeline theme, and consumers override the vars to re-theme. */
+
+.tz-select {
+  --tz-bg: #0f172a;
+  --tz-fg: #f8fafc;
+  --tz-border: #334155;
+  --tz-border-hover: #475569;
+  --tz-focus: #6366f1;
+  --tz-focus-ring: rgba(99, 102, 241, 0.25);
+
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.45rem 1.7rem 0.45rem 0.7rem;
+  background-color: var(--tz-bg);
+  color: var(--tz-fg);
+  border: 1px solid var(--tz-border);
+  border-radius: 6px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%2394a3b8' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 10px 6px;
+}
+.tz-select:hover {
+  border-color: var(--tz-border-hover);
+}
+.tz-select:focus {
+  outline: none;
+  border-color: var(--tz-focus);
+  box-shadow: 0 0 0 3px var(--tz-focus-ring);
+}

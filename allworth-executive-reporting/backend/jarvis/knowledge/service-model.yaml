@@ -1,0 +1,40 @@
+name: Service Model
+uri: frameworks://service-model
+category: Data Model
+description: Household segmentation dimension representing the type of advisory engagement (discretionary, advisory, robo, etc.).
+keywords:
+  - service model
+  - segmentation
+  - classification
+  - household
+content: |
+  Source column: `Classification` on `Historical_Household_Demographic` (see `growth.py:101`).
+
+  Service model is a primary household segmentation dimension used across growth, profitability, and risk analytics:
+
+  - `growth.py`: `segment_by: Literal["firm", "advisor", "division", "service_model"]`.
+  - `profitability.py`: same segmentation pattern.
+  - `risk.py`: account-level risk analysis via household demographics.
+
+  ## Access
+  Via the semantic layer:
+  ```python
+  R.col("Historical_Household_Demographic", "Classification")
+  ```
+
+  ## Values
+  The enumeration (discretionary, advisory, robo, etc.) is **not hardcoded in Python** — it's stored in Synapse. To see the current set, query the warehouse:
+
+  ```sql
+  SELECT DISTINCT Classification, COUNT(*) AS hhs
+  FROM [tav].[Historical_Household_Demographic]
+  GROUP BY Classification
+  ORDER BY hhs DESC
+  ```
+
+  ## Distinct from
+  - `division` — organizational unit (region/office).
+  - `channel` — distribution/acquisition channel.
+  - `PM_Service_Level` — operational service tier (Platinum/Gold/Silver/Bronze).
+
+  The four dimensions above are orthogonal — a household can be Platinum-tier, advisory-model, in the West division, sourced from the 401k-rollover channel. Use the right one for the analytical question at hand.

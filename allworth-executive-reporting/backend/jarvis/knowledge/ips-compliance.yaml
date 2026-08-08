@@ -1,0 +1,44 @@
+name: IPS Compliance
+uri: frameworks://ips-compliance
+category: Compliance
+description: Investment Policy Statement compliance — operationalized as portfolio drift tolerance against model allocation targets.
+keywords:
+  - IPS
+  - investment policy
+  - compliance
+  - drift
+  - allocation model
+  - target weight
+content: |
+  Source: `risk.py:check_ips_compliance()`.
+
+  IPS compliance is operationalized as **drift tolerance against the account's assigned model portfolio**.
+
+  ## Mechanism
+  - Each account assigned to a `Rebalancing_Model_Name` (on `Current_Account_Demographic`).
+  - Model defines target weights in `Asset_Allocation_Security_Weights`.
+  - Actual holdings compared daily via `Account_Daily_Holdings`.
+  - Drift flagged when `|actual_weight − target_weight| > threshold` (default `0.05` = 5%).
+
+  ## Drift Calculation
+  ```
+  actual_weight = holdings_value / total_account_value
+  target_weight = per-model allocation rule
+  drift = actual_weight − target_weight
+  ```
+  - Computed **per asset class per account**.
+  - `exclude_cash` parameter can remove cash from both numerator and denominator.
+  - Absolute drift used for sorting alerts.
+
+  ## Reporting
+  - **Overweight rows**: `drift > 0` (position exceeds target).
+  - **Underweight rows**: `drift < 0` (position below target).
+  - **Counts**: separate overweight and underweight tallies.
+  - **Minimum account size**: $10K default (configurable).
+
+  ## What This Does Not Cover
+  - Cash-flow constraints (e.g. max stocks in taxable accounts).
+  - ESG / SRI screens (those would be documented in the model definition).
+  - Single-security concentration caps (see `investment-philosophy`).
+
+  For those, check the model's allocation rule in `Asset_Allocation_Security_Weights` directly, or confirm with the trading/portfolio team.

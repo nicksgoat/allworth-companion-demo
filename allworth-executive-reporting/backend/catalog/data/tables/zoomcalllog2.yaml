@@ -1,0 +1,179 @@
+id: zoomcalllog2
+name: ZoomCallLog2
+schema: tho
+db: DataWarehouse
+db_table: ZoomCallLog2
+guid: c0fe3115-6cfd-4f2d-afed-e662b32bdb7e
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Activity
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Zoom Call Log External
+column_count: 14
+columns:
+- name: call_id
+  db_column_name: call_id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Call_Queue_Name
+  db_column_name: Call_Queue_Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Call_Queue_Department
+  db_column_name: Call_Queue_Department
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LeadId
+  db_column_name: LeadId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: callee_did_number
+  db_column_name: callee_did_number
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: caller_did_number
+  db_column_name: caller_did_number
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: date_time
+  db_column_name: date_time
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: direction
+  db_column_name: direction
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: duration
+  db_column_name: duration
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: path
+  db_column_name: path
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: result
+  db_column_name: result
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: hold_time
+  db_column_name: hold_time
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: waiting_time
+  db_column_name: waiting_time
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: caller_email
+  db_column_name: caller_email
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+relationships:
+- join_name: Zoom to 360
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[ZoomCallLog2::LeadId] = [Current_Household_Demographic::LeadId]'
+  pairs:
+  - from_table: ZoomCallLog2
+    from_col: LeadId
+    to_table: Current_Household_Demographic
+    to_col: LeadId
+- join_name: Zoom to HH Fact
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[ZoomCallLog2::LeadId] = [Current_Household_Fact::LeadId]'
+  pairs:
+  - from_table: ZoomCallLog2
+    from_col: LeadId
+    to_table: Current_Household_Fact
+    to_col: LeadId
+- join_name: 'Zoom to User '
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[ZoomCallLog2::caller_email] = [User::Email]'
+  pairs:
+  - from_table: ZoomCallLog2
+    from_col: caller_email
+    to_table: User
+    to_col: Email

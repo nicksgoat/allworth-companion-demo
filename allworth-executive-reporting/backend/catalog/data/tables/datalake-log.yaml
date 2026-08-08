@@ -1,0 +1,37 @@
+id: datalake-log
+name: datalake_log
+schema: aip
+db: DataWarehouse
+db_table: datalake_log
+guid: c5c2928c-1baf-45ba-ac9c-b4334b153b01
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Logging
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets: []
+column_count: 2
+columns:
+- name: table_name
+  db_column_name: table_name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: last_updated_cst
+  db_column_name: last_updated_cst
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

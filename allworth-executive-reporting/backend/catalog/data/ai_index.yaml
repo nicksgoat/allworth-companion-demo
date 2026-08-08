@@ -1,0 +1,1460 @@
+note: Compact schema catalog for LLM system-prompt injection. Generated from ThoughtSpot TML + schema_index.yaml.
+glossary:
+  AUM: Assets Under Management ($)
+  PAUM: Projected AUM (current AUM + pipeline-weighted opportunities)
+  VMAC: Variable Managed Account Value
+  AVHHID: Advent Household ID (numeric, joins household across systems)
+  HHID: Household ID (Salesforce-side, varchar)
+  LeadId: Salesforce Lead ID (primary key of household demographic)
+  NCNM: New Client Net Money (inflows from clients new in period)
+  ECNM: Existing Client Net Money (inflows from existing clients)
+  Net Flows: NCNM + ECNM - Distributions - Attrition
+  Distribution: client withdrawal
+  Attrition: outflow from terminated client
+  Acquisition: assets from acquired books of business
+  BoP / EoP: Beginning / End of Period AUM
+  Rollforward: monthly snapshot reconciling BoP AUM to EoP AUM
+  Trade Date RF: rollforward using trade date instead of settlement date
+  CRP: Client Referral Program
+  RPS: Retirement Plan Services
+  PWS: Private Wealth Services
+  RMD: Required Minimum Distribution
+  Practice Management Score: count of services delivered (tax, estate, insurance, FP, annual review)
+  Catchlight Score: third-party household wealth-propensity score
+  Spice / Compass: marketing engagement platforms
+  AdvisorKey / AdvisorTeam: rep grouping for goal aggregation
+  RLS: Row-Level Security mapping (advisor -> visible offices/teams)
+tables:
+- name: 1stAppt_Routed_Advisors
+  schema: aip
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - RD_Region
+  - Operational_Region
+  - Monthly_Appt_Expectation
+  - AUM_Range
+  - Email
+  - SF_userId
+  - Advisor_Appt_Date_Range
+  - name
+- name: AWF_New_Plan_Tracker_V2
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - recordtype
+  - Goal
+  - Id
+  - leadsource
+  - Source
+  - SS Promoter Influenced
+  - acqsource
+  - AcqClosingDate
+  - organic_new
+  - Name
+  - Email
+  - Advisor Email
+- name: AccountSetups
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - AcctSetupID
+  - OwnerId
+  - IsDeleted
+  - AccountSetupName
+  - CreatedDate
+  - CreatedById
+  - Custodian__c
+  - Account_Type__c
+  - Using_DocuSign__c
+  - Account_Category__c
+  - Estimated_Amount__c
+  - Household__c
+- name: AccountTeamMember
+  schema: sfp
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Id
+  - AccountId
+  - UserId
+  - TeamMemberRole
+  - PhotoUrl
+  - Title
+  - AccountAccessLevel
+  - OpportunityAccessLevel
+  - CaseAccessLevel
+  - ContactAccessLevel
+  - CreatedDate
+  - CreatedById
+- name: Account_Rollforward
+  schema: tho
+  business_name: null
+  grain: avaccountuploadid x reportingperiod
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Distribution
+  - total account value
+  - Acquisition
+  - Reporting Period
+  - expenses
+  - avhhid
+  - ECNM
+  - NCNM
+  - mgntfee
+  - Attrition
+  - avaccountuploadid
+  - asset_allocation_unclassified
+- name: Acquisition
+  schema: aip
+  business_name: Acquisition / partner books
+  grain: null
+  pk: AcqCode
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Acquisition
+  - AcqCode
+  - ClosingDate
+  - organicdate
+  - Repapered
+  - expectedaum
+  - AUM_Met
+- name: Activity_Dim
+  schema: tho
+  business_name: Activity attributes (tasks/events)
+  grain: one row per Salesforce Activity Id
+  pk: Id
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Call_Disposition
+  - Id
+  - Subject
+  - Process_Type__c
+  - Activity_Type
+  - Status
+  - Created_Datetime
+  - LeadId
+- name: Activity_Fact
+  schema: tho
+  business_name: Activity measures
+  grain: one row per Salesforce Activity Id
+  pk: Id
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - CreatedDateKey
+  - OwnerId
+  - LeadID
+  - DueDateKey
+  - Days_To_Contact
+  - CreatedById
+  - CompletedDateKey
+  - Spice_Contacted
+  - Id
+  - Sentiment_Score
+  - Contact_Made
+- name: Advisor_CSAT
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Survey ID
+  - Question ID
+  - Weight
+  - Created Date
+- name: Campaign
+  schema: sfp
+  business_name: Salesforce campaign
+  grain: null
+  pk: Id
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Id
+  - Name
+  - ParentId
+  - Type
+  - Status
+  - StartDate
+  - EndDate
+  - IsActive
+  - NumberOfLeads
+  - NumberOfConvertedLeads
+  - AmountWonOpportunities
+  - Business_Line__c
+- name: Campaign_Demographic
+  schema: tho
+  business_name: Campaign membership / response
+  grain: Campaign_Member_ID
+  pk: Campaign_Member_ID
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Leadid
+  - Status
+  - Campaign Name
+  - Type
+  - campaignid
+  - Marketing_Disposition__c
+  - First_Campaign_Submission_Date
+  - Most_Recent_Campaign
+  - Sentiment__c
+  - Campaign_Member_ID
+  - Campaign_Channel
+- name: Case
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Id
+  - CaseNumber
+  - ContactId
+  - AccountId
+  - Type
+  - RecordTypeId
+  - Status
+  - Priority
+  - ClosedDate
+  - IsEscalated
+  - OwnerId
+  - CreatedDate
+- name: Cash_Reserve_Report
+  schema: tho
+  business_name: null
+  grain: Upload Account ID
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Primary Household ID
+  - Total Cash Reserve Goal Dollar
+  - Cash Needed
+  - '% Of Account'
+  - Upload Account ID
+  - Monthly Dist - Value
+  - Monthly Dist - Amount
+  - Monthly Dist - Start Date
+  - Monthly Dist - End Date
+  - Monthly Dist - Note
+  - Cash Carve Out - Value
+  - Cash Carve Out - Amount
+- name: Client_Count_Rollforward
+  schema: tho
+  business_name: null
+  grain: avhhid x Reporting_Period_Key
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Reporting_Period_Key
+  - avhhid
+  - BoP_Client_Count
+  - New_Organic_Clients
+  - New_Acquisition_Clients
+  - Lost_Clients
+  - EoP_Client_Count
+- name: Combined_Fact
+  schema: tho
+  business_name: null
+  grain: LeadId x Goal IDs
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - LeadId
+  - RF_ID
+  - Goal_First_Touch_ID
+  - Goal_Sales_ID
+  - Actual
+- name: Contact_Demographic
+  schema: tho
+  business_name: Contact (individuals within a household)
+  grain: contact_id
+  pk: contact_id
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Status
+  - Employer
+  - Contact Name
+  - Job Title
+  - DOB
+  - Contact ID
+  - HH ID
+  - Primary or Secondary
+  - Is Promoter
+  - LastName
+  - FirstName
+  - deceased flag
+- name: Current_Account_Demographic
+  schema: tho
+  business_name: Account (current attributes + measures)
+  grain: one row per account upload
+  pk: Upload Account ID
+  synonyms:
+  - account
+  - financial account
+  deprecated: false
+  hot_columns:
+  - Taxable
+  - Date
+  - Custodian
+  - Discretionary
+  - Plan/Private
+- name: Current_Household_Demographic
+  schema: tho
+  business_name: Household (current attributes)
+  grain: one row per Salesforce Lead (LeadId)
+  pk: LeadId
+  synonyms:
+  - client
+  - household
+  - hh
+  - lead
+  deprecated: false
+  hot_columns:
+  - Zip
+  - Term_Reason
+  - Household Name
+  - Client_Segment
+  - State
+  - Marketing Region
+  - HHCity
+  - Household Status
+  - Classification
+  - Channel_Middle
+  - Term Category
+  - LeadId
+  - AVHHID
+  - Service_Model
+- name: Current_Household_Fact
+  schema: tho
+  business_name: Household (current measures)
+  grain: one row per Salesforce Lead (LeadId)
+  pk: LeadId
+  synonyms:
+  - client metrics
+  - hh fact
+  deprecated: false
+  hot_columns:
+  - Client_Service_Primary__c
+  - Sales_Owner
+  - secondaryadvisorid
+  - Met_Premier_AUM
+  - lead_created_date
+  - HHID
+  - firstappt_advisorid
+  - term_date
+  - advisorid
+  - Goal
+  - AUM_Billed
+  - ClientSince
+  - FormerAdvisorID
+  - PAUM
+  - Run_Rate_Revenue
+  - Met_Premier_AUM_Date
+  - LeadId
+  - GoalKey
+  - AUM
+  - AVHHID
+  - ttm_net_flows
+  - ttm_ecnm
+  - ttm_distribution
+  - ttm_ncnm
+  - ttm_attrition
+- name: Custodian_Reps
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Contact_Id
+  - Rep_Name
+  - Rep_Email
+  - Rep_Email_2
+  - Rep_Company
+  - Rep_Location
+  - Phone
+  - Branch_Id
+  - Branch_Name
+  - Street
+  - City
+  - State
+- name: DateDimension
+  schema: aip
+  business_name: Date dimension
+  grain: DateKey (YYYYMMDD int)
+  pk: DateKey
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Date
+  - Day
+  - IsWeekend
+  - IsHoliday
+  - Month
+  - MonthName
+  - Quarter
+  - Year
+  - MMYYYY
+  - MonthYear
+  - FirstDayOfMonth
+  - LastDayOfMonth
+  - DateKey
+  - ProrateMonth
+- name: Dif_Advisors
+  schema: aip
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - SF Account Id Tam_Join
+  - SF Account Name Tam_Join
+  - SF Account Advisor Tam_Join
+  - Primary Household Id Tam_Join
+  - Tam Account Name
+  - Tam Advisor
+  - Tam Fin Acct Number
+  - SF Primary Household Id Tam_Join
+  - SF Managed Value Tam_Join
+  - Fin Acct Total Value Tam_Join
+  - Master Category
+  - Account Category
+- name: Distribution_SF_Fact
+  schema: tho
+  business_name: Salesforce distribution requests
+  grain: one row per Distribution record
+  pk: Id
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Id
+  - OwnerId
+  - Due_Date__c
+  - Gross_Distribution_Amount__c
+  - Household__c
+  - Completed_Date_Key
+  - Status
+  - Close_Account
+  - Distribution_Method
+  - To_Other_Household
+  - 60_Day_Rollover
+- name: Events
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: true
+  hot_columns:
+  - EventId
+  - EventURL
+  - CreatedDate
+  - Created_By_Delegate
+  - Whoid
+  - Whatid
+  - Appt Comp Date
+  - Appt Comp By
+  - Process
+  - Process Type
+  - Service Type
+  - Event Status
+- name: Fact_MonthlyMetrics
+  schema: dbo
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - reportingperiod
+  - measure
+  - roworder
+  - amount
+- name: Goals_Net_Flows_2025
+  schema: aip
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Net Flow Goal
+  - ECNM Goal
+  - Attrition Goal
+  - NCNM Goal
+  - Reporting_Period_Key
+  - Distribution Goal
+  - NCNM_6
+  - Goal_6
+- name: Historical_Household_Demographic
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - RPS
+  - leadid
+  - AdvisorId
+  - avhhid
+  - Reporting Period
+  - tenure
+  - advisor
+  - Previous Advisor
+  - Client Category
+  - Organic
+  - Current Partner
+  - Original Partner
+- name: Household_Rollforward
+  schema: tho
+  business_name: Monthly AUM rollforward (calendar)
+  grain: avhhid x reportingperiod (month-end)
+  pk: RF_ID
+  synonyms:
+  - monthly aum
+  - rollforward
+  - RF
+  deprecated: false
+  hot_columns:
+  - avhhid
+  - Attrition
+  - Reporting Period
+  - ECNM
+  - NCNM
+  - NCNM_Goal
+  - Acquisition
+  - income
+  - Distribution
+  - mgntfee
+  - expenses
+  - withdrawalsecurities
+  - cashdeposit
+  - cashwithdrawal
+  - Reporting_Period_Key
+  - receiptsecurities
+  - MTD_Percentage
+  - Marketing_Channel
+  - BoP_AUM
+- name: Household_Rollforward(Trade Date)
+  schema: tho
+  business_name: Monthly AUM rollforward (trade-date basis)
+  grain: avhhid x reportingperiod
+  pk: RF_ID
+  synonyms:
+  - trade date rollforward
+  - TD RF
+  deprecated: false
+  hot_columns:
+  - Reporting Period
+  - NCNM
+  - Advisor_Assist_Addition
+  - NFBC_Adjustment
+  - AdvisorId
+  - Attrition
+  - Acquisition
+  - Flow_Protection_Flag
+  - BoP_AUM
+  - avhhid
+  - Distribution
+  - Transitioned_Client_Adjustment
+  - ECNM
+- name: IncomingFunds
+  schema: tho
+  business_name: Expected incoming transfers
+  grain: one row per IncomingFunds record
+  pk: Id
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Household
+  - Financial_Account__c
+  - Estimated_Value__c
+  - Actual_Value__c
+  - Transfer_Type__c
+  - Status__c
+  - Contra_Firm__c
+  - Funds_Expected__c
+  - Incoming Funds ID
+  - Funds_Overdue__c
+- name: Jira
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Id
+  - Key
+  - Issue_Type_Id
+  - Issue_Type_Name
+  - Project_Id
+  - Project_Name
+  - Resolution_Id
+  - Resolution_Name
+  - Resolution_Description
+  - ResolutionDate
+  - Created
+  - Assignee_Email
+- name: MarketingGoals_2025
+  schema: dbo
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Channel
+  - Marketing Channel
+  - reporting_period_key
+  - Goal
+  - Appointments
+  - Clients
+- name: Opportunity
+  schema: tho
+  business_name: Opportunities (tax, wealth services)
+  grain: Opportunity_Id
+  pk: Opportunity_Id
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Opportunity_Created_Date
+  - Stage
+  - Opportunity_Id
+  - Tax_Advisor
+  - HHID
+  - LeadId
+  - Service_Type
+  - Term_Date
+  - Tax_Term_Reason
+- name: Outflow_Reasons
+  schema: tho
+  business_name: null
+  grain: Outflow Id
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Id
+  - Household
+  - Total_Amount
+  - AVHHID
+  - Trade_Date_Key
+  - Outflow_Reason
+  - Additional_Outflow_Reason
+- name: Pipeline_Fact
+  schema: tho
+  business_name: Pipeline stages (wide, sparse - prefer fact_pipeline_event in mart)
+  grain: one row per LeadId
+  pk: LeadId
+  synonyms:
+  - pipeline
+  - funnel
+  - stages
+  deprecated: false
+  hot_columns:
+  - LeadId
+  - Lead_Created_Key
+  - Client_Since_Key
+  - Days_In_Discovery
+  - Days_In_Onboarding
+  - Days_In_Current_Stage
+  - Current_Stage
+- name: Practice_Management
+  schema: tho
+  business_name: Practice Management scorecard
+  grain: LeadId
+  pk: Leadid
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Leadid
+  - Tax_Services
+  - Insurance
+  - Estate_Planning
+  - Financial_Planning
+  - Annual_Review
+  - Tax_Services_Satisfied
+  - Annual_Review_Satisfied
+  - Estate_Planning_Satisfied
+  - PM_Score
+  - PM_Count
+  - Insurance_Satisfied
+  - Financial_Planning_Satisfied
+  - Wealth_Complexity
+- name: Project_Stages
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - project_id
+  - first_status
+  - first_status_ts
+  - current_status
+  - current_status_ts
+  - dt_planned
+  - dt_ready_to_start
+  - dt_open
+  - dt_preparation
+  - dt_review
+  - dt_delivery
+  - dt_completed
+- name: Projected_NCNM
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - leadid
+  - Reporting_Period
+  - Weighted_PAUM_Funding_Cycle
+  - closed_open_flag
+  - Projected_NCNM_ID
+  - channel_middle
+- name: Projects
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Wealth_Management_Advisor__c
+  - ownerid
+  - Tech_Reviewer__c
+  - Project_Created_Date
+  - Total_Budget__c
+  - Project_Due_Date
+  - Discount
+  - Opportunity_ID
+  - Tax_Advisor_Budget__c
+  - Tax_Advisor__c
+  - Policy_Type__c
+  - Project_Sub_Status
+- name: Projects_Fact
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Project_Id
+  - Discount
+  - Total_Invoice
+  - Household_AUM
+- name: RD_NetFlows_Goals_2025_NEW
+  schema: dbo
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - user id
+  - Goal
+  - reporting_period_key
+- name: RD_NetFlows_Goals_Summary
+  schema: dbo
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - userid
+  - Goal
+- name: RD_Netflows_Goals_2025
+  schema: dbo
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: true
+  hot_columns:
+  - advisorid
+  - reporting_period_key
+  - Goal
+- name: RF_Part1
+  schema: dbo
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - ClientID
+  - Advisor ID
+  - ADP ID
+  - Previous Advisor ID
+  - Previous ADP ID
+  - Last Transfer Date
+  - Client Since
+  - Channel
+  - Channel Middle
+  - Channel Detail
+  - Organic Flag 1
+  - Original Partner
+- name: RF_Part2
+  schema: dbo
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - ClientID
+  - ECNM-Dec_25
+  - ECNM_22
+  - ECNM_23
+  - ECNM_24
+  - ECNM_25
+  - Withdrawals-Jan_22
+  - Withdrawals-Feb_22
+  - Withdrawals-Mar_22
+  - Withdrawals-Apr_22
+  - Withdrawals-May_22
+  - Withdrawals-Jun_22
+- name: RF_Part3
+  schema: dbo
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - ClientID
+  - Div/Int-Mar_23
+  - Div/Int-Apr_23
+  - Div/Int-May_23
+  - Div/Int-Jun_23
+  - Div/Int-Jul_23
+  - Div/Int-Aug_23
+  - Div/Int-Sep_23
+  - Div/Int-Oct_23
+  - Div/Int-Nov_23
+  - Div/Int-Dec_23
+  - Div/Int-Jan_24
+- name: RF_Part4
+  schema: dbo
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - ClientID
+- name: RLS
+  schema: tho
+  business_name: Row-Level Security mapping
+  grain: null
+  pk: User_Id
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - User Id
+  - email
+  - Ops_Team__c
+  - HR_AcquiredSource__c
+  - ViewAccess2
+  - ViewAccess1
+  - ViewAccess3
+  - ViewAccess4
+  - ViewAccess_Partner
+  - View_Office
+  - Office_Location
+- name: RMD
+  schema: tho
+  business_name: null
+  grain: RMD Id
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Id
+  - OwnerId
+  - Name
+  - CreatedDate
+  - CreatedById
+  - LastModifiedDate
+  - LastModifiedById
+  - Account_Number
+  - Upload_Account_ID
+  - Cash_Balance
+  - Current_Value
+  - Year_of_Birth
+- name: Referral
+  schema: tho
+  business_name: null
+  grain: Referral Id
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Id
+  - OwnerId
+  - Name
+  - CreatedDate
+  - Household__c
+  - Opportunity_New_Service__c
+  - Opportunity_Referral_Source__c
+  - Referred_By__c
+  - Referred_To__c
+  - Service_Type__c
+  - External_Referral_Flag
+  - Priority__c
+- name: StoreProcRunLog
+  schema: tho
+  business_name: null
+  grain: TableName x StoredProcRunDate
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - TableName
+  - MaxReportingPeriod
+  - StoredProcRunDate
+  - MaxDateKey
+  - Max_ID
+  - End_Date
+  - Duration_Minutes
+- name: SurveyMonkeyEmail
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Survey ID
+  - Person ID
+  - Email
+  - Created Date
+- name: SurveyMonkey_CX_Metrics
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Survey Name
+  - Question ID
+  - Question Text
+  - Weight
+  - Created Date
+  - Answer Text
+  - Person ID
+  - Comments
+  - Email
+  - Name
+- name: Tasks_Recent
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: true
+  hot_columns:
+  - Id
+  - Owner_Client_Service_Type__c
+  - CreatedById
+  - Completed_By__c
+  - Task URL
+  - Subject
+  - LeadID
+  - ActivityDate
+  - Status
+  - Priority
+  - IsHighPriority
+  - OwnerId
+- name: Tax_Time_Tracking
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Id
+  - IsDeleted
+  - Project_ID
+  - Role
+  - Team_Member
+  - Duration_Hours
+  - Budget_Hours
+  - Start_Date
+  - Role_Project_ID
+  - Billing_Type
+- name: Term_Prediction_Probability
+  schema: tho
+  business_name: Household churn probability (ML output)
+  grain: avhhid x "Reporting Period" x Model
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Model
+  - avhhid
+- name: Term_Prediction_Scoring_Model
+  schema: tho
+  business_name: Churn model feature inputs + score
+  grain: one row per avhhid
+  pk: avhhid
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - avhhid
+  - rolling_12_month_volatility
+  - trailing_number_of_meetings
+  - equity_percentage
+  - practice_management_score
+  - churn_risk_score
+  - risk_category
+- name: Trade_Request_Fact
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Trade_Request_Id
+  - Executed_Same_Day
+  - HHID
+  - UploadAccountId
+  - Created_Date
+  - New_Date
+  - Execute_Date
+  - Verify_Date
+  - Confirm_Date
+  - Completed_Date
+  - Entered_New_By
+  - Executed_By
+- name: Transaction_Activity_Type
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Activity_Id
+  - Activity_Type
+- name: Transaction_Daily_TopBottom5_Cube
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Entry Date
+  - Entry Date Key
+  - Amount
+  - AVHHID
+  - Rank Bucket
+  - Rank Number
+  - Rank Label
+  - Rank Sort
+- name: Transaction_Fact
+  schema: tho
+  business_name: Transactions
+  grain: one row per transaction
+  pk: Transaction_Id
+  synonyms:
+  - transactions
+  - trades
+  - cashflows
+  deprecated: false
+  hot_columns:
+  - Trade_DateKey
+  - AVHHID
+  - Transaction_Id
+  - Amount
+  - Upload_Account_Id
+  - Entry_DateKey
+  - Activity_Id
+  - Outflow_Reason_Id
+  - Intra_Group_Flow
+  - Auto_Recon
+- name: User
+  schema: tho
+  business_name: User / Advisor
+  grain: User_ID
+  pk: User_ID
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Manager
+  - Title
+  - AdvisorKey
+  - Name
+  - Department
+  - Book Type
+  - Operational Region
+  - RD Region
+  - Office Location
+  - AdvisorTeam
+  - User ID
+  - IsActive
+  - Net_Flows_Monthly_Goal
+  - Regional Director
+  - Advisor_Segment
+  - CRP
+  - hire_date
+- name: ZoomCallLog2
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - call_id
+  - Call_Queue_Name
+  - Call_Queue_Department
+  - LeadId
+  - callee_did_number
+  - caller_did_number
+  - date_time
+  - direction
+  - duration
+  - path
+  - result
+  - hold_time
+- name: datalake_log
+  schema: aip
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - table_name
+  - last_updated_cst
+- name: goals_20250317
+  schema: aip
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Metric
+  - Channel
+  - Date
+  - Goal
+  - unique_id
+  - Date_Key
+- name: goals_20260109
+  schema: aip
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Metric
+  - Channel
+  - Date
+  - Goal
+  - unique_id
+  - Date_Key
+  - Employer
+  - Channel_Core
+- name: hh_fact
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Leadid
+  - AUM
+  - PAUM
+  - Open_Activities
+  - HHID
+  - run_rate_revenue
+  - avhhid
+  - aum_billed
+  - ncnm
+  - days_in_current_stage
+  - expected_close_rate
+  - weighted_paum
+- name: integration_tracker
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Tracker_ID
+  - HHID
+  - LeadId
+  - CreatedDate
+  - Consented
+  - Discretionary_Flag
+  - NIGO_Status
+  - Nonconsent_Reason
+  - Primary_Delivery_Type
+  - Service_Level
+  - Status
+  - AUM_as_stated_in_Purchase_Agreement
+- name: pm_external_fact
+  schema: tho
+  business_name: null
+  grain: EventID
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - EventID
+  - Client_Name
+  - AdvisorId
+  - LeadID
+  - HHID
+  - Date_Key
+  - Program_Type
+  - Event_Type
+  - Value_Proposition
+  - Event_Rank
+  - Format
+- name: positions
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - account_number
+  - cusip
+  - symbol
+  - market_price
+  - trade_date_quantity
+  - settlement_date_quantity
+  - tam_symbol
+  - tam_price
+  - tam_quantity
+  - avhhid
+  - custodian
+  - unique_id
+- name: sfb2b_Account
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Type
+  - Escalation_Date
+  - Total_Assets
+  - createddate
+  - Id
+  - Owner
+  - Name
+  - Account_Status
+- name: sfb2b_Opp
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Id
+  - IsDeleted
+  - AccountId
+  - Name
+  - Description
+  - StageName
+  - Amount
+  - Probability
+  - CloseDate
+  - Type
+  - NextStep
+  - LeadSource
+- name: sfb2b_Task
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - TaskId
+  - Type
+  - ActivityDate
+  - Subject
+  - AssignedTo
+  - Whatid
+  - Whoid
+  - AccountId
+  - Status
+  - KPIType
+  - DiscoveryCalls
+  - Completed_Date
+- name: sql_query_usage
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - login_name
+  - end_time
+  - runtime_minutes
+  - queue_minutes
+  - start_time
+  - request_id
+- name: stage_change_history
+  schema: tho
+  business_name: null
+  grain: Stage_Change_Id
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Stage_Change_Id
+  - LeadId
+  - Entered_Stage_Date
+  - Stage
+  - Is_Current_Stage
+  - Days_In_Stage
+  - Previous_Stage
+  - Skipped_Stage
+  - Successful_Stage_Move
+  - Latest_Stage_Instance
+  - Days_to_Client
+- name: transformation_log
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - notebook_name
+  - start_time
+  - run_time_minutes
+  - result
+  - last_successful_run
+  - error_message
+- name: update_log
+  schema: tho
+  business_name: null
+  grain: null
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - Schema
+  - Table
+  - Unique_Id
+  - Start_Time
+  - End_Time
+  - Minutes
+  - Latest_Version_Flag
+  - RowCount
+  - Trigger
+- name: user_fact
+  schema: tho
+  business_name: null
+  grain: advisor_id
+  pk: null
+  synonyms: []
+  deprecated: false
+  hot_columns:
+  - advisor_id
+  - net_flows_2021
+  - net_flows_2022
+  - net_flows_2023
+  - net_flows_2024
+  - net_flows_2025
+  - AUM
+  - '#_of_clients'
+  - Goal
+join_hints:
+- Current_Household_Fact.AVHHID = Current_Household_Demographic.AVHHID
+- Current_Account_Demographic."Primary Household ID" = Current_Household_Demographic.AVHHID
+- Household_Rollforward.avhhid = Current_Household_Demographic.AVHHID
+- Transaction_Fact.AVHHID = Current_Household_Demographic.AVHHID
+- Transaction_Fact.Upload_Account_Id = Current_Account_Demographic."Upload Account ID"
+- Activity_Fact.Id = Activity_Dim.Id
+- Activity_Fact.LeadID = Current_Household_Demographic.LeadId
+- Campaign_Demographic.Leadid = Current_Household_Demographic.LeadId
+- Distribution_SF_Fact.Household__c = Current_Household_Demographic.LeadId
+- IncomingFunds.Household = Current_Household_Fact.LeadId
+- Opportunity.LeadId = Current_Household_Fact.LeadId
+- Term_Prediction_Probability.avhhid = Current_Household_Demographic.AVHHID
+- '*.advisorid = User.User_ID'
+- '*.<any>_DateKey = DateDimension.DateKey'
+few_shot:
+- q: What were our YTD net flows by region?
+  sql: 'SELECT u.RD_Region, SUM(rf.NCNM + rf.ECNM - rf.Distribution - rf.Attrition) AS net_flows
+
+    FROM tho.Household_Rollforward rf
+
+    JOIN tho.Current_Household_Fact f  ON rf.avhhid = f.AVHHID
+
+    JOIN tho."User" u                  ON f.advisorid = u.User_ID
+
+    WHERE rf.reportingperiod >= DATEFROMPARTS(YEAR(GETDATE()),1,1)
+
+    GROUP BY u.RD_Region;
+
+    '
+- q: Which households are at high churn risk with > $1M AUM?
+  sql: 'SELECT d.LeadId, d.HHName, f.AUM, s.churn_risk_score, s.risk_category
+
+    FROM tho.Current_Household_Demographic d
+
+    JOIN tho.Current_Household_Fact f             ON d.AVHHID = f.AVHHID
+
+    JOIN tho.Term_Prediction_Scoring_Model s      ON d.AVHHID = s.avhhid
+
+    WHERE f.AUM > 1000000 AND s.risk_category = ''High''
+
+    ORDER BY s.churn_risk_score DESC;
+
+    '

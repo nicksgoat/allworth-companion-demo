@@ -1,0 +1,436 @@
+id: household-rollforward
+name: Household_Rollforward
+schema: tho
+db: DataWarehouse
+db_table: Household_Rollforward
+guid: be1f6371-ab30-408b-98aa-fb088ad567be
+business_name: Monthly AUM rollforward (calendar)
+grain: avhhid x reportingperiod (month-end)
+pk: RF_ID
+synonyms:
+- monthly aum
+- rollforward
+- RF
+domain: Household
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: Use this for any monthly AUM / net-flows question.
+worksheets:
+- Client Count Rollforward
+- Rollforward Historical
+column_count: 33
+columns:
+- name: duration
+  db_column_name: duration
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Total Account Value
+  db_column_name: total account value
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: avhhid
+  db_column_name: avhhid
+  data_type: INT64
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Attrition
+  db_column_name: Attrition
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Reporting Period
+  db_column_name: reportingperiod
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - reportingperiod
+  description: ''
+  pii: false
+  hot: true
+- name: GoalKey
+  db_column_name: GoalKey
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ECNM
+  db_column_name: ECNM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: NCNM
+  db_column_name: NCNM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Term_Date_Key
+  db_column_name: Term_Date_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: weighted_average_yield
+  db_column_name: weighted_average_yield
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: NCNM_Goal
+  db_column_name: NCNM_Goal
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: beta
+  db_column_name: beta
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Acquisition
+  db_column_name: Acquisition
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: income
+  db_column_name: income
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Distribution
+  db_column_name: Distribution
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: mgntfee
+  db_column_name: mgntfee
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: expenses
+  db_column_name: expenses
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: withdrawalsecurities
+  db_column_name: withdrawalsecurities
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: cashdeposit
+  db_column_name: cashdeposit
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: cashwithdrawal
+  db_column_name: cashwithdrawal
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Reporting_Period_Key
+  db_column_name: Reporting_Period_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: receiptsecurities
+  db_column_name: receiptsecurities
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: RF_Max_Date_Key
+  db_column_name: RF_Max_Date_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: MTD_Percentage
+  db_column_name: MTD_Percentage
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: EOMONTH_Key
+  db_column_name: EOMONTH_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Marketing_Channel
+  db_column_name: Marketing_Channel
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: RF_ID
+  db_column_name: RF_ID
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_cash
+  db_column_name: asset_allocation_cash
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: BoP_AUM
+  db_column_name: BoP_AUM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: asset_allocation_alternative_liquid
+  db_column_name: asset_allocation_alternative_liquid
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_alternative_fixed_income
+  db_column_name: asset_allocation_alternative_fixed_income
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_alternative_illiquid
+  db_column_name: asset_allocation_alternative_illiquid
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_alternative
+  db_column_name: asset_allocation_alternative
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: HH Fact to RF Fact
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  type: RIGHT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward::avhhid] = [Current_Household_Fact::AVHHID]'
+  pairs:
+  - from_table: Household_Rollforward
+    from_col: avhhid
+    to_table: Current_Household_Fact
+    to_col: AVHHID
+- join_name: HH RF to Current HH
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward::avhhid] = [Current_Household_Demographic::AVHHID]'
+  pairs:
+  - from_table: Household_Rollforward
+    from_col: avhhid
+    to_table: Current_Household_Demographic
+    to_col: AVHHID
+- join_name: HH RF to Historical HH
+  to: Historical_Household_Demographic
+  to_id: historical-household-demographic
+  type: LEFT_OUTER
+  one_to_one: true
+  'on': '[Household_Rollforward::Reporting Period] = [Historical_Household_Demographic::Reporting Period]
+    AND [Household_Rollforward::avhhid] = [Historical_Household_Demographic::avhhid]'
+  pairs:
+  - from_table: Household_Rollforward
+    from_col: Reporting Period
+    to_table: Historical_Household_Demographic
+    to_col: Reporting Period
+  - from_table: Household_Rollforward
+    from_col: avhhid
+    to_table: Historical_Household_Demographic
+    to_col: avhhid
+- join_name: Household_Rollforward_to_Term_Prediction_Probability
+  to: Term_Prediction_Probability
+  to_id: term-prediction-probability
+  type: LEFT_OUTER
+  one_to_one: true
+  'on': '[Household_Rollforward::Reporting Period] = [Term_Prediction_Probability::Reporting Period] AND
+    [Household_Rollforward::avhhid] = [Term_Prediction_Probability::avhhid]'
+  pairs:
+  - from_table: Household_Rollforward
+    from_col: Reporting Period
+    to_table: Term_Prediction_Probability
+    to_col: Reporting Period
+  - from_table: Household_Rollforward
+    from_col: avhhid
+    to_table: Term_Prediction_Probability
+    to_col: avhhid
+- join_name: MarketingGoals_2025_to_Household_Rollforward
+  to: MarketingGoals_2025
+  to_id: marketinggoals-2025
+  type: RIGHT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward::EOMONTH_Key] = [MarketingGoals_2025::reporting_period_key] AND [Household_Rollforward::Marketing_Channel]
+    = [MarketingGoals_2025::Marketing Channel]'
+  pairs:
+  - from_table: Household_Rollforward
+    from_col: EOMONTH_Key
+    to_table: MarketingGoals_2025
+    to_col: reporting_period_key
+  - from_table: Household_Rollforward
+    from_col: Marketing_Channel
+    to_table: MarketingGoals_2025
+    to_col: Marketing Channel
+- join_name: RF Max Date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward::RF_Max_Date_Key] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Household_Rollforward
+    from_col: RF_Max_Date_Key
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: RF Term Date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward::Term_Date_Key] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Household_Rollforward
+    from_col: Term_Date_Key
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: RF to DateDim
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Household_Rollforward::Reporting_Period_Key] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Household_Rollforward
+    from_col: Reporting_Period_Key
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: waived_fee_promo_to_Household_Rollforward
+  to: waived_fee_promo
+  to_id: waived-fee-promo
+  type: INNER
+  one_to_one: false
+  'on': '[Household_Rollforward::avhhid] = [waived_fee_promo::avhhid]'
+  pairs:
+  - from_table: Household_Rollforward
+    from_col: avhhid
+    to_table: waived_fee_promo
+    to_col: avhhid

@@ -1,0 +1,91 @@
+id: transaction-daily-topbottom5-cube
+name: Transaction_Daily_TopBottom5_Cube
+schema: tho
+db: DataWarehouse
+db_table: Transaction_Daily_TopBottom5_Cube
+guid: 557ec0f1-0bf1-489f-9316-de80a99d6fea
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Transactions
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets: []
+column_count: 8
+columns:
+- name: Entry Date
+  db_column_name: entry_date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Entry Date Key
+  db_column_name: entry_date_key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Amount
+  db_column_name: amount
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AVHHID
+  db_column_name: avhhid
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Rank Bucket
+  db_column_name: rank_bucket
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Rank Number
+  db_column_name: rank_number
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Rank Label
+  db_column_name: rank_label
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Rank Sort
+  db_column_name: rank_sort
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

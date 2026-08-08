@@ -1,0 +1,38 @@
+name: Channel
+uri: frameworks://channel
+category: Data Model
+description: Distribution or acquisition-channel segmentation referenced in projected NCNM and growth analytics.
+keywords:
+  - channel
+  - channel middle
+  - distribution
+  - pipeline
+  - acquisition source
+content: |
+  Source column: `channel_middle` on `Projected_NCNM` (see `growth.py:877`).
+
+  Used in `get_projected_ncnm()` to filter and segment projected new client net money by distribution type:
+
+  ```python
+  async def get_projected_ncnm(channel: str | None = None, ...) -> dict:
+      p_ch = R.col("Projected_NCNM", "channel_middle")
+      if channel is not None and channel.lower() != "all":
+          where_parts.append(f"p.{p_ch} LIKE ?")
+  ```
+
+  ## Distinct from
+  - `division` — organizational unit.
+  - `service_model` — engagement type.
+  - `lead_source` — the individual lead's acquisition origin (channel is the aggregate).
+
+  ## Values
+  Enumerated in the warehouse, not in code. Query `Projected_NCNM.channel_middle` for the current set:
+
+  ```sql
+  SELECT DISTINCT channel_middle, COUNT(*)
+  FROM [tav].[Projected_NCNM]
+  GROUP BY channel_middle
+  ```
+
+  ## Usage
+  Channel is primarily a **pipeline attribution** dimension. Use it when answering questions like "where is our funded growth coming from?" or "which acquisition channels should we invest in?". For realized AUM segmentation, prefer `service_model` or `division`.

@@ -1,0 +1,43 @@
+name: Lead Scoring Methodology
+uri: frameworks://lead-scoring-methodology
+category: Playbooks
+description: Composite behavioral score combining PAUM weight, call-response velocity, dual-touch signals, verbal-commit timing, and high-certainty source indicators.
+keywords:
+  - lead scoring
+  - behavioral signal
+  - PAUM
+  - call velocity
+  - dual-touch
+  - score formula
+content: |
+  Source: `pipeline_analytics.py:24–126` (`_score_lead(row) -> (score, reasons)`).
+
+  The score is a simple additive sum — every triggered signal adds points and a reason string. The agent that cites a lead's score can explain *why* it's ranked that way by surfacing the reasons.
+
+  ## Signal Table
+
+  | Signal | Points | Condition |
+  |---|---|---|
+  | **Whale prospect** | 40 | PAUM ≥ $10M |
+  | **High-value** | 30 | PAUM $5M – $10M |
+  | **Mid-market** | 20 | PAUM $1M – $5M |
+  | **Entry prospect** | 10 | PAUM $500K – $1M |
+  | **Same-day call** | 25 | First call date = lead creation date |
+  | **Dual-touch** | 15 | Call + event within 7 days |
+  | **Verbal-commit overdue** | 20 | Stage = "verbal" AND expected close date passed |
+  | **Verbal-commit imminent** | 15 | Stage = "verbal" AND close ≤ 14 days |
+  | **Close date imminent** | 10 | Close ≤ 21 days (any stage) |
+  | **Fast progression** | 15 | Aged ≤ 7 days AND already past "prospect" stage |
+  | **High-certainty source** | 10 | Source ∈ {401k rollover, retirement, pension, business sale, inheritance} |
+
+  ## Return Shape
+  `_score_lead(row)` returns `(score, reasons_list)`. The reasons list is a human-readable log of which signals fired. This is what gets rendered in advisor-facing outputs.
+
+  ## Why This Structure
+  - **Additive, not multiplicative** — easy to audit, easy to tune (just change a weight).
+  - **PAUM-heavy** — size dominates (40 points for whale vs 25 for any single behavioral signal), so bigger opportunities surface even without strong behavioral signals.
+  - **Behavioral signals reward velocity** — same-day call, dual-touch, fast progression all capture momentum.
+  - **Stage-aware for "verbal"** — the verbal-commit-imminent rule is specific because advisors frequently let verbal commits slip past their close date.
+
+  ## Usage
+  Ranks leads for advisor call lists, firmwide hot-lead reports, and RVP analysis. For "best next action", combine score with lead age to prioritize oldest + highest-scoring leads first.

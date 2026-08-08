@@ -1,0 +1,11 @@
+name: Tracking Error
+uri: frameworks://tracking-error
+category: Metric Definitions
+description: Degree of divergence from target allocation or benchmark.
+keywords:
+  - tracking error
+  - benchmark
+  - allocation
+  - divergence
+content: |
+  Degree of divergence from the target allocation or benchmark. Use this to describe implementation mismatch, not absolute risk tolerance.

@@ -1,0 +1,39 @@
+name: Stage Taxonomy
+uri: frameworks://stage-taxonomy
+category: Data Model
+description: Lead and opportunity stage progression, with verbal-commit and close-date semantics from pipeline scoring.
+keywords:
+  - stage
+  - lead phase
+  - pipeline stage
+  - prospect
+  - verbal
+  - close
+content: |
+  ## Stages Referenced in Code
+  (from `pipeline_analytics.py` scoring logic)
+
+  - **`prospect` / `new` / `pending`** — early-stage, no advancement yet. These are treated as "not yet progressed" for the fast-progression signal.
+  - **`verbal`** — advanced stage with verbal commitment. Triggers overdue- and imminent-close scoring rules.
+  - **Other stages** — handled by close-date rules regardless of name.
+
+  ## Scoring Implications (also in `lead-scoring-methodology`)
+  - `verbal` stage + close date overdue → +20 points.
+  - `verbal` stage + close ≤ 14 days → +15.
+  - Any stage (non-early) + close ≤ 21 days → +10.
+  - Any stage other than `prospect`/`new`/`pending`, aged ≤ 7 days → +15 (fast progression).
+
+  ## Source of Truth
+  Stages come from **Salesforce Opportunity.StageName** and flow through to the warehouse via the pipeline-sync jobs.
+
+  ## Distinct from Activity Status
+  Don't confuse stage with `Activity_Dim.Status` (completed / pending / cancelled) — those track whether a specific activity was done, not where the opportunity sits in the pipeline.
+
+  ## Authoritative Stage List
+  The code doesn't enumerate all stages — only specific names (`prospect`, `new`, `pending`, `verbal`) are matched explicitly. For the full set in current use, query Salesforce directly or check the warehouse:
+
+  ```sql
+  SELECT DISTINCT StageName, COUNT(*) AS n
+  FROM [sf].[Opportunity]
+  GROUP BY StageName ORDER BY n DESC
+  ```

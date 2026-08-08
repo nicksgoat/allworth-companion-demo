@@ -1,0 +1,410 @@
+functions:
+- name: build_lead_refs
+  title: Activity → Lead ID Resolution
+  plain_english: Sets up the lookup tables used to connect Salesforce activities (tasks, calls, emails)
+    back to the right lead. Built once per data load and reused by the activity-to-lead matching.
+  description: "Build (and cache) the reference frames used to resolve activities to leads.\n    Call\
+    \ ONCE per notebook run and pass the result to every\n    resolve_activity_lead_id() call, so the\
+    \ Lead/Account scans happen a single\n    time and are reused across the task and event passes.\n\n\
+    \    Returns:\n        (lead_df, account_df) — both cached."
+  source: "from pyspark.sql import functions as F\n\ndef build_lead_refs():\n    \"\"\"\n    Build (and\
+    \ cache) the reference frames used to resolve activities to leads.\n    Call ONCE per notebook run\
+    \ and pass the result to every\n    resolve_activity_lead_id() call, so the Lead/Account scans happen\
+    \ a single\n    time and are reused across the task and event passes.\n\n    Returns:\n        (lead_df,\
+    \ account_df) — both cached.\n    \"\"\"\n    lead_df = read_delta(\"bronze\", \"sfp2/Lead\").selectExpr(\n\
+    \        \"Id as Lead_Id\"\n    ).cache()\n    account_df = read_delta(\"bronze\", \"sfp2/Account\"\
+    ).selectExpr(\n        \"ID as A_ID\", \"Household__c\", \"Converted_Lead__c\"\n    ).cache()\n  \
+    \  return lead_df, account_df\n\n\ndef resolve_activity_lead_id(activity_df, account_id_col, lead_refs):\n\
+    \    \"\"\"\n    Trace a Task/Event activity back to a Lead_Id, covering the two ways a\n    Salesforce\
+    \ activity connects to a lead:\n\n      1. Direct            - activity has no AccountId and its WhoId\
+    \ points at a Lead.\n      2. FinServ Household - activity has FinServ__Household__c -> that household\n\
+    \                             Account's Converted_Lead__c.\n      3. Account Household - activity\
+    \ is on an Account -> the Account's Household\n                             -> the Household's Converted_Lead__c.\n\
+    \n    Resolved in that priority order (coalesce); the first non-null wins.\n\n    Args:\n        activity_df:\
+    \    Task or Event df; must contain WhoId and <account_id_col>.\n        account_id_col: name of the\
+    \ account-id column, e.g. \"Task_AccountId\"\n                        or \"Event_AccountId\".\n  \
+    \      lead_refs:      tuple from build_lead_refs() —\n                        (lead_df, account_df).\n\
+    \n    Returns:\n        activity_df with one new column, LeadId. Join-side columns are dropped.\n\
+    \    \"\"\"\n    lead_df, account_df = lead_refs\n    acct = F.col(account_id_col)\n    keep = activity_df.columns\n\
+    \n    return (\n        activity_df\n        .join(lead_df.alias(\"L\"),     acct.isNull()    & (F.col(\"\
+    WhoId\") == F.col(\"L.Lead_Id\")), \"left\")\n        .join(account_df.alias(\"FH\"), F.col(\"FinServ__Household__c\"\
+    ).isNotNull() & (F.col(\"FinServ__Household__c\") == F.col(\"FH.A_ID\")), \"left\")\n        .join(account_df.alias(\"\
+    A\"),  acct.isNotNull() & (acct == F.col(\"A.A_ID\")),               \"left\")\n        .join(account_df.alias(\"\
+    H\"),  F.col(\"A.Household__c\") == F.col(\"H.A_ID\"),                 \"left\")\n        .withColumn(\"\
+    LeadId\", F.coalesce(F.col(\"L.Lead_Id\"), F.col(\"FH.Converted_Lead__c\"), F.col(\"H.Converted_Lead__c\"\
+    )))\n        .select(*keep, \"LeadId\")\n    )"
+- name: channel_detail
+  title: Channel Detail - Finance PE Directed
+  plain_english: Classifies how a household was originally sourced into a detailed marketing channel (e.g.
+    online, branding, advisor-driven), matching the ThoughtSpot 'Channel Detail' definition.
+  description: "Implements the ThoughtSpot TML logic as a PySpark Column expression.\n    Returns a Column\
+    \ you can add with withColumn()."
+  source: "from pyspark.sql.column import Column\n\ndef channel_detail(channel_middle: Column, lead_description:\
+    \ Column, lead_source: Column) -> Column:\n    \"\"\"\n    Implements the ThoughtSpot TML logic as\
+    \ a PySpark Column expression.\n    Returns a Column you can add with withColumn().\n    \"\"\"\n\
+    \    return (\n        F.when((channel_middle == F.lit(\"paid leads\")) & (lead_description == F.lit(\"\
+    Smart Asset\")), F.lit(\"Smart Asset\"))\n         .when(channel_middle == F.lit(\"paid leads\"),\
+    \ F.lit(\"Other\"))\n         .when(channel_middle.isin(\"beneficiary\", \"other\", \"self-sourced\"\
+    , \"referral\", \"promoter\"), F.lit(\"Advisor Driven\"))\n         .when(\n             (channel_middle\
+    \ == F.lit(\"other media\")) &\n             (lead_source.isin(\"paid social\", \"paid search\", \"\
+    email marketing\", \"web\", \"social media\")),\n             F.lit(\"Online\")\n         )\n    \
+    \     .when(channel_middle == F.lit(\"other media\"), F.lit(\"Branding\"))\n         .otherwise(channel_middle)\n\
+    \    )"
+- name: client_segment
+  title: Client Segment
+  plain_english: Buckets a household into an AUM tier — 5M+, 1M–5M, 250k–1M, or <250k — using the larger
+    of its terminated value or current total account value.
+  description: "Inline Client_Segment function matching [dbo].[Client_Segment].\n    Uses the greater\
+    \ of term_col and aum_col for the threshold comparison."
+  source: "def client_segment(term_col, aum_col):\n    \"\"\"Inline Client_Segment function matching [dbo].[Client_Segment].\n\
+    \    Uses the greater of term_col and aum_col for the threshold comparison.\"\"\"\n    val = F.greatest(term_col,\
+    \ aum_col)\n    return (\n        F.when(val >= 5000000, F.lit(\"5M+\"))\n         .when(val >= 1000000,\
+    \ F.lit(\"1M - 5M\"))\n         .when(val >= 250000, F.lit(\"250k - 1M\"))\n         .otherwise(F.lit(\"\
+    <250k\"))\n    )"
+- name: combine_names
+  title: Household Name Normalize
+  plain_english: Builds the household's display name from its contacts, leaving out anyone marked deceased
+    (it never uses the raw lead name).
+  description: "Combines household contact names, excluding deceased individuals.\n    Only uses contact\
+    \ names from the household, never lead names.\n    \n    Parameters:\n    - first_name1, last_name1:\
+    \ Primary contact names (required)\n    - first_name2, last_name2: Secondary contact names (optional)\n\
+    \    \n    Returns NULL if both contacts are deceased or if only contact is deceased."
+  source: "from pyspark.sql import Column\nfrom pyspark.sql.functions import when, col, regexp_replace,\
+    \ concat, lit, trim\n\ndef combine_names(\n    first_name1: Column | str,\n    last_name1: Column\
+    \ | str,\n    first_name2: Column | str | None = None,\n    last_name2: Column | str | None = None\n\
+    ) -> Column:\n    \"\"\"\n    Combines household contact names, excluding deceased individuals.\n\
+    \    Only uses contact names from the household, never lead names.\n    \n    Parameters:\n    - first_name1,\
+    \ last_name1: Primary contact names (required)\n    - first_name2, last_name2: Secondary contact names\
+    \ (optional)\n    \n    Returns NULL if both contacts are deceased or if only contact is deceased.\n\
+    \    \"\"\"\n\n    def to_col(x: Column | str | None) -> Column:\n        if x is None:\n        \
+    \    return lit(None)\n        return col(x) if isinstance(x, str) else x\n\n    fn1 = to_col(first_name1)\n\
+    \    ln1 = to_col(last_name1)\n    fn2 = to_col(first_name2)\n    ln2 = to_col(last_name2)\n\n   \
+    \ def is_empty(c: Column) -> Column:\n        return c.isNull() | (trim(c) == lit(\"\"))\n\n    def\
+    \ is_deceased(c1: Column, c2: Column) -> Column:\n        \"\"\"Check if either name field contains\
+    \ 'Deceased'\"\"\"\n        return (c1.isNotNull() & c1.rlike(\"(?i)Deceased\")) | (c2.isNotNull()\
+    \ & c2.rlike(\"(?i)Deceased\"))\n\n    second_person_missing = is_empty(fn2) | is_empty(ln2)\n   \
+    \ person1_deceased = is_deceased(fn1, ln1)\n    person2_deceased = is_deceased(fn2, ln2)\n\n    #\
+    \ Build combined names excluding deceased individuals\n    combined = when(\n        person1_deceased\
+    \ & (second_person_missing | person2_deceased),\n        lit(None)  # Both deceased or only person1\
+    \ exists and is deceased\n    ).when(\n        person1_deceased & ~person2_deceased,\n        concat(fn2,\
+    \ lit(\" \"), ln2)  # Person1 deceased, use person2 only\n    ).when(\n        second_person_missing,\n\
+    \        concat(fn1, lit(\" \"), ln1)  # Only person1 (not deceased)\n    ).when(\n        person2_deceased,\n\
+    \        concat(fn1, lit(\" \"), ln1)  # Person2 deceased, use person1 only\n    ).when(\n       \
+    \ ln1 == ln2,\n        concat(fn1, lit(\" and \"), fn2, lit(\" \"), ln1)  # Both alive, same last\
+    \ name\n    ).otherwise(\n        concat(fn1, lit(\" \"), ln1, lit(\" and \"), fn2, lit(\" \"), ln2)\
+    \  # Both alive, different last names\n    )\n\n    # Clean up whitespace\n    result = trim(regexp_replace(combined,\
+    \ r\"\\s+\", \" \"))\n    return result"
+- name: deceased_flag
+  title: Deceased Flag
+  plain_english: Flags whether a contact is deceased — based on the name containing 'deceased', a date
+    of death, or a deceased indicator.
+  description: "Returns a boolean Column that is True when the contact is deceased.\n\n    Criteria (any\
+    \ match -> True):\n      1. contact_name contains 'deceas' (case-insensitive)\n      2. deceased_date\
+    \ is not null\n      3. contact_status equals 'Deceased'"
+  source: "from pyspark.sql import functions as F\nfrom pyspark.sql.column import Column\n\ndef deceased_flag(\n\
+    \    contact_name_col: Column = F.col(\"contact_name\"),\n    deceased_date_col: Column = F.col(\"\
+    Deceased_Date__c\"),\n    contact_status_col: Column = F.col(\"contact_status\"),\n) -> Column:\n\
+    \    \"\"\"\n    Returns a boolean Column that is True when the contact is deceased.\n\n    Criteria\
+    \ (any match -> True):\n      1. contact_name contains 'deceas' (case-insensitive)\n      2. deceased_date\
+    \ is not null\n      3. contact_status equals 'Deceased'\n    \"\"\"\n    return (\n        F.when(\n\
+    \            F.lower(contact_name_col).like(\"%deceas%\")\n            | deceased_date_col.isNotNull()\n\
+    \            | (contact_status_col == \"Deceased\"),\n            F.lit(True),\n        ).otherwise(F.lit(False))\n\
+    \    )\n\n# Usage:\n# df = df.withColumn(\"deceased_flag\", deceased_flag())\n# Or with custom column\
+    \ names:\n# df = df.withColumn(\"deceased_flag\", deceased_flag(F.col(\"Name\"), F.col(\"death_date\"\
+    ), F.col(\"status\")))"
+- name: employer_group
+  title: Employer Group
+  plain_english: Standardizes messy employer names and groups them into consistent employer categories
+    used for reporting.
+  description: ''
+  source: "def employer_group(\n    channel_middle_col,\n    businessunit_col,\n    employernew_col,\n\
+    \    targetmarket_col,\n    leadsource_col\n):\n    return (\n        F.when(F.col(channel_middle_col)\
+    \ != \"Target Market\", \"No Employer\")\n         .when(F.col(businessunit_col) == \"RAA\", \"Airline\"\
+    )\n         .when(F.col(employernew_col) == \"Dental Office\", \"Dentists\")\n         .when(F.col(employernew_col)\
+    \ == \"PG&E\", \"PG&E\")\n         .when(F.col(targetmarket_col) == 1, \"Other TM\")\n         .when(F.col(leadsource_col)\
+    \ == \"Target Company\", \"Other TM\")\n         .otherwise(\"No Employer\")\n    )"
+- name: finance_organic_2
+  title: Organic Flag
+  plain_english: Labels a client as 'Acquisition' (came in through an acquired book of business) or 'Organic'
+    (won directly by an advisor), matching the Finance_Organic_2 rules.
+  description: "PySpark implementation of [dbo].[Finance_Organic_2] SQL function.\n    \n    Returns 'Acquisition'\
+    \ or 'Organic' based on acquisition logic.\n    \n    Parameters:\n    - lead_source: Lead source\
+    \ column\n    - lead_description: Lead description column\n    - acquisition_closing_date: Acquisition\
+    \ closing date column\n    - account_client_since_date: Account client since date column\n    \n \
+    \   Returns: Column expression with 'Acquisition' or 'Organic'"
+  source: "from pyspark.sql import functions as F\nfrom pyspark.sql.types import StringType\n\ndef finance_organic_2(lead_source,\
+    \ lead_description, acquisition_closing_date, account_client_since_date):\n    \"\"\"\n    PySpark\
+    \ implementation of [dbo].[Finance_Organic_2] SQL function.\n    \n    Returns 'Acquisition' or 'Organic'\
+    \ based on acquisition logic.\n    \n    Parameters:\n    - lead_source: Lead source column\n    -\
+    \ lead_description: Lead description column\n    - acquisition_closing_date: Acquisition closing date\
+    \ column\n    - account_client_since_date: Account client since date column\n    \n    Returns: Column\
+    \ expression with 'Acquisition' or 'Organic'\n    \"\"\"\n    cutoff_date = F.lit(\"2023-07-31\").cast(\"\
+    date\")\n    \n    # Condition 1: Acquisition + Pre-Exis + within 180 days + client_since <= 2023-07-31\n\
+    \    condition_1 = (\n        (lead_source == \"Acquisition\") &\n        (lead_description.like(\"\
+    %Pre-Exis%\")) &\n        (F.datediff(account_client_since_date, acquisition_closing_date) < 180)\
+    \ &\n        (account_client_since_date.isNotNull()) &\n        (account_client_since_date <= cutoff_date)\n\
+    \    )\n    \n    # Condition 2: Acquisition + Pre-Exis + client_since > 2023-07-31 (no 180-day restriction)\n\
+    \    condition_2 = (\n        (lead_source == \"Acquisition\") &\n        (lead_description.like(\"\
+    %Pre-Exis%\")) &\n        (account_client_since_date.isNotNull()) &\n        (account_client_since_date\
+    \ > cutoff_date)\n    )\n    \n    # Condition 3: Acquisition + client_since is NULL\n    condition_3\
+    \ = (\n        (lead_source == \"Acquisition\") &\n        (account_client_since_date.isNull())\n\
+    \    )\n    \n    return (\n        F.when(condition_1, F.lit(\"Acquisition\"))\n         .when(condition_2,\
+    \ F.lit(\"Acquisition\"))\n         .when(condition_3, F.lit(\"Acquisition\"))\n         .otherwise(F.lit(\"\
+    Organic\"))\n    )\n\n\n# Example usage:\n# df = df.withColumn(\n#     \"Finance_Organic_2\",\n# \
+    \    finance_organic_2(\n#         F.col(\"LeadSource\"),\n#         F.col(\"Lead_Description__c\"\
+    ),\n#         F.col(\"Acquisition_Closing_Date__c\"),\n#         F.col(\"Client_Since__c\")\n#   \
+    \  )\n# )"
+- name: get_division
+  title: Division
+  plain_english: 'Assigns a household to a division/market: ''Airline'' for the RAA business unit, ''Other
+    Target Market'' when a target-market flag is set, otherwise its standard division.'
+  description: "Determine market segment:\n      - If businessunit_col == 'RAA' → 'Airline'\n      - If\
+    \ ANY column in targetmarketflag_cols == 1 → 'Other Target Market'\n      - Else → 'General Market'\n\
+    \    \n    Parameters\n    ----------\n    businessunit_col : Column\n        The Business Unit column.\n\
+    \    targetmarketflag_cols : list[Column] or Column\n        One column or a list of columns to evaluate."
+  source: "def get_division(businessunit_col, targetmarketflag_cols):\n    \"\"\"\n    Determine market\
+    \ segment:\n      - If businessunit_col == 'RAA' → 'Airline'\n      - If ANY column in targetmarketflag_cols\
+    \ == 1 → 'Other Target Market'\n      - Else → 'General Market'\n    \n    Parameters\n    ----------\n\
+    \    businessunit_col : Column\n        The Business Unit column.\n    targetmarketflag_cols : list[Column]\
+    \ or Column\n        One column or a list of columns to evaluate.\n    \"\"\"\n\n    # Ensure the\
+    \ input is a list\n    if not isinstance(targetmarketflag_cols, (list, tuple)):\n        targetmarketflag_cols\
+    \ = [targetmarketflag_cols]\n\n    # Build OR expression: col1 == 1 OR col2 == 1 ...\n    any_tm_flag\
+    \ = None\n    for col in targetmarketflag_cols:\n        cond = (col == 1) | (col == \"1\")\n    \
+    \    any_tm_flag = cond if any_tm_flag is None else (any_tm_flag | cond)\n\n    return (\n       \
+    \ F.when(businessunit_col == \"RAA\", \"Airline\")\n         .when(any_tm_flag, \"Other Target Market\"\
+    )\n         .otherwise(\"General Market\")\n    )"
+- name: get_filtered_lead_df
+  title: 360 Collected Lead Filtering
+  plain_english: Loads the set of leads used across the 360 build and filters out test/invalid records
+    so downstream metrics only count real households.
+  description: ''
+  source: "from pyspark.sql import functions as F\n\ndef get_filtered_lead_df():\n    df = read_delta(\"\
+    bronze\", \"sfp2/Lead\")\n\n    status_ok = F.coalesce(F.col(\"Status\"), F.lit(\"\")) != F.lit(\"\
+    Collected\")\n    is_raa = F.coalesce(F.col(\"Business_Unit__c\"), F.lit(\"\")) == F.lit(\"RAA\")\n\
+    \    has_custodian = F.col(\"Crp_Custodian__c\").isNotNull()\n    self_sourced = F.coalesce(F.col(\"\
+    Self_Sourced_Lead__c\"), F.lit(False)) == F.lit(True)\n\n    # Include converted leads when either\
+    \ flag is true or converted household is populated\n    is_converted = F.coalesce(F.col(\"IsConverted\"\
+    ), F.lit(False)) == F.lit(True)\n    has_converted_household = F.col(\"ConvertedHouseholdId__c\").isNotNull()\n\
+    \n    lastname_ok = F.lower(F.coalesce(F.col(\"LastName\"), F.lit(\"\"))) != F.lit(\"dailytest\")\n\
+    \n    nurture_ok = F.lower(\n        F.coalesce(F.col(\"Lead_Nurture_Code__c\"), F.lit(\"\"))\n  \
+    \  ) != F.lit(\"test account\")\n\n    return df.filter(\n        (\n            status_ok\n     \
+    \       | is_raa\n            | has_custodian\n            | self_sourced\n            | is_converted\n\
+    \            | has_converted_household\n        )\n        & lastname_ok\n        & nurture_ok\n \
+    \   )"
+- name: map_acq
+  title: Acquisition Source Mapping
+  plain_english: Works out a household's acquisition-source code from its acquisition source and business
+    unit — how the client came to the firm.
+  description: "Returns acquisition code based on lead_acquisition_source and lead_business_unit.\n  \
+    \  \n    Parameters:\n        lead_acquisition_source: Column containing the acquisition source\n\
+    \        lead_business_unit: Column containing the business unit\n        \n    Returns:\n       \
+    \ Column with the mapped acquisition code"
+  source: "def map_acq(lead_acquisition_source: Column, lead_business_unit: Column) -> Column:\n    \"\
+    \"\"\n    Returns acquisition code based on lead_acquisition_source and lead_business_unit.\n    \n\
+    \    Parameters:\n        lead_acquisition_source: Column containing the acquisition source\n    \
+    \    lead_business_unit: Column containing the business unit\n        \n    Returns:\n        Column\
+    \ with the mapped acquisition code\n    \"\"\"\n    # Helper condition for non-RAA business unit\n\
+    \    not_raa = (lead_business_unit != 'RAA') | lead_business_unit.isNull()\n    \n    return (\n \
+    \       F.when(\n            (lead_acquisition_source.isin('Adam Kint', 'AK', 'HansonMcClain', 'Allworth\
+    \ Financial') | lead_acquisition_source.isNull()) & not_raa,\n            F.lit('AWF')\n        )\n\
+    \        .when(lead_business_unit == 'RAA', F.lit('RAA'))\n        .when(lead_acquisition_source.isin('Simply\
+    \ Money') & not_raa, F.lit('SMA'))\n        .when(lead_acquisition_source.isin('Blueprint Financial')\
+    \ & not_raa, F.lit('BPF'))\n        .when(lead_acquisition_source.isin('YellowBrickRoad') & not_raa,\
+    \ F.lit('YBR'))\n        .when(lead_acquisition_source.isin('Siena') & not_raa, F.lit('SWM'))\n  \
+    \      .when(lead_acquisition_source.isin('HoustonAsset') & not_raa, F.lit('HAM'))\n        .when(lead_acquisition_source.isin('Pathways')\
+    \ & not_raa, F.lit('PFP'))\n        .when(lead_acquisition_source.isin('Bastoni') & not_raa, F.lit('BFS'))\n\
+    \        .when(lead_acquisition_source.isin('Shone') & not_raa, F.lit('SHO'))\n        .when(lead_acquisition_source.isin('Giordano')\
+    \ & not_raa, F.lit('GWM'))\n        .when(lead_acquisition_source.isin('Novak') & not_raa, F.lit('NOV'))\n\
+    \        .when(lead_acquisition_source.isin('DeBoer') & not_raa, F.lit('DFG'))\n        .when(lead_acquisition_source.isin('DeGreen')\
+    \ & not_raa, F.lit('DGN'))\n        .when(lead_acquisition_source.isin('RG Capital') & not_raa, F.lit('RGC'))\n\
+    \        .when(lead_acquisition_source.isin('Horseman') & not_raa, F.lit('HSG'))\n        .when(lead_acquisition_source.isin('Johanson')\
+    \ & not_raa, F.lit('JFA'))\n        .when(lead_acquisition_source.isin('Chetwood') & not_raa, F.lit('CHT'))\n\
+    \        .when(lead_acquisition_source.isin('UAS') & not_raa, F.lit('UAS'))\n        .when(lead_acquisition_source.isin('Muchler')\
+    \ & not_raa, F.lit('MCH'))\n        .when(lead_acquisition_source.isin('Second Opinion') & not_raa,\
+    \ F.lit('SOP'))\n        .when(lead_acquisition_source.isin('Red Rock Chico') & not_raa, F.lit('RRC'))\n\
+    \        .when(lead_acquisition_source.isin('One to One') & not_raa, F.lit('OTO'))\n        .when(lead_acquisition_source.isin('Red\
+    \ Rock Vegas', 'RRVegas') & not_raa, F.lit('RRV'))\n        .otherwise(lead_acquisition_source)\n\
+    \    )"
+- name: map_channel
+  title: Channel
+  plain_english: Rolls the detailed 'channel middle' value up into the high-level marketing channel (e.g.
+    media-driven, advisor-driven, CRP).
+  description: Maps channel_middle values to channel using a dictionary.
+  source: "from itertools import chain\n\ndef map_channel(channel_middle_col):\n    \"\"\"\n    Maps channel_middle\
+    \ values to channel using a dictionary.\n    \"\"\"\n\n    channel_map = {\n        \"Advisor Driven\"\
+    : \"Advisor Driven\",\n        \"Other\": \"Advisor Driven\",\n        \"Advisor Recruiting\": \"\
+    Advisor Driven\",\n        \"Beneficiary\": \"Advisor Driven\",\n        \"Self-Sourced\": \"Advisor\
+    \ Driven\",\n        \"Referral\": \"Advisor Driven\",\n        \"Promoter\": \"Advisor Driven\",\n\
+    \        \"Schwab\": \"CRP\",\n        \"Fidelity\": \"CRP\",\n        \"CRP\": \"CRP\",\n       \
+    \ \"Other Media\": \"Media Driven\",\n        \"Digital Media\": \"Media Driven\",\n        \"Digital\
+    \ Media and Events\": \"Media Driven\",\n        \"Paid Media\": \"Media Driven\",\n        \"Brand\
+    \ Driven\": \"Media Driven\",\n        \"Radio\": \"Media Driven\",\n        \"Target Market\": \"\
+    Media Driven\",\n        \"Paid Leads\": \"Paid Leads\",\n    }\n\n    mapping_expr = F.create_map(\n\
+    \        *[F.lit(x) for x in chain(*channel_map.items())]\n    )\n\n    return F.coalesce(mapping_expr[channel_middle_col],\
+    \ F.lit(\"Advisor Driven\"))"
+- name: map_stage
+  title: Pipeline Value Mapping
+  plain_english: Translates a Salesforce opportunity stage name into the firm's standardized pipeline
+    stage label.
+  description: "Map a StageName to the standardized pipeline label.\n\n    Parameters\n    ----------\n\
+    \    stageName : str or pyspark.sql.column.Column\n        The column name or Column containing the\
+    \ stage text.\n\n    Returns\n    -------\n    pyspark.sql.column.Column\n        A Column with the\
+    \ mapped stage value."
+  source: "from pyspark.sql.functions import col, when\nfrom pyspark.sql.column import Column\n\ndef map_stage(stageName:\
+    \ [str, Column]) -> Column:\n    \"\"\"\n    Map a StageName to the standardized pipeline label.\n\
+    \n    Parameters\n    ----------\n    stageName : str or pyspark.sql.column.Column\n        The column\
+    \ name or Column containing the stage text.\n\n    Returns\n    -------\n    pyspark.sql.column.Column\n\
+    \        A Column with the mapped stage value.\n    \"\"\"\n    s = col(stageName) if isinstance(stageName,\
+    \ str) else stageName\n\n    return (\n        when(s == 'New', '1 - New')\n        .when(s.isin('Contacted',\
+    \ 'Attempting'), '2 - Attempting')\n        .when(s.isin('Prospect', 'Intro/1st Appt Scheduled'),\
+    \ '3 - Intro/1st Appt Scheduled')\n        .when(s.isin('Pending', 'Advisor Qualification Pending'),\
+    \ '4 - Advisor Qualification Pending')\n        .when(s.isin('Qualified', 'Interested', 'Referred',\
+    \ 'Discovery'), '5 - Discovery')\n        .when(s.isin('Proposal', 'Engaged', 'Proposal Delivered'),\
+    \ '6 - Proposal Delivered')\n        .when(s.isin('Committed', 'Verbal Commitment Received'), '7 -\
+    \ Verbal Commitment Received')\n        .when(s.isin('Onboarding'), '8 - Onboarding')\n        .when(s.isin('Closed\
+    \ Won'), '9 - Closed Won')\n        .when(s.isin('Closed Lost'), 'z - Closed Lost')\n        .otherwise(s)\n\
+    \    )"
+- name: new_channel_middle
+  title: Channel Middle
+  plain_english: Determines a household's 'channel middle' (how it was influenced or sourced), with a
+    manual override for specific excluded households.
+  description: "Streamlined PySpark implementation of dbo.New_Channel_Middle (Influence logic only).\n\
+    \n    Exclusion rule:\n      - If HHID is in excluded list, do NOT assign CRP / Custodial Referral\
+    \ channels.\n      - If HHID is NULL, allow (do not exclude)."
+  source: "from pyspark.sql import functions as F\n\ndef new_channel_middle(\n    leadsource_col,    \
+    \             # required (Column)\n    targetmarket_col=None,          # optional (Column or None)\n\
+    \    crp_col=None,                   # optional (Column or None)\n    hhid_col=None              \
+    \     # optional (Column or None)\n):\n    \"\"\"\n    Streamlined PySpark implementation of dbo.New_Channel_Middle\
+    \ (Influence logic only).\n\n    Exclusion rule:\n      - If HHID is in excluded list, do NOT assign\
+    \ CRP / Custodial Referral channels.\n      - If HHID is NULL, allow (do not exclude).\n    \"\"\"\
+    \n\n    # Convert None → Spark NULL literal\n    targetmarket_col = F.lit(None) if targetmarket_col\
+    \ is None else targetmarket_col\n    crp_col = F.lit(None) if crp_col is None else crp_col\n    hhid_col\
+    \ = F.lit(None) if hhid_col is None else hhid_col\n\n    leadsource_lower = F.lower(leadsource_col)\n\
+    \n    tm_list = [\n        \"direct\",\"direct mail\",\"email marketing\",\"events\",\"historical\"\
+    ,\n        \"marketing email\",\"organic\",\"paid search\",\"paid social\",\n        \"partner channel\"\
+    ,\"print advertising\",\"display\",\n        \"social media\",\"radio\",\"target company\",\"tv\"\
+    ,\"word of mouth\",\"other\"\n    ]\n\n    excluded_hhid = [\n        \"001UW00000iGVheYAG\",\"001UW00000jVetmYAC\"\
+    ,\"001UW00000eG0WVYA0\",\"001UW00000nfIrHYAU\"\n    ]\n\n    \"\"\"\n    Excluded names for auditing\
+    \ purposes: \n    McCormack, William and Caroline\n    Smith, Christine and Michael\n    Brandt, Steve\n\
+    \    Buettner, Russ and Kelly\n    \"\"\"\n\n    # ---- Helpers (readability) ----\n    is_excluded_hhid\
+    \ = hhid_col.isin(excluded_hhid)\n    hhid_allowed = hhid_col.isNull() | (~is_excluded_hhid)  # nulls\
+    \ are allowed\n\n    cust_ref_channel = F.coalesce(crp_col, F.lit(\"Fidelity\"))\n\n    is_target_market\
+    \ = (\n        ((targetmarket_col == 1) | (targetmarket_col == True)) &\n        (leadsource_lower.isin(tm_list))\n\
+    \    )\n\n    return (\n        F.when(crp_col.isNotNull() & hhid_allowed, crp_col)\n         .when((leadsource_col\
+    \ == \"Custodial Referral\") & hhid_allowed, cust_ref_channel)\n         .when(leadsource_col.isin(\"\
+    Representative\", \"Promoter\"), F.lit(\"Promoter\"))\n         .when(leadsource_col.isin(\"Household\
+    \ With No Lead\"), F.lit(\"Other\"))\n         .when(leadsource_col.isin(\"Advisor Recruiting\"),\
+    \ F.lit(\"Advisor Recruiting\"))\n         .when(leadsource_col.isin(\"External Referral\", \"Referral\"\
+    , \"Internal Referral\"), F.lit(\"Referral\"))\n         .when(leadsource_col == \"Advisor Self-Sourced\"\
+    , F.lit(\"Self-Sourced\"))\n         .when(leadsource_col == \"Beneficiary\", F.lit(\"Beneficiary\"\
+    ))\n         .when(leadsource_col == \"Acquisition\", F.lit(\"Other\"))\n         .when(leadsource_col\
+    \ == \"Paid Leads\", F.lit(\"Paid Leads\"))\n         .when(leadsource_col == \"Radio\", F.lit(\"\
+    Radio\"))\n         .when(leadsource_col == \"Target Company\", F.lit(\"Target Market\"))\n      \
+    \   .when(leadsource_col == \"Advisor Recruiting\", F.lit(\"Advisor Recruiting\"))\n         .when(is_target_market,\
+    \ F.lit(\"Target Market\"))\n         .when(leadsource_col.isNull(), F.lit(\"Other\"))\n         .otherwise(F.lit(\"\
+    Other Media\"))\n    )"
+- name: normalize_billing_state
+  title: Normalize State - State_Group
+  plain_english: Cleans up state values — turning abbreviations and variants into full, consistent state
+    names — and groups them.
+  description: "Normalizes state abbreviations and variations to full state names.\n    \n    Args:\n\
+    \        billing_state_col: Name of the column containing billing state values\n        \n    Returns:\n\
+    \        Column: A PySpark Column with normalized state names"
+  source: "from pyspark.sql import Column\nfrom pyspark.sql.functions import col, when, upper, trim\n\n\
+    \ndef normalize_billing_state(billing_state_col: str = \"BillingState\") -> Column:\n    \"\"\"\n\
+    \    Normalizes state abbreviations and variations to full state names.\n    \n    Args:\n       \
+    \ billing_state_col: Name of the column containing billing state values\n        \n    Returns:\n\
+    \        Column: A PySpark Column with normalized state names\n    \"\"\"\n    state_col = upper(trim(col(billing_state_col)))\n\
+    \    \n    state_mapping = {\n        \"Alabama\": [\"AL\", \"ALABAMA\"],\n        \"Alaska\": [\"\
+    AK\"],\n        \"Arizona\": [\"AZ\", \"AZ.\", \"ARIZONA\"],\n        \"Arkansas\": [\"AR\"],\n  \
+    \      \"California\": [\"CA\", \"CA.\", \"CALIFORNIA\"],\n        \"Colorado\": [\"CO\", \"COLORADO\"\
+    ],\n        \"Connecticut\": [\"CT\"],\n        \"Delaware\": [\"DE\", \"DELAWARE\"],\n        \"\
+    District of Columbia\": [\"DC\"],\n        \"Florida\": [\"FL\", \"FL.\", \"FLORIDA\"],\n        \"\
+    Georgia\": [\"GA\"],\n        \"Hawaii\": [\"HI\"],\n        \"Idaho\": [\"ID\", \"IDAHO\"],\n   \
+    \     \"Illinois\": [\"IL\", \"IL.\"],\n        \"Indiana\": [\"IN\", \"INDIANA\"],\n        \"Iowa\"\
+    : [\"IA\"],\n        \"Kansas\": [\"KS\", \"KANSAS\"],\n        \"Kentucky\": [\"KY\", \"KENTUCKY\"\
+    ],\n        \"Louisiana\": [\"LA\"],\n        \"Maine\": [\"ME\"],\n        \"Maryland\": [\"MD\"\
+    , \"MD.\", \"MARYLAND\"],\n        \"Massachusetts\": [\"MA\"],\n        \"Michigan\": [\"MI\"],\n\
+    \        \"Minnesota\": [\"MN\"],\n        \"Mississippi\": [\"MS\"],\n        \"Missouri\": [\"MO\"\
+    , \"MISSOURI\"],\n        \"Montana\": [\"MT\"],\n        \"Nebraska\": [\"NE\"],\n        \"Nevada\"\
+    : [\"NV\"],\n        \"New Hampshire\": [\"NH\"],\n        \"New Jersey\": [\"NJ\", \"NEW JERSEY\"\
+    ],\n        \"New Mexico\": [\"NM\"],\n        \"New York\": [\"NY\", \"NEW YORK\"],\n        \"North\
+    \ Carolina\": [\"NC\"],\n        \"North Dakota\": [\"ND\"],\n        \"Ohio\": [\"OH\", \"OHIO\"\
+    ],\n        \"Oklahoma\": [\"OK\"],\n        \"Oregon\": [\"OR\", \"OREGON\"],\n        \"Pennsylvania\"\
+    : [\"PA\"],\n        \"Puerto Rico\": [\"PR\", \"PUERTO RICO\"],\n        \"Rhode Island\": [\"RI\"\
+    ],\n        \"South Carolina\": [\"SC\"],\n        \"South Dakota\": [\"SD\"],\n        \"Tennessee\"\
+    : [\"TN\"],\n        \"Texas\": [\"TX\", \"TEXAS\"],\n        \"Utah\": [\"UT\", \"UTAH\"],\n    \
+    \    \"Vermont\": [\"VT\"],\n        \"Virgin Islands\": [\"VI\"],\n        \"Virginia\": [\"VA\"\
+    ],\n        \"Washington\": [\"WA\", \"WASHINGTON\"],\n        \"West Virginia\": [\"WV\", \"WEST\
+    \ VIRGINIA\"],\n        \"Wisconsin\": [\"WI\", \"WISCONSIN\"],\n        \"Wyoming\": [\"WY\"],\n\
+    \    }\n    \n    # Build the when chain\n    result = None\n    for state_name, variations in state_mapping.items():\n\
+    \        condition = state_col.isin([v.upper() for v in variations])\n        if result is None:\n\
+    \            result = when(condition, state_name)\n        else:\n            result = result.when(condition,\
+    \ state_name)\n    \n    # Add the ELSE clause (return original value if no match)\n    result = result.otherwise(col(billing_state_col))\n\
+    \    \n    return result"
+- name: pipeline_status_with_value
+  title: Pipeline Status
+  plain_english: Produces a pipeline status label prefixed with its stage number (e.g. '30 Proposal')
+    so stages sort in the right order.
+  description: Returns '<NN> <Pipeline Status>' as a PySpark Column
+  source: "from pyspark.sql import functions as F\nfrom pyspark.sql.column import Column\n\ndef pipeline_status_with_value(opportunity_stage_col:\
+    \ Column, lead_status_col: Column) -> Column:\n    \"\"\"\n    Returns '<NN> <Pipeline Status>' as\
+    \ a PySpark Column\n    \"\"\"\n\n    pipeline_status = (\n        F.when(opportunity_stage_col.isNotNull(),\n\
+    \               F.concat(F.lit(\"Opportunity: \"), opportunity_stage_col))\n         .when(lead_status_col\
+    \ == \"Contacted\", \"Lead: Attempting\")\n         .when(lead_status_col == \"Prospect\", \"Lead:\
+    \ Intro/1st Appt Scheduled\")\n         .when(lead_status_col == \"Pending\", \"Lead: Advisor Qualification\
+    \ Pending\")\n         .otherwise(F.concat(F.lit(\"Lead: \"), lead_status_col))\n    )\n\n    pipeline_value\
+    \ = (\n        F.when(pipeline_status == \"Lead: Collected\", \"01\")\n         .when(pipeline_status\
+    \ == \"Lead: New\", \"02\")\n         .when(pipeline_status == \"Lead: Attempting\", \"03\")\n   \
+    \      .when(pipeline_status == \"Lead: Intro/1st Appt Scheduled\", \"04\")\n         .when(pipeline_status\
+    \ == \"Lead: Advisor Qualification Pending\", \"05\")\n         .when(pipeline_status == \"Lead: Nurture\"\
+    , \"06\")\n         .when(pipeline_status == \"Lead: Qualified\", \"07\")\n         .when(pipeline_status\
+    \ == \"Opportunity: Referred\", \"08\")\n         .when(pipeline_status == \"Opportunity: Interested\"\
+    , \"09\")\n         .when(pipeline_status == \"Opportunity: Discovery\", \"10\")\n         .when(pipeline_status\
+    \ == \"Opportunity: Proposal Delivered\", \"11\")\n         .when(pipeline_status == \"Opportunity:\
+    \ Verbal Commitment Received\", \"12\")\n         .when(pipeline_status == \"Opportunity: Onboarding\"\
+    , \"13\")\n         .when(pipeline_status == \"Opportunity: Closed Won\", \"14\")\n         .when(pipeline_status\
+    \ == \"Lead: Unqualified\", \"15\")\n         .when(pipeline_status == \"Opportunity: Closed Lost\"\
+    , \"16\")\n         .when(pipeline_status == \"Opportunity: Nurture\", \"17\")\n         .when(pipeline_status\
+    \ == \"Opportunity: Terminated\", \"18\")\n         .otherwise(\"00\")\n    )\n\n    # ✅ MUST explicitly\
+    \ return a Column\n    return F.concat(pipeline_value, F.lit(\" \"), pipeline_status)"
+- name: resolve_activity_lead_id
+  title: Activity → Lead ID Resolution
+  plain_english: Traces a Salesforce task or event back to the lead it belongs to, covering both direct
+    links and links through related records.
+  description: "Trace a Task/Event activity back to a Lead_Id, covering the two ways a\n    Salesforce\
+    \ activity connects to a lead:\n\n      1. Direct            - activity has no AccountId and its WhoId\
+    \ points at a Lead.\n      2. FinServ Household - activity has FinServ__Household__c -> that household\n\
+    \                             Account's Converted_Lead__c.\n      3. Account Household - activity\
+    \ is on an Account -> the Account's Household\n                             -> the Household's Converted_Lead__c.\n\
+    \n    Resolved in that priority order (coalesce); the first non-null wins.\n\n    Args:\n        activity_df:\
+    \    Task or Event df; must contain WhoId and <account_id_col>.\n        account_id_col: name of the\
+    \ account-id column, e.g. \"Task_AccountId\"\n                        or \"Event_AccountId\".\n  \
+    \      lead_refs:      tuple from build_lead_refs() —\n                        (lead_df, account_df).\n\
+    \n    Returns:\n        activity_df with one new column, LeadId. Join-side columns are dropped."
+  source: "from pyspark.sql import functions as F\n\ndef build_lead_refs():\n    \"\"\"\n    Build (and\
+    \ cache) the reference frames used to resolve activities to leads.\n    Call ONCE per notebook run\
+    \ and pass the result to every\n    resolve_activity_lead_id() call, so the Lead/Account scans happen\
+    \ a single\n    time and are reused across the task and event passes.\n\n    Returns:\n        (lead_df,\
+    \ account_df) — both cached.\n    \"\"\"\n    lead_df = read_delta(\"bronze\", \"sfp2/Lead\").selectExpr(\n\
+    \        \"Id as Lead_Id\"\n    ).cache()\n    account_df = read_delta(\"bronze\", \"sfp2/Account\"\
+    ).selectExpr(\n        \"ID as A_ID\", \"Household__c\", \"Converted_Lead__c\"\n    ).cache()\n  \
+    \  return lead_df, account_df\n\n\ndef resolve_activity_lead_id(activity_df, account_id_col, lead_refs):\n\
+    \    \"\"\"\n    Trace a Task/Event activity back to a Lead_Id, covering the two ways a\n    Salesforce\
+    \ activity connects to a lead:\n\n      1. Direct            - activity has no AccountId and its WhoId\
+    \ points at a Lead.\n      2. FinServ Household - activity has FinServ__Household__c -> that household\n\
+    \                             Account's Converted_Lead__c.\n      3. Account Household - activity\
+    \ is on an Account -> the Account's Household\n                             -> the Household's Converted_Lead__c.\n\
+    \n    Resolved in that priority order (coalesce); the first non-null wins.\n\n    Args:\n        activity_df:\
+    \    Task or Event df; must contain WhoId and <account_id_col>.\n        account_id_col: name of the\
+    \ account-id column, e.g. \"Task_AccountId\"\n                        or \"Event_AccountId\".\n  \
+    \      lead_refs:      tuple from build_lead_refs() —\n                        (lead_df, account_df).\n\
+    \n    Returns:\n        activity_df with one new column, LeadId. Join-side columns are dropped.\n\
+    \    \"\"\"\n    lead_df, account_df = lead_refs\n    acct = F.col(account_id_col)\n    keep = activity_df.columns\n\
+    \n    return (\n        activity_df\n        .join(lead_df.alias(\"L\"),     acct.isNull()    & (F.col(\"\
+    WhoId\") == F.col(\"L.Lead_Id\")), \"left\")\n        .join(account_df.alias(\"FH\"), F.col(\"FinServ__Household__c\"\
+    ).isNotNull() & (F.col(\"FinServ__Household__c\") == F.col(\"FH.A_ID\")), \"left\")\n        .join(account_df.alias(\"\
+    A\"),  acct.isNotNull() & (acct == F.col(\"A.A_ID\")),               \"left\")\n        .join(account_df.alias(\"\
+    H\"),  F.col(\"A.Household__c\") == F.col(\"H.A_ID\"),                 \"left\")\n        .withColumn(\"\
+    LeadId\", F.coalesce(F.col(\"L.Lead_Id\"), F.col(\"FH.Converted_Lead__c\"), F.col(\"H.Converted_Lead__c\"\
+    )))\n        .select(*keep, \"LeadId\")\n    )"

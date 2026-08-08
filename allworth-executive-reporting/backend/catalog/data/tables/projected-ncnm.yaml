@@ -1,0 +1,74 @@
+id: projected-ncnm
+name: Projected_NCNM
+schema: tho
+db: DataWarehouse
+db_table: Projected_NCNM
+guid: 8b837f31-2864-4644-acbf-cae10c39782a
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Goals
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Projected NCNM
+column_count: 6
+columns:
+- name: leadid
+  db_column_name: leadid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Reporting_Period
+  db_column_name: Reporting_Period
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Weighted_PAUM_Funding_Cycle
+  db_column_name: Weighted_PAUM_Funding_Cycle
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: closed_open_flag
+  db_column_name: closed_open_flag
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Projected_NCNM_ID
+  db_column_name: Projected_NCNM_ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: channel_middle
+  db_column_name: channel_middle
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

@@ -1,0 +1,6 @@
+id: cash-reserve-report
+source: wealth_mcp.domain.tables
+description: Account-level cash reserve positions vs targets (Total Cash Dollar and
+  related measures).
+grain: Upload Account ID
+domain: Account

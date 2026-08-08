@@ -1,0 +1,11 @@
+name: Fee Yield
+uri: frameworks://fee-yield
+category: Metric Definitions
+description: Revenue divided by billed or managed assets, expressed in basis points.
+keywords:
+  - fee yield
+  - basis points
+  - revenue
+  - yield
+content: |
+  Revenue divided by billed or managed assets. Use basis points where possible and separate observed fee yield from policy fee schedule.

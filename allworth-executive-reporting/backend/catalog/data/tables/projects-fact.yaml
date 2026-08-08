@@ -1,0 +1,56 @@
+id: projects-fact
+name: Projects_Fact
+schema: tho
+db: DataWarehouse
+db_table: Projects_Fact
+guid: e6d6fe1e-4985-493a-bc2f-930b9ed70065
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Integrated Services
+column_count: 4
+columns:
+- name: Project_Id
+  db_column_name: Project_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Discount
+  db_column_name: Discount
+  data_type: DOUBLE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Total_Invoice
+  db_column_name: Total_Invoice
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Household_AUM
+  db_column_name: Household_AUM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

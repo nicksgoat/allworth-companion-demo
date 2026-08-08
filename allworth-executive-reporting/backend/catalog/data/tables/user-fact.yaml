@@ -1,0 +1,102 @@
+id: user-fact
+name: user_fact
+schema: tho
+db: DataWarehouse
+db_table: user_fact
+guid: 6aaa9909-c484-46dd-b4c5-78479fd95a9d
+business_name: null
+grain: advisor_id
+pk: null
+synonyms: []
+domain: Advisor
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: pre-computed advisor net flows by year
+worksheets:
+- Advisor 360
+- Trade Date Rollforward
+column_count: 9
+columns:
+- name: advisor_id
+  db_column_name: advisor_id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: net_flows_2021
+  db_column_name: net_flows_2021
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: net_flows_2022
+  db_column_name: net_flows_2022
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: net_flows_2023
+  db_column_name: net_flows_2023
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: net_flows_2024
+  db_column_name: net_flows_2024
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: net_flows_2025
+  db_column_name: net_flows_2025
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AUM
+  db_column_name: AUM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: '#_of_clients'
+  db_column_name: '#_of_clients'
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Goal
+  db_column_name: Goal
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

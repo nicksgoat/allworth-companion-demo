@@ -1,0 +1,34 @@
+name: Household Aggregation
+uri: frameworks://household-aggregation
+category: Data Model
+description: How multiple custodial accounts roll up into a single household entity (AVHHID) for consolidated AUM, fees, and service metrics.
+keywords:
+  - household aggregation
+  - account rollup
+  - AUM consolidation
+  - AVHHID
+content: |
+  ## The AVHHID Key
+  Accounts aggregate at the household level via `AVHHID` (Allworth Virtual Household ID). See `entity-taxonomy`:
+
+  > The core client or prospect container. Use for household-level AUM, service, planning, and relationship analysis.
+
+  ## Aggregation Mechanics
+  - `Current_Household_Fact` aggregates account AUM into household-level `AUM` and `PAUM`.
+  - Rollforward queries use a two-key join (`avhhid` + `Reporting_Period`) to preserve time-aware demographic consistency.
+  - `Account_Rollforward` → `Historical_Household_Demographic` joins preserve household context when segmenting by division or service_model over time.
+
+  ## Why It Matters for Fees
+  Per `data-caveats`:
+
+  > Account-level exceptions, household aggregation, and billing adjustments can move realized yield away from standard tiers.
+
+  A household with two accounts on different billing groups will have its realized yield depend on how the groups interact, not just on the tier rate.
+
+  ## Where Aggregation Is Managed
+  Household membership (which accounts roll up into which AVHHID) is maintained in **Salesforce** and reflected in the warehouse. Mis-aggregated households (e.g. spouse accounts not linked) show up as fragmented AUM and should be escalated to ops, not fixed in the warehouse.
+
+  ## Edge Cases
+  - Multi-advisor households: one AVHHID, multiple advisors on different accounts.
+  - Trust / entity accounts: may or may not aggregate to the individual household depending on beneficial-ownership rules.
+  - Held-away assets: typically tracked separately (not in `Current_Household_Fact.AUM`).

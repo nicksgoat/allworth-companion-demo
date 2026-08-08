@@ -1,0 +1,36 @@
+name: Activity Type
+uri: frameworks://activity-type
+category: Data Model
+description: Classification of a client touchpoint or CRM activity (call, meeting, email, task) used for engagement analysis and conversion tracking.
+keywords:
+  - activity type
+  - touchpoint
+  - call
+  - meeting
+  - email
+  - engagement
+content: |
+  Source column: `Activity_Type` on `Activity_Dim` (see `client_outcomes.py:297`).
+
+  ## Usage
+  - Segmentation in `get_conversion_analytics()`:
+    `segment_by: Literal["firm", "advisor", "division", "lead_source", "activity_type"]` (`client_outcomes.py:762`).
+  - Activity detail retrieval:
+    `get_activity_log(activity_type: str | None = None)` (`client_outcomes.py:271`).
+  - Engagement-rate calculations anchor to defined touchpoints — see `engagement-behavior-standard`.
+
+  ## Underlying Data
+  - `Activity_Fact` aggregates contact events; `Activity_Dim` provides the type classification.
+  - Upstream sources: Salesforce `Event` (calendar events) and `Task` (task records), classified by type on ingest (`client_outcomes.py:12`).
+
+  ## Values
+  The enumeration (call, meeting, email, task, event, etc.) lives in the Salesforce Activity taxonomy. Current warehouse values:
+
+  ```sql
+  SELECT DISTINCT Activity_Type, COUNT(*) AS n
+  FROM [tav].[Activity_Dim]
+  GROUP BY Activity_Type ORDER BY n DESC
+  ```
+
+  ## Engagement Guidance
+  Per `engagement-behavior-standard`, not every activity type counts equally toward engagement. A call that advances a service deliverable counts; a bulk-emailed newsletter does not.

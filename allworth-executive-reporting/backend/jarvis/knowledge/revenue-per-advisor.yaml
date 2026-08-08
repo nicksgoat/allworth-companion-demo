@@ -1,0 +1,11 @@
+name: Revenue Per Advisor
+uri: frameworks://revenue-per-advisor
+category: Metric Definitions
+description: Total advisory revenue attributed to an advisor over the period.
+keywords:
+  - revenue per advisor
+  - rpa
+  - advisor productivity
+  - capacity
+content: |
+  Total advisory revenue attributed to an advisor over the period. Use this as a capacity/productivity metric, not a pure quality metric.

@@ -1,0 +1,11 @@
+name: Annual Review Completion
+uri: frameworks://annual-review-completion
+category: Metric Definitions
+description: Percentage of eligible households that completed an annual review.
+keywords:
+  - annual review completion
+  - annual review
+  - review
+  - service standard
+content: |
+  Percentage of eligible households that completed an annual review. This should be compared against service standards and client segment expectations.

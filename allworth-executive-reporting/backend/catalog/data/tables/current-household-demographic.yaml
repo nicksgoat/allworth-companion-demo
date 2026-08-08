@@ -1,0 +1,926 @@
+id: current-household-demographic
+name: Current_Household_Demographic
+schema: tho
+db: DataWarehouse
+db_table: Current_Household_Demographic
+guid: 780942d7-7412-43d5-811a-b46130de0880
+business_name: Household (current attributes)
+grain: one row per Salesforce Lead (LeadId)
+pk: LeadId
+synonyms:
+- client
+- household
+- hh
+- lead
+domain: Household
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: 'Near-1:1 partner of Current_Household_Fact. Demographic = attributes,
+
+  Fact = measures + advisor FKs + date keys.
+
+  '
+worksheets:
+- Account Rollforward
+- Account Setups
+- Account Team Member
+- Activities
+- Advisor Conversion Worksheet
+- Allworth 360
+- Campaigns
+- Case
+- Cash Reserves
+- Client Count Rollforward
+- Comparison 360
+- Comparison Rollforward - Trade Date
+- Contact 360
+- CRP Reps with Flows
+- Distribution Requests
+- Download Version of 360
+- Events Worksheet (Migrate to Activities Model)
+- Financial Account 360
+- Incoming Funds
+- Integrated Services
+- Integration Tracker
+- IS Referrals
+- Jira FSI
+- Outflow/Term Reason Audit
+- Performance Tracking
+- Pipeline 360
+- Practice Management External Sources
+- Practice Management
+- Projected NCNM
+- RMD Model
+- Rollforward Historical
+- Stage Change History
+- Survey Monkey Results
+- Tasks (Migrate to Activities Model)
+- Tax Clients
+- Tax Retention
+- Trade Date Rollforward
+- Trade Requests
+- Transactions
+- Zoom Call Log External
+column_count: 91
+columns:
+- name: Self_Sourced_Lead
+  db_column_name: Self_Sourced_Lead__c
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - Self_Sourced_Lead__c
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Range__c
+  db_column_name: CRP_Range__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Employer Additional Info
+  db_column_name: Employer_Additional_Info
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: County_Number
+  db_column_name: County_Number
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Job_Title
+  db_column_name: Job_Title
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: HasOptedOutOfEmail
+  db_column_name: HasOptedOutOfEmail
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Call_Disposition
+  db_column_name: Call_Disposition
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Acquisition_Source
+  db_column_name: Acquisition_Source
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Address
+  db_column_name: Address
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: CRP_Rep_Phone__c
+  db_column_name: CRP_Rep_Phone__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Zip
+  db_column_name: Zip
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: true
+- name: Mobile_Phone
+  db_column_name: Mobile_Phone
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Spice_Campaign_Name
+  db_column_name: Spice_Campaign_Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Name
+  db_column_name: Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Term_Reason
+  db_column_name: TermReason
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - TermReason
+  description: ''
+  pii: false
+  hot: true
+- name: Has_Tax_Service
+  db_column_name: Has_Tax_Service
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Pipeline Status
+  db_column_name: pipelinestatus
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - pipelinestatus
+  description: ''
+  pii: false
+  hot: false
+- name: Contact_Id
+  db_column_name: Contact_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Job Location
+  db_column_name: Base__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - Base
+  description: ''
+  pii: false
+  hot: false
+- name: Sage_ID
+  db_column_name: Sage_ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Catchlight_Score__c
+  db_column_name: Catchlight_Score__c
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Call_Disposition_Detail
+  db_column_name: Call_Disposition_Detail
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Longitude
+  db_column_name: Longitude
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Rep_Email__c
+  db_column_name: CRP_Rep_Email__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: SmartAsset_Match_Id
+  db_column_name: SmartAsset_Match_Id
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Tax_Client_At_Some_Point
+  db_column_name: Tax_Client_At_Some_Point
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Original_Partner
+  db_column_name: Original_Partner
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Household Name
+  db_column_name: HHName
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - HHName
+  description: ''
+  pii: false
+  hot: true
+- name: Rating
+  db_column_name: Rating
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: HHID
+  db_column_name: HHID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Division
+  db_column_name: Division
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Client_Segment
+  db_column_name: Client_Segment
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: 1stApptAssignedAdvisor
+  db_column_name: 1stApptAssignedAdvisor
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Phone
+  db_column_name: Phone
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Seat
+  db_column_name: Seat__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - Seat__c
+  description: ''
+  pii: false
+  hot: false
+- name: waived_fee_promo_Id
+  db_column_name: waived_fee_promo_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Marketing Appt Reques Checkbox
+  db_column_name: Marketing_Appt_Request_Checkbox__c
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - Marketing_Appt_Request_Checkbox__c
+  description: ''
+  pii: false
+  hot: false
+- name: overduetask
+  db_column_name: overduetask
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Promoter Influenced
+  db_column_name: Referred_by_Promoter
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: State
+  db_column_name: State
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: CRP_Funnel_Stage
+  db_column_name: CRP_Funnel_Stage
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Self Sourced Additional Info
+  db_column_name: Self_Sourced_Additional_Information__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - Self_Sourced_Additional_Information__c
+  description: ''
+  pii: false
+  hot: false
+- name: Marketing Region
+  db_column_name: marketing_region
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - marketing_region
+  description: ''
+  pii: false
+  hot: true
+- name: Compass Mail Subscription
+  db_column_name: Compass_Mail_Subscription__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - Compass_Mail_Subscription__c
+  description: ''
+  pii: false
+  hot: false
+- name: Latitude
+  db_column_name: Latitude
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Organic
+  db_column_name: Organic
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Referral_Number__c
+  db_column_name: CRP_Referral_Number__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Custodian__c
+  db_column_name: CRP_Custodian
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: hhurl
+  db_column_name: hhurl
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Marketing Lead Status
+  db_column_name: Marketing_Lead_Status__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - Marketing_Lead_Status__c
+  description: ''
+  pii: false
+  hot: false
+- name: Do Not Mail
+  db_column_name: Do_Not_Mail__c
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - Do_Not_Mail__c
+  description: ''
+  pii: false
+  hot: false
+- name: PM_Service_Level
+  db_column_name: PM_Service_Level
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: HHCity
+  db_column_name: HHCity
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: true
+- name: oppopenactivity
+  db_column_name: oppopenactivity
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Household Status
+  db_column_name: HHStatus
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - HHStatus
+  description: ''
+  pii: false
+  hot: true
+- name: Is_High_Priority_Client__c
+  db_column_name: Is_High_Priority_Client__c
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Nurture Code
+  db_column_name: NurtureCode
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - NurtureCode
+  description: ''
+  pii: false
+  hot: false
+- name: Classification
+  db_column_name: Classification
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Channel_Middle
+  db_column_name: Channel_Middle
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: CRP_Status__c
+  db_column_name: CRP_Status__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Former Advisor
+  db_column_name: TransitionedAdvisor
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - TransitionedAdvisor
+  description: ''
+  pii: false
+  hot: false
+- name: Do Not Call
+  db_column_name: DoNotCall
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Email
+  db_column_name: Email
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: CRP_Selected_Office__c
+  db_column_name: CRP_Selected_Office__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Lead Source
+  db_column_name: leadsource
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - leadsource
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Rep__c
+  db_column_name: CRP_Rep__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Lead Description
+  db_column_name: leaddescription
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - leaddescription
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Likely_To_Close
+  db_column_name: CRP_Likely_To_Close
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Term Category
+  db_column_name: term_category
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - term_category
+  description: ''
+  pii: false
+  hot: true
+- name: Business Unit
+  db_column_name: Business_Unit
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LeadId
+  db_column_name: LeadId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: AVHHID
+  db_column_name: AVHHID
+  data_type: INT64
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: CRP_Branch__c
+  db_column_name: CRP_Branch__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Target Market Flag
+  db_column_name: Target_Market_Flag
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Created_Date__c
+  db_column_name: CRP_Created_Date__c
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Employer
+  db_column_name: Employer
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: HHStreet
+  db_column_name: HHStreet
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Service_Model
+  db_column_name: Service_Model
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Dentist_Flag
+  db_column_name: Dentist_Flag
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Employer_Group
+  db_column_name: Employer_Group
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Employment_Status
+  db_column_name: Employment_Status
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Service_Model_Exception
+  db_column_name: Service_Model_Exception
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Legal_Address
+  db_column_name: Legal_Address
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: HHName_Normalized
+  db_column_name: HHName_Normalized
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Last_Note_Sent
+  db_column_name: Last_Note_Sent
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Last_Gift_Sent
+  db_column_name: Last_Gift_Sent
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CX_CampaignId
+  db_column_name: CX_CampaignId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: State_Group
+  db_column_name: State_Group
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Stage
+  db_column_name: Stage
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Stage_Number
+  db_column_name: Stage_Number
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Channel
+  db_column_name: Channel
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: Current_Household_Demographic_to_Campaign
+  to: Campaign
+  to_id: campaign
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Demographic::waived_fee_promo_Id] = [Campaign::Id]'
+  pairs:
+  - from_table: Current_Household_Demographic
+    from_col: waived_fee_promo_Id
+    to_table: Campaign
+    to_col: Id
+- join_name: HH to Acquisition Table
+  to: Acquisition
+  to_id: acquisition
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Demographic::Acquisition_Source] = [Acquisition::AcqCode]'
+  pairs:
+  - from_table: Current_Household_Demographic
+    from_col: Acquisition_Source
+    to_table: Acquisition
+    to_col: AcqCode

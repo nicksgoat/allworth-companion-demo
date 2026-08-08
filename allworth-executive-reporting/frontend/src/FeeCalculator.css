@@ -1,0 +1,1543 @@
+/* FeeCalculator.css — Jarvis-style glassmorphism layout */
+
+:root {
+  --brand-navy: #00205C;
+  --brand-navy-soft: #1a3c5e;
+  --brand-sky: #4a7bb8;
+  --brand-orange: #C75B12;
+  --brand-orange-warm: #E67E22;
+  --fc-bg: #f4f6fb;
+  --fc-glass: rgba(255, 255, 255, 0.60);
+  --fc-glass-strong: rgba(255, 255, 255, 0.78);
+  --fc-glass-border: rgba(255, 255, 255, 0.75);
+  --fc-glass-edge: rgba(255, 255, 255, 0.92);
+  --fc-border: rgba(0, 32, 92, 0.08);
+  --fc-border-strong: rgba(0, 32, 92, 0.14);
+  --fc-text: #0a0e1a;
+  --fc-text-muted: #4a5468;
+  --fc-text-subtle: #8a94a8;
+  --fc-accent: var(--brand-navy);
+  --fc-pop: var(--brand-orange);
+  --fc-success: #157a4c;
+  --fc-danger: #b3261e;
+  --fc-shadow-sm: 0 1px 2px rgba(0, 32, 92, 0.04);
+  --fc-shadow: 0 20px 48px -12px rgba(0, 32, 92, 0.14), 0 4px 12px rgba(0, 32, 92, 0.06);
+  --fc-highlight: inset 0 1px 0 var(--fc-glass-edge);
+  --fc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fee-calc-page {
+  min-height: 100vh;
+  background: var(--fc-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.fee-calc-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fee-calc-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(0, 32, 92, 0.04) 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+}
+
+.fee-calc-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  will-change: transform;
+}
+
+.fee-calc-orb-1 {
+  width: 640px;
+  height: 640px;
+  top: -200px;
+  left: -180px;
+  background: radial-gradient(circle, rgba(0, 32, 92, 0.38), rgba(0, 32, 92, 0) 70%);
+  animation: fcFloat1 42s ease-in-out infinite;
+}
+
+.fee-calc-orb-2 {
+  width: 520px;
+  height: 520px;
+  top: -160px;
+  right: -140px;
+  background: radial-gradient(circle, rgba(230, 126, 34, 0.32), rgba(230, 126, 34, 0) 70%);
+  animation: fcFloat2 38s ease-in-out infinite;
+}
+
+.fee-calc-orb-3 {
+  width: 440px;
+  height: 440px;
+  top: 35%;
+  left: 55%;
+  background: radial-gradient(circle, rgba(74, 123, 184, 0.28), rgba(74, 123, 184, 0) 70%);
+  animation: fcFloat3 46s ease-in-out infinite;
+}
+
+@keyframes fcFloat1 { 0%,100%{transform:translate(0,0) scale(1);} 25%{transform:translate(120px,80px) scale(1.1);} 50%{transform:translate(60px,180px) scale(0.95);} 75%{transform:translate(-40px,120px) scale(1.05);} }
+@keyframes fcFloat2 { 0%,100%{transform:translate(0,0) scale(1);} 30%{transform:translate(-100px,60px) scale(1.12);} 60%{transform:translate(-60px,160px) scale(0.92);} }
+@keyframes fcFloat3 { 0%,100%{transform:translate(0,0) scale(1);} 20%{transform:translate(-80px,-60px) scale(1.08);} 50%{transform:translate(-140px,40px) scale(1.15);} 80%{transform:translate(20px,80px) scale(0.95);} }
+
+.fee-calc-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+  padding: 48px 48px 80px;
+  font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: var(--fc-text);
+  letter-spacing: -0.003em;
+}
+
+.fee-calc-header {
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--fc-border);
+}
+
+.fee-calc-header h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 640;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--fc-text);
+}
+
+.fee-calc-subtitle {
+  margin: 8px 0 0;
+  color: var(--fc-text-muted);
+  font-size: 15px;
+}
+
+.fee-calc-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--fc-text-muted);
+  text-decoration: none;
+  margin-bottom: 16px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--fc-border);
+  background: var(--fc-glass);
+  transition: all 160ms var(--fc-ease);
+}
+
+.fee-calc-back:hover {
+  background: var(--fc-glass-strong);
+  transform: translateY(-1px);
+}
+
+.fee-calc-section {
+  margin-bottom: 32px;
+}
+
+.fee-calc-section h2 {
+  font-size: 18px;
+  font-weight: 620;
+  letter-spacing: -0.015em;
+  color: var(--fc-accent);
+  margin-bottom: 14px;
+}
+
+/* Fee Schedule Reference Tile */
+.fee-schedule-ref-desc {
+  font-size: 13.5px;
+  color: var(--fc-text-subtle);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.fee-schedule-table-wrap {
+  overflow-x: auto;
+  background: var(--fc-glass-strong);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid var(--fc-glass-border);
+  border-radius: 14px;
+  box-shadow: var(--fc-shadow);
+  padding: 4px;
+}
+
+.fee-schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.fee-schedule-table thead tr {
+  background: var(--brand-navy);
+  color: #fff;
+}
+
+.fee-schedule-table th {
+  padding: 10px 14px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--brand-navy-soft);
+}
+
+.fee-schedule-table th:first-child,
+.fee-schedule-table th:nth-child(2),
+.fee-schedule-table th:nth-child(3) {
+  text-align: left;
+}
+
+.fee-schedule-table th.aum-header span {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+
+.fee-schedule-table td {
+  padding: 8px 14px;
+  text-align: center;
+  border-bottom: 1px solid var(--fc-glass-border);
+  white-space: nowrap;
+}
+
+.fee-schedule-table td:first-child,
+.fee-schedule-table td:nth-child(2) {
+  text-align: left;
+  font-weight: 500;
+  color: var(--fc-text);
+}
+
+.fee-schedule-table td.expl {
+  text-align: left;
+  font-style: italic;
+  color: var(--fc-text-subtle);
+  font-size: 12px;
+}
+
+.fee-schedule-table tbody tr:hover {
+  background: rgba(0, 32, 92, 0.04);
+}
+
+.fee-schedule-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Glass panels */
+.fee-calc-panel {
+  background: var(--fc-glass-strong);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid var(--fc-glass-border);
+  border-radius: 18px;
+  box-shadow: var(--fc-shadow), var(--fc-highlight);
+  padding: 24px 28px;
+  margin-bottom: 20px;
+}
+
+/* Filters */
+.fee-calc-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  background: var(--fc-glass);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid var(--fc-glass-border);
+  border-radius: 14px;
+  box-shadow: var(--fc-shadow-sm), var(--fc-highlight);
+}
+
+.fee-calc-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fee-calc-filter label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fc-text-muted);
+}
+
+.fee-calc-filter select {
+  padding: 8px 12px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: var(--fc-text);
+  background: var(--fc-glass);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid var(--fc-glass-border);
+  border-radius: 10px;
+  box-shadow: var(--fc-shadow-sm), var(--fc-highlight);
+  min-width: 170px;
+  cursor: pointer;
+  transition: border-color 160ms var(--fc-ease), box-shadow 160ms var(--fc-ease);
+}
+
+.fee-calc-filter select:focus {
+  outline: none;
+  border-color: rgba(0, 32, 92, 0.3);
+  box-shadow: var(--fc-shadow-sm), var(--fc-highlight), 0 0 0 3px rgba(0, 32, 92, 0.08);
+}
+
+.fee-calc-btn-clear {
+  font: inherit;
+  font-size: 12.5px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--fc-danger);
+  background: rgba(179, 38, 30, 0.08);
+  border: 1px solid rgba(179, 38, 30, 0.25);
+  transition: all 160ms var(--fc-ease);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  line-height: 1;
+}
+
+.fee-calc-btn-clear:hover {
+  background: rgba(179, 38, 30, 0.14);
+  transform: translateY(-1px);
+}
+
+/* Search */
+.fee-calc-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--fc-glass);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--fc-glass-border);
+  border-radius: 14px;
+  box-shadow: var(--fc-shadow-sm), var(--fc-highlight);
+  transition: border-color 220ms var(--fc-ease), box-shadow 220ms var(--fc-ease), background 220ms var(--fc-ease);
+}
+
+.fee-calc-search-wrap:focus-within {
+  border-color: rgba(0, 32, 92, 0.22);
+  background: var(--fc-glass-strong);
+  box-shadow: var(--fc-shadow), var(--fc-highlight), 0 0 0 4px rgba(0, 32, 92, 0.06);
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px 6px;
+  line-height: 1;
+  border-radius: 50%;
+}
+
+.search-clear-btn:hover {
+  color: #1e293b;
+  background: rgba(0,0,0,0.06);
+}
+
+.fee-calc-search {
+  flex: 1;
+  padding: 14px 18px;
+  font: inherit;
+  font-size: 15px;
+  color: var(--fc-text);
+  background: transparent;
+  border: 0;
+  outline: 0;
+  min-width: 0;
+  letter-spacing: -0.005em;
+}
+
+.fee-calc-search::placeholder {
+  color: var(--fc-text-subtle);
+}
+
+.fee-calc-spinner {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--fc-border);
+  border-top-color: var(--fc-accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* Search Results */
+.fee-calc-results {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  background: var(--fc-glass-strong);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--fc-glass-border);
+  border-radius: 14px;
+  max-height: 320px;
+  overflow-y: auto;
+  box-shadow: var(--fc-shadow), var(--fc-highlight);
+}
+
+.fee-calc-results li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--fc-border);
+  transition: all 140ms var(--fc-ease);
+}
+
+.fee-calc-results li:last-child {
+  border-bottom: none;
+}
+
+.fee-calc-results li:hover {
+  background: rgba(0, 32, 92, 0.03);
+}
+
+.result-name {
+  font-weight: 560;
+  font-size: 13.5px;
+  color: var(--fc-accent);
+  letter-spacing: -0.01em;
+}
+
+.result-region {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--fc-text-muted);
+  background: rgba(0, 32, 92, 0.06);
+  border: 1px solid var(--fc-border);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.result-id {
+  color: var(--fc-text-subtle);
+  font-size: 12px;
+  margin-left: auto;
+}
+
+.result-aum {
+  font-weight: 620;
+  font-size: 13.5px;
+  color: var(--fc-success);
+}
+
+/* Household Card */
+.fee-calc-household-card {
+  margin-top: 16px;
+  padding: 18px 22px;
+  background: var(--fc-glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--fc-glass-border);
+  border-radius: 14px;
+  box-shadow: var(--fc-shadow-sm), var(--fc-highlight);
+}
+
+.hh-row {
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: var(--fc-text);
+}
+
+.hh-row strong {
+  color: var(--fc-text-muted);
+  font-weight: 600;
+}
+
+.hh-asof {
+  font-size: 11.5px;
+  color: var(--fc-text-subtle);
+  margin-top: 8px;
+}
+
+/* Inputs */
+.fee-calc-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+}
+
+.fee-calc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.fee-calc-field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--fc-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.fee-calc-field input[type="text"],
+.fee-calc-field select {
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--fc-text);
+  background: var(--fc-glass);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid var(--fc-glass-border);
+  border-radius: 10px;
+  box-shadow: var(--fc-shadow-sm), var(--fc-highlight);
+  min-width: 180px;
+  transition: border-color 160ms var(--fc-ease), box-shadow 160ms var(--fc-ease);
+}
+
+.fee-calc-field input[type="text"]:focus,
+.fee-calc-field select:focus {
+  outline: none;
+  border-color: rgba(0, 32, 92, 0.3);
+  box-shadow: var(--fc-shadow-sm), var(--fc-highlight), 0 0 0 3px rgba(0, 32, 92, 0.08);
+}
+
+.fee-calc-toggle {
+  flex-direction: row;
+  align-items: center;
+}
+
+.fee-calc-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: normal;
+  cursor: pointer;
+  color: var(--fc-text-muted);
+}
+
+.fee-calc-btn {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 560;
+  padding: 10px 20px;
+  color: #fff;
+  background: var(--fc-accent);
+  border: 1px solid var(--fc-accent);
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 32, 92, 0.2);
+  transition: all 160ms var(--fc-ease);
+  letter-spacing: -0.003em;
+}
+
+.fee-calc-btn:hover:not(:disabled) {
+  background: #001a4a;
+  transform: translateY(-1px);
+}
+
+.fee-calc-btn:active {
+  transform: scale(0.97);
+}
+
+.fee-calc-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Result */
+.fee-calc-result {
+  margin-top: 20px;
+  animation: fcFadeUp 0.4s var(--fc-ease) both;
+}
+
+.fee-calc-result h3 {
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 620;
+  color: var(--fc-accent);
+  letter-spacing: -0.01em;
+}
+
+@keyframes fcFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.fee-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.fee-summary-item {
+  background: var(--fc-glass);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid var(--fc-glass-border);
+  padding: 14px 16px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: var(--fc-shadow-sm), var(--fc-highlight);
+}
+
+.fee-label {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fc-text-subtle);
+  margin-bottom: 4px;
+}
+
+.fee-value {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fc-text);
+  letter-spacing: -0.02em;
+}
+
+.fee-min-notice {
+  background: rgba(199, 91, 18, 0.08);
+  border: 1px solid rgba(199, 91, 18, 0.25);
+  color: var(--fc-pop);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+
+/* Tables */
+.fee-tier-table,
+.fee-compare-table,
+.billing-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.fee-tier-table th,
+.fee-compare-table th,
+.billing-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12.5px;
+  color: var(--fc-text-muted);
+  border-bottom: 1px solid var(--fc-border-strong);
+}
+
+.fee-tier-table td,
+.fee-compare-table td,
+.billing-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--fc-border);
+}
+
+.fee-tier-table tr:hover td,
+.fee-compare-table tr:hover td,
+.billing-table tr:hover td {
+  background: rgba(0, 32, 92, 0.02);
+}
+
+.fee-tier-table tr.active-tier td {
+  background: rgba(21, 122, 76, 0.06);
+}
+
+.fee-compare-table tr.selected-row td {
+  background: rgba(0, 32, 92, 0.05);
+  font-weight: 560;
+}
+
+/* Comparison */
+.fee-calc-comparison {
+  margin-top: 20px;
+  animation: fcFadeUp 0.4s var(--fc-ease) both;
+}
+
+.fee-calc-comparison h3 {
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 620;
+  color: var(--fc-accent);
+}
+
+/* Billing Upload */
+.fee-calc-hint {
+  color: var(--fc-text-muted);
+  font-size: 13.5px;
+  margin-bottom: 12px;
+}
+
+.billing-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.fee-calc-file-input {
+  font-size: 13px;
+}
+
+.billing-loading {
+  color: var(--fc-accent);
+  font-size: 13px;
+  font-weight: 560;
+  animation: fcPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes fcPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.fee-calc-error {
+  background: rgba(179, 38, 30, 0.08);
+  border: 1px solid rgba(179, 38, 30, 0.25);
+  color: var(--fc-danger);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.fee-calc-success {
+  background: rgba(30, 130, 76, 0.08);
+  border: 1px solid rgba(30, 130, 76, 0.25);
+  color: var(--fc-success);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.fee-calc-btn-db {
+  background: var(--brand-navy);
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.fee-calc-btn-db:hover {
+  background: var(--brand-navy-soft);
+}
+
+.fee-calc-btn-db:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.fee-calc-db-status {
+  margin-top: 8px;
+}
+
+/* Billing Analysis */
+.billing-analysis {
+  margin-top: 20px;
+  animation: fcFadeUp 0.4s var(--fc-ease) both;
+}
+
+/* Client Book & Segments Tables */
+.book-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.book-col {
+  min-width: 0;
+}
+
+.book-col-left {
+  flex: 0 0 34%;
+}
+
+.book-col-right {
+  flex: 1 1 0;
+  overflow: hidden;
+}
+
+.book-col-right .client-book-table th,
+.book-col-right .client-book-table td {
+  padding: 8px 8px;
+  font-size: 11px;
+}
+
+.client-book-table-wrap {
+  overflow-x: hidden;
+  background: var(--fc-glass-strong);
+  border: 1px solid var(--fc-glass-border);
+  border-radius: 14px;
+  box-shadow: var(--fc-shadow-sm);
+  margin-bottom: 24px;
+}
+
+.client-book-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.client-book-table thead tr {
+  background: var(--brand-navy);
+  color: #fff;
+}
+
+.client-book-table th {
+  padding: 8px 10px;
+  font-weight: 600;
+  font-size: 10.5px;
+  text-align: right;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.client-book-table th:first-child {
+  text-align: left;
+}
+
+.client-book-table td {
+  padding: 8px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--fc-glass-border);
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.client-book-table td:first-child {
+  text-align: left;
+}
+
+.client-book-table td.row-label {
+  font-weight: 600;
+  color: var(--fc-text);
+}
+
+.client-book-table tr.after-row td {
+  font-weight: 600;
+}
+
+.client-book-table tr.totals-row {
+  background: rgba(0, 32, 92, 0.05);
+  border-top: 2px solid var(--brand-navy);
+}
+
+.client-book-table tr.totals-row td {
+  font-weight: 700;
+  border-bottom: none;
+}
+
+.client-book-table tbody tr:hover {
+  background: rgba(0, 32, 92, 0.03);
+}
+
+.client-book-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.client-book-table td.delta-up {
+  color: var(--fc-success);
+  font-weight: 600;
+}
+
+.client-book-table td.delta-down {
+  color: var(--fc-danger);
+  font-weight: 600;
+}
+
+.billing-analysis h3 {
+  margin: 24px 0 12px;
+  font-size: 16px;
+  font-weight: 620;
+  color: var(--fc-accent);
+}
+
+.client-book-table td.needs-attention {
+  color: var(--brand-orange);
+  font-weight: 700;
+}
+
+/* Schedule Impact Table */
+.billing-schedule-table,
+.billing-hh-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.billing-schedule-table th,
+.billing-hh-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12.5px;
+  color: var(--fc-text-muted);
+  border-bottom: 1px solid var(--fc-border-strong);
+}
+
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.sortable-th:hover {
+  color: var(--fc-text);
+  background: rgba(0, 32, 92, 0.03);
+}
+
+.sort-arrow {
+  font-size: 10px;
+  margin-left: 4px;
+  opacity: 0.7;
+}
+
+.filter-row th {
+  padding: 4px 6px !important;
+  border-bottom: 2px solid var(--fc-border-strong) !important;
+}
+
+.filter-row select {
+  width: 100%;
+  font-size: 11px;
+  padding: 3px 6px;
+  border: 1px solid var(--fc-border);
+  border-radius: 4px;
+  background: var(--fc-bg, #fff);
+  color: var(--fc-text);
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.filter-row select:focus {
+  outline: none;
+  border-color: var(--fc-accent, #6366f1);
+}
+
+.billing-schedule-table td,
+.billing-hh-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--fc-border);
+}
+
+.billing-schedule-table tr:hover td,
+.billing-hh-table tr:hover td {
+  background: rgba(0, 32, 92, 0.02);
+}
+
+.billing-schedule-table tr.selected-row td {
+  background: rgba(0, 32, 92, 0.05);
+  font-weight: 560;
+}
+
+.delta-up {
+  color: #b3261e;
+  font-weight: 560;
+}
+
+.delta-down {
+  color: #157a4c;
+  font-weight: 560;
+}
+
+/* Household Detail Header */
+.billing-hh-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.billing-hh-header h3 {
+  margin: 24px 0 12px;
+}
+
+.billing-hh-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.billing-hh-schedule-pick {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--fc-text-muted);
+}
+
+.billing-hh-schedule-pick select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--fc-glass-border);
+  background: var(--fc-glass);
+  color: var(--fc-text);
+  font-size: 13px;
+}
+
+.fee-calc-btn-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  padding: 7px 16px;
+}
+
+.fee-calc-btn-excel {
+  background: #1d6b3f;
+}
+
+.fee-calc-btn-excel:hover {
+  background: #155c34;
+}
+
+.fee-calc-btn-export svg {
+  flex-shrink: 0;
+}
+
+.sched-name-cell {
+  font-size: 12px;
+  color: var(--fc-text-muted);
+}
+
+.user-sched-cell select {
+  font-size: 12px;
+  padding: 3px 6px;
+  border: 1px solid var(--fc-border);
+  border-radius: 6px;
+  background: var(--fc-surface);
+  color: var(--fc-text);
+  cursor: pointer;
+  min-width: 140px;
+}
+
+.user-sched-cell select:focus {
+  outline: none;
+  border-color: var(--fc-accent, #6366f1);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+/* Bulk Apply Panel */
+.bulk-apply-panel {
+  margin: 16px 0;
+  padding: 14px 18px;
+  background: var(--fc-surface, #f8fafc);
+  border: 1px solid var(--fc-border, #e2e8f0);
+  border-radius: 10px;
+}
+
+.bulk-apply-panel h4 {
+  margin: 0 0 10px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fc-text);
+}
+
+.bulk-apply-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.bulk-apply-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bulk-apply-field label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--fc-text-muted);
+}
+
+.bulk-apply-field input,
+.bulk-apply-field select {
+  font-size: 12px;
+  padding: 5px 8px;
+  border: 1px solid var(--fc-border);
+  border-radius: 6px;
+  background: var(--fc-bg, #fff);
+  color: var(--fc-text);
+  min-width: 100px;
+}
+
+.bulk-apply-field select {
+  min-width: 160px;
+}
+
+.bulk-apply-check {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--fc-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  padding-bottom: 4px;
+}
+
+/* Waived account styles */
+.billing-waived-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--fc-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.billing-waived-toggle input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.waived-indicator {
+  display: inline-block;
+  background: #e8a317;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: 4px;
+  vertical-align: middle;
+  cursor: help;
+}
+
+/* Row coloring for above/below */
+.row-above td {
+  background: rgba(21, 122, 76, 0.06) !important;
+}
+
+.row-below td {
+  background: rgba(179, 38, 30, 0.06) !important;
+}
+
+/* Badges */
+.badge-above {
+  background: rgba(21, 122, 76, 0.12);
+  color: #157a4c;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.badge-below {
+  background: rgba(179, 38, 30, 0.12);
+  color: #b3261e;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.badge-on-track {
+  background: rgba(0, 32, 92, 0.08);
+  color: var(--fc-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* Delta Range Filter */
+.fee-calc-delta-range {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.delta-range-input {
+  width: 70px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--fc-glass-border);
+  background: var(--fc-glass);
+  color: var(--fc-text);
+  font-size: 14px;
+  text-align: center;
+}
+
+.delta-range-input.min-aum-input {
+  width: 120px;
+}
+
+.delta-range-input::placeholder {
+  color: var(--fc-text-subtle);
+}
+
+.delta-range-sep {
+  font-size: 13px;
+  color: var(--fc-text-subtle);
+}
+
+.billing-table-wrap {
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid var(--fc-glass-border);
+  border-radius: 14px;
+  background: var(--fc-glass);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+
+.billing-hh-table {
+  width: 100%;
+}
+
+.billing-hh-table th,
+.billing-hh-table td {
+  white-space: nowrap;
+}
+
+.billing-hh-table td:nth-child(2) {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.billing-truncated {
+  text-align: center;
+  color: var(--fc-text-subtle);
+  font-size: 12px;
+  padding: 10px;
+}
+
+.billing-show-more {
+  text-align: center;
+  padding: 16px 0 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .fee-calc-container {
+    padding: 24px 16px 60px;
+  }
+  .fee-calc-panel {
+    padding: 18px 16px;
+    border-radius: 14px;
+  }
+  .fee-calc-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .fee-calc-filter select {
+    min-width: unset;
+    width: 100%;
+  }
+}
+
+/* ─── Scatter Chart ─────────────────────────────────────────── */
+.scatter-chart-section {
+  margin: 24px 0;
+  padding: 16px 20px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.scatter-chart-section h3 {
+  margin: 0 0 8px;
+  color: #1a2a44;
+  font-size: 1rem;
+}
+
+.scatter-chart-placeholder .scatter-placeholder-msg {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 12px 0 0;
+  font-style: italic;
+}
+
+.scatter-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.legend-above { background: #e74c3c; }
+.legend-on-track { background: #27ae60; }
+.legend-below { background: #f39c12; }
+
+.scatter-tooltip {
+  background: #1a2a44;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.scatter-tooltip strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.85rem;
+}
+
+.scatter-clear-btn {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  padding: 4px 12px;
+}
+
+/* ─── Lasso / Free-draw Selection ──────────────────────────── */
+.scatter-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.lasso-toggle-btn {
+  font-size: 0.78rem;
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.lasso-toggle-btn.lasso-active {
+  background: #dbeafe;
+  border-color: #3498db;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.scatter-chart-wrapper {
+  position: relative;
+  user-select: none;
+}
+
+.scatter-chart-wrapper.lasso-mode {
+  cursor: crosshair;
+}
+
+.lasso-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ─── Range Sliders ─────────────────────────────────────────── */
+.scatter-range-sliders {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.range-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.range-slider-row label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1a2a44;
+  min-width: 60px;
+}
+
+.range-slider-row input[type="range"] {
+  flex: 1;
+  height: 6px;
+  appearance: none;
+  background: #cbd5e1;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.range-slider-row input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #1a2a44;
+  cursor: pointer;
+}
+
+.range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #555;
+}
+
+.range-inputs input[type="number"] {
+  width: 80px;
+  padding: 3px 6px;
+  font-size: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+}
+
+/* ─── Per-Filter Clear Buttons ──────────────────────────────────── */
+.filter-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+}
+
+.filter-select-wrap select {
+  width: 100%;
+  padding-right: 22px;
+}
+
+.filter-clear-x {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  border-radius: 50%;
+  transition: color 0.15s, background 0.15s;
+}
+
+.filter-clear-x:hover {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+}
+
+/* ─── Filter Badge ──────────────────────────────────────────────── */
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: #1e293b;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  margin-left: 6px;
+  padding: 0 5px;
+}
+
+/* ─── Back to Top Button ────────────────────────────────────────── */
+.back-to-top-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #1e293b;
+  color: #fff;
+  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  opacity: 0.7;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 1000;
+}
+
+.back-to-top-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* ─── Scroll to Filters Button ──────────────────────────────────── */
+.hh-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.scroll-to-filters-btn {
+  background: none;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.scroll-to-filters-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+

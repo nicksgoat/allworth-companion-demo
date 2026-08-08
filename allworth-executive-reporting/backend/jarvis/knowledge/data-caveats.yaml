@@ -1,0 +1,37 @@
+name: Data Caveats
+uri: frameworks://data-caveats
+description: Known caveats, interpretation warnings, and source limitations for common datasets and metrics.
+keywords:
+  - caveat
+  - limitation
+  - stale
+  - warehouse
+  - daily refresh
+  - caveats
+directive: >
+  Consult when answering high-stakes questions, comparing multiple systems, or
+  whenever the distinction between projected, warehouse, and live data matters.
+content: |
+  # Data Caveats
+
+  ## Warehouse vs Live Systems
+  - Synapse warehouse data is often refreshed on a schedule and may lag live operational systems.
+  - Tamarac warehouse reads are suitable for most analytical questions, but real-time holdings should use live holdings workflows.
+  - Salesforce warehouse views may not reflect the latest same-day CRM edits.
+
+  ## Pipeline Metrics
+  - PAUM and weighted PAUM are opportunity-sizing fields, not realized assets.
+  - Estimated close dates and expected close rates are assumptions and should be described as directional.
+
+  ## Fee and Revenue Metrics
+  - Fee schedule policy is not the same as realized fee yield.
+  - Account-level exceptions, household aggregation, and billing adjustments can move realized yield away from standard tiers.
+  - **`NON BILLED` is stale** — refreshed quarterly, routinely out of date between refreshes. Do not use it to determine billability. Use the three-condition rule against `billing_definitions` (see `billable-account-determination`).
+
+  ## Risk and Prediction Metrics
+  - Termination scores and probabilities are predictive signals, not facts.
+  - Unsatisfied RMD rows and compliance exceptions should be treated as time-sensitive and verified with current periods.
+
+  ## Comparative Analysis
+  - Be explicit about denominator, period, and segment when comparing metrics.
+  - Do not compare projected metrics directly with realized metrics without labeling the distinction.

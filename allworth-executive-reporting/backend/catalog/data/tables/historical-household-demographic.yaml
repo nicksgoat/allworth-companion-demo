@@ -1,0 +1,441 @@
+id: historical-household-demographic
+name: Historical_Household_Demographic
+schema: tho
+db: DataWarehouse
+db_table: Historical_Household_Demographic
+guid: 66215a12-23a9-48ed-b54b-405bb9eb362a
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Household
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Account Rollforward
+- Client Count Rollforward
+- Comparison Rollforward - Trade Date
+- Performance Tracking
+- Rollforward Historical
+- Trade Date Rollforward
+- Transactions
+column_count: 36
+columns:
+- name: RPS
+  db_column_name: RPS
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: leadid
+  db_column_name: leadid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AdvisorId
+  db_column_name: AdvisorId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: avhhid
+  db_column_name: avhhid
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Reporting Period
+  db_column_name: reportingperiod
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - reportingperiod
+  description: ''
+  pii: false
+  hot: false
+- name: tenure
+  db_column_name: tenure
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: advisor
+  db_column_name: advisor
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Previous Advisor
+  db_column_name: previous_advisor
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Client Category
+  db_column_name: clientcat
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - clientcat
+  description: ''
+  pii: false
+  hot: false
+- name: Organic
+  db_column_name: acqorganic_reporting
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - acqorganic_reporting
+  description: ''
+  pii: false
+  hot: false
+- name: Current Partner
+  db_column_name: currentpartner
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Original Partner
+  db_column_name: originalpartner
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: number_of_plan_reviews
+  db_column_name: number_of_plan_reviews
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: FormerAdvisorID
+  db_column_name: FormerAdvisorID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Latest_CampaignId
+  db_column_name: Latest_CampaignId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: PreviousAdvisorId
+  db_column_name: PreviousAdvisorId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Effective_Date
+  db_column_name: Effective_Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Reporting_Period_Key
+  db_column_name: Reporting_Period_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: HHID
+  db_column_name: HHID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Employer
+  db_column_name: Employer
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Id
+  db_column_name: Id
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Classification
+  db_column_name: Classification
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Flow_Protection_Flag
+  db_column_name: Flow_Protection_Flag
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Division
+  db_column_name: Division
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Household_Name
+  db_column_name: Household_Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: term_date_key
+  db_column_name: term_date_key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Client_Segment
+  db_column_name: Client_Segment
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: estate_planning
+  db_column_name: estate_planning
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Channel_Middle
+  db_column_name: Channel_Middle
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: RF_ID
+  db_column_name: RF_ID
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: financial_planning
+  db_column_name: financial_planning
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: lead_source
+  db_column_name: lead_source
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: PWS_Referral_Id
+  db_column_name: PWS_Referral_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: insurance
+  db_column_name: insurance
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: annual_review
+  db_column_name: annual_review
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: tax_services
+  db_column_name: tax_services
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: Campaign_to_Historical_Household_Demographic
+  to: Campaign
+  to_id: campaign
+  type: INNER
+  one_to_one: false
+  'on': '[Historical_Household_Demographic::Latest_CampaignId] = [Campaign::Id]'
+  pairs:
+  - from_table: Historical_Household_Demographic
+    from_col: Latest_CampaignId
+    to_table: Campaign
+    to_col: Id
+- join_name: Historical Advisor
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Historical_Household_Demographic::advisor] = [User::Name]'
+  pairs:
+  - from_table: Historical_Household_Demographic
+    from_col: advisor
+    to_table: User
+    to_col: Name
+- join_name: Historical Advisor New
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Historical_Household_Demographic::AdvisorId] = [User::User ID]'
+  pairs:
+  - from_table: Historical_Household_Demographic
+    from_col: AdvisorId
+    to_table: User
+    to_col: User ID
+- join_name: Historical HH Former Advisor
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Historical_Household_Demographic::FormerAdvisorID] = [User::User ID]'
+  pairs:
+  - from_table: Historical_Household_Demographic
+    from_col: FormerAdvisorID
+    to_table: User
+    to_col: User ID
+- join_name: Historical HH to RLS
+  to: RLS
+  to_id: rls
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Historical_Household_Demographic::AdvisorId] = [RLS::User Id]'
+  pairs:
+  - from_table: Historical_Household_Demographic
+    from_col: AdvisorId
+    to_table: RLS
+    to_col: User Id
+- join_name: Historical Previous Advisor
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Historical_Household_Demographic::PreviousAdvisorId] = [User::User ID]'
+  pairs:
+  - from_table: Historical_Household_Demographic
+    from_col: PreviousAdvisorId
+    to_table: User
+    to_col: User ID
+- join_name: Historical Term Date New
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Historical_Household_Demographic::term_date_key] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Historical_Household_Demographic
+    from_col: term_date_key
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: RF Original Partner (Client Based)
+  to: Acquisition
+  to_id: acquisition
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Historical_Household_Demographic::Original Partner] = [Acquisition::AcqCode]'
+  pairs:
+  - from_table: Historical_Household_Demographic
+    from_col: Original Partner
+    to_table: Acquisition
+    to_col: AcqCode

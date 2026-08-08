@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Jarvis — Allworth Knowledge</title>
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300205C'/><g stroke='%23fff' stroke-width='1.4' stroke-linecap='round'><line x1='16' y1='4' x2='16' y2='9'/><line x1='16' y1='23' x2='16' y2='28'/><line x1='4' y1='16' x2='9' y2='16'/><line x1='23' y1='16' x2='28' y2='16'/><line x1='7.5' y1='7.5' x2='11' y2='11'/><line x1='21' y1='21' x2='24.5' y2='24.5'/><line x1='7.5' y1='24.5' x2='11' y2='21'/><line x1='21' y1='11' x2='24.5' y2='7.5'/></g><circle cx='16' cy='16' r='3' fill='none' stroke='%23fff' stroke-width='1.4'/><circle cx='16' cy='16' r='1' fill='%23fff'/></svg>">
+<style>
+  :root {
+    --brand-navy: #00205C;
+    --brand-navy-soft: #1a3c5e;
+    --brand-sky: #4a7bb8;
+    --brand-orange: #C75B12;
+    --brand-orange-warm: #E67E22;
+
+    --bg: #f4f6fb;
+    --glass: rgba(255, 255, 255, 0.60);
+    --glass-strong: rgba(255, 255, 255, 0.78);
+    --glass-soft: rgba(255, 255, 255, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.75);
+    --glass-edge: rgba(255, 255, 255, 0.92);
+    --border: rgba(0, 32, 92, 0.08);
+    --border-strong: rgba(0, 32, 92, 0.14);
+    --text: #0a0e1a;
+    --text-muted: #4a5468;
+    --text-subtle: #8a94a8;
+    --accent: var(--brand-navy);
+    --accent-strong: #001a4a;
+    --pop: var(--brand-orange);
+    --danger: #b3261e;
+    --success: #157a4c;
+    --shadow-sm: 0 1px 2px rgba(0, 32, 92, 0.04);
+    --shadow: 0 20px 48px -12px rgba(0, 32, 92, 0.14), 0 4px 12px rgba(0, 32, 92, 0.06);
+    --shadow-lg: 0 32px 72px -18px rgba(0, 32, 92, 0.22), 0 8px 20px rgba(0, 32, 92, 0.08);
+    --highlight: inset 0 1px 0 var(--glass-edge);
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --sidebar-w: 280px;
+    --topbar-h: 72px;
+    --ms: 420ms;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.003em;
+    overflow: hidden;
+  }
+
+  .bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .bg::after {
+    content: ""; position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(0, 32, 92, 0.04) 1px, transparent 1px);
+    background-size: 4px 4px; opacity: 0.5; mix-blend-mode: multiply; pointer-events: none;
+  }
+  .orb { position: absolute; border-radius: 50%; filter: blur(90px); will-change: transform; }
+  .orb-1 { width: 640px; height: 640px; top: -200px; left: -180px;
+    background: radial-gradient(circle, rgba(0, 32, 92, 0.38), rgba(0, 32, 92, 0) 70%);
+    animation: float1 42s ease-in-out infinite; }
+  .orb-2 { width: 520px; height: 520px; top: -160px; right: -140px;
+    background: radial-gradient(circle, rgba(230, 126, 34, 0.32), rgba(230, 126, 34, 0) 70%);
+    animation: float2 38s ease-in-out infinite; }
+  .orb-3 { width: 440px; height: 440px; top: 35%; left: 55%;
+    background: radial-gradient(circle, rgba(74, 123, 184, 0.28), rgba(74, 123, 184, 0) 70%);
+    animation: float3 46s ease-in-out infinite; }
+  .orb-4 { width: 560px; height: 560px; bottom: -220px; left: 10%;
+    background: radial-gradient(circle, rgba(199, 91, 18, 0.22), rgba(199, 91, 18, 0) 70%);
+    animation: float4 52s ease-in-out infinite; }
+  .orb-5 { width: 400px; height: 400px; bottom: -150px; right: 5%;
+    background: radial-gradient(circle, rgba(26, 60, 94, 0.26), rgba(26, 60, 94, 0) 70%);
+    animation: float5 48s ease-in-out infinite; }
+  @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1);} 25%{transform:translate(120px,80px) scale(1.1);} 50%{transform:translate(60px,180px) scale(0.95);} 75%{transform:translate(-40px,120px) scale(1.05);} }
+  @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1);} 30%{transform:translate(-100px,60px) scale(1.12);} 60%{transform:translate(-60px,160px) scale(0.92);} }
+  @keyframes float3 { 0%,100%{transform:translate(0,0) scale(1);} 20%{transform:translate(-80px,-60px) scale(1.08);} 50%{transform:translate(-140px,40px) scale(1.15);} 80%{transform:translate(20px,80px) scale(0.95);} }
+  @keyframes float4 { 0%,100%{transform:translate(0,0) scale(1);} 40%{transform:translate(180px,-80px) scale(1.1);} 70%{transform:translate(80px,-40px) scale(0.9);} }
+  @keyframes float5 { 0%,100%{transform:translate(0,0) scale(1);} 35%{transform:translate(-140px,-100px) scale(1.12);} 65%{transform:translate(-60px,-60px) scale(0.95);} }
+
+  .app { position: relative; z-index: 1; display: grid; grid-template-columns: var(--sidebar-w) 1fr; height: 100vh; }
+
+  .sidebar {
+    padding: 18px 12px 16px 16px;
+    border-right: 1px solid var(--border);
+    background: var(--glass-soft);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 6px 16px; margin-bottom: 12px;
+    border-bottom: 1px solid var(--border); cursor: pointer;
+    transition: opacity 140ms var(--ease); text-decoration: none;
+  }
+  .sidebar-brand:hover { opacity: 0.85; }
+  .sidebar-brand img { height: 22px; width: auto; }
+  .sidebar-brand .bar { flex: 1; }
+  .sidebar-brand .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    font-weight: 600; color: var(--text-muted);
+    padding: 3px 8px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    border-radius: 5px; box-shadow: var(--highlight);
+  }
+  .sidebar-brand .chip .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--pop); box-shadow: 0 0 6px var(--pop); }
+  .sidebar-actions { display: flex; gap: 6px; margin-bottom: 14px; }
+  .btn {
+    font: inherit; font-size: 12.5px;
+    padding: 7px 12px; border-radius: 8px;
+    cursor: pointer; letter-spacing: -0.003em;
+    transition: all 160ms var(--ease);
+    background: var(--glass); border: 1px solid var(--glass-border);
+    color: var(--text); box-shadow: var(--shadow-sm), var(--highlight);
+    display: inline-flex; align-items: center; gap: 6px; line-height: 1;
+  }
+  .btn:hover { background: var(--glass-strong); transform: translateY(-1px); }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 4px 12px rgba(0, 32, 92, 0.2); }
+  .btn-primary:hover { background: var(--accent-strong); }
+  .btn-ghost { background: transparent; border-color: var(--border); box-shadow: none; }
+  .btn-ghost:hover { background: var(--glass); }
+  .btn-danger { color: var(--danger); border-color: rgba(179, 38, 30, 0.25); }
+  .btn-danger:hover { background: rgba(179, 38, 30, 0.08); }
+  .btn .icon { width: 13px; height: 13px; }
+
+  .nav { flex: 1; overflow-y: auto; margin: 0 -6px; padding: 0 6px; }
+  .nav::-webkit-scrollbar { width: 8px; }
+  .nav::-webkit-scrollbar-thumb { background: rgba(0, 32, 92, 0.12); border-radius: 4px; }
+  .nav-group { margin-bottom: 16px; }
+  .nav-group h6 { font-size: 10.5px; font-weight: 600; color: var(--text-subtle); letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 10px 4px; }
+  .nav-item {
+    display: block; padding: 6px 10px; margin: 1px 0;
+    font-size: 13.5px; color: var(--text-muted);
+    border-radius: 7px; cursor: pointer;
+    border: 1px solid transparent; transition: all 140ms var(--ease);
+    text-decoration: none; letter-spacing: -0.003em;
+  }
+  .nav-item:hover { background: var(--glass); color: var(--text); border-color: var(--glass-border); }
+  .nav-item.active { background: var(--glass-strong); color: var(--accent); border-color: var(--glass-border); font-weight: 560; box-shadow: var(--shadow-sm), var(--highlight); }
+  .nav-item .draft { float: right; font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--pop); background: rgba(199, 91, 18, 0.1); border: 1px solid rgba(199, 91, 18, 0.25); padding: 1px 5px; border-radius: 3px; margin-top: 1px; }
+  .doc-header .draft-badge { display: inline-flex; align-items: center; gap: 4px; margin-left: 10px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; color: var(--pop); background: rgba(199, 91, 18, 0.1); border: 1px solid rgba(199, 91, 18, 0.25); padding: 2px 7px; border-radius: 4px; vertical-align: middle; }
+
+  .sidebar-footer { padding: 10px 6px 4px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-subtle); letter-spacing: 0.01em; display: flex; justify-content: space-between; align-items: center; }
+  .sidebar-footer strong { color: var(--text-muted); font-weight: 600; }
+
+  .main { position: relative; overflow: hidden; height: 100vh; }
+
+  .island {
+    position: absolute; z-index: 10;
+    display: flex; flex-direction: column; align-items: center;
+    transition: top var(--ms) var(--ease), left var(--ms) var(--ease), right var(--ms) var(--ease), width var(--ms) var(--ease), padding var(--ms) var(--ease), gap var(--ms) var(--ease);
+  }
+  .island[data-state="hero"] { top: 14vh; left: 24px; right: 24px; padding: 0 24px; gap: 24px; }
+  .island[data-state="compact"] { top: 16px; left: 24px; right: 24px; padding: 0; gap: 0; align-items: stretch; flex-direction: row; }
+  .island[data-state="overlay"] { top: 14vh; left: 24px; right: 24px; padding: 0 24px; gap: 24px; z-index: 40; }
+
+  .hero-mark { display: flex; flex-direction: column; align-items: center; gap: 14px; transition: opacity 260ms var(--ease), transform 320ms var(--ease), max-height var(--ms) var(--ease); max-height: 260px; overflow: hidden; }
+  .hero-mark img { height: 40px; width: auto; }
+  .hero-mark p { text-align: center; color: var(--text-muted); font-size: 15px; max-width: 460px; letter-spacing: -0.005em; }
+  .island[data-state="compact"] .hero-mark { opacity: 0; transform: translateY(-6px); max-height: 0; pointer-events: none; }
+
+  .search-wrap {
+    position: relative; display: flex; align-items: center;
+    background: var(--glass);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow), var(--highlight);
+    transition: width var(--ms) var(--ease), max-width var(--ms) var(--ease), border-radius var(--ms) var(--ease), box-shadow 220ms var(--ease), background 220ms var(--ease);
+  }
+  .island[data-state="hero"] .search-wrap, .island[data-state="overlay"] .search-wrap { width: 100%; max-width: 600px; border-radius: 18px; }
+  .island[data-state="compact"] .search-wrap { width: 100%; max-width: 520px; border-radius: 12px; }
+  .search-wrap:focus-within { border-color: rgba(0, 32, 92, 0.22); background: var(--glass-strong); box-shadow: var(--shadow), var(--highlight), 0 0 0 4px rgba(0, 32, 92, 0.06); }
+  .search-icon { width: 20px; height: 20px; color: var(--text-subtle); flex-shrink: 0; transition: width var(--ms) var(--ease), height var(--ms) var(--ease), margin var(--ms) var(--ease); }
+  .island[data-state="hero"] .search-icon, .island[data-state="overlay"] .search-icon { margin-left: 18px; width: 20px; height: 20px; }
+  .island[data-state="compact"] .search-icon { margin-left: 14px; width: 18px; height: 18px; }
+
+  input[type="search"], .editor input[type="text"], .editor textarea, .editor select { font: inherit; color: var(--text); background: transparent; border: 0; outline: 0; min-width: 0; }
+  input[type="search"] { flex: 1; letter-spacing: -0.005em; transition: padding var(--ms) var(--ease), font-size var(--ms) var(--ease); }
+  .island[data-state="hero"] input[type="search"], .island[data-state="overlay"] input[type="search"] { padding: 20px 16px; font-size: 17px; }
+  .island[data-state="compact"] input[type="search"] { padding: 11px 12px; font-size: 14.5px; }
+  input[type="search"]::placeholder { color: var(--text-subtle); }
+  input[type="search"]::-webkit-search-cancel-button { display: none; }
+  kbd { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 11px; padding: 3px 7px; color: var(--text-subtle); background: rgba(255, 255, 255, 0.6); border: 1px solid var(--glass-border); border-radius: 5px; user-select: none; flex-shrink: 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9); transition: margin var(--ms) var(--ease); }
+  .island[data-state="hero"] kbd, .island[data-state="overlay"] kbd { margin-right: 16px; }
+  .island[data-state="compact"] kbd { margin-right: 10px; }
+
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 640px; width: 100%; transition: opacity 260ms var(--ease), max-height var(--ms) var(--ease), margin var(--ms) var(--ease); max-height: 200px; overflow: hidden; }
+  .island[data-state="compact"] .chips { opacity: 0; max-height: 0; margin: 0; pointer-events: none; }
+  .chip { font: inherit; font-size: 13px; color: var(--text-muted); background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%); border: 1px solid var(--glass-border); border-radius: 999px; padding: 7px 14px; cursor: pointer; transition: all 180ms var(--ease); letter-spacing: -0.003em; box-shadow: var(--shadow-sm), var(--highlight); }
+  .chip:hover { color: var(--text); background: rgba(255, 255, 255, 0.85); border-color: rgba(0, 32, 92, 0.24); transform: translateY(-1px); }
+
+  .topbar-meta { position: absolute; left: calc(24px + 520px + 16px); top: 24px; height: 32px; display: flex; align-items: center; color: var(--text-subtle); font-size: 12.5px; letter-spacing: -0.003em; opacity: 0; pointer-events: none; transition: opacity 260ms var(--ease); }
+  .island[data-state="compact"] + .topbar-meta { opacity: 1; }
+  .topbar-meta .crumb { color: var(--text-muted); }
+  .topbar-meta .sep { margin: 0 6px; opacity: 0.6; }
+
+  .content { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; padding: calc(var(--topbar-h) + 16px) 48px 80px; transition: opacity 240ms var(--ease), padding-top var(--ms) var(--ease); }
+  .content[data-hidden="true"] { opacity: 0; pointer-events: none; }
+  .content-inner { max-width: 820px; margin: 0 auto; animation: fadeUp 0.4s var(--ease) both; }
+
+  @media (max-width: 900px) {
+    :root { --sidebar-w: 220px; }
+    .content { padding: calc(var(--topbar-h) + 8px) 20px 60px; }
+    .island[data-state="hero"], .island[data-state="overlay"] { top: 10vh; }
+  }
+
+  .overlay-bg { position: fixed; inset: 0; z-index: 35; background: rgba(10, 14, 26, 0.28); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); opacity: 0; pointer-events: none; transition: opacity 260ms var(--ease); }
+  .overlay-bg.visible { opacity: 1; pointer-events: auto; }
+
+  .doc-header { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .doc-header .hdr-text { flex: 1; min-width: 0; }
+  .doc-header .kicker { font-size: 11px; color: var(--pop); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 8px; }
+  .doc-header h1 { font-size: 30px; font-weight: 640; letter-spacing: -0.025em; line-height: 1.15; margin-bottom: 10px; }
+  .doc-header p.lede { color: var(--text-muted); font-size: 15px; max-width: 640px; }
+  .doc-header .meta { margin-top: 14px; font-size: 12px; color: var(--text-subtle); letter-spacing: 0.01em; }
+  .doc-header .meta strong { color: var(--text-muted); font-weight: 600; }
+  .doc-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+
+  .doc-body { background: var(--glass-strong); backdrop-filter: blur(32px) saturate(180%); -webkit-backdrop-filter: blur(32px) saturate(180%); border: 1px solid var(--glass-border); border-radius: 18px; box-shadow: var(--shadow), var(--highlight); padding: 32px 36px; }
+  .doc-body h1, .doc-body h2, .doc-body h3, .doc-body h4 { font-weight: 620; letter-spacing: -0.015em; line-height: 1.3; margin: 28px 0 10px; color: var(--text); }
+  .doc-body h1 { font-size: 22px; color: var(--accent); padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .doc-body h2 { font-size: 18px; color: var(--accent); }
+  .doc-body h3 { font-size: 15.5px; }
+  .doc-body h4 { font-size: 14px; color: var(--text-muted); }
+  .doc-body > *:first-child { margin-top: 0; }
+  .doc-body > *:last-child { margin-bottom: 0; }
+  .doc-body p { margin: 10px 0; }
+  .doc-body ul, .doc-body ol { margin: 10px 0; padding-left: 22px; }
+  .doc-body li { margin: 5px 0; }
+  .doc-body li::marker { color: var(--text-subtle); }
+  .doc-body strong { font-weight: 600; }
+  .doc-body code { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 12.5px; background: rgba(0, 32, 92, 0.05); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; }
+  .doc-body pre { background: rgba(0, 32, 92, 0.04); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; overflow-x: auto; margin: 14px 0; }
+  .doc-body pre code { background: none; border: 0; padding: 0; }
+  .doc-body table { border-collapse: collapse; margin: 16px 0; font-size: 13.5px; width: 100%; }
+  .doc-body th, .doc-body td { padding: 10px 14px; border-bottom: 1px solid var(--border); text-align: left; }
+  .doc-body th { font-weight: 600; color: var(--text-muted); font-size: 12.5px; border-bottom-color: var(--border-strong); }
+  .doc-body tr:hover td { background: rgba(0, 32, 92, 0.02); }
+  .doc-body blockquote { margin: 14px 0; padding: 2px 0 2px 14px; border-left: 2px solid var(--accent); color: var(--text-muted); }
+
+  .results-header { margin-bottom: 24px; }
+  .results-header h1 { font-size: 22px; font-weight: 620; letter-spacing: -0.02em; }
+  .results-header p { margin-top: 4px; color: var(--text-muted); font-size: 14px; }
+  .result-list { display: flex; flex-direction: column; gap: 12px; }
+  .result-card { display: block; padding: 20px 24px; cursor: pointer; background: var(--glass); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid var(--glass-border); border-radius: 14px; box-shadow: var(--shadow-sm), var(--highlight); transition: all 200ms var(--ease); color: var(--text); text-decoration: none; }
+  .result-card:hover { transform: translateY(-1px); background: var(--glass-strong); box-shadow: var(--shadow), var(--highlight); }
+  .result-card .name { font-size: 13.5px; color: var(--accent); font-weight: 620; letter-spacing: -0.01em; margin-bottom: 6px; }
+  .result-card .snippet { font-size: 14px; color: var(--text); }
+  .result-card .snippet p:first-child { margin-top: 0; }
+  .result-card .snippet p:last-child { margin-bottom: 0; }
+  .result-card .snippet h1, .result-card .snippet h2, .result-card .snippet h3, .result-card .snippet h4 { font-size: 14.5px; font-weight: 620; margin: 6px 0 4px; color: var(--text); }
+
+  .editor { display: flex; flex-direction: column; gap: 16px; }
+  .editor .field { display: flex; flex-direction: column; gap: 6px; }
+  .editor label { font-size: 11.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .editor input[type="text"], .editor textarea, .editor select { font-size: 14px; padding: 10px 14px; background: var(--glass); backdrop-filter: blur(18px) saturate(180%); -webkit-backdrop-filter: blur(18px) saturate(180%); border: 1px solid var(--glass-border); border-radius: 10px; box-shadow: var(--shadow-sm), var(--highlight); transition: border-color 160ms var(--ease), box-shadow 160ms var(--ease); }
+  .editor input[type="text"]:focus, .editor textarea:focus, .editor select:focus { border-color: rgba(0, 32, 92, 0.3); box-shadow: var(--shadow-sm), var(--highlight), 0 0 0 3px rgba(0, 32, 92, 0.08); }
+  .editor textarea { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 13px; line-height: 1.55; min-height: 440px; resize: vertical; }
+  .editor textarea.small { min-height: 70px; font-family: inherit; font-size: 14px; }
+  .editor .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .editor-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .editor-actions .right { display: flex; gap: 8px; }
+  .editor-notice { font-size: 12.5px; color: var(--text-muted); padding: 10px 14px; background: rgba(199, 91, 18, 0.08); border: 1px solid rgba(199, 91, 18, 0.2); border-radius: 8px; }
+
+  .drawer-backdrop { position: fixed; inset: 0; z-index: 50; background: rgba(10, 14, 26, 0.2); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 220ms var(--ease); }
+  .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(520px, 100vw); z-index: 51; background: var(--glass-strong); backdrop-filter: blur(32px) saturate(180%); -webkit-backdrop-filter: blur(32px) saturate(180%); border-left: 1px solid var(--glass-border); box-shadow: var(--shadow-lg); transform: translateX(100%); transition: transform 320ms var(--ease); display: flex; flex-direction: column; }
+  .drawer.open { transform: none; }
+  .drawer header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .drawer header h2 { font-size: 15px; font-weight: 620; flex: 1; letter-spacing: -0.01em; }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 16px 22px 40px; }
+  .history-item { padding: 14px 16px; border: 1px solid var(--glass-border); background: var(--glass); border-radius: 12px; margin-bottom: 10px; box-shadow: var(--shadow-sm), var(--highlight); }
+  .history-item .line1 { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); }
+  .history-item .action { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; background: rgba(0, 32, 92, 0.08); color: var(--accent); }
+  .history-item .action.create { background: rgba(21, 122, 76, 0.12); color: var(--success); }
+  .history-item .action.delete { background: rgba(179, 38, 30, 0.1); color: var(--danger); }
+  .history-item .action.restore { background: rgba(199, 91, 18, 0.12); color: var(--pop); }
+  .history-item .user { color: var(--text-muted); font-size: 13px; }
+  .history-item .ts { color: var(--text-subtle); font-size: 11.5px; margin-left: auto; }
+  .history-item .summary { margin-top: 6px; font-size: 13px; color: var(--text-muted); }
+  .history-item .row-actions { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .diff { margin-top: 10px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: rgba(255, 255, 255, 0.5); font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 12px; line-height: 1.55; max-height: 480px; overflow-y: auto; }
+  .diff-line { display: flex; padding: 1px 10px 1px 8px; white-space: pre-wrap; word-break: break-word; border-left: 3px solid transparent; }
+  .diff-line .gutter { flex-shrink: 0; width: 16px; margin-right: 8px; color: var(--text-subtle); user-select: none; text-align: center; }
+  .diff-line.add { background: rgba(21, 122, 76, 0.09); border-left-color: rgba(21, 122, 76, 0.5); color: #064527; }
+  .diff-line.add .gutter { color: var(--success); }
+  .diff-line.remove { background: rgba(179, 38, 30, 0.07); border-left-color: rgba(179, 38, 30, 0.5); color: #6b120d; }
+  .diff-line.remove .gutter { color: var(--danger); }
+  .diff-line.context { color: var(--text-muted); }
+  .diff-line.hunk { background: rgba(0, 32, 92, 0.06); color: var(--accent); font-weight: 600; padding: 4px 10px; border-left-color: var(--accent); }
+  .diff-empty { padding: 14px; text-align: center; color: var(--text-subtle); font-size: 12px; }
+
+  .empty-state { text-align: center; padding: 48px 16px; color: var(--text-muted); font-size: 14px; }
+  .error-banner { padding: 10px 14px; background: rgba(179, 38, 30, 0.1); border: 1px solid rgba(179, 38, 30, 0.25); border-radius: 8px; color: var(--danger); font-size: 13px; margin-bottom: 14px; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); padding: 10px 18px; background: var(--accent); color: #fff; border-radius: 10px; box-shadow: var(--shadow); z-index: 60; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 240ms var(--ease), transform 240ms var(--ease); }
+  .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--danger); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+</style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+  <div class="orb orb-5"></div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <a class="sidebar-brand" href="#" id="home-link" title="Home">
+      <img src="{{ base_url }}/logo.png" alt="Allworth Financial">
+      <div class="bar"></div>
+      <span class="chip"><span class="dot"></span>Jarvis</span>
+    </a>
+
+    <a class="btn btn-ghost" href="/home" title="Back to Allworth Team Hub" style="justify-content: flex-start; margin-bottom: 10px;">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      Back to Hub
+    </a>
+
+    <div class="sidebar-actions">
+      <button class="btn btn-primary" id="new-doc-btn" title="Create a new document">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New
+      </button>
+      <button class="btn btn-ghost" id="global-history-btn" title="Recent changes">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+        History
+      </button>
+    </div>
+
+    <nav class="nav" id="nav" aria-label="Documentation"></nav>
+
+    <div class="sidebar-footer">
+      <span>Powered by <strong>Jarvis</strong></span>
+      <span id="me"></span>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="overlay-bg" id="overlay-bg"></div>
+
+    <div class="island" id="island" data-state="hero">
+      <div class="hero-mark">
+        <img src="{{ base_url }}/logo.png" alt="Allworth Financial">
+        <p>Search metric definitions, policies, and playbooks from the Allworth knowledge base.</p>
+      </div>
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+        </svg>
+        <input id="q" type="search" placeholder="Search the Allworth knowledge base…" autocomplete="off" aria-label="Search">
+        <kbd id="kbd">⌘K</kbd>
+      </div>
+      <div class="chips" role="list">
+        <button class="chip" data-q="NCNM" role="listitem">NCNM</button>
+        <button class="chip" data-q="fee yield" role="listitem">Fee yield</button>
+        <button class="chip" data-q="retention risk" role="listitem">Retention risk</button>
+        <button class="chip" data-q="engagement rate" role="listitem">Engagement rate</button>
+        <button class="chip" data-q="rebalancing policy" role="listitem">Rebalancing policy</button>
+        <button class="chip" data-q="concentration risk" role="listitem">Concentration risk</button>
+      </div>
+    </div>
+
+    <div class="topbar-meta" id="crumb"></div>
+
+    <section class="content" id="content" data-hidden="true"></section>
+  </div>
+</div>
+
+<div class="drawer-backdrop" id="drawer-bg"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <header>
+    <h2 id="drawer-title">History</h2>
+    <button class="btn btn-ghost" id="drawer-close">Close</button>
+  </header>
+  <div class="drawer-body" id="drawer-body"></div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  // Injected by Flask so the same template works no matter where the blueprint is mounted.
+  const API_BASE = {{ base_url | tojson }};
+
+  const $ = sel => document.querySelector(sel);
+  const nav = $("#nav");
+  const content = $("#content");
+  const crumb = $("#crumb");
+  const q = $("#q");
+  const kbd = $("#kbd");
+  const me = $("#me");
+  const island = $("#island");
+  const overlayBg = $("#overlay-bg");
+  const drawer = $("#drawer");
+  const drawerBg = $("#drawer-bg");
+  const drawerBody = $("#drawer-body");
+  const drawerTitle = $("#drawer-title");
+  const toast = $("#toast");
+
+  const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+  kbd.textContent = isMac ? "⌘K" : "Ctrl+K";
+
+  let groups = [];
+  let categories = [];
+  let searchInflight;
+  let searchDebounce;
+  let overlayOpen = false;
+  let user = "anonymous";
+
+  function escapeHtml(s) {
+    return String(s ?? "").replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+  async function fetchJson(url, opts = {}) {
+    const r = await fetch(url, opts);
+    let body = null;
+    try { body = await r.json(); } catch {}
+    if (!r.ok) throw new Error((body && body.detail) || `${r.status} ${r.statusText}`);
+    return body;
+  }
+  function relTime(iso) {
+    if (!iso) return "";
+    const then = new Date(iso).getTime();
+    const sec = Math.max(1, Math.round((Date.now() - then) / 1000));
+    if (sec < 60) return `${sec}s ago`;
+    const min = Math.round(sec / 60);
+    if (min < 60) return `${min}m ago`;
+    const hr = Math.round(min / 60);
+    if (hr < 48) return `${hr}h ago`;
+    const day = Math.round(hr / 24);
+    if (day < 30) return `${day}d ago`;
+    return new Date(iso).toLocaleDateString();
+  }
+  function showToast(msg, kind = "ok") {
+    toast.textContent = msg;
+    toast.classList.toggle("error", kind === "error");
+    toast.classList.add("visible");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove("visible"), 2400);
+  }
+  function renderDiff(d) {
+    if (!d.lines || !d.lines.length) {
+      if (d.action === "create") {
+        return `<div class="diff"><div class="diff-line add"><span class="gutter">+</span>(new document — ${escapeHtml(String(d.added || 0))} lines added)</div></div>`;
+      }
+      if (d.action === "delete") {
+        return `<div class="diff-empty">Document deleted. ${escapeHtml(String(d.removed || 0))} lines removed.</div>`;
+      }
+      return `<div class="diff-empty">No textual change.</div>`;
+    }
+    const header = `<div class="diff-line hunk"><span class="gutter"></span>${escapeHtml(d.added)} added · ${escapeHtml(d.removed)} removed</div>`;
+    const body = d.lines.map(l => {
+      const gutter = l.type === "add" ? "+" : l.type === "remove" ? "−" : l.type === "hunk" ? "" : " ";
+      return `<div class="diff-line ${escapeHtml(l.type)}"><span class="gutter">${gutter}</span>${escapeHtml(l.text || "")}</div>`;
+    }).join("");
+    return `<div class="diff">${header}${body}</div>`;
+  }
+
+  function slugify(s) {
+    return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 64);
+  }
+
+  function isHomeRoute() {
+    const h = location.hash;
+    return !h || h === "#";
+  }
+  function applyIslandState() {
+    let state;
+    if (overlayOpen) state = "overlay";
+    else if (isHomeRoute()) state = "hero";
+    else state = "compact";
+    island.dataset.state = state;
+    overlayBg.classList.toggle("visible", state === "overlay");
+    content.dataset.hidden = state === "hero" ? "true" : "false";
+  }
+
+  function openOverlay() {
+    if (isHomeRoute()) { q.focus(); q.select(); return; }
+    overlayOpen = true;
+    applyIslandState();
+    requestAnimationFrame(() => { q.focus(); q.select(); });
+  }
+  function closeOverlay() {
+    if (!overlayOpen) return;
+    overlayOpen = false;
+    applyIslandState();
+    q.blur();
+  }
+
+  async function loadNav() {
+    const data = await fetchJson(`${API_BASE}/api/docs`);
+    groups = data.groups || [];
+    categories = data.categories || [];
+    nav.innerHTML = groups.map(g => `
+      <div class="nav-group">
+        <h6>${escapeHtml(g.category)}</h6>
+        ${g.docs.map(d => `
+          <a class="nav-item" href="#/docs/${encodeURIComponent(d.key)}" data-key="${escapeHtml(d.key)}">
+            ${escapeHtml(d.name)}
+            ${d.draft ? `<span class="draft">DRAFT</span>` : ""}
+          </a>
+        `).join("")}
+      </div>
+    `).join("");
+  }
+  function highlightActive(key) {
+    nav.querySelectorAll(".nav-item").forEach(el => {
+      el.classList.toggle("active", el.dataset.key === key);
+    });
+  }
+
+  async function renderDoc(key) {
+    try {
+      const doc = await fetchJson(`${API_BASE}/api/docs/${encodeURIComponent(key)}`);
+      highlightActive(key);
+      crumb.innerHTML = `<span class="crumb">${escapeHtml(doc.category || "")}</span><span class="sep">/</span><span class="crumb">${escapeHtml(doc.name)}</span>`;
+      const last = doc.last_edit;
+      const meta = last
+        ? `Last ${escapeHtml(last.action)} by <strong>${escapeHtml(last.user)}</strong> · <span title="${escapeHtml(last.ts)}">${relTime(last.ts)}</span>${last.summary ? ' · ' + escapeHtml(last.summary) : ''}`
+        : 'No edit history yet.';
+      content.innerHTML = `
+        <div class="content-inner">
+          <header class="doc-header">
+            <div class="hdr-text">
+              ${doc.category ? `<div class="kicker">${escapeHtml(doc.category)}</div>` : ""}
+              <h1>${escapeHtml(doc.name)}${doc.draft ? '<span class="draft-badge">DRAFT</span>' : ""}</h1>
+              ${doc.description ? `<p class="lede">${escapeHtml(doc.description)}</p>` : ""}
+              ${doc.draft ? '<p class="lede" style="color: var(--pop); font-size: 13px; margin-top: 8px;"><strong>Draft:</strong> this entry contains presumptive content that is not fully derivable from code. Verify against authoritative Allworth sources before citing externally.</p>' : ""}
+              <div class="meta">${meta}</div>
+            </div>
+            <div class="doc-actions">
+              <button class="btn btn-ghost" data-action="edit">Edit</button>
+              <button class="btn btn-ghost" data-action="history">History</button>
+            </div>
+          </header>
+          <article class="doc-body">${doc.content_html || ""}</article>
+        </div>`;
+      content.scrollTop = 0;
+      content.querySelector('[data-action="edit"]').onclick = () => location.hash = "#/edit/" + encodeURIComponent(key);
+      content.querySelector('[data-action="history"]').onclick = () => openHistory(doc.key, doc.name);
+    } catch {
+      content.innerHTML = `<div class="content-inner"><p class="empty-state">Document not found: ${escapeHtml(key)}</p></div>`;
+    }
+  }
+
+  async function renderSearch(query) {
+    crumb.innerHTML = `<span class="crumb">Search</span><span class="sep">/</span><span class="crumb">${escapeHtml(query)}</span>`;
+    highlightActive(null);
+    if (searchInflight) searchInflight.abort();
+    searchInflight = new AbortController();
+    try {
+      const data = await fetchJson(`${API_BASE}/api/search/all?q=${encodeURIComponent(query)}`, { signal: searchInflight.signal });
+      const matches = data.matches || [];
+      if (!matches.length) {
+        content.innerHTML = `
+          <div class="content-inner">
+            <div class="results-header">
+              <h1>No matches for “${escapeHtml(query)}”</h1>
+              <p>Try a simpler term or browse the sidebar.</p>
+            </div>
+          </div>`;
+        return;
+      }
+      content.innerHTML = `
+        <div class="content-inner">
+          <div class="results-header">
+            <h1>${matches.length} ${matches.length === 1 ? 'match' : 'matches'} for “${escapeHtml(query)}”</h1>
+            <p>Click any result to open the full document.</p>
+          </div>
+          <div class="result-list">
+            ${matches.map(m => `
+              <a class="result-card" href="#/docs/${encodeURIComponent(m.key || "")}">
+                <div class="name">${escapeHtml(m.name || "")}</div>
+                <div class="snippet">${m.snippet_html || ""}</div>
+              </a>
+            `).join("")}
+          </div>
+        </div>`;
+      content.scrollTop = 0;
+    } catch (err) {
+      if (err.name === "AbortError") return;
+      content.innerHTML = `<div class="content-inner"><p class="empty-state">Search failed.</p></div>`;
+    }
+  }
+
+  function renderEditor(doc, { creating = false, initialKey = "" } = {}) {
+    const name = creating ? "" : (doc?.name || "");
+    const description = creating ? "" : (doc?.description || "");
+    const keywords = creating ? "" : (doc?.keywords || []).join(", ");
+    const contentVal = creating ? "# New document\n\nWrite the body here in Markdown.\n" : (doc?.content || "");
+    const cat = creating ? (categories[0] || "Reference") : (doc?.category || "Reference");
+    const key = creating ? initialKey : doc.key;
+    const crumbText = creating ? "New document" : `Editing · ${doc.name}`;
+    crumb.innerHTML = `<span class="crumb">${escapeHtml(crumbText)}</span>`;
+    highlightActive(creating ? null : key);
+
+    const catOptions = [...new Set([...categories, cat])]
+      .map(c => `<option value="${escapeHtml(c)}" ${c === cat ? 'selected' : ''}>${escapeHtml(c)}</option>`).join("");
+
+    content.innerHTML = `
+      <div class="content-inner">
+        <header class="doc-header">
+          <div class="hdr-text">
+            <div class="kicker">${creating ? "NEW DOCUMENT" : "EDITING"}</div>
+            <h1>${creating ? "Create a document" : escapeHtml(doc.name)}</h1>
+            <p class="lede">${creating ? "Definitions saved here are searchable within seconds." : "Changes save immediately and are logged in this document's history."}</p>
+          </div>
+        </header>
+        <form class="editor" id="editor-form" autocomplete="off">
+          <div id="edit-error" style="display:none"></div>
+          ${creating ? `
+            <div class="field">
+              <label for="f-key">Key (URL slug)</label>
+              <input id="f-key" type="text" value="${escapeHtml(key)}" placeholder="e.g. new-metric" required pattern="^[a-z0-9][a-z0-9-]{1,63}$">
+            </div>` : ''}
+          <div class="row">
+            <div class="field">
+              <label for="f-name">Title</label>
+              <input id="f-name" type="text" value="${escapeHtml(name)}" placeholder="Metric Dictionary" required>
+            </div>
+            <div class="field">
+              <label for="f-category">Category</label>
+              <select id="f-category">${catOptions}</select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="f-description">Description</label>
+            <textarea id="f-description" class="small" placeholder="One-sentence description">${escapeHtml(description)}</textarea>
+          </div>
+          <div class="field">
+            <label for="f-keywords">Keywords (comma-separated)</label>
+            <input id="f-keywords" type="text" value="${escapeHtml(keywords)}" placeholder="metric, definition, ncnm">
+          </div>
+          <div class="field">
+            <label for="f-content">Content (Markdown)</label>
+            <textarea id="f-content" required>${escapeHtml(contentVal)}</textarea>
+          </div>
+          <div class="field">
+            <label for="f-summary">Change summary (optional)</label>
+            <input id="f-summary" type="text" placeholder="What changed and why">
+          </div>
+          <div class="editor-notice">
+            <strong>Note:</strong> This editor changes content and metadata only. Retrieval logic, stopwords, and ranking weights live in Python and require a code deploy to change.
+          </div>
+          <div class="editor-actions">
+            <div>${!creating ? `<button type="button" class="btn btn-danger" id="delete-btn">Delete</button>` : ''}</div>
+            <div class="right">
+              <button type="button" class="btn btn-ghost" id="cancel-btn">Cancel</button>
+              <button type="submit" class="btn btn-primary" id="save-btn">${creating ? 'Create' : 'Save'}</button>
+            </div>
+          </div>
+        </form>
+      </div>`;
+    content.scrollTop = 0;
+
+    const form = $("#editor-form");
+    const errBox = $("#edit-error");
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const savedKey = creating ? $("#f-key").value.trim() : key;
+      const body = {
+        name: $("#f-name").value.trim(),
+        description: $("#f-description").value.trim(),
+        keywords: $("#f-keywords").value.split(",").map(s => s.trim()).filter(Boolean),
+        content: $("#f-content").value,
+        category: $("#f-category").value,
+        summary: $("#f-summary").value.trim(),
+      };
+      try {
+        await fetchJson(`${API_BASE}/api/docs/${encodeURIComponent(savedKey)}`, {
+          method: "PUT",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        showToast(creating ? "Created" : "Saved");
+        await loadNav();
+        location.hash = "#/docs/" + encodeURIComponent(savedKey);
+      } catch (err) {
+        errBox.style.display = "block";
+        errBox.className = "error-banner";
+        errBox.textContent = "Save failed: " + err.message;
+      }
+    };
+    $("#cancel-btn").onclick = () => {
+      if (creating) location.hash = ""; else location.hash = "#/docs/" + encodeURIComponent(key);
+    };
+    const delBtn = $("#delete-btn");
+    if (delBtn) {
+      delBtn.onclick = async () => {
+        if (!confirm(`Delete "${doc.name}"? The document is removed but history is preserved.`)) return;
+        try {
+          await fetchJson(`${API_BASE}/api/docs/${encodeURIComponent(key)}`, { method: "DELETE" });
+          showToast("Deleted");
+          await loadNav();
+          location.hash = "";
+        } catch (err) { showToast("Delete failed: " + err.message, "error"); }
+      };
+    }
+    if (creating) {
+      const keyField = $("#f-key"), nameField = $("#f-name");
+      let keyEdited = false;
+      keyField.addEventListener("input", () => { keyEdited = true; });
+      nameField.addEventListener("input", () => { if (!keyEdited) keyField.value = slugify(nameField.value); });
+    }
+  }
+
+  async function openHistory(key, title) {
+    drawerTitle.textContent = key ? `History · ${title}` : "Recent changes";
+    drawerBody.innerHTML = '<p class="empty-state">Loading…</p>';
+    drawer.classList.add("open");
+    drawerBg.classList.add("open");
+    try {
+      const url = key ? `${API_BASE}/api/docs/${encodeURIComponent(key)}/history` : `${API_BASE}/api/history`;
+      const data = await fetchJson(url);
+      const events = data.history || [];
+      if (!events.length) {
+        drawerBody.innerHTML = '<p class="empty-state">No history yet.</p>';
+        return;
+      }
+      drawerBody.innerHTML = events.map((e, idx) => {
+        const diffKey = key || e.key;
+        return `
+        <div class="history-item" data-ts="${escapeHtml(e.ts)}" data-diff-key="${escapeHtml(diffKey || "")}">
+          <div class="line1">
+            <span class="action ${escapeHtml(e.action)}">${escapeHtml(e.action)}</span>
+            <span class="user">${escapeHtml(e.user || "—")}</span>
+            ${!key && e.key ? `<span class="user">· ${escapeHtml(e.name || e.key)}</span>` : ""}
+            <span class="ts" title="${escapeHtml(e.ts)}">${relTime(e.ts)}</span>
+          </div>
+          ${e.summary ? `<div class="summary">${escapeHtml(e.summary)}</div>` : ""}
+          <div class="row-actions">
+            ${diffKey ? `<button class="btn btn-ghost" data-diff>View changes</button>` : ""}
+            ${key && idx !== 0 && (e.after || e.before) ? `<button class="btn btn-ghost" data-restore="${escapeHtml(e.ts)}">Restore this version</button>` : ""}
+            ${!key && e.key ? `<button class="btn btn-ghost" data-open="${escapeHtml(e.key)}">Open document</button>` : ""}
+          </div>
+          <div class="diff-slot"></div>
+        </div>`;
+      }).join("");
+      drawerBody.querySelectorAll("[data-diff]").forEach(btn => {
+        btn.onclick = async () => {
+          const item = btn.closest(".history-item");
+          const slot = item.querySelector(".diff-slot");
+          if (slot.innerHTML) {
+            slot.style.display = slot.style.display === "none" ? "" : "none";
+            btn.textContent = slot.style.display === "none" ? "View changes" : "Hide changes";
+            return;
+          }
+          const diffKey = item.dataset.diffKey;
+          const ts = item.dataset.ts;
+          slot.innerHTML = '<div class="diff-empty">Loading diff…</div>';
+          try {
+            const d = await fetchJson(`${API_BASE}/api/docs/${encodeURIComponent(diffKey)}/history/${encodeURIComponent(ts)}/diff`);
+            slot.innerHTML = renderDiff(d);
+            btn.textContent = "Hide changes";
+          } catch (err) {
+            slot.innerHTML = `<div class="diff-empty">Failed to load diff: ${escapeHtml(err.message)}</div>`;
+          }
+        };
+      });
+      drawerBody.querySelectorAll("[data-restore]").forEach(btn => {
+        btn.onclick = async () => {
+          if (!confirm("Restore this version?")) return;
+          try {
+            await fetchJson(`${API_BASE}/api/docs/${encodeURIComponent(key)}/restore`, {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ ts: btn.dataset.restore }),
+            });
+            showToast("Restored");
+            closeDrawer();
+            handleRoute();
+          } catch (err) { showToast("Restore failed: " + err.message, "error"); }
+        };
+      });
+      drawerBody.querySelectorAll("[data-open]").forEach(btn => {
+        btn.onclick = () => { closeDrawer(); location.hash = "#/docs/" + encodeURIComponent(btn.dataset.open); };
+      });
+    } catch (err) {
+      drawerBody.innerHTML = `<div class="error-banner">Failed to load history: ${escapeHtml(err.message)}</div>`;
+    }
+  }
+  function closeDrawer() {
+    drawer.classList.remove("open");
+    drawerBg.classList.remove("open");
+  }
+  drawerBg.onclick = closeDrawer;
+  $("#drawer-close").onclick = closeDrawer;
+  $("#global-history-btn").onclick = () => openHistory(null, null);
+  $("#new-doc-btn").onclick = () => { location.hash = "#/new"; };
+  $("#home-link").onclick = (e) => { e.preventDefault(); location.hash = ""; };
+
+  function handleRoute() {
+    closeOverlay();
+    applyIslandState();
+    const hash = location.hash;
+    if (hash === "#/new") {
+      renderEditor(null, { creating: true });
+    } else if (hash.startsWith("#/docs/")) {
+      const key = decodeURIComponent(hash.slice("#/docs/".length));
+      renderDoc(key);
+    } else if (hash.startsWith("#/edit/")) {
+      const key = decodeURIComponent(hash.slice("#/edit/".length));
+      fetchJson(`${API_BASE}/api/docs/${encodeURIComponent(key)}`).then(d => renderEditor(d)).catch(() => { location.hash = ""; });
+    } else if (hash.startsWith("#/search/")) {
+      const query = decodeURIComponent(hash.slice("#/search/".length));
+      q.value = query;
+      renderSearch(query);
+    } else {
+      q.value = "";
+      crumb.innerHTML = "";
+      highlightActive(null);
+      content.innerHTML = "";
+    }
+  }
+  window.addEventListener("hashchange", handleRoute);
+
+  q.addEventListener("input", () => {
+    clearTimeout(searchDebounce);
+    const query = q.value.trim();
+    searchDebounce = setTimeout(() => {
+      if (!query) {
+        if (location.hash.startsWith("#/search/")) location.hash = "";
+        return;
+      }
+      if (location.hash !== "#/search/" + encodeURIComponent(query)) {
+        location.hash = "#/search/" + encodeURIComponent(query);
+      }
+    }, 240);
+  });
+  q.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+      if (overlayOpen) { closeOverlay(); return; }
+      q.value = "";
+      if (location.hash.startsWith("#/search/")) location.hash = "";
+    }
+  });
+  q.addEventListener("focus", () => {
+    if (island.dataset.state === "compact") openOverlay();
+  });
+  overlayBg.addEventListener("click", closeOverlay);
+
+  document.querySelectorAll(".chip").forEach(el => {
+    el.addEventListener("click", () => {
+      q.value = el.dataset.q;
+      clearTimeout(searchDebounce);
+      location.hash = "#/search/" + encodeURIComponent(el.dataset.q);
+    });
+  });
+
+  window.addEventListener("keydown", e => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      if (isHomeRoute()) { q.focus(); q.select(); }
+      else { overlayOpen ? closeOverlay() : openOverlay(); }
+    }
+    if (e.key === "Escape" && drawer.classList.contains("open")) closeDrawer();
+  });
+
+  (async () => {
+    try {
+      const meResp = await fetchJson(`${API_BASE}/api/me`);
+      user = meResp.user || "anonymous";
+      me.textContent = user === "anonymous" ? "" : `· ${user}`;
+    } catch {}
+    await loadNav();
+    handleRoute();
+  })();
+})();
+</script>
+</body>
+</html>

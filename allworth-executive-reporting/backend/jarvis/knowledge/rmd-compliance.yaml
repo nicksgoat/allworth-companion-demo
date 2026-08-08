@@ -1,0 +1,37 @@
+name: RMD Compliance
+uri: frameworks://rmd-compliance
+category: Compliance
+description: Required Minimum Distribution tracking — satisfaction status, remaining amounts, and IRS due dates per household.
+keywords:
+  - RMD
+  - required minimum distribution
+  - compliance
+  - distribution
+  - withdrawal
+  - IRS deadline
+content: |
+  Source: `risk.py:get_rmd_compliance()` — `RMD` table in the warehouse.
+
+  ## Tracked Fields (per RMD record)
+  - `Household` — client identifier.
+  - `Account_Number`, `Primary_Owner` — account-level granularity.
+  - `RMD_Year` — tax year for the distribution.
+  - `RMD_Total_Amount` — calculated RMD obligation.
+  - `Remaining_RMD_Calc` — unfulfilled balance (dollars).
+  - `RMD_Satisfied_Calc` — flag: `1` = satisfied, `0`/`NULL` = unsatisfied.
+  - `Due_Date` — IRS deadline for distribution.
+  - `Scheduled`, `PDP` — scheduled vs pending-distribution flags.
+  - `Custodian`, `Operations_Team` — accountability owners.
+  - `12_31_Balance`, `Factor` — year-end balance and life-expectancy factor (for recalc).
+
+  ## Satisfaction Status
+  - **Satisfied** (`RMD_Satisfied_Calc = 1`) — distribution completed.
+  - **Unsatisfied** (`RMD_Satisfied_Calc IN (0, NULL)`) — pending or incomplete.
+  - Query flag format: `"UNSATISFIED RMD: $[remaining] remaining, due [date]"`.
+
+  ## Aggregations
+  - By household, custodian, operations team.
+  - Summary: unsatisfied count, total remaining, satisfaction rate.
+
+  ## Escalation
+  Unsatisfied RMDs near the IRS deadline are a high-priority compliance risk — surface in client-priority triage and flag to the operations team owning the account. Penalty for missed RMD is 25% of the shortfall (50% pre-SECURE 2.0), so this is time-sensitive.

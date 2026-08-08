@@ -1,0 +1,6 @@
+id: client-count-rollforward
+source: wealth_mcp.domain.tables
+description: 'Monthly client-count reconciliation: household gains and losses per
+  period, the count-side companion to the AUM rollforward.'
+grain: avhhid x Reporting_Period_Key
+domain: Household

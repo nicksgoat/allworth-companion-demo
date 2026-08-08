@@ -1,0 +1,30 @@
+name: Billing Exception Policy
+uri: frameworks://billing-exception-policy
+category: Metrics & Fees
+description: Adjustments and exceptions tracked at account and group level in historical billing records.
+keywords:
+  - billing
+  - adjustment
+  - exception
+  - proration
+  - override
+  - billing history
+draft: true
+content: |
+  Source: `profitability.py:get_billing_history()` — fields in `[bil].[Billing_History_Table]`.
+
+  ## Exception Types Tracked
+  1. **Account Adjustment** — per-account fee reduction or override (e.g. onboarding discount, client negotiation).
+  2. **Billing Group Adjustment** — group-level adjustment applied across a cohort.
+  3. **New Account Adjustment** — special handling for recently onboarded accounts.
+  4. **Proration Amount** — partial-period fees (inception mid-month, closure, transfers).
+
+  ## Impact on Yield
+  - **Gross Billed** = fees before adjustments.
+  - **Billed Amount** = `Gross_Billed − Account_Adjustment − Billing_Group_Adjustment − New_Account_Adjustment + Proration_Amount`.
+  - **Effective Rate** = `Billed_Amount / Billable_Value` — used in billing-history analysis.
+
+  ## Rule Ownership
+  The adjustment amounts are tracked in the warehouse, but the **rules** for when exceptions are granted (discount thresholds, approval workflow, sunset rules) live in operational systems / firm policy docs — not in MCP code.
+
+  This entry is flagged `draft: true` because only the tracking schema is derivable from code; the approval policy should be documented from the source of truth and pasted in here.

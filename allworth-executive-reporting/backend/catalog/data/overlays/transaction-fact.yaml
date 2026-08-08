@@ -1,0 +1,8 @@
+id: transaction-fact
+source: wealth_mcp.domain.tables
+description: 'Transaction-level fact: amount, activity type, trade/entry date keys,
+  account and household linkage. Source grain under the rollforward flow components.'
+business_name: Transactions
+grain: one row per transaction
+pk: Transaction_Id
+domain: Transactions

@@ -1,0 +1,24 @@
+name: Net Flows
+uri: frameworks://net-flows
+category: Metric Definitions
+description: Movement in and out of existing books of business.
+keywords:
+  - net flows
+  - flows
+  - trade-date
+  - entry-date
+  - rollforward
+related_tables:
+  - Household_Rollforward
+  - Household_Rollforward(Trade Date)
+related_columns:
+  - table: Household_Rollforward
+    column: NCNM
+  - table: Household_Rollforward
+    column: ECNM
+  - table: Household_Rollforward
+    column: Distribution
+  - table: Household_Rollforward
+    column: Attrition
+content: |
+  Use net flows for movement into and out of existing books of business. Distinguish trade-date net flows from entry-date rollforward flows when discussing advisor incentives or bonus attribution.

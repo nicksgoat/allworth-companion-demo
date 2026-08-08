@@ -1,0 +1,52 @@
+name: Termination Risk Model
+uri: frameworks://termination-risk-model
+category: Compliance
+description: Rules-based churn scoring with 18 component factors plus ML probability estimates; used for retention prioritization.
+keywords:
+  - termination risk
+  - churn risk
+  - termination prediction
+  - risk score
+  - probability
+  - retention model
+content: |
+  Source: `term_prediction.py:get_term_prediction()` and `get_term_prediction_probability()`.
+
+  This entry documents **the model**; see the `retention-risk` metric entry for the business-level definition of the signal.
+
+  ## Rules-Based Score (`Term_Prediction_Scoring_Model`)
+  - **Range**: 0 – 100. Higher score = greater termination risk.
+  - **18 factors** across four buckets:
+
+  ### Portfolio
+  - `investment_portfolio_deviation`, `rolling_12_month_volatility`.
+  - Unrealized and realized short- and long-term gains.
+  - `equity_percentage`; holdings in `total_amount_in_low/medium/high` risk buckets.
+  - Management-fee burden.
+
+  ### Engagement
+  - `trailing_number_of_inbound_calls_emails`.
+  - `trailing_number_of_outbound_calls_emails`.
+  - `trailing_ratio_outbound_inbound` (advisor reach-out intensity).
+  - `trailing_number_of_meetings`.
+
+  ### Service
+  Binary flags for `annual_review`, `estate_planning`, `insurance`, `tax_services`, `financial_planning`.
+
+  ### Composite
+  - `age_score`.
+  - `practice_management_score` (rollup of service completeness).
+
+  ## Category Bucketing
+  `risk_category` = categorical mapping from the numeric score (High / Medium / Low). Query supports filtering by category and minimum score.
+
+  ## ML Probability (`Term_Prediction_Probability`)
+  - **Model Name** — ML model identifier (multiple models may score concurrently).
+  - **Probability Score** — per-model termination probability (0 – 1).
+  - **Max Probability Score** / **Average Probability Score** across models.
+  - **Reporting Period** / **Generated Date**.
+
+  ## Interpretation
+  The rules-based score quantifies *observable* risk factors (activity, fees, volatility, engagement). The ML probability offers calibrated forward-looking estimates. Use in tandem: the score tells you *why* a household is at risk; the probability tells you *how likely* termination is.
+
+  Treat outputs as directional signals, not certainties — see `data-caveats` for the interpretation rules.

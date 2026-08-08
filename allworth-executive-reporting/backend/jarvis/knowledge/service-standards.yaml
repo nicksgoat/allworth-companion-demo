@@ -1,0 +1,63 @@
+name: Service Standards
+uri: frameworks://service-standards
+category: Policies
+description: Client service tier classification based on AUM with defined meeting cadence and response SLAs.
+keywords:
+  - service tier
+  - platinum
+  - gold
+  - silver
+  - bronze
+  - AUM
+  - SLA
+  - response time
+  - service standards
+content: |
+  The operational service tier is stored in `PM_Service_Level` on `Current_Household_Demographic` (see `client_outcomes.py:92`) and surfaced in `get_client_snapshot()`.
+
+  ## Client Tiers
+
+  ### Platinum ($5M+ AUM)
+  - Dedicated advisor + associate advisor
+  - Quarterly review meetings
+  - Annual comprehensive plan update
+  - Same-day response to inquiries
+  - Direct access to CIO
+  - Priority scheduling
+
+  ### Gold ($1M – $5M AUM)
+  - Dedicated advisor
+  - Semi-annual review meetings
+  - Annual plan update
+  - Next-business-day response
+  - Quarterly market commentary
+
+  ### Silver ($250K – $1M AUM)
+  - Shared advisor team
+  - Annual review meeting
+  - Biennial plan update
+  - 2-business-day response
+  - Monthly newsletter
+
+  ### Bronze (< $250K AUM)
+  - Digital-first service model
+  - Annual check-in call
+  - Plan review upon request
+  - 3-business-day response
+  - Monthly newsletter
+
+  ## Response Time SLAs
+
+  | Request Type | Platinum | Gold | Silver | Bronze |
+  |---|---|---|---|---|
+  | Urgent (market event) | 2 hours | 4 hours | Same day | Next day |
+  | Account inquiry | Same day | Next day | 2 days | 3 days |
+  | Transfer/withdrawal | Same day | Same day | Next day | Next day |
+  | Plan question | Same day | Next day | 2 days | 3 days |
+
+  ## Usage
+  - Engagement cadence expectations (in `engagement-behavior-standard`) anchor to these tiers.
+  - `PM_Service_Level` is a segmentation dimension across client_outcomes analytics.
+  - Tier assignment is AUM-driven in current practice; the `household-tier-assignment` entry describes the rule.
+
+  The tier structure and thresholds above reflect the existing policy baseline. Update here when firm service model changes; Jarvis will hot-reload the change and the MCP tools will pick it up on next call.

@@ -1,0 +1,7 @@
+id: term-prediction-probability
+source: wealth_mcp.domain.tables
+description: Model-scored probability that a household terminates, per reporting period
+  and model version.
+business_name: Household churn probability (ML output)
+grain: avhhid x "Reporting Period" x Model
+domain: ML

@@ -1,0 +1,175 @@
+id: referral
+name: Referral
+schema: tho
+db: DataWarehouse
+db_table: Referral
+guid: 821058c7-5071-43cc-86d5-f9c3ece9c106
+business_name: null
+grain: Referral Id
+pk: null
+synonyms: []
+domain: Reference
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- CRP Reps with Flows
+- IS Referrals
+- Trade Date Rollforward
+column_count: 17
+columns:
+- name: Id
+  db_column_name: Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: OwnerId
+  db_column_name: OwnerId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Name
+  db_column_name: Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CreatedDate
+  db_column_name: CreatedDate
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Household__c
+  db_column_name: Household__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Opportunity_New_Service__c
+  db_column_name: Opportunity_New_Service__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Opportunity_Referral_Source__c
+  db_column_name: Opportunity_Referral_Source__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Referred_By__c
+  db_column_name: Referred_By__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Referred_To__c
+  db_column_name: Referred_To__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Service_Type__c
+  db_column_name: Service_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: External_Referral_Flag
+  db_column_name: External_Referral_Flag
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Priority__c
+  db_column_name: Priority__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Private_Wealth_Status__c
+  db_column_name: Private_Wealth_Status__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Amount__c
+  db_column_name: Amount__c
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Estimated_Close_Date
+  db_column_name: Estimated_Close_Date
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: VC_Eligibility_Since
+  db_column_name: VC_Eligibility_Since
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: VC_Eligibility_Type__c
+  db_column_name: VC_Eligibility_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

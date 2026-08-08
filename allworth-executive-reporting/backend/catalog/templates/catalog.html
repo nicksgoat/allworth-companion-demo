@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Data Catalog — Allworth tho Warehouse</title>
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300205C'/><g fill='none' stroke='%23fff' stroke-width='1.6'><ellipse cx='16' cy='9' rx='9' ry='3.4'/><path d='M7 9v14c0 1.9 4 3.4 9 3.4s9-1.5 9-3.4V9'/><path d='M7 16c0 1.9 4 3.4 9 3.4s9-1.5 9-3.4'/></g></svg>">
+<link rel="stylesheet" href="{{ base_url }}/static/styles.css?v={{ asset_version }}">
+</head>
+<body>
+<div class="app">
+  <!-- ── Sidebar ─────────────────────────────────────────── -->
+  <aside class="rail">
+    <div class="brand">
+      <img class="brand-logo" src="/home/logo.png" alt="Allworth"
+           onerror="this.style.display='none'">
+      <span class="brand-chip">Data Catalog</span>
+    </div>
+    <a class="back-hub" href="/" title="Back to Allworth hub">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      Back to hub
+    </a>
+
+    <div class="search">
+      <input id="q" type="search" placeholder="Search tables, columns, synonyms…" autocomplete="off">
+    </div>
+
+    <div class="facet-group">
+      <h3>Domain</h3>
+      <div class="chip-row" id="facet-domain"></div>
+    </div>
+    <div class="facet-group">
+      <h3>Schema</h3>
+      <div class="chip-row" id="facet-schema"></div>
+    </div>
+    <div class="facet-group">
+      <h3>Column kind</h3>
+      <div class="chip-row" id="facet-kind">
+        <span class="chip" data-kind="measure">Has measures</span>
+        <span class="chip" data-kind="attribute">Has attributes</span>
+      </div>
+    </div>
+    <div class="facet-group">
+      <label class="toggle"><input type="checkbox" id="pii-only"> Only tables with PII</label>
+      <label class="toggle"><input type="checkbox" id="hide-dep"> Hide deprecated</label>
+    </div>
+
+    <div class="rail-foot">
+      <span id="me"></span><br>
+      <span id="stat"></span>
+    </div>
+  </aside>
+
+  <!-- ── Main ────────────────────────────────────────────── -->
+  <main class="main">
+    <nav class="tabs">
+      <button class="tab active" data-view="columns">Columns</button>
+      <button class="tab" data-view="tables">Tables</button>
+      <button class="tab" data-view="graph">ER Graph</button>
+      <button class="tab" data-view="sources">Sources</button>
+      <button class="tab" data-view="glossary">Glossary</button>
+    </nav>
+
+    <!-- Columns view (searchable field dictionary from the TML tables) -->
+    <section class="view" data-view="columns">
+      <div class="split">
+        <div>
+          <div class="metric-bar">
+            <input id="col-q" type="search" placeholder="Search columns / fields…" autocomplete="off">
+          </div>
+          <div class="count" id="col-count"></div>
+          <div class="list" id="col-list"></div>
+        </div>
+        <div class="detail empty" id="col-detail">Select a column to see its source table, the models it appears in, and any formula.</div>
+      </div>
+    </section>
+
+    <!-- Tables view -->
+    <section class="view" data-view="tables" hidden>
+      <div class="split">
+        <div>
+          <div class="count" id="count"></div>
+          <div class="list" id="list"></div>
+        </div>
+        <div class="detail empty" id="detail">Select a table to see its columns, joins and lineage.</div>
+      </div>
+    </section>
+
+    <!-- Graph view -->
+    <section class="view" data-view="graph" hidden>
+      <div class="graph-bar">
+        <select id="ws-select"></select>
+        <span class="muted" id="graph-stat"></span>
+      </div>
+      <div class="graph-desc" id="graph-desc"></div>
+      <div class="mermaid-wrap" id="graph-wrap"></div>
+    </section>
+
+    <!-- Sources view (systems where the data originates) -->
+    <section class="view" data-view="sources" hidden>
+      <div class="gloss" id="sources"></div>
+    </section>
+
+    <!-- Glossary view -->
+    <section class="view" data-view="glossary" hidden>
+      <div class="gloss" id="gloss"></div>
+    </section>
+  </main>
+</div>
+
+<script>window.CATALOG_BASE = "{{ base_url }}";</script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"
+        onerror="window.MERMAID_FAILED=true"></script>
+<script src="{{ base_url }}/static/app.js?v={{ asset_version }}"></script>
+</body>
+</html>

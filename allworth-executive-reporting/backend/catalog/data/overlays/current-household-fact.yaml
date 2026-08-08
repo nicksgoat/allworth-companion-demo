@@ -1,0 +1,8 @@
+id: current-household-fact
+source: wealth_mcp.domain.tables
+description: 'Current-state household measures: AUM, trailing-twelve-month flows (ttm_ncnm
+  etc.), tenure, engagement and value metrics. Pair with Current_Household_Demographic.'
+business_name: Household (current measures)
+grain: one row per Salesforce Lead (LeadId)
+pk: LeadId
+domain: Household

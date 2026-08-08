@@ -1,0 +1,11 @@
+name: Engagement Rate
+uri: frameworks://engagement-rate
+category: Metric Definitions
+description: Share of target households completing a defined engagement behavior.
+keywords:
+  - engagement rate
+  - engagement
+  - touchpoint
+  - service
+content: |
+  Share of target households completing the desired engagement behavior during the period. Engagement should be anchored to the defined service or touchpoint, not generic contact volume.

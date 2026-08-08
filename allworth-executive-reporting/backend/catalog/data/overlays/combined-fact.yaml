@@ -1,0 +1,5 @@
+id: combined-fact
+source: wealth_mcp.domain.tables
+description: Leads joined to goal targets — supports goal pacing and attainment reporting.
+grain: LeadId x Goal IDs
+domain: Pipeline

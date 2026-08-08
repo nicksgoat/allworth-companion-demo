@@ -1,0 +1,354 @@
+name: Build and Deploy to Azure Web App (Dev)
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: allworth-executive-reporting
+  RESOURCE_GROUP: analytics-insights-westus
+  ACR_NAME: allworthaml
+  BACKEND_IMAGE_NAME: allworth-executive-reporting-backend-dev
+  FRONTEND_IMAGE_NAME: allworth-executive-reporting-frontend-dev
+  SLOT_NAME: dev
+  ADLS_ACCOUNT_NAME: dlallworthai
+  ADLS_RESOURCE_GROUP: Analytics-Insights-WestUS
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4.1.1
+
+    - name: Checkout synapse notebooks from Azure DevOps
+      # Bundles the latest Synapse notebook JSONs into the backend image so
+      # the SFP2 notebook-reference index can flag columns that are still
+      # consumed downstream. Source-of-truth is the Azure DevOps repo (the
+      # GitHub Enterprise mirror lags behind manual syncs). Auth uses an
+      # Azure DevOps PAT with `Code (Read)` scope stored in the repo secret
+      # AZDO_SYNAPSE_PAT. The PAT is passed via the Authorization header
+      # rather than embedded in the URL so it doesn't leak into git config.
+      env:
+        AZDO_PAT: ${{ secrets.AZDO_SYNAPSE_PAT }}
+      run: |
+        if [ -z "$AZDO_PAT" ]; then
+          echo "⚠️  AZDO_SYNAPSE_PAT not set — notebook index will be empty"
+          mkdir -p backend/synapse-notebooks
+          exit 0
+        fi
+        # ADO basic auth: empty username + PAT, base64-encoded. Persist the
+        # header in the clone's local config so sparse-checkout fetches reuse it.
+        AUTH_HEADER="Authorization: Basic $(printf ':%s' "$AZDO_PAT" | base64 -w0)"
+        git clone --depth 1 --no-checkout \
+          --config "http.extraheader=$AUTH_HEADER" \
+          https://hansonmcclain.visualstudio.com/allworthsynapse/_git/allworthsynapse \
+          backend/synapse-notebooks-src
+        git -C backend/synapse-notebooks-src sparse-checkout init --cone
+        git -C backend/synapse-notebooks-src sparse-checkout set notebook
+        git -C backend/synapse-notebooks-src checkout
+        mkdir -p backend/synapse-notebooks
+        if [ -d backend/synapse-notebooks-src/notebook ]; then
+          cp -r backend/synapse-notebooks-src/notebook/. backend/synapse-notebooks/
+          echo "✅ Staged $(find backend/synapse-notebooks -name '*.json' | wc -l) notebook JSONs"
+        else
+          echo "⚠️  notebook/ folder not found in clone — index will be empty"
+        fi
+        rm -rf backend/synapse-notebooks-src
+
+    - name: Log in to Azure Container Registry
+      uses: docker/login-action@v3.2.0
+      with:
+        registry: ${{ env.ACR_NAME }}.azurecr.io
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    - name: Build and push backend image
+      uses: docker/build-push-action@v5.3.0
+      with:
+        context: ./backend
+        push: true
+        no-cache: true
+        tags: |
+          ${{ env.ACR_NAME }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
+          ${{ env.ACR_NAME }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:latest
+
+    - name: Build and push frontend image
+      uses: docker/build-push-action@v5.3.0
+      with:
+        context: ./frontend
+        push: true
+        no-cache: true
+        tags: |
+          ${{ env.ACR_NAME }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
+          ${{ env.ACR_NAME }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:latest
+        build-args: |
+          VITE_API_URL=/api
+          # SSO disabled: leave VITE_ENTRA_* empty so the SPA does not
+          # redirect to login.microsoftonline.com.  Re-enable by uncommenting
+          # the two lines below once the SPA redirect URI is registered on
+          # the App Registration.
+          # VITE_ENTRA_CLIENT_ID=${{ secrets.ENTRA_CLIENT_ID }}
+          # VITE_ENTRA_TENANT_ID=${{ secrets.ENTRA_TENANT_ID }}
+          CACHEBUST=${{ github.run_id }}
+
+    - name: Azure Login
+      uses: azure/login@v2.1.0
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy sidecar containers to Dev Slot
+      # Azure Web App multi-container via Docker Compose retires 2027-03-31.
+      # We now use the sidecar containers model: ONE main container (frontend,
+      # public-facing on WEBSITES_PORT) plus N sidecars (backend) that share
+      # the network namespace. Sidecars are reachable from the main container
+      # on localhost (not by docker-compose service name).
+      env:
+        APP_NAME: ${{ env.AZURE_WEBAPP_NAME }}
+        RG: ${{ env.RESOURCE_GROUP }}
+        SLOT: ${{ env.SLOT_NAME }}
+        ACR_HOST: ${{ env.ACR_NAME }}.azurecr.io
+        ACR_USER: ${{ secrets.ACR_USERNAME }}
+        ACR_PASS: ${{ secrets.ACR_PASSWORD }}
+        BACKEND_IMAGE: ${{ env.ACR_NAME }}.azurecr.io/${{ env.BACKEND_IMAGE_NAME }}:${{ github.sha }}
+        FRONTEND_IMAGE: ${{ env.ACR_NAME }}.azurecr.io/${{ env.FRONTEND_IMAGE_NAME }}:${{ github.sha }}
+      run: |
+        set -euo pipefail
+
+        echo "🧹 Removing any existing sitecontainers on slot $SLOT (idempotent migration from compose)..."
+        existing=$(az webapp sitecontainers list -g "$RG" -n "$APP_NAME" --slot "$SLOT" --query "[].name" -o tsv 2>/dev/null || true)
+        for c in $existing; do
+          echo "  - deleting $c"
+          az webapp sitecontainers delete -g "$RG" -n "$APP_NAME" --slot "$SLOT" --container-name "$c"
+        done
+
+        echo "📦 Creating backend sidecar (target-port 5000, reachable on localhost)..."
+        az webapp sitecontainers create \
+          -g "$RG" -n "$APP_NAME" --slot "$SLOT" \
+          --container-name backend \
+          --image "$BACKEND_IMAGE" \
+          --is-main false \
+          --target-port 5000 \
+          --registry-username "$ACR_USER" \
+          --registry-password "$ACR_PASS"
+
+        echo "🌐 Creating frontend main container (target-port 80)..."
+        az webapp sitecontainers create \
+          -g "$RG" -n "$APP_NAME" --slot "$SLOT" \
+          --container-name frontend \
+          --image "$FRONTEND_IMAGE" \
+          --is-main true \
+          --target-port 80 \
+          --registry-username "$ACR_USER" \
+          --registry-password "$ACR_PASS"
+
+        echo "🔁 Ensuring slot runtime mode is 'sitecontainers' (guards against drift back to COMPOSE)..."
+        current_lfv=$(az webapp config show -g "$RG" -n "$APP_NAME" --slot "$SLOT" --query linuxFxVersion -o tsv)
+        echo "  current linuxFxVersion: $current_lfv"
+        if [ "$current_lfv" != "sitecontainers" ]; then
+          az webapp config set -g "$RG" -n "$APP_NAME" --slot "$SLOT" --linux-fx-version "sitecontainers" -o none
+          echo "  flipped linuxFxVersion -> sitecontainers"
+        fi
+
+        echo "✅ Sidecar containers deployed to slot $SLOT"
+
+    - name: Retrieve ADLS account key for Delta Lake reads
+      id: adls_key
+      run: |
+        echo "🔑 Fetching storage account key for ${{ env.ADLS_ACCOUNT_NAME }}..."
+        KEY=$(az storage account keys list \
+          --account-name "${{ env.ADLS_ACCOUNT_NAME }}" \
+          --resource-group "${{ env.ADLS_RESOURCE_GROUP }}" \
+          --query "[0].value" -o tsv)
+        if [ -z "$KEY" ]; then
+          echo "❌ Could not retrieve storage account key"
+          exit 1
+        fi
+        echo "::add-mask::$KEY"
+        echo "key=$KEY" >> "$GITHUB_OUTPUT"
+        echo "✅ Retrieved key (masked in logs)"
+
+    - name: Configure App Settings for Dev Slot
+      uses: azure/appservice-settings@v1
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        slot-name: ${{ env.SLOT_NAME }}
+        app-settings-json: |
+          [
+            {
+              "name": "WEBSITES_ENABLE_APP_SERVICE_STORAGE",
+              "value": "false"
+            },
+            {
+              "name": "WEBSITES_PORT",
+              "value": "80"
+            },
+            {
+              "name": "DOCKER_ENABLE_CI",
+              "value": "true"
+            },
+            {
+              "name": "BACKEND_HOST",
+              "value": "localhost"
+            },
+            {
+              "name": "AUTH_METHOD",
+              "value": "${{ secrets.AUTH_METHOD }}"
+            },
+            {
+              "name": "SYNAPSE_SERVER",
+              "value": "${{ secrets.SYNAPSE_SERVER }}"
+            },
+            {
+              "name": "SYNAPSE_DATABASE",
+              "value": "${{ secrets.SYNAPSE_DATABASE }}"
+            },
+            {
+              "name": "SYNAPSE_USERNAME",
+              "value": "${{ secrets.SYNAPSE_USERNAME }}"
+            },
+            {
+              "name": "SYNAPSE_PASSWORD",
+              "value": "${{ secrets.SYNAPSE_PASSWORD }}"
+            },
+            {
+              "name": "DW_SERVER",
+              "value": "${{ secrets.SYNAPSE_SERVER }}"
+            },
+            {
+              "name": "DW_DATABASE",
+              "value": "${{ secrets.SYNAPSE_DATABASE }}"
+            },
+            {
+              "name": "DW_USER",
+              "value": "${{ secrets.SYNAPSE_USERNAME }}"
+            },
+            {
+              "name": "DW_PW",
+              "value": "${{ secrets.SYNAPSE_PASSWORD }}"
+            },
+            {
+              "name": "DW_PORT",
+              "value": "1433"
+            },
+            {
+              "name": "SYNAPSE_PLANNING_ENABLED",
+              "value": "true"
+            },
+            {
+              "name": "SYNAPSE_PLANNING_SCHEMA",
+              "value": "planengine"
+            },
+            {
+              "name": "AUTH_FIRM_ID",
+              "value": "allworth"
+            },
+            {
+              "name": "ADLS_ACCOUNT_NAME",
+              "value": "${{ env.ADLS_ACCOUNT_NAME }}"
+            },
+            {
+              "name": "AZURE_STORAGE_ACCOUNT_KEY",
+              "value": "${{ steps.adls_key.outputs.key }}",
+              "slotSetting": true
+            },
+            {
+              "name": "AZURE_CLIENT_ID",
+              "value": "${{ secrets.AZURE_CLIENT_ID }}"
+            },
+            {
+              "name": "AZURE_CLIENT_SECRET",
+              "value": "${{ secrets.AZURE_CLIENT_SECRET }}"
+            },
+            {
+              "name": "AZURE_TENANT_ID",
+              "value": "${{ secrets.AZURE_TENANT_ID }}"
+            },
+            {
+              "name": "ENTRA_TENANT_ID",
+              "value": "${{ secrets.ENTRA_TENANT_ID }}"
+            },
+            {
+              "name": "ENTRA_CLIENT_ID",
+              "value": "${{ secrets.ENTRA_CLIENT_ID }}"
+            },
+            {
+              "name": "SF_USERNAME",
+              "value": "${{ secrets.SF_USERNAME }}"
+            },
+            {
+              "name": "SF_PASSWORD",
+              "value": "${{ secrets.SF_PASSWORD }}"
+            },
+            {
+              "name": "SF_TOKEN",
+              "value": "${{ secrets.SF_TOKEN }}"
+            },
+            {
+              "name": "SFP2_ALLOW_ENV_SF_CREDS",
+              "value": "1"
+            },
+            {
+              "name": "JIRA_EMAIL",
+              "value": "${{ secrets.JIRA_EMAIL }}"
+            },
+            {
+              "name": "JIRA_API_TOKEN",
+              "value": "${{ secrets.JIRA_API_TOKEN }}"
+            },
+            {
+              "name": "ANTHROPIC_API_KEY",
+              "value": "${{ secrets.ANTHROPIC_API_KEY }}"
+            },
+            {
+              "name": "OPENAI_API_KEY",
+              "value": "${{ secrets.OPENAI_API_KEY }}"
+            },
+            {
+              "name": "AZURE_OPENAI_API_KEY",
+              "value": "${{ secrets.AZURE_OPENAI_API_KEY }}"
+            },
+            {
+              "name": "AZURE_OPENAI_ENDPOINT",
+              "value": "https://allworth-openai-westus.openai.azure.com/"
+            },
+            {
+              "name": "AZURE_OPENAI_API_VERSION",
+              "value": "2024-12-01-preview"
+            },
+            {
+              "name": "NFBC_AZURE_OPENAI_DEPLOYMENT",
+              "value": "gpt-4.1"
+            },
+            {
+              "name": "AUTH_DISABLE",
+              "value": "1"
+            },
+            {
+              "name": "SFP2_DISABLE_AUTH",
+              "value": "1"
+            },
+            {
+              "name": "ADMIN_STATE_READONLY",
+              "value": "1"
+            },
+            {
+              "name": "APP_ENV",
+              "value": "dev"
+            }
+          ]
+
+    - name: Restart Azure Web App to pull new images
+      run: |
+        echo "🔄 Restarting web app to pull new container images..."
+        az webapp restart --name ${{ env.AZURE_WEBAPP_NAME }} --resource-group ${{ env.RESOURCE_GROUP }} --slot ${{ env.SLOT_NAME }}
+        echo "⏳ Waiting 30 seconds for containers to start..."
+        sleep 30
+        echo "✅ Restart complete. Deployed images with tag: ${{ github.sha }}"
+
+    - name: Azure Logout
+      run: az logout

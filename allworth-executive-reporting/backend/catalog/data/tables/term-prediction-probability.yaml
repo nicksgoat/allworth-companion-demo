@@ -1,0 +1,147 @@
+id: term-prediction-probability
+name: Term_Prediction_Probability
+schema: tho
+db: DataWarehouse
+db_table: Term_Prediction_Probability
+guid: 69289d97-cb1a-4db4-9305-8f867b5e5dd0
+business_name: Household churn probability (ML output)
+grain: avhhid x "Reporting Period" x Model
+pk: null
+synonyms: []
+domain: ML
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Rollforward Historical
+- Trade Date Rollforward
+column_count: 11
+columns:
+- name: Converted Household ID
+  db_column_name: Converted Household ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Reporting Period
+  db_column_name: Reporting Period
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Generated
+  db_column_name: Generated
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Model
+  db_column_name: Model
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Model Name
+  db_column_name: Model Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Probability Score
+  db_column_name: Probability Score
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Max Model
+  db_column_name: Max Model
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Max Model Name
+  db_column_name: Max Model Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Max Probability Score
+  db_column_name: Max Probability Score
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: avhhid
+  db_column_name: avhhid
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Average Probability Score
+  db_column_name: Average Probability Score
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: Term_Prediction_Probability_to_Current_Household_Demographic
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Term_Prediction_Probability::avhhid] = [Current_Household_Demographic::AVHHID]'
+  pairs:
+  - from_table: Term_Prediction_Probability
+    from_col: avhhid
+    to_table: Current_Household_Demographic
+    to_col: AVHHID
+- join_name: Term_Prediction_Probability_to_Historical_Household_Demographic
+  to: Historical_Household_Demographic
+  to_id: historical-household-demographic
+  type: LEFT_OUTER
+  one_to_one: true
+  'on': '[Term_Prediction_Probability::Reporting Period] = [Historical_Household_Demographic::Reporting
+    Period] AND [Term_Prediction_Probability::avhhid] = [Historical_Household_Demographic::avhhid]'
+  pairs:
+  - from_table: Term_Prediction_Probability
+    from_col: Reporting Period
+    to_table: Historical_Household_Demographic
+    to_col: Reporting Period
+  - from_table: Term_Prediction_Probability
+    from_col: avhhid
+    to_table: Historical_Household_Demographic
+    to_col: avhhid

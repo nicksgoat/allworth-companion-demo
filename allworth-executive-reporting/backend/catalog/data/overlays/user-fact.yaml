@@ -1,0 +1,6 @@
+id: user-fact
+source: wealth_mcp.domain.tables
+description: 'Advisor-level measures: book size, household counts, goal attainment
+  inputs.'
+grain: advisor_id
+domain: Advisor

@@ -1,0 +1,6 @@
+id: rmd
+source: wealth_mcp.domain.tables
+description: 'Required Minimum Distribution tracking per account/household: amounts
+  due, satisfied, remaining.'
+grain: RMD Id
+domain: Transactions

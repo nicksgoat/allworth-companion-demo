@@ -1,0 +1,33 @@
+name: Effective Annual Rate
+uri: frameworks://effective-annual-rate
+category: Metric Definitions
+description: Actual blended fee rate as a percentage of billable value, computed in billing-history analysis.
+keywords:
+  - effective rate
+  - annual rate
+  - fee rate
+  - yield
+  - basis points
+draft: true
+content: |
+  Source: `profitability.py:get_billing_history()`.
+
+  Effective Annual Rate captures the realized blended fee rate including tiering, adjustments, and proration.
+
+  ```
+  Effective Annual Rate = SUM(Billed_Amount) / SUM(Billable_Value)
+  ```
+
+  where both sides are period-normalized (annualized).
+
+  ## Computed in Three Groupings
+  1. **By Billing Group** — weighted blended rate across all accounts in a group.
+  2. **By Advisor** — blended rate for the advisor's entire book.
+  3. **By Account** — the individual account's realized rate (before/after adjustments).
+
+  ## Interpretation
+  - Rolls up tier impact, exception adjustments, and proration into one number.
+  - Used to benchmark advisor-book pricing against the fee-schedule template.
+  - Varies by segment due to client AUM mix and billing-rule interactions.
+
+  Code computes the number; **target ranges and acceptable bands are firm policy** and not hardcoded — this entry is flagged `draft: true` pending that context.

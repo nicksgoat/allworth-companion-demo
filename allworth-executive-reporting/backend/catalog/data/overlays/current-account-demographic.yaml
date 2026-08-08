@@ -1,0 +1,8 @@
+id: current-account-demographic
+source: wealth_mcp.domain.tables
+description: 'Current-state financial account attributes and balances: custodian,
+  account type, registration, household linkage (AVHHID), market value.'
+business_name: Account (current attributes + measures)
+grain: one row per account upload
+pk: Upload Account ID
+domain: Account

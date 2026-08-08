@@ -1,0 +1,73 @@
+id: goals-20250317
+name: goals_20250317
+schema: aip
+db: DataWarehouse
+db_table: goals_20250317
+guid: aa54fab5-ff04-4e69-9251-9757572f2cad
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Goals
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets: []
+column_count: 6
+columns:
+- name: Metric
+  db_column_name: Metric
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Channel
+  db_column_name: Channel
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Date
+  db_column_name: Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Goal
+  db_column_name: Goal
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: unique_id
+  db_column_name: unique_id
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Date_Key
+  db_column_name: Date_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

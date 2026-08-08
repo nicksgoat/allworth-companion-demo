@@ -1,0 +1,461 @@
+id: distribution-sf-fact
+name: Distribution_SF_Fact
+schema: tho
+db: DataWarehouse
+db_table: Distribution_SF_Fact
+guid: 777922c9-6831-4fd7-8f8c-267d7f6db08b
+business_name: Salesforce distribution requests
+grain: one row per Distribution record
+pk: Id
+synonyms: []
+domain: Transactions
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Distribution Requests
+column_count: 38
+columns:
+- name: Id
+  db_column_name: Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Distribution Type
+  db_column_name: Distribution_Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Transfer From
+  db_column_name: Transfer_From
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Custodian
+  db_column_name: Custodian
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Custodian Transfer To
+  db_column_name: Custodian_Transfer_To
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: OwnerId
+  db_column_name: OwnerId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: CreatedDate
+  db_column_name: CreatedDate
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CreatedById
+  db_column_name: CreatedById
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LastModifiedDate
+  db_column_name: LastModifiedDate
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LastModifiedById
+  db_column_name: LastModifiedById
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Due_Date__c
+  db_column_name: Due_Date__c
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Gross_Distribution_Amount__c
+  db_column_name: Gross_Distribution_Amount__c
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Household__c
+  db_column_name: Household__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Number_of_annual_distributions
+  db_column_name: Number_of_annual_distributions
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Raise Cash Completed
+  db_column_name: Raise_Cash_Completed
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Transfer To
+  db_column_name: Transfer_To
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Raise Cash
+  db_column_name: Raise_Cash
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Scheduled Date
+  db_column_name: Scheduled_Date
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Completed_Date_Key
+  db_column_name: Completed_Date_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Status
+  db_column_name: Status
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Enters Completed Status
+  db_column_name: Enters_Completed_Status
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Updated to Completed By
+  db_column_name: Updated_to_Completed_By
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Close_Account
+  db_column_name: Close_Account
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Distribution_Method
+  db_column_name: Distribution_Method
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: To_Other_Household
+  db_column_name: To_Other_Household
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: 60_Day_Rollover
+  db_column_name: x60_Day_Rollover
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Distribute_Entire_Account
+  db_column_name: Distribute_Entire_Account
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Periodic_Is_Active
+  db_column_name: Periodic_Is_Active
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Contract_Anniversary_Date_BD__c
+  db_column_name: Contract_Anniversary_Date_BD__c
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Taking_Income_BD__c
+  db_column_name: Taking_Income_BD__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Living_Benefit_BD__c
+  db_column_name: Living_Benefit_BD__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Annual_Allowable_Rider_Amount__c
+  db_column_name: Annual_Allowable_Rider_Amount__c
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ExcessWithdrawal_ImpactOnRider_BD__c
+  db_column_name: ExcessWithdrawal_ImpactOnRider_BD__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Rider_RMD_Friendly_BD__c
+  db_column_name: Rider_RMD_Friendly_BD__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Current_Benefit_Base_BD__c
+  db_column_name: Current_Benefit_Base_BD__c
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Amount_Withdrawal_Occurrence_BD__c
+  db_column_name: Amount_Withdrawal_Occurrence_BD__c
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Allowable_Withdrawal_Amount_BD__c
+  db_column_name: Allowable_Withdrawal_Amount_BD__c
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Servicing_Agent_BD__c
+  db_column_name: Servicing_Agent_BD__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: Distribution Completed Date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Distribution_SF_Fact::Completed_Date_Key] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Distribution_SF_Fact
+    from_col: Completed_Date_Key
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Distribution Fact to Created By
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Distribution_SF_Fact::CreatedById] = [User::User ID]'
+  pairs:
+  - from_table: Distribution_SF_Fact
+    from_col: CreatedById
+    to_table: User
+    to_col: User ID
+- join_name: Distribution Fact to Created Date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Distribution_SF_Fact::CreatedDate] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Distribution_SF_Fact
+    from_col: CreatedDate
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Distribution Fact to HH
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Distribution_SF_Fact::Household__c] = [Current_Household_Demographic::HHID]'
+  pairs:
+  - from_table: Distribution_SF_Fact
+    from_col: Household__c
+    to_table: Current_Household_Demographic
+    to_col: HHID
+- join_name: Distribution Fact to Owner
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Distribution_SF_Fact::OwnerId] = [User::User ID]'
+  pairs:
+  - from_table: Distribution_SF_Fact
+    from_col: OwnerId
+    to_table: User
+    to_col: User ID
+- join_name: Distribution_Comp_By_to_User
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Distribution_SF_Fact::Updated to Completed By] = [User::User ID]'
+  pairs:
+  - from_table: Distribution_SF_Fact
+    from_col: Updated to Completed By
+    to_table: User
+    to_col: User ID
+- join_name: Distribution_SF_Enters_Comp_status_to_datedim
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Distribution_SF_Fact::Enters Completed Status] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Distribution_SF_Fact
+    from_col: Enters Completed Status
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Distribution_SF_Fact_to_DateDimension
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Distribution_SF_Fact::Due_Date__c] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Distribution_SF_Fact
+    from_col: Due_Date__c
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Distribution_Scheduled_Date_to_DateDimension_1
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Distribution_SF_Fact::Scheduled Date] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Distribution_SF_Fact
+    from_col: Scheduled Date
+    to_table: DateDimension
+    to_col: DateKey

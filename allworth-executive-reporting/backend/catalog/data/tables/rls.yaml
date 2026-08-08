@@ -1,0 +1,133 @@
+id: rls
+name: RLS
+schema: tho
+db: DataWarehouse
+db_table: RLS
+guid: 67d00707-3f29-4243-b049-11a53f1f18fb
+business_name: Row-Level Security mapping
+grain: null
+pk: User_Id
+synonyms: []
+domain: Advisor
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: Always filter user-facing queries via JOIN tho.RLS ON advisorid = User_Id
+worksheets:
+- Activities
+- Advisor Conversion Worksheet
+- Allworth 360
+- Campaigns
+- Cash Reserves
+- Contact 360
+- Download Version of 360
+- Events Worksheet (Migrate to Activities Model)
+- Financial Account 360
+- Incoming Funds
+- Outflow/Term Reason Audit
+- Practice Management External Sources
+- Practice Management
+- Rollforward Historical
+- Trade Date Rollforward
+column_count: 11
+columns:
+- name: User Id
+  db_column_name: User_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: email
+  db_column_name: email
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Ops_Team__c
+  db_column_name: Ops_Team__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: HR_AcquiredSource__c
+  db_column_name: HR_AcquiredSource__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ViewAccess2
+  db_column_name: ViewAccess2
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ViewAccess1
+  db_column_name: ViewAccess1
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ViewAccess3
+  db_column_name: ViewAccess3
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ViewAccess4
+  db_column_name: ViewAccess4
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ViewAccess_Partner
+  db_column_name: ViewAccess_Partner
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: View_Office
+  db_column_name: View_Office
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Office_Location
+  db_column_name: Office_Location
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

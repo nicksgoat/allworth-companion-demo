@@ -1,0 +1,76 @@
+name: Billable Account Determination
+uri: frameworks://billable-account-determination
+category: Metrics & Fees
+description: The canonical rule for whether an account is billed — do not use `Non_billed`; it's stale. Evaluate Closed_Date, Billing_Inception_Date, and Billing_Definitions against the rule below.
+keywords:
+  - billable
+  - billed
+  - non billed
+  - Non_billed
+  - billing definition
+  - billing closed date
+  - closed date
+  - billing inception date
+  - waived
+  - placeholder
+content: |
+  An account is billable when **all three** of these conditions hold on its record in `[tho].[Current_Account_Demographic]`:
+
+  1. **`Closed_Date IS NULL`** — the account has not been closed.
+  2. **`Billing_Inception_Date <= GETDATE() OR Billing_Inception_Date IS NULL`** — billing has started or no inception date is recorded (recorded-null is treated as already active in current practice, because most accounts in the system have null inception).
+  3. **`Billing_Definitions IS NOT NULL AND NOT LIKE '%WAIVED%' AND NOT LIKE '%PLACEHOLDER%'`** — a real billing definition is attached (not null, not a waiver, not a placeholder stub).
+
+  ### Authoritative SQL
+
+  ```sql
+  SELECT *
+  FROM [tho].[Current_Account_Demographic]
+  WHERE Closed_Date IS NULL
+    AND (Billing_Inception_Date <= GETDATE() OR Billing_Inception_Date IS NULL)
+    AND Billing_Definitions IS NOT NULL
+    AND Billing_Definitions NOT LIKE '%WAIVED%'
+    AND Billing_Definitions NOT LIKE '%PLACEHOLDER%'
+  ```
+
+  ## Do Not Use `Non_billed`
+
+  `Non_billed` (values `'Yes'` / `'No'` / `NULL`) is **refreshed quarterly** and drifts out of date between refreshes. A current snapshot shows material disagreement with the rule:
+
+  | `Non_billed` | rule says | accounts |
+  |---|---|---|
+  | `No` (says billed) | rule_billable | 69,343 ✅ |
+  | `No` (says billed) | rule_not_billable | **59,028 ⚠ stale** |
+  | `Yes` (says not billed) | rule_not_billable | 11,938 ✅ |
+  | `Yes` (says not billed) | rule_billable | 3 ⚠ stale |
+  | `NULL` | rule_not_billable | 14 |
+  | `NULL` | rule_billable | 1 |
+
+  About **42% of accounts** have a `Non_billed` value that disagrees with the rule (≈59k of ≈140k). Most of the drift is "`Non_billed = No` but the rule says not billable" — typically closed accounts, waived accounts, and accounts without a billing definition that weren't refreshed.
+
+  **Always compute billability from the rule above. Do not use `Non_billed` as a filter or a segmentation attribute.**
+
+  ## Related Fields on `Current_Account_Demographic`
+
+  - `Billing_Definitions` — the name of the applied billing definition (see `fee-schedule` for what each name means).
+  - `Billing_Groups` — household-level billing group (for fee aggregation across accounts in a household).
+  - `Billing_Sets` — set-level grouping inside a billing group.
+  - `Custodian_Fee_Schedule` — custodian-level fee schedule designation.
+  - `Exclude_All_Securities_From_Billing` — account-level opt-out (`'Yes'` excludes every security from the fee calc; otherwise `'No'`).
+  - `Billing_Inception_Date` — when billing started for this account (frequently NULL in current data).
+  - `Closed_Date` — when the account was closed (NULL = still open).
+
+  ## Why This Matters
+
+  Misclassifying billability distorts:
+
+  - **Fee yield** — denominator wrong.
+  - **Run-rate revenue** — includes accounts that shouldn't generate fees (or excludes ones that do).
+  - **New-client fee contribution** — new accounts without a finalized billing definition get counted as billable before they actually start billing.
+  - **Billing exception reporting** — waived accounts appear as exceptions instead of as intentional waivers.
+
+  ## Related Entries
+
+  - `fee-schedule` — structure of billing definitions (tiered / cliff / flat) and the master table.
+  - `billing-exception-policy` — how adjustments are tracked once an account is billable.
+  - `run-rate-revenue`, `fee-yield` — the metrics that rely on this determination.
+  - `data-caveats` — cross-references this entry under the "Fee and Revenue Metrics" section.

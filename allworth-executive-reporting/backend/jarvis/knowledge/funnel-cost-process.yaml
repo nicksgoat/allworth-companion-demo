@@ -1,0 +1,77 @@
+name: Funnel Cost Process
+uri: frameworks://funnel-cost-process
+description: >
+  How the FunnelCost pipeline works — Variable, VMAC, and Fixed cost
+  allocation methodology, lookup tables, source tables, and output
+  tables.
+keywords:
+  - cost per lead
+  - cost per client
+  - funnel cost
+  - VMAC
+  - cost allocation
+  - variable cost
+  - fixed cost
+directive: >
+  Consult when interpreting cost-per-lead or cost-per-client metrics,
+  or when the user asks how costs are calculated.
+
+content: |
+  # Funnel Cost Process
+
+  This process calculates the **cost per lead** by allocating company departmental spending down to individual leads and activities. The purpose is to understand how much it costs to acquire and service each lead/client across the sales funnel. Total departmental spend is broken into three cost types — Variable (activity-weighted), VMAC (marketing acquisition), and Fixed (overhead) — and distributed to leads so the business can measure cost efficiency by lead source, business unit, department, and time period.
+
+  Azure Synapse dedicated SQL pool. Stored Procedure in DataWarehouse: `[tho].[FunnelCost_Procedure]`
+
+  ## Lookup Tables
+
+  **`tho.FunnelCost_AdvisorUnit`** — Work units per department (default **1**): Associate Advisor=2, Advisor Associate=2, Advisor=6, Client Service=2
+
+  **`tho.FunnelCost_TaskSubtype`** — Work units per activity type (default **1**): Call=3, Email=2, Task=1, ListEmail=2, Event=10
+
+  **`tho.FunnelCost_Department`** — Maps raw dept (from `tho.User`) → `Department_New` → `Department_Calculate`. If `Department_Calculate = 'Fixed'`, dept is excluded from variable cost and allocated via Fixed Cost instead. Variable depts: Advisors, Operations, Future Client Development. All others are Fixed.
+
+  **`tho.FunnelCost_TotalSpent`** — Monthly spend per department. `Department` column = `Department_New` (not raw dept). Join: `TotalSpent.Department = FunnelCost_Department.Department_New`, then group by `Department_Calculate`.
+
+  ## Source Tables
+
+  - `tho.Activity_Dim` + `tho.Activity_Fact` — activities (tasks/events)
+  - `tho.Current_Household_Fact` — LeadId, ClientSince, term_date, lead_created_date, HHID
+  - `tho.Current_Household_Demographic` — Business_Unit, leadsource, HHStatus, pipelinestatus, Classification
+  - `tho.User` — OwnerID → raw Department
+  - `aip.Accounting_GL_Summary` — GL marketing spend (VMAC)
+  - `sfp.Lifecycle_Stage__c` — lead lifecycle status (Fixed Cost cutoff)
+  - `aip.Numbers` — month fan-out for Fixed Cost
+
+  ## Cost Types
+
+  ### 1. Variable Cost
+  Dept spend allocated per activity weighted by Unit * Advisor Unit.
+  ```
+  Cost = ROUND((Unit * AdvisorUnit * TotalSpent) / SUM(Unit * AdvisorUnit) OVER(ActivityFDOM, Department_Calculate), 2)
+  ```
+  Activities classified as 'Client Activity' (ActivityDate >= ClientSince) or 'Prospect Activity'. Fixed departments excluded.
+
+  ### 2. VMAC Cost (Variable Marketing Acquisition Cost)
+  GL spend (`aip.Accounting_GL_Summary`) split equally per lead by lead-created month, LeadSource, BusinessUnit.
+  ```
+  Cost = ROUND(GL_Spend / COUNT(leads) OVER(LeadCreatedFDOM, LeadSource, BusinessUnit), 2)
+  ```
+  Clients: ClientSince NOT NULL, HHStatus != 'Inactive'. Leads: non-collected AWF, all RAA, NULL BU, HHID IS NULL.
+
+  ### 3. Fixed Cost
+  Fixed dept spend split equally across all active leads per month. Each lead fans out monthly from lead-created FDOM to cutoff = earliest of TermDate, UnqualifiedDate, or GETDATE().
+  ```
+  Cost = ROUND(Fixed_Spend / COUNT(leads) OVER(fan-out month), 2)
+  ```
+
+  ## Output Tables
+
+  **`tho.FunnelCost_Expense`** — Per-lead detail. RecordType: 'Variable' (per activity), 'VMAC Cost' (per lead), 'Fixed Cost' (per lead per month). Key cols: RecordType, ID, LeadId, ActivityDate, ActivityFDOM, ActivityType, FirstDayOfMonth, LeadCreatedDate, BusinessUnit, LeadSource, Department, Department-Name, Unit, Advisor Unit, Total Cost
+
+  **`tho.FunnelCost_AggregateResults`** — Dynamic pivot (months as columns). Filters: >= 2019-01-01, AWF or NULL, select depts. Rows: Client, VMAC Cost, Prospect Cost, Client Cost, Number of Leads, Number of Clients.
+
+  ## Synapse Notes
+  - Use `INSERT INTO` (not `INSERT`) for temp tables
+  - No `+=` — use `STRING_AGG(...) WITHIN GROUP (ORDER BY ...)`
+  - Dynamic pivot via `EXEC(@query)` with `SELECT INTO`

@@ -1,0 +1,1532 @@
+nodes:
+- id: 1stappt-routed-advisors
+  name: 1stAppt_Routed_Advisors
+  domain: Advisor
+- id: awf-new-plan-tracker-v2
+  name: AWF_New_Plan_Tracker_V2
+  domain: Logging
+- id: accountsetups
+  name: AccountSetups
+  domain: Account
+- id: accountteammember
+  name: AccountTeamMember
+  domain: Account
+- id: account-rollforward
+  name: Account_Rollforward
+  domain: Account
+- id: acquisition
+  name: Acquisition
+  domain: Reference
+- id: activity-dim
+  name: Activity_Dim
+  domain: Activity
+- id: activity-fact
+  name: Activity_Fact
+  domain: Activity
+- id: advisor-csat
+  name: Advisor_CSAT
+  domain: Advisor
+- id: campaign
+  name: Campaign
+  domain: Activity
+- id: campaign-demographic
+  name: Campaign_Demographic
+  domain: Activity
+- id: case
+  name: Case
+  domain: Activity
+- id: cash-reserve-report
+  name: Cash_Reserve_Report
+  domain: Other
+- id: client-count-rollforward
+  name: Client_Count_Rollforward
+  domain: Other
+- id: combined-fact
+  name: Combined_Fact
+  domain: Other
+- id: contact-demographic
+  name: Contact_Demographic
+  domain: Other
+- id: current-account-demographic
+  name: Current_Account_Demographic
+  domain: Account
+- id: current-household-demographic
+  name: Current_Household_Demographic
+  domain: Household
+- id: current-household-fact
+  name: Current_Household_Fact
+  domain: Household
+- id: custodian-reps
+  name: Custodian_Reps
+  domain: Reference
+- id: datedimension
+  name: DateDimension
+  domain: Reference
+- id: dif-advisors
+  name: Dif_Advisors
+  domain: Advisor
+- id: distribution-sf-fact
+  name: Distribution_SF_Fact
+  domain: Transactions
+- id: events
+  name: Events
+  domain: Activity
+- id: fact-monthlymetrics
+  name: Fact_MonthlyMetrics
+  domain: Other
+- id: goals-net-flows-2025
+  name: Goals_Net_Flows_2025
+  domain: Goals
+- id: historical-household-demographic
+  name: Historical_Household_Demographic
+  domain: Household
+- id: household-rollforward
+  name: Household_Rollforward
+  domain: Household
+- id: household-rollforward-trade-date
+  name: Household_Rollforward(Trade Date)
+  domain: Household
+- id: incomingfunds
+  name: IncomingFunds
+  domain: Transactions
+- id: jira
+  name: Jira
+  domain: Other
+- id: marketinggoals-2025
+  name: MarketingGoals_2025
+  domain: Goals
+- id: opportunity
+  name: Opportunity
+  domain: Pipeline
+- id: outflow-reasons
+  name: Outflow_Reasons
+  domain: Transactions
+- id: pipeline-fact
+  name: Pipeline_Fact
+  domain: Pipeline
+- id: practice-management
+  name: Practice_Management
+  domain: Other
+- id: project-stages
+  name: Project_Stages
+  domain: Pipeline
+- id: projected-ncnm
+  name: Projected_NCNM
+  domain: Goals
+- id: projects
+  name: Projects
+  domain: Other
+- id: projects-fact
+  name: Projects_Fact
+  domain: Other
+- id: rd-netflows-goals-2025-new
+  name: RD_NetFlows_Goals_2025_NEW
+  domain: Goals
+- id: rd-netflows-goals-summary
+  name: RD_NetFlows_Goals_Summary
+  domain: Goals
+- id: rd-netflows-goals-2025
+  name: RD_Netflows_Goals_2025
+  domain: Goals
+- id: rf-part1
+  name: RF_Part1
+  domain: Other
+- id: rf-part2
+  name: RF_Part2
+  domain: Other
+- id: rf-part3
+  name: RF_Part3
+  domain: Other
+- id: rf-part4
+  name: RF_Part4
+  domain: Other
+- id: rls
+  name: RLS
+  domain: Advisor
+- id: rmd
+  name: RMD
+  domain: Other
+- id: referral
+  name: Referral
+  domain: Reference
+- id: storeprocrunlog
+  name: StoreProcRunLog
+  domain: Logging
+- id: surveymonkeyemail
+  name: SurveyMonkeyEmail
+  domain: Other
+- id: surveymonkey-cx-metrics
+  name: SurveyMonkey_CX_Metrics
+  domain: Other
+- id: tasks-recent
+  name: Tasks_Recent
+  domain: Activity
+- id: tax-time-tracking
+  name: Tax_Time_Tracking
+  domain: Other
+- id: term-prediction-probability
+  name: Term_Prediction_Probability
+  domain: ML
+- id: term-prediction-scoring-model
+  name: Term_Prediction_Scoring_Model
+  domain: ML
+- id: trade-request-fact
+  name: Trade_Request_Fact
+  domain: Other
+- id: transaction-activity-type
+  name: Transaction_Activity_Type
+  domain: Activity
+- id: transaction-daily-topbottom5-cube
+  name: Transaction_Daily_TopBottom5_Cube
+  domain: Transactions
+- id: transaction-fact
+  name: Transaction_Fact
+  domain: Transactions
+- id: user
+  name: User
+  domain: Advisor
+- id: zoomcalllog2
+  name: ZoomCallLog2
+  domain: Activity
+- id: datalake-log
+  name: datalake_log
+  domain: Logging
+- id: goals-20250317
+  name: goals_20250317
+  domain: Goals
+- id: goals-20260109
+  name: goals_20260109
+  domain: Goals
+- id: hh-fact
+  name: hh_fact
+  domain: Household
+- id: integration-tracker
+  name: integration_tracker
+  domain: Logging
+- id: pm-external-fact
+  name: pm_external_fact
+  domain: Other
+- id: positions
+  name: positions
+  domain: Other
+- id: sfb2b-account
+  name: sfb2b_Account
+  domain: Account
+- id: sfb2b-opp
+  name: sfb2b_Opp
+  domain: Other
+- id: sfb2b-task
+  name: sfb2b_Task
+  domain: Activity
+- id: sql-query-usage
+  name: sql_query_usage
+  domain: Other
+- id: stage-change-history
+  name: stage_change_history
+  domain: Pipeline
+- id: transformation-log
+  name: transformation_log
+  domain: Logging
+- id: update-log
+  name: update_log
+  domain: Logging
+- id: user-fact
+  name: user_fact
+  domain: Advisor
+edges:
+- from: AccountSetups
+  from_id: accountsetups
+  to: User
+  to_id: user
+  from_col: OwnerId
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: AccountSetup Owner
+- from: AccountSetups
+  from_id: accountsetups
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: Household__c
+  to_col: HHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: AccountSetups to HH
+- from: AccountSetups
+  from_id: accountsetups
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  from_col: Household__c
+  to_col: HHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: AccountSetups_to_Current_Household_Fact
+- from: AccountSetups
+  from_id: accountsetups
+  to: User
+  to_id: user
+  from_col: CreatedById
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: AccountSetupscreatedby_to_User
+- from: AccountSetups
+  from_id: accountsetups
+  to: User
+  to_id: user
+  from_col: Updated_to_Account_Funded_By__c
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Ops Funded Account
+- from: AccountSetups
+  from_id: accountsetups
+  to: User
+  to_id: user
+  from_col: Updated_to_Receive_Submit_Paperwork_By__c
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Updated to Receive Submit
+- from: Account_Rollforward
+  from_id: account-rollforward
+  to: Current_Account_Demographic
+  to_id: current-account-demographic
+  from_col: avaccountuploadid
+  to_col: Upload Account ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Acct RF to ACV
+- from: Account_Rollforward
+  from_id: account-rollforward
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: avhhid
+  to_col: AVHHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Acct RF to Current HH
+- from: Account_Rollforward
+  from_id: account-rollforward
+  to: Historical_Household_Demographic
+  to_id: historical-household-demographic
+  from_col: avhhid
+  to_col: avhhid
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Acct RF to Historical HH
+- from: Account_Rollforward
+  from_id: account-rollforward
+  to: Historical_Household_Demographic
+  to_id: historical-household-demographic
+  from_col: Reporting Period
+  to_col: Reporting Period
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Acct RF to Historical HH
+- from: Activity_Fact
+  from_id: activity-fact
+  to: User
+  to_id: user
+  from_col: OwnerId
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Activity_Assigned_To
+- from: Activity_Fact
+  from_id: activity-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: CreatedDateKey
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Activity_CreatedDate
+- from: Activity_Fact
+  from_id: activity-fact
+  to: User
+  to_id: user
+  from_col: CreatedById
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Activity_Created_By
+- from: Activity_Fact
+  from_id: activity-fact
+  to: User
+  to_id: user
+  from_col: Created_By_Delegate_ID
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Activity_Created_By_Delegate
+- from: Activity_Fact
+  from_id: activity-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: DueDateKey
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Activity_DueDate
+- from: Activity_Fact
+  from_id: activity-fact
+  to: Activity_Dim
+  to_id: activity-dim
+  from_col: Id
+  to_col: Id
+  type: INNER
+  one_to_one: true
+  join_name: Activity_Fact_to_Activity_Dim
+- from: Activity_Fact
+  from_id: activity-fact
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: LeadID
+  to_col: LeadId
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Activity_Fact_to_Current_Household_Demographic
+- from: Activity_Fact
+  from_id: activity-fact
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  from_col: LeadID
+  to_col: LeadId
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Activity_Fact_to_Current_Household_Fact
+- from: Activity_Fact
+  from_id: activity-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: CompletedDateKey
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Activity_Fact_to_DateDimension
+- from: Campaign
+  from_id: campaign
+  to: User
+  to_id: user
+  from_col: OwnerId
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Campaign_Owner_to_User
+- from: Campaign_Demographic
+  from_id: campaign-demographic
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: Leadid
+  to_col: LeadId
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Campaign_Demographic_to_Current_Household_Demographic_1
+- from: Campaign_Demographic
+  from_id: campaign-demographic
+  to: User
+  to_id: user
+  from_col: Campaign_Owner_id
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Campaign_Owner_to_User
+- from: Campaign_Demographic
+  from_id: campaign-demographic
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  from_col: Leadid
+  to_col: LeadId
+  type: RIGHT_OUTER
+  one_to_one: false
+  join_name: HH Fact to Campaign
+- from: Contact_Demographic
+  from_id: contact-demographic
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: HH ID
+  to_col: HHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: All Contacts
+- from: Current_Account_Demographic
+  from_id: current-account-demographic
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: Primary Household ID
+  to_col: AVHHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: ACV to HH
+- from: Current_Account_Demographic
+  from_id: current-account-demographic
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  from_col: Primary Household ID
+  to_col: AVHHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: ACV to HH Fact
+- from: Current_Household_Demographic
+  from_id: current-household-demographic
+  to: Campaign
+  to_id: campaign
+  from_col: waived_fee_promo_Id
+  to_col: Id
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Current_Household_Demographic_to_Campaign
+- from: Current_Household_Demographic
+  from_id: current-household-demographic
+  to: Acquisition
+  to_id: acquisition
+  from_col: Acquisition_Source
+  to_col: AcqCode
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: HH to Acquisition Table
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: firstappt_comp_combo
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: 1st Appt Comp
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: ClientSince
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Client Since
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: Estimated Close Date
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Estimated Close Date
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: Expected_Retirement_Date__c
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Expected Retirement Date
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: User
+  to_id: user
+  from_col: firstappt_advisorid
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Fact To 1st Appt Advisor
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: User
+  to_id: user
+  from_col: advisorid
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Fact To Advisor
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: User
+  to_id: user
+  from_col: Client_Service_Primary__c
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Fact To Client Service Primary
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: LastAnnualReview
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Fact To Last Annual Review
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: Contact_Demographic
+  to_id: contact-demographic
+  from_col: referredbyclientid
+  to_col: Contact ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Fact To Referring Contact
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: User
+  to_id: user
+  from_col: secondaryadvisorid
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Fact To Secondary Advisor
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: Contact_Demographic
+  to_id: contact-demographic
+  from_col: SecondaryContactID
+  to_col: Contact ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Fact To Secondary Contact
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: firstappt_set_combo
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Fact to 1st Appt Set
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: User
+  to_id: user
+  from_col: referringadvisorid
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Fact to Internal Referrer
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: Contact_Demographic
+  to_id: contact-demographic
+  from_col: ContactID
+  to_col: Contact ID
+  type: LEFT_OUTER
+  one_to_one: true
+  join_name: Fact to Primary Contact
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: term_date
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Fact to Term Date
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: First_Spice_Contact_Key
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: First Spice Contact
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: User
+  to_id: user
+  from_col: FormerAdvisorID
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Former Advisor
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: FormerAdvisorTermDate
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Former Advisor Term Date
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: LeadId
+  to_col: LeadId
+  type: LEFT_OUTER
+  one_to_one: true
+  join_name: HH Fact to HH Dim
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: RLS
+  to_id: rls
+  from_col: advisorid
+  to_col: User Id
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: HH Fact to RLS Table
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: Handraiser_Date__c
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Handraiser Date
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: LastContacted
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Last Contacted
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: Last_Call_Or_Meeting_by_Advisor
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Last Contacted by Advisor
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: User
+  to_id: user
+  from_col: LeadCreatedById
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Lead Created By
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: Marketing_Qualified_Date__c
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Marketing Qualified Date
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: Recap_Appt_Completed_Date
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Recap_Comp_to_DateDimension
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: Recap_Appt_Create_Date
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Recap_Created_to_DateDimension
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: User
+  to_id: user
+  from_col: Sales_Owner
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Sales Owner
+- from: Current_Household_Fact
+  from_id: current-household-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: lead_created_date
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: lead created date
+- from: Distribution_SF_Fact
+  from_id: distribution-sf-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: Completed_Date_Key
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Distribution Completed Date
+- from: Distribution_SF_Fact
+  from_id: distribution-sf-fact
+  to: User
+  to_id: user
+  from_col: CreatedById
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Distribution Fact to Created By
+- from: Distribution_SF_Fact
+  from_id: distribution-sf-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: CreatedDate
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Distribution Fact to Created Date
+- from: Distribution_SF_Fact
+  from_id: distribution-sf-fact
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: Household__c
+  to_col: HHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Distribution Fact to HH
+- from: Distribution_SF_Fact
+  from_id: distribution-sf-fact
+  to: User
+  to_id: user
+  from_col: OwnerId
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Distribution Fact to Owner
+- from: Distribution_SF_Fact
+  from_id: distribution-sf-fact
+  to: User
+  to_id: user
+  from_col: Updated to Completed By
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Distribution_Comp_By_to_User
+- from: Distribution_SF_Fact
+  from_id: distribution-sf-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: Enters Completed Status
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Distribution_SF_Enters_Comp_status_to_datedim
+- from: Distribution_SF_Fact
+  from_id: distribution-sf-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: Due_Date__c
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Distribution_SF_Fact_to_DateDimension
+- from: Distribution_SF_Fact
+  from_id: distribution-sf-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: Scheduled Date
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Distribution_Scheduled_Date_to_DateDimension_1
+- from: Events
+  from_id: events
+  to: User
+  to_id: user
+  from_col: Created_By_Delegate
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Event Created By Delegate
+- from: Events
+  from_id: events
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: LeadID
+  to_col: LeadId
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Events to HH
+- from: Events
+  from_id: events
+  to: User
+  to_id: user
+  from_col: Appt Comp By
+  to_col: Name
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Events_to_ApptCompBy
+- from: Events
+  from_id: events
+  to: User
+  to_id: user
+  from_col: ownerid
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Events_to_User
+- from: Events
+  from_id: events
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  from_col: LeadID
+  to_col: LeadId
+  type: RIGHT_OUTER
+  one_to_one: false
+  join_name: HH Fact to Event
+- from: Historical_Household_Demographic
+  from_id: historical-household-demographic
+  to: Campaign
+  to_id: campaign
+  from_col: Latest_CampaignId
+  to_col: Id
+  type: INNER
+  one_to_one: false
+  join_name: Campaign_to_Historical_Household_Demographic
+- from: Historical_Household_Demographic
+  from_id: historical-household-demographic
+  to: User
+  to_id: user
+  from_col: advisor
+  to_col: Name
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Historical Advisor
+- from: Historical_Household_Demographic
+  from_id: historical-household-demographic
+  to: User
+  to_id: user
+  from_col: AdvisorId
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Historical Advisor New
+- from: Historical_Household_Demographic
+  from_id: historical-household-demographic
+  to: User
+  to_id: user
+  from_col: FormerAdvisorID
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Historical HH Former Advisor
+- from: Historical_Household_Demographic
+  from_id: historical-household-demographic
+  to: RLS
+  to_id: rls
+  from_col: AdvisorId
+  to_col: User Id
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Historical HH to RLS
+- from: Historical_Household_Demographic
+  from_id: historical-household-demographic
+  to: User
+  to_id: user
+  from_col: PreviousAdvisorId
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Historical Previous Advisor
+- from: Historical_Household_Demographic
+  from_id: historical-household-demographic
+  to: DateDimension
+  to_id: datedimension
+  from_col: term_date_key
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Historical Term Date New
+- from: Historical_Household_Demographic
+  from_id: historical-household-demographic
+  to: Acquisition
+  to_id: acquisition
+  from_col: Original Partner
+  to_col: AcqCode
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: RF Original Partner (Client Based)
+- from: Household_Rollforward
+  from_id: household-rollforward
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  from_col: avhhid
+  to_col: AVHHID
+  type: RIGHT_OUTER
+  one_to_one: false
+  join_name: HH Fact to RF Fact
+- from: Household_Rollforward
+  from_id: household-rollforward
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: avhhid
+  to_col: AVHHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: HH RF to Current HH
+- from: Household_Rollforward
+  from_id: household-rollforward
+  to: Historical_Household_Demographic
+  to_id: historical-household-demographic
+  from_col: Reporting Period
+  to_col: Reporting Period
+  type: LEFT_OUTER
+  one_to_one: true
+  join_name: HH RF to Historical HH
+- from: Household_Rollforward
+  from_id: household-rollforward
+  to: Historical_Household_Demographic
+  to_id: historical-household-demographic
+  from_col: avhhid
+  to_col: avhhid
+  type: LEFT_OUTER
+  one_to_one: true
+  join_name: HH RF to Historical HH
+- from: Household_Rollforward
+  from_id: household-rollforward
+  to: Term_Prediction_Probability
+  to_id: term-prediction-probability
+  from_col: Reporting Period
+  to_col: Reporting Period
+  type: LEFT_OUTER
+  one_to_one: true
+  join_name: Household_Rollforward_to_Term_Prediction_Probability
+- from: Household_Rollforward
+  from_id: household-rollforward
+  to: Term_Prediction_Probability
+  to_id: term-prediction-probability
+  from_col: avhhid
+  to_col: avhhid
+  type: LEFT_OUTER
+  one_to_one: true
+  join_name: Household_Rollforward_to_Term_Prediction_Probability
+- from: Household_Rollforward
+  from_id: household-rollforward
+  to: MarketingGoals_2025
+  to_id: marketinggoals-2025
+  from_col: EOMONTH_Key
+  to_col: reporting_period_key
+  type: RIGHT_OUTER
+  one_to_one: false
+  join_name: MarketingGoals_2025_to_Household_Rollforward
+- from: Household_Rollforward
+  from_id: household-rollforward
+  to: MarketingGoals_2025
+  to_id: marketinggoals-2025
+  from_col: Marketing_Channel
+  to_col: Marketing Channel
+  type: RIGHT_OUTER
+  one_to_one: false
+  join_name: MarketingGoals_2025_to_Household_Rollforward
+- from: Household_Rollforward
+  from_id: household-rollforward
+  to: DateDimension
+  to_id: datedimension
+  from_col: RF_Max_Date_Key
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: RF Max Date
+- from: Household_Rollforward
+  from_id: household-rollforward
+  to: DateDimension
+  to_id: datedimension
+  from_col: Term_Date_Key
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: RF Term Date
+- from: Household_Rollforward
+  from_id: household-rollforward
+  to: DateDimension
+  to_id: datedimension
+  from_col: Reporting_Period_Key
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: RF to DateDim
+- from: Household_Rollforward
+  from_id: household-rollforward
+  to: waived_fee_promo
+  to_id: waived-fee-promo
+  from_col: avhhid
+  to_col: avhhid
+  type: INNER
+  one_to_one: false
+  join_name: waived_fee_promo_to_Household_Rollforward
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  from_col: avhhid
+  to_col: AVHHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: HH Fact to RF Trade Date
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: User
+  to_id: user
+  from_col: NFBC_PreviousAdvisorID
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: NFBC_Previous_Advisor
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: RD_NetFlows_Goals_2024
+  to_id: rd-netflows-goals-2024
+  from_col: AdvisorId
+  to_col: advisorid
+  type: RIGHT_OUTER
+  one_to_one: false
+  join_name: RD_NetFlows_Goals_2024_to_Household_Rollforward(Trade Date)
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: RD_NetFlows_Goals_2024
+  to_id: rd-netflows-goals-2024
+  from_col: EOMONTH_Key
+  to_col: reporting_period_key
+  type: RIGHT_OUTER
+  one_to_one: false
+  join_name: RD_NetFlows_Goals_2024_to_Household_Rollforward(Trade Date)
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: RD_NetFlows_Goals_2025_NEW
+  to_id: rd-netflows-goals-2025-new
+  from_col: AdvisorId
+  to_col: user id
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: RD_NetFlows_Goals_2025_NEW_to_Household_Rollforward(Trade Date)
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: RD_NetFlows_Goals_2025_NEW
+  to_id: rd-netflows-goals-2025-new
+  from_col: EOMONTH_Key
+  to_col: reporting_period_key
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: RD_NetFlows_Goals_2025_NEW_to_Household_Rollforward(Trade Date)
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: RD_Netflows_Goals_2025
+  to_id: rd-netflows-goals-2025
+  from_col: EOMONTH_Key
+  to_col: reporting_period_key
+  type: RIGHT_OUTER
+  one_to_one: false
+  join_name: RD_Netflows_Goals_2025_to_Household_Rollforward(Trade Date)
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: RD_Netflows_Goals_2025
+  to_id: rd-netflows-goals-2025
+  from_col: AdvisorId
+  to_col: advisorid
+  type: RIGHT_OUTER
+  one_to_one: false
+  join_name: RD_Netflows_Goals_2025_to_Household_Rollforward(Trade Date)
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: Historical_Household_Demographic
+  to_id: historical-household-demographic
+  from_col: Reporting Period
+  to_col: Reporting Period
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: RF Fact(Trade Date)_to_Historical_Household_Demographic
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: Historical_Household_Demographic
+  to_id: historical-household-demographic
+  from_col: avhhid
+  to_col: avhhid
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: RF Fact(Trade Date)_to_Historical_Household_Demographic
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: avhhid
+  to_col: AVHHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: RF Trade Date to Current HH Dim
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: DateDimension
+  to_id: datedimension
+  from_col: Reporting_Period_Key
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: RF Trade Date to DateDim
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: DateDimension
+  to_id: datedimension
+  from_col: RF_Max_Date_Key
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: RF Trade Date to Max RF Date
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: User
+  to_id: user
+  from_col: Advisor_Assist
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Trade Date Advisor Assist
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: RLS
+  to_id: rls
+  from_col: AdvisorId
+  to_col: User Id
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Trade Date Advisor RLS
+- from: Household_Rollforward(Trade Date)
+  from_id: household-rollforward-trade-date
+  to: User
+  to_id: user
+  from_col: AdvisorId
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Trade Date Historical Advisor
+- from: IncomingFunds
+  from_id: incomingfunds
+  to: AccountSetups
+  to_id: accountsetups
+  from_col: Account_Setup__c
+  to_col: AcctSetupID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: IncFunds to AcctSetup
+- from: IncomingFunds
+  from_id: incomingfunds
+  to: User
+  to_id: user
+  from_col: OwnerId
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Incoming Funds Owner
+- from: IncomingFunds
+  from_id: incomingfunds
+  to: Current_Account_Demographic
+  to_id: current-account-demographic
+  from_col: Account_Number__c
+  to_col: Account Number
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Incoming Funds to ACV
+- from: IncomingFunds
+  from_id: incomingfunds
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  from_col: Household
+  to_col: HHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: IncomingFunds to HH Fact
+- from: IncomingFunds
+  from_id: incomingfunds
+  to: User
+  to_id: user
+  from_col: CreatedById
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: IncomingFundsCreatedBy_to_User
+- from: IncomingFunds
+  from_id: incomingfunds
+  to: User
+  to_id: user
+  from_col: CompletedById
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: IncomingFunds_CompletedById
+- from: IncomingFunds
+  from_id: incomingfunds
+  to: User
+  to_id: user
+  from_col: LastModifiedById
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Ops Funds Last Modified
+- from: Opportunity
+  from_id: opportunity
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  from_col: LeadId
+  to_col: LeadId
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Opp to HH Fact
+- from: Projects
+  from_id: projects
+  to: Opportunity
+  to_id: opportunity
+  from_col: Opportunity_ID
+  to_col: Opportunity_Id
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Projects to Opp
+- from: SurveyMonkey_CX_Metrics
+  from_id: surveymonkey-cx-metrics
+  to: SurveyMonkeyEmail
+  to_id: surveymonkeyemail
+  from_col: Person ID
+  to_col: Person ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: SurveyMonkeyEmail_to_SurveyMonkey_CX_Metrics
+- from: SurveyMonkey_CX_Metrics
+  from_id: surveymonkey-cx-metrics
+  to: Contact_Demographic
+  to_id: contact-demographic
+  from_col: Email
+  to_col: Email
+  type: INNER
+  one_to_one: false
+  join_name: SurveyMonkey_CX_Metrics_to_Contact_Demographic
+- from: Tasks_Recent
+  from_id: tasks-recent
+  to: User
+  to_id: user
+  from_col: OwnerId
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Task Assigned To
+- from: Tasks_Recent
+  from_id: tasks-recent
+  to: User
+  to_id: user
+  from_col: CreatedById
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: TaskCreatedBy
+- from: Tasks_Recent
+  from_id: tasks-recent
+  to: User
+  to_id: user
+  from_col: Completed_By__c
+  to_col: Name
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Tasks Completed By
+- from: Tasks_Recent
+  from_id: tasks-recent
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  from_col: LeadID
+  to_col: LeadId
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Tasks to HH Fact
+- from: Tax_Time_Tracking
+  from_id: tax-time-tracking
+  to: Projects
+  to_id: projects
+  from_col: Project_ID
+  to_col: Project_ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Tax_Time_Tracking_to_Projects
+- from: Term_Prediction_Probability
+  from_id: term-prediction-probability
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: avhhid
+  to_col: AVHHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Term_Prediction_Probability_to_Current_Household_Demographic
+- from: Term_Prediction_Probability
+  from_id: term-prediction-probability
+  to: Historical_Household_Demographic
+  to_id: historical-household-demographic
+  from_col: Reporting Period
+  to_col: Reporting Period
+  type: LEFT_OUTER
+  one_to_one: true
+  join_name: Term_Prediction_Probability_to_Historical_Household_Demographic
+- from: Term_Prediction_Probability
+  from_id: term-prediction-probability
+  to: Historical_Household_Demographic
+  to_id: historical-household-demographic
+  from_col: avhhid
+  to_col: avhhid
+  type: LEFT_OUTER
+  one_to_one: true
+  join_name: Term_Prediction_Probability_to_Historical_Household_Demographic
+- from: Term_Prediction_Scoring_Model
+  from_id: term-prediction-scoring-model
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  from_col: avhhid
+  to_col: AVHHID
+  type: RIGHT_OUTER
+  one_to_one: true
+  join_name: Term_Prediction_Scoring_Model_to_Current_Household_Fact
+- from: Trade_Request_Fact
+  from_id: trade-request-fact
+  to: User
+  to_id: user
+  from_col: Executed_By
+  to_col: User ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Trade Request Executed By
+- from: Trade_Request_Fact
+  from_id: trade-request-fact
+  to: Current_Account_Demographic
+  to_id: current-account-demographic
+  from_col: UploadAccountId
+  to_col: Upload Account ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Trade Request to ACV
+- from: Trade_Request_Fact
+  from_id: trade-request-fact
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: HHID
+  to_col: HHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Trade Requests to HH Dim
+- from: Transaction_Fact
+  from_id: transaction-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: Entry_DateKey
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Transaction Entry Date
+- from: Transaction_Fact
+  from_id: transaction-fact
+  to: DateDimension
+  to_id: datedimension
+  from_col: Trade_DateKey
+  to_col: DateKey
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Transaction Trade Date
+- from: Transaction_Fact
+  from_id: transaction-fact
+  to: Current_Account_Demographic
+  to_id: current-account-demographic
+  from_col: Upload_Account_Id
+  to_col: Upload Account ID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Transaction to ACV
+- from: Transaction_Fact
+  from_id: transaction-fact
+  to: Transaction_Activity_Type
+  to_id: transaction-activity-type
+  from_col: Activity_Id
+  to_col: Activity_Id
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Transaction to Activity Type
+- from: Transaction_Fact
+  from_id: transaction-fact
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: AVHHID
+  to_col: AVHHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Transaction to HH Dim
+- from: Transaction_Fact
+  from_id: transaction-fact
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  from_col: AVHHID
+  to_col: AVHHID
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Transaction to HH Fact
+- from: Transaction_Fact
+  from_id: transaction-fact
+  to: Outflow_Reasons
+  to_id: outflow-reasons
+  from_col: Outflow_Reason_Id
+  to_col: Id
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Transaction to Outflow Reason
+- from: Transaction_Fact
+  from_id: transaction-fact
+  to: Outflow_Reasons
+  to_id: outflow-reasons
+  from_col: AVHHID
+  to_col: AVHHID
+  type: LEFT_OUTER
+  one_to_one: true
+  join_name: Transaction_Fact_to_Outflow_Reasons
+- from: Transaction_Fact
+  from_id: transaction-fact
+  to: Outflow_Reasons
+  to_id: outflow-reasons
+  from_col: Trade_DateKey
+  to_col: Trade_Date_Key
+  type: LEFT_OUTER
+  one_to_one: true
+  join_name: Transaction_Fact_to_Outflow_Reasons
+- from: User
+  from_id: user
+  to: Acquisition
+  to_id: acquisition
+  from_col: HR Acquired Source
+  to_col: AcqCode
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: User to Acquisition
+- from: ZoomCallLog2
+  from_id: zoomcalllog2
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  from_col: LeadId
+  to_col: LeadId
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Zoom to 360
+- from: ZoomCallLog2
+  from_id: zoomcalllog2
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  from_col: LeadId
+  to_col: LeadId
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Zoom to HH Fact
+- from: ZoomCallLog2
+  from_id: zoomcalllog2
+  to: User
+  to_id: user
+  from_col: caller_email
+  to_col: Email
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: 'Zoom to User '
+- from: sfb2b_Task
+  from_id: sfb2b-task
+  to: DateDimension
+  to_id: datedimension
+  from_col: ActivityDate
+  to_col: Date
+  type: LEFT_OUTER
+  one_to_one: false
+  join_name: Due Date to DimDate

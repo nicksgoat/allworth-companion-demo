@@ -1,0 +1,4 @@
+# This file has been split into individual metric entries (one YAML per metric).
+# See ncnm.yaml, paum.yaml, fee-yield.yaml, and the rest under category
+# "Metric Definitions". The loader skips any YAML with `deprecated: true`.
+deprecated: true

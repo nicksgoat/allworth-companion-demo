@@ -1,0 +1,49 @@
+line-length = 88
+target-version = "py311"
+
+[lint]
+select = [
+    "E", "W",       # pycodestyle
+    "F",             # pyflakes
+    "I",             # isort
+    "UP",            # pyupgrade
+    "B",             # flake8-bugbear
+    "SIM",           # flake8-simplify
+    "RUF",           # ruff-specific
+    "S",             # flake8-bandit (security)
+    "DTZ",           # datetime timezone
+]
+ignore = [
+    # Broad except is intentional in app.py blueprint registrations (defensive).
+    "BLE001",
+    # try/except pass used deliberately in warmup/cache guards.
+    "S110", "S112",
+    # datetime.today() / utcnow() used in non-critical reporting paths.
+    "DTZ003", "DTZ005", "DTZ011",
+    # Long lines in generated SQL/HTML strings are unavoidable.
+    "E501",
+    # SQL strings are parameterised at runtime; not injection risk here.
+    "S608",
+    # Existing Synapse SQL queries use string building; too invasive to change.
+    "RUF001",
+    # zip() without strict= is acceptable in existing data-processing code.
+    "B905",
+    # Unicode characters in docstrings/comments (existing content, non-confusable).
+    "RUF002", "RUF003",
+    # Flask debug=True in run_local.py is intentional (local dev only).
+    "S201",
+    # 0.0.0.0 bind in run_local.py is intentional for VS Code port forwarding.
+    "S104",
+    # Module-level import ordering in app.py is load-order-sensitive.
+    "E402",
+]
+
+[lint.per-file-ignores]
+# Tests may use broader assertions and test-specific patterns.
+"tests/**" = ["S101", "S105", "S106"]
+# Synapse notebook cell: spark is a runtime-injected global.
+"sfp2/overnight_drop_worker_cell.py" = ["F821"]
+# Existing packages: suppress SIM105 until progressively refactored.
+"app.py" = ["SIM105"]
+"nfbc/**" = ["SIM105"]
+"jarvis/**" = ["SIM105"]

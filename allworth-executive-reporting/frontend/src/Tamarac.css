@@ -1,0 +1,329 @@
+.tamarac-page {
+  min-height: 100vh;
+  background: #0f172a;
+  color: #f8fafc;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.tamarac-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.tamarac-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  background-image: linear-gradient(135deg, #6366f1, #0ea5e9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.tamarac-subtitle {
+  margin: 0.25rem 0 0;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.tamarac-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.tamarac-checkbox {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #cbd5e1;
+}
+
+.tamarac-button {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #6366f1, #0ea5e9);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.tamarac-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Timezone <select> chrome moved to components/TimezonePicker.css (shared). */
+
+.tamarac-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+
+.tamarac-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tamarac-legend-fetched {
+  margin-left: auto;
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+.tamarac-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.tamarac-error {
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid #f87171;
+  color: #fecaca;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.tamarac-pipeline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.25rem 0.5rem;
+  padding: 1rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.tamarac-step {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tamarac-tile {
+  min-width: 170px;
+  max-width: 220px;
+  padding: 0.85rem 0.9rem;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  color: #0f172a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: transform 0.12s;
+}
+
+.tamarac-tile:hover {
+  transform: translateY(-2px);
+}
+
+.tamarac-tile-name {
+  font-weight: 600;
+  font-size: 0.85rem;
+  word-break: break-word;
+  margin-bottom: 0.25rem;
+}
+
+.tamarac-tile-meta {
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
+.tamarac-arrow {
+  color: #64748b;
+  font-size: 1.25rem;
+  padding: 0 0.25rem;
+}
+
+/* Status colors */
+.status-not_started {
+  background: #64748b;
+  color: #e2e8f0 !important;
+  border-color: #475569;
+}
+.tamarac-dot.status-not_started { background: #64748b; }
+
+.status-running {
+  background: #facc15;
+  color: #422006 !important;
+  border-color: #ca8a04;
+  animation: tamarac-pulse 1.8s ease-in-out infinite;
+}
+.tamarac-dot.status-running { background: #facc15; }
+
+.status-success {
+  background: #22c55e;
+  color: #052e16 !important;
+  border-color: #16a34a;
+}
+.tamarac-dot.status-success { background: #22c55e; }
+
+.status-failure {
+  background: #ef4444;
+  color: #fef2f2 !important;
+  border-color: #b91c1c;
+}
+.tamarac-dot.status-failure { background: #ef4444; }
+
+@keyframes tamarac-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.6); }
+  50% { box-shadow: 0 0 0 10px rgba(250, 204, 21, 0); }
+}
+
+/* ---------- Gantt-style timeline ---------- */
+
+.tamarac-gantt-wrap {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.tamarac-empty {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  padding: 1.5rem 0.5rem;
+  text-align: center;
+}
+
+.tamarac-gantt {
+  position: relative;
+  min-height: 140px;
+  /* width & height are set imperatively based on lane count + span */
+}
+
+.tamarac-axis {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 22px;
+  border-bottom: 1px dashed #334155;
+}
+
+.tamarac-axis-tick {
+  position: absolute;
+  top: 0;
+  bottom: -9999px;
+  width: 1px;
+  background: rgba(100, 116, 139, 0.25);
+}
+
+.tamarac-axis-label {
+  position: absolute;
+  top: 0;
+  left: 4px;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.tamarac-bar {
+  position: absolute;
+  height: 44px;
+  border-radius: 6px;
+  padding: 5px 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  cursor: default;
+  transition: transform 0.12s;
+  min-width: 24px;
+}
+
+.tamarac-bar:hover {
+  transform: translateY(-1px);
+  z-index: 5;
+}
+
+.tamarac-bar-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tamarac-bar-meta {
+  font-size: 0.7rem;
+  line-height: 1.15;
+  opacity: 0.85;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tamarac-now {
+  position: absolute;
+  top: 22px;
+  bottom: 0;
+  width: 2px;
+  background: #f8fafc;
+  box-shadow: 0 0 6px rgba(248, 250, 252, 0.6);
+  pointer-events: none;
+}
+
+.tamarac-now-label {
+  position: absolute;
+  top: -18px;
+  left: 4px;
+  font-size: 0.68rem;
+  color: #f8fafc;
+  background: rgba(15, 23, 42, 0.8);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* Pending chips */
+.tamarac-pending {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #334155;
+}
+
+.tamarac-pending-title {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tamarac-pending-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tamarac-chip {
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+

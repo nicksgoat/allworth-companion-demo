@@ -1,0 +1,61 @@
+name: A&I Business Logic Documentation
+uri: frameworks://docs-library
+description: >
+  Index of documented business logic changes across the data warehouse,
+  MCP tools, and reporting layers.  Covers channel mappings, AUM calculations,
+  goal definitions, revenue rules, and more.
+keywords:
+  - business logic
+  - change log
+  - channel
+  - channel middle
+  - documentation
+  - what changed
+  - why did this change
+directive: >
+  When the user asks about a business logic change, what changed, or why
+  something works a certain way, call list_doc_changes() or get_doc_change()
+  FIRST before querying data.
+content: |
+  # A&I Business Logic Documentation Library
+
+  A searchable library of documented business logic changes maintained by the
+  Analytics & Insights team.
+
+  ## How to use
+
+  - **list_doc_changes()** — Browse or search all documented changes.
+    Filter by domain (channel, aum, revenue, goals, client, advisor,
+    operations, risk, campaigns) or free-text search.
+  - **get_doc_change(slug)** — Read the full documentation for a specific change.
+
+  ## Domain areas
+
+  | Domain     | Covers |
+  |------------|--------|
+  | channel    | Channel, Channel Middle, Channel Core — acquisition/marketing classification |
+  | aum        | AUM calculations, bridge logic, flow categorization |
+  | revenue    | Fee schedules, revenue recognition, billing |
+  | goals      | Net flow goals, marketing goals, metric definitions |
+  | client     | Household composition, segmentation, lifecycle |
+  | advisor    | Advisor attribution, team hierarchy, division/region |
+  | operations | Staff metrics, cost allocation, efficiency |
+  | risk       | Exposure, IPS compliance, stress testing |
+  | campaigns  | Campaign attribution, funnel stages, opportunity mapping |
+
+  ## Adding a new entry
+
+  Create a Markdown file in `wealth_mcp/docs/changes/` with YAML frontmatter:
+
+  ```yaml
+  ---
+  title: Short Title
+  domain: channel
+  date: 2026-03-24
+  author: Nick McKenzie
+  status: final
+  summary: One-line summary of what changed.
+  ---
+  ```
+
+  Then write the body with: What Changed, Why, Affected Systems, Before/After.

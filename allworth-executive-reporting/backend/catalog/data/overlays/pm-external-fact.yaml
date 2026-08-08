@@ -1,0 +1,6 @@
+id: pm-external-fact
+source: wealth_mcp.domain.tables
+description: Practice-management events from external sources (tax, estate, insurance
+  actions delivered).
+grain: EventID
+domain: Activity

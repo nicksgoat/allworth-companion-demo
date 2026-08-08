@@ -1,0 +1,56 @@
+id: surveymonkeyemail
+name: SurveyMonkeyEmail
+schema: tho
+db: DataWarehouse
+db_table: SurveyMonkeyEmail
+guid: 68285722-25ae-4523-b324-2ab09cdee0df
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Survey Monkey Results
+column_count: 4
+columns:
+- name: Survey ID
+  db_column_name: Survey ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Person ID
+  db_column_name: Person ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Email
+  db_column_name: Email
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Created Date
+  db_column_name: Created Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

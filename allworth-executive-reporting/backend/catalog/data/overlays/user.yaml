@@ -1,0 +1,8 @@
+id: user
+source: wealth_mcp.domain.tables
+description: 'User/advisor dimension: name, role, team, office, active flag. Joins
+  activities, accounts, and pipeline to people.'
+business_name: User / Advisor
+grain: User_ID
+pk: User_ID
+domain: Advisor

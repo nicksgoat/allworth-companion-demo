@@ -1,0 +1,139 @@
+id: custodian-reps
+name: Custodian_Reps
+schema: tho
+db: DataWarehouse
+db_table: Custodian_Reps
+guid: ae9fad53-1e06-4af2-b72e-1ba09b344d0b
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Reference
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Allworth 360
+- CRP Reps with Flows
+- Financial Account 360
+column_count: 13
+columns:
+- name: Contact_Id
+  db_column_name: Contact_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Rep_Name
+  db_column_name: Rep_Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Rep_Email
+  db_column_name: Rep_Email
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Rep_Email_2
+  db_column_name: Rep_Email_2
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Rep_Company
+  db_column_name: Rep_Company
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Rep_Location
+  db_column_name: Rep_Location
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Phone
+  db_column_name: Phone
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Branch_Id
+  db_column_name: Branch_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Branch_Name
+  db_column_name: Branch_Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Street
+  db_column_name: Street
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: City
+  db_column_name: City
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: State
+  db_column_name: State
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Zip
+  db_column_name: Zip
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+relationships: []

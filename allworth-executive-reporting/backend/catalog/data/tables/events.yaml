@@ -1,0 +1,219 @@
+id: events
+name: Events
+schema: tho
+db: DataWarehouse
+db_table: Events
+guid: bfdcd406-1269-4bbf-b03a-544fdb7189c2
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Activity
+deprecated: true
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Events Worksheet (Migrate to Activities Model)
+column_count: 16
+columns:
+- name: EventId
+  db_column_name: Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: EventURL
+  db_column_name: EventURL
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CreatedDate
+  db_column_name: CreatedDate
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Created_By_Delegate
+  db_column_name: Created_By_Delegate
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Whoid
+  db_column_name: Whoid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Whatid
+  db_column_name: Whatid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Appt Comp Date
+  db_column_name: Appt_Comp_Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Appt Comp By
+  db_column_name: Appt_Comp_By
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Process
+  db_column_name: Process__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Process Type
+  db_column_name: Process_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Service Type
+  db_column_name: Service_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Event Status
+  db_column_name: Event_Status__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Event Completed Date
+  db_column_name: Event_Completed_DateTime__c
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ownerid
+  db_column_name: ownerid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LeadID
+  db_column_name: LeadID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Subject
+  db_column_name: Subject
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: Event Created By Delegate
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Events::Created_By_Delegate] = [User::User ID]'
+  pairs:
+  - from_table: Events
+    from_col: Created_By_Delegate
+    to_table: User
+    to_col: User ID
+- join_name: Events to HH
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Events::LeadID] = [Current_Household_Demographic::LeadId]'
+  pairs:
+  - from_table: Events
+    from_col: LeadID
+    to_table: Current_Household_Demographic
+    to_col: LeadId
+- join_name: Events_to_ApptCompBy
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Events::Appt Comp By] = [User::Name]'
+  pairs:
+  - from_table: Events
+    from_col: Appt Comp By
+    to_table: User
+    to_col: Name
+- join_name: Events_to_User
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Events::ownerid] = [User::User ID]'
+  pairs:
+  - from_table: Events
+    from_col: ownerid
+    to_table: User
+    to_col: User ID
+- join_name: HH Fact to Event
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  type: RIGHT_OUTER
+  one_to_one: false
+  'on': '[Events::LeadID] = [Current_Household_Fact::LeadId]'
+  pairs:
+  - from_table: Events
+    from_col: LeadID
+    to_table: Current_Household_Fact
+    to_col: LeadId

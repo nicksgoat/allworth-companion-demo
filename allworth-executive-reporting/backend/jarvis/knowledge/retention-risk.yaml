@@ -1,0 +1,11 @@
+name: Retention Risk
+uri: frameworks://retention-risk
+category: Metric Definitions
+description: Estimated probability that a household terminates or reduces assets.
+keywords:
+  - retention risk
+  - churn
+  - termination
+  - risk score
+content: |
+  Estimated probability or risk score that a household terminates or materially reduces assets. Treat model outputs as directional signals, not certain outcomes.

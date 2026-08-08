@@ -1,0 +1,119 @@
+id: acquisition
+name: Acquisition
+schema: aip
+db: DataWarehouse
+db_table: Acquisition
+guid: 1255ea81-def0-43fa-a19e-663445cacbbb
+business_name: Acquisition / partner books
+grain: null
+pk: AcqCode
+synonyms: []
+domain: Reference
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Account Setups
+- Advisor 360
+- Allworth 360
+- Comparison 360
+- Comparison Rollforward - Trade Date
+- Download Version of 360
+- Financial Account 360
+- Practice Management
+- Rollforward Historical
+- Trade Date Rollforward
+column_count: 10
+columns:
+- name: AcquisitionId
+  db_column_name: AcquisitionId
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Acquisition
+  db_column_name: Acquisition
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: AcqCode
+  db_column_name: AcqCode
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: ClosingDate
+  db_column_name: ClosingDate
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: organicdate
+  db_column_name: organicdate
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Repapered
+  db_column_name: Repapered
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: sourcesystem
+  db_column_name: sourcesystem
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: expectedaum
+  db_column_name: expectedaum
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: AUM_Met
+  db_column_name: AUM_Met
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Updated_by_stored_proc
+  db_column_name: Updated_by_stored_proc
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

@@ -1,0 +1,1246 @@
+id: current-household-fact
+name: Current_Household_Fact
+schema: tho
+db: DataWarehouse
+db_table: Current_Household_Fact
+guid: 62687709-c569-49f6-a849-35bd09081f21
+business_name: Household (current measures)
+grain: one row per Salesforce Lead (LeadId)
+pk: LeadId
+synonyms:
+- client metrics
+- hh fact
+domain: Household
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Account Rollforward
+- Account Setups
+- Account Team Member
+- Activities
+- Advisor Conversion Worksheet
+- Allworth 360
+- Campaigns
+- Cash Reserves
+- Comparison 360
+- Comparison Rollforward - Trade Date
+- Contact 360
+- CRP Reps with Flows
+- Distribution Requests
+- Download Version of 360
+- Events Worksheet (Migrate to Activities Model)
+- Financial Account 360
+- Incoming Funds
+- Integrated Services
+- IS Referrals
+- Outflow/Term Reason Audit
+- Performance Tracking
+- Pipeline 360
+- Practice Management External Sources
+- Practice Management
+- RMD Model
+- Rollforward Historical
+- Stage Change History
+- Survey Monkey Results
+- Tasks (Migrate to Activities Model)
+- Tax Retention
+- Trade Date Rollforward
+- Transactions
+- Zoom Call Log External
+column_count: 97
+columns:
+- name: referringadvisorid
+  db_column_name: referringadvisorid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: referredbyclientid
+  db_column_name: referredbyclientid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Client_Service_Primary__c
+  db_column_name: Client_Service_Primary__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Marketing_Qualified_Date__c
+  db_column_name: Marketing_Qualified_Date__c
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Sales_Owner
+  db_column_name: Sales_Owner
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: secondaryadvisorid
+  db_column_name: secondaryadvisorid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: 55ip_Fee_Waiver
+  db_column_name: _55ip_Fee_Waiver
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Recap_Appt_Create_Date
+  db_column_name: Recap_Appt_Create_Date
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Met_Premier_AUM
+  db_column_name: Met_Premier_AUM
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: ConvertingCampaignId
+  db_column_name: ConvertingCampaignId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: lead_created_date
+  db_column_name: lead_created_date
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: HHID
+  db_column_name: HHID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: firstappt_advisorid
+  db_column_name: firstappt_advisorid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Mail_Suppression_Filter
+  db_column_name: Mail_Suppression_Filter
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: term_date
+  db_column_name: term_date
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: advisorid
+  db_column_name: advisorid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: FormerAdvisorTermDate
+  db_column_name: FormerAdvisorTermDate
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: First_Spice_Contact_Key
+  db_column_name: First_Spice_Contact_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Goal
+  db_column_name: Goal
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: ConvertingCampaignDate
+  db_column_name: ConvertingCampaignDate
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LeadCreatedById
+  db_column_name: LeadCreatedById
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AUM_Billed
+  db_column_name: AUM_Billed
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: ClientSince
+  db_column_name: ClientSince
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Current_Client
+  db_column_name: Current_Client
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LastContacted
+  db_column_name: LastContacted
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Estimated Close Date
+  db_column_name: Estimated_Close_Date
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: FormerAdvisorID
+  db_column_name: FormerAdvisorID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: SecondaryContactID
+  db_column_name: SecondaryContactID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LastAnnualReview
+  db_column_name: LastAnnualReview
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: PAUM
+  db_column_name: PAUM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Employee_Account
+  db_column_name: Employee_Account
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Client Service Specialist
+  db_column_name: Client_Service_Specialist
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: HasOptedOutOfEmail
+  db_column_name: HasOptedOutOfEmail
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Run_Rate_Revenue
+  db_column_name: Run_Rate_Revenue
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: firstappt_comp_combo
+  db_column_name: firstappt_comp_combo
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: DoNotCall
+  db_column_name: DoNotCall
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Do_Not_Mail__c
+  db_column_name: Do_Not_Mail__c
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Has_Broker_Dealer_Accounts
+  db_column_name: Has_Broker_Dealer_Accounts
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Met_Premier_AUM_Date
+  db_column_name: Met_Premier_AUM_Date
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Opportunity_ID
+  db_column_name: Opportunity_ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LeadId
+  db_column_name: LeadId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Last_Call_Or_Meeting_by_Advisor
+  db_column_name: Last_Call_Or_Meeting_by_Advisor
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: firstappt_set_combo
+  db_column_name: firstappt_set_combo
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: GoalKey
+  db_column_name: GoalKey
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Recap_Appt_Completed_Date
+  db_column_name: Recap_Appt_Completed_Date
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Expected_Retirement_Date__c
+  db_column_name: Expected_Retirement_Date__c
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ContactID
+  db_column_name: ContactID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Handraiser_Date__c
+  db_column_name: Handraiser_Date__c
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AUM
+  db_column_name: AUM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Has_Direct_Business_Accounts
+  db_column_name: Has_Direct_Business_Accounts
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AVHHID
+  db_column_name: AVHHID
+  data_type: INT64
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: VMAC
+  db_column_name: VMAC
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: TermValue
+  db_column_name: TermValue
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: referredbyinternalid
+  db_column_name: referredbyinternalid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: regional_VP
+  db_column_name: regional_VP
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Has_Advisory_Accounts
+  db_column_name: Has_Advisory_Accounts
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Previous_Advisor__c
+  db_column_name: Previous_Advisor__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Lead_Created_Datetime
+  db_column_name: Lead_Created_Datetime
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Interactions_LTM
+  db_column_name: Interactions_LTM
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Next_Activity
+  db_column_name: Next_Activity
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Date_Exited_Private
+  db_column_name: Date_Exited_Private
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Premier_Service_Model_Exception
+  db_column_name: Premier_Service_Model_Exception
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Premier_Service_Model_Exception_Approver
+  db_column_name: Premier_Service_Model_Exception_Approver
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Current_Service_Model_Since
+  db_column_name: Current_Service_Model_Since
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Date_Entered_Private
+  db_column_name: Date_Entered_Private
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Service_Model_Discrepancy__c
+  db_column_name: Service_Model_Discrepancy__c
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ttm_net_flows
+  db_column_name: ttm_net_flows
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: ttm_ecnm
+  db_column_name: ttm_ecnm
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: ttm_distribution
+  db_column_name: ttm_distribution
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: ttm_ncnm
+  db_column_name: ttm_ncnm
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: ttm_attrition
+  db_column_name: ttm_attrition
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: SPS_Contract_Date
+  db_column_name: SPS_Contract_Date
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SPS_Last_Payment
+  db_column_name: SPS_Last_Payment
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SPS_Historical
+  db_column_name: SPS_Historical
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SPS_Flag
+  db_column_name: SPS_Flag
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Private_Wealth_Next_Steps_Date_f__c
+  db_column_name: Private_Wealth_Next_Steps_Date_f__c
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Rep_Id
+  db_column_name: CRP_Rep_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Expected_Funds_Received
+  db_column_name: CRP_Expected_Funds_Received
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Had_Intro_Appt_Flag
+  db_column_name: Had_Intro_Appt_Flag
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Funds_Received_Acct_Setups
+  db_column_name: CRP_Funds_Received_Acct_Setups
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Funds_Received_Incoming_Funds
+  db_column_name: CRP_Funds_Received_Incoming_Funds
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Assigned_to_Advisor_Date_Key
+  db_column_name: CRP_Assigned_to_Advisor_Date_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Actual_Handoff_Date_Key
+  db_column_name: CRP_Actual_Handoff_Date_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CRP_Advisor_Id
+  db_column_name: CRP_Advisor_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: TamAdvisor__Unmanaged_Value__c
+  db_column_name: TamAdvisor__Unmanaged_Value__c
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: TamAdvisor__Managed_Value__c
+  db_column_name: TamAdvisor__Managed_Value__c
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: second_appt_start_Date_key
+  db_column_name: second_appt_start_Date_key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: second_appt_Process_type
+  db_column_name: second_appt_Process_type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: second_appt_comp_date_key
+  db_column_name: second_appt_comp_date_key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: second_appt_set_date_key
+  db_column_name: second_appt_set_date_key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: firstappt_set_advisor_id
+  db_column_name: firstappt_set_advisor_id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: firstappt_delegate_id
+  db_column_name: firstappt_delegate_id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: recap_advisor_id
+  db_column_name: recap_advisor_id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Intended_Service_Advisor__c
+  db_column_name: Intended_Service_Advisor__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Current_Calling_Campaign_Name
+  db_column_name: Current_Calling_Campaign_Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AWF_Guided_Service
+  db_column_name: AWF_Guided_Service
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Previous_Advisor_Date
+  db_column_name: Previous_Advisor_Date
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: 1st Appt Comp
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::firstappt_comp_combo] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: firstappt_comp_combo
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Client Since
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::ClientSince] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: ClientSince
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Estimated Close Date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::Estimated Close Date] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: Estimated Close Date
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Expected Retirement Date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::Expected_Retirement_Date__c] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: Expected_Retirement_Date__c
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Fact To 1st Appt Advisor
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::firstappt_advisorid] = [User::User ID]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: firstappt_advisorid
+    to_table: User
+    to_col: User ID
+- join_name: Fact To Advisor
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::advisorid] = [User::User ID]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: advisorid
+    to_table: User
+    to_col: User ID
+- join_name: Fact To Client Service Primary
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::Client_Service_Primary__c] = [User::User ID]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: Client_Service_Primary__c
+    to_table: User
+    to_col: User ID
+- join_name: Fact To Last Annual Review
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::LastAnnualReview] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: LastAnnualReview
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Fact To Referring Contact
+  to: Contact_Demographic
+  to_id: contact-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::referredbyclientid] = [Contact_Demographic::Contact ID]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: referredbyclientid
+    to_table: Contact_Demographic
+    to_col: Contact ID
+- join_name: Fact To Secondary Advisor
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::secondaryadvisorid] = [User::User ID]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: secondaryadvisorid
+    to_table: User
+    to_col: User ID
+- join_name: Fact To Secondary Contact
+  to: Contact_Demographic
+  to_id: contact-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::SecondaryContactID] = [Contact_Demographic::Contact ID]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: SecondaryContactID
+    to_table: Contact_Demographic
+    to_col: Contact ID
+- join_name: Fact to 1st Appt Set
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::firstappt_set_combo] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: firstappt_set_combo
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Fact to Internal Referrer
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::referringadvisorid] = [User::User ID]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: referringadvisorid
+    to_table: User
+    to_col: User ID
+- join_name: Fact to Primary Contact
+  to: Contact_Demographic
+  to_id: contact-demographic
+  type: LEFT_OUTER
+  one_to_one: true
+  'on': '[Current_Household_Fact::ContactID] = [Contact_Demographic::Contact ID]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: ContactID
+    to_table: Contact_Demographic
+    to_col: Contact ID
+- join_name: Fact to Term Date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::term_date] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: term_date
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: First Spice Contact
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::First_Spice_Contact_Key] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: First_Spice_Contact_Key
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Former Advisor
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::FormerAdvisorID] = [User::User ID]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: FormerAdvisorID
+    to_table: User
+    to_col: User ID
+- join_name: Former Advisor Term Date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::FormerAdvisorTermDate] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: FormerAdvisorTermDate
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: HH Fact to HH Dim
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: true
+  'on': '[Current_Household_Fact::LeadId] = [Current_Household_Demographic::LeadId]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: LeadId
+    to_table: Current_Household_Demographic
+    to_col: LeadId
+- join_name: HH Fact to RLS Table
+  to: RLS
+  to_id: rls
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::advisorid] = [RLS::User Id]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: advisorid
+    to_table: RLS
+    to_col: User Id
+- join_name: Handraiser Date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::Handraiser_Date__c] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: Handraiser_Date__c
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Last Contacted
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::LastContacted] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: LastContacted
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Last Contacted by Advisor
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::Last_Call_Or_Meeting_by_Advisor] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: Last_Call_Or_Meeting_by_Advisor
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Lead Created By
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::LeadCreatedById] = [User::User ID]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: LeadCreatedById
+    to_table: User
+    to_col: User ID
+- join_name: Marketing Qualified Date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::Marketing_Qualified_Date__c] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: Marketing_Qualified_Date__c
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Recap_Comp_to_DateDimension
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::Recap_Appt_Completed_Date] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: Recap_Appt_Completed_Date
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Recap_Created_to_DateDimension
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::Recap_Appt_Create_Date] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: Recap_Appt_Create_Date
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Sales Owner
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::Sales_Owner] = [User::User ID]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: Sales_Owner
+    to_table: User
+    to_col: User ID
+- join_name: lead created date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Household_Fact::lead_created_date] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Current_Household_Fact
+    from_col: lead_created_date
+    to_table: DateDimension
+    to_col: DateKey

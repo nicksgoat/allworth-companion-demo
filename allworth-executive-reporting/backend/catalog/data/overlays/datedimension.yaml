@@ -1,0 +1,8 @@
+id: datedimension
+source: wealth_mcp.domain.tables
+description: Standard date dimension keyed by YYYYMMDD integer (DateKey); join target
+  for all *_DateKey columns.
+business_name: Date dimension
+grain: DateKey (YYYYMMDD int)
+pk: DateKey
+domain: Reference

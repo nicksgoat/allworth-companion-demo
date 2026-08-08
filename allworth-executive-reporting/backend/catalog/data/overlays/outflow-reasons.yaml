@@ -1,0 +1,6 @@
+id: outflow-reasons
+source: wealth_mcp.domain.tables
+description: Categorized reasons for client outflows, used in attrition and distribution
+  commentary.
+grain: Outflow Id
+domain: Transactions

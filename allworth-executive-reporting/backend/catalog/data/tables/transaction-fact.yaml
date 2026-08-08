@@ -1,0 +1,215 @@
+id: transaction-fact
+name: Transaction_Fact
+schema: tho
+db: DataWarehouse
+db_table: Transaction_Fact
+guid: d0e9f321-1a1c-477a-8ca1-afc926e5e286
+business_name: Transactions
+grain: one row per transaction
+pk: Transaction_Id
+synonyms:
+- transactions
+- trades
+- cashflows
+domain: Transactions
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Transactions
+column_count: 11
+columns:
+- name: Trade_DateKey
+  db_column_name: Trade_DateKey
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: AVHHID
+  db_column_name: AVHHID
+  data_type: INT64
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Transaction_Id
+  db_column_name: Transaction_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Amount
+  db_column_name: Amount
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Upload_Account_Id
+  db_column_name: Upload_Account_Id
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Entry_DateKey
+  db_column_name: Entry_DateKey
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Activity_Id
+  db_column_name: Activity_Id
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Outflow_Reason_Id
+  db_column_name: Outflow_Reason_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: RF_ID
+  db_column_name: RF_ID
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Intra_Group_Flow
+  db_column_name: Intra_Group_Flow
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Auto_Recon
+  db_column_name: Auto_Recon
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+relationships:
+- join_name: Transaction Entry Date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Transaction_Fact::Entry_DateKey] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Transaction_Fact
+    from_col: Entry_DateKey
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Transaction Trade Date
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Transaction_Fact::Trade_DateKey] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Transaction_Fact
+    from_col: Trade_DateKey
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Transaction to ACV
+  to: Current_Account_Demographic
+  to_id: current-account-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Transaction_Fact::Upload_Account_Id] = [Current_Account_Demographic::Upload Account ID]'
+  pairs:
+  - from_table: Transaction_Fact
+    from_col: Upload_Account_Id
+    to_table: Current_Account_Demographic
+    to_col: Upload Account ID
+- join_name: Transaction to Activity Type
+  to: Transaction_Activity_Type
+  to_id: transaction-activity-type
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Transaction_Fact::Activity_Id] = [Transaction_Activity_Type::Activity_Id]'
+  pairs:
+  - from_table: Transaction_Fact
+    from_col: Activity_Id
+    to_table: Transaction_Activity_Type
+    to_col: Activity_Id
+- join_name: Transaction to HH Dim
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Transaction_Fact::AVHHID] = [Current_Household_Demographic::AVHHID]'
+  pairs:
+  - from_table: Transaction_Fact
+    from_col: AVHHID
+    to_table: Current_Household_Demographic
+    to_col: AVHHID
+- join_name: Transaction to HH Fact
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Transaction_Fact::AVHHID] = [Current_Household_Fact::AVHHID]'
+  pairs:
+  - from_table: Transaction_Fact
+    from_col: AVHHID
+    to_table: Current_Household_Fact
+    to_col: AVHHID
+- join_name: Transaction to Outflow Reason
+  to: Outflow_Reasons
+  to_id: outflow-reasons
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Transaction_Fact::Outflow_Reason_Id] = [Outflow_Reasons::Id]'
+  pairs:
+  - from_table: Transaction_Fact
+    from_col: Outflow_Reason_Id
+    to_table: Outflow_Reasons
+    to_col: Id
+- join_name: Transaction_Fact_to_Outflow_Reasons
+  to: Outflow_Reasons
+  to_id: outflow-reasons
+  type: LEFT_OUTER
+  one_to_one: true
+  'on': '[Transaction_Fact::AVHHID] = [Outflow_Reasons::AVHHID] AND [Transaction_Fact::Trade_DateKey]
+    = [Outflow_Reasons::Trade_Date_Key]'
+  pairs:
+  - from_table: Transaction_Fact
+    from_col: AVHHID
+    to_table: Outflow_Reasons
+    to_col: AVHHID
+  - from_table: Transaction_Fact
+    from_col: Trade_DateKey
+    to_table: Outflow_Reasons
+    to_col: Trade_Date_Key

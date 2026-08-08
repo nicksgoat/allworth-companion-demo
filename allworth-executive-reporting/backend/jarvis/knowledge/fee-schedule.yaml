@@ -1,0 +1,100 @@
+name: Fee Schedule
+uri: frameworks://fee-schedule
+category: Metrics & Fees
+description: Billing-definition master table — tier structures, minimum fees, and cadence patterns driving how accounts are billed. The authoritative master is `[fnp].[billing_definitions]`.
+keywords:
+  - fee
+  - billing
+  - fee schedule
+  - fee tier
+  - billing definition
+  - billing_definitions
+  - tiered
+  - cliff
+  - flat
+  - minimum fee
+  - Tamarac
+content: |
+  ## Master Table
+
+  The authoritative source is `[fnp].[billing_definitions]`. One row per **tier** of a billing definition — a multi-tier schedule shows up as multiple rows sharing the same `Billing Definition Name`.
+
+  ### Columns
+  - `Billing Definition Name` — the schedule's display name (e.g. `"GM Schedule NEW (Min Fee) (Jan/Apr/Jul/Oct)"`).
+  - `Minimum Fee` (money) — floor annual fee for the whole schedule. Same value repeats on every tier row for that schedule.
+  - `Rate Tier Annual Rate` (money) — percent rate for the tier, e.g. `1.50` = 1.50% / year.
+  - `Rate Tier Annual Flat Fee` (money) — used for flat-fee schedules; `NULL` on tiered schedules.
+  - `Rate Tier Start Value`, `Rate Tier End Value` (money) — AUM bracket boundaries for the tier, in dollars.
+
+  Application to accounts is via `[tho].[Current_Account_Demographic].Billing_Definitions` (the name), joined back to `[fnp].[billing_definitions]` by name to get the tier grid.
+
+  ## Structure Types
+
+  - **Tiered** — graduated rate by AUM bracket. Fee = Σ(weighted rate × tier slice of AUM).
+  - **Cliff** — single rate applies when AUM crosses a threshold (the whole balance bills at that rate; no blending).
+  - **Flat** — fixed annual fee regardless of AUM (`Rate Tier Annual Flat Fee` populated; one tier row).
+
+  ## Naming Convention (observed)
+
+  Schedule names in production follow the pattern:
+  `<SCHEDULE PREFIX> <STRUCTURE/TIER> (<CADENCE>)`
+
+  Top prefixes currently in use: `GM`, `AAA`, `H-NEW`, `G-`, `WAS`, `RWM`, `GFA`, `CEG`. Tier qualifiers you'll see: `Silver`, `Gold`, `Platinum`, `Diamond`, `Min Fee`, `Standard`, `Current`, `NEW`.
+
+  ### Billing Cadence Suffix
+
+  Always in parentheses at the end of the name:
+
+  - `(Monthly)` — billed every month.
+  - `(Jan/Apr/Jul/Oct)` — standard quarterly (calendar Q1/Q2/Q3/Q4 ends).
+  - `(Feb/May/Aug/Nov)` — offset quarterly.
+  - `(Mar/Jun/Sep/Dec)` — offset quarterly.
+
+  ## Example: "GM Schedule NEW (Min Fee) (Jan/Apr/Jul/Oct)"
+
+  One of the most common schedules (≈8,000 accounts). Minimum fee $625/yr.
+
+  | AUM tier | Annual rate |
+  |---|---|
+  | $0 – $250K | 1.50% |
+  | $250K – $750K | 1.25% |
+  | $750K – $1.5M | 1.00% |
+  | $1.5M – $3M | 0.80% |
+  | $3M – $5M | 0.70% |
+  | $5M – $7.5M | 0.60% |
+  | $7.5M – $10M | 0.40% |
+  | $10M – $50M | 0.35% |
+  | $50M+ | 0.30% |
+
+  Reproduce with:
+
+  ```sql
+  SELECT [Rate Tier Annual Rate], [Rate Tier Start Value], [Rate Tier End Value], [Minimum Fee]
+  FROM [fnp].[billing_definitions]
+  WHERE [Billing Definition Name] = 'GM Schedule NEW (Min Fee) (Jan/Apr/Jul/Oct)'
+  ORDER BY [Rate Tier Start Value]
+  ```
+
+  ## Waived and Placeholder Variants
+
+  Definition names containing `WAIVED` or `PLACEHOLDER` are treated as non-billing — see `billable-account-determination`. Example: `"Waived - Quarterly (Jan/Apr/Jul/Oct)"` (≈3,000 accounts as of the latest snapshot).
+
+  ## Realized vs Run-Rate
+
+  - **Realized Fee Yield (bps)** = `SUM(management_fees) / (total_aum / period_count) × 10,000` from `Household_Rollforward` (historical lookback).
+  - **Run-Rate Yield (bps)** = `SUM(Run_Rate_Revenue) / SUM(AUM) × 10,000` from `Current_Household_Fact` (forward-looking snapshot).
+
+  ## Fee Adjustments
+
+  Tracked in `[bil].[Billing_History_Table]`:
+
+  - `Account_Adjustment` — per-account override.
+  - `Billing_Group_Adjustment` — group-level adjustment.
+  - `New_Account_Adjustment` — special handling for recent onboarded accounts.
+  - `Proration_Amount` — partial-period fees.
+
+  See `billing-exception-policy` for how these interact with realized yield.
+
+  ## Determining Whether an Account Is Billed
+
+  The schedule only applies if the account is actually billable. Do **not** use the `Non_billed` flag — it's refreshed quarterly and disagrees with the real rule in ≈42% of accounts. Use the three-condition rule (`Closed_Date IS NULL`, `Billing_Inception_Date <= GETDATE() OR NULL`, `Billing_Definitions NOT LIKE '%WAIVED%' / '%PLACEHOLDER%' AND NOT NULL`). Full rule: see `billable-account-determination`.

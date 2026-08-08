@@ -1,0 +1,137 @@
+id: positions
+name: positions
+schema: tho
+db: DataWarehouse
+db_table: positions
+guid: b94cebc5-c3a5-45f3-b19d-90fcdbf0e3a7
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Position Reconciliation
+column_count: 13
+columns:
+- name: account_number
+  db_column_name: account_number
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: cusip
+  db_column_name: cusip
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: symbol
+  db_column_name: symbol
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: market_price
+  db_column_name: market_price
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: trade_date_quantity
+  db_column_name: trade_date_quantity
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: settlement_date_quantity
+  db_column_name: settlement_date_quantity
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: tam_symbol
+  db_column_name: tam_symbol
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: tam_price
+  db_column_name: tam_price
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: tam_quantity
+  db_column_name: tam_quantity
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: avhhid
+  db_column_name: avhhid
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: custodian
+  db_column_name: custodian
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: unique_id
+  db_column_name: unique_id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: custodian_as_of_date
+  db_column_name: custodian_as_of_date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

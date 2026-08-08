@@ -1,0 +1,120 @@
+id: pm-external-fact
+name: pm_external_fact
+schema: tho
+db: DataWarehouse
+db_table: pm_external_fact
+guid: 80a0bfdf-1769-4423-af3b-4b9e7773b062
+business_name: null
+grain: EventID
+pk: null
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Practice Management External Sources
+- Practice Management
+column_count: 11
+columns:
+- name: EventID
+  db_column_name: EventID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Client_Name
+  db_column_name: Client_Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AdvisorId
+  db_column_name: AdvisorId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LeadID
+  db_column_name: LeadID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: HHID
+  db_column_name: HHID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Date_Key
+  db_column_name: Date_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Program_Type
+  db_column_name: Program_Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Event_Type
+  db_column_name: Event_Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Value_Proposition
+  db_column_name: Value_Proposition
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Event_Rank
+  db_column_name: Event_Rank
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Format
+  db_column_name: Format
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

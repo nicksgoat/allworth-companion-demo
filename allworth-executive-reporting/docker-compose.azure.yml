@@ -1,0 +1,9 @@
+# DEPRECATED — kept as a migration breadcrumb only.
+#
+# Azure Web App for Linux multi-container via Docker Compose retires
+# 2027-03-31. This app no longer deploys via this file.
+#
+
+# [DEPRECATED] Azure Web App multi-container (Docker Compose) deployments are retired.
+# This file is a placeholder. All deployments now use the sidecar containers model via az webapp sitecontainers.
+# See .github/workflows/azure-deploy.yml for the current deployment logic.

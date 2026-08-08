@@ -1,0 +1,49 @@
+name: Tool Selection Policy
+uri: frameworks://tool-selection-policy
+description: MECE guidance for when to use each reduced public facade tool.
+keywords:
+  - tool selection
+  - which tool
+  - reduced facade
+  - get brief
+  - run query
+  - get record
+directive: >
+  Consult when deciding which public tool family should handle a request.
+content: |
+  # Tool Selection Policy
+
+  ## Use `get_brief`
+  - Broad domain question
+  - Need top-line summary before drilling deeper
+
+  ## Use `run_query`
+  - Need a curated analytical view within growth, profitability, risk, client outcomes, or practice management
+  - The user is asking for a standard business cut rather than a one-off raw record
+
+  ## Use `compare_segments`
+  - The user is comparing advisors, divisions, channels, or service models
+  - The question is explicitly benchmark-oriented
+
+  ## Use `get_record`
+  - The user is asking about one household, account, advisor, lead, or campaign
+  - The request is identifier-centric
+
+  ## Use `explain_metric` or `search_knowledge`
+  - The user wants definitions, benchmarks, process, caveats, or policy
+  - The answer does not require live execution
+
+  ## Use `run_planning_analysis`
+  - The user wants planning calculations, simulations, tax, insurance, or retirement analysis
+
+  ## Use `run_portfolio_analysis`
+  - The user wants holdings, allocation, optimization, transition, or trade-oriented workflows
+
+  ## Use `generate_report` and `send_report`
+  - The user wants output artifacts or delivery workflows
+
+  ## Use `admin_diagnostics`
+  - The user wants cache, lineage, ETL, validation, or page retrieval diagnostics
+
+  ## Use `run_data_operation`
+  - The user needs operational system access or stateful platform actions

@@ -1,0 +1,336 @@
+/* src/PipelineReview.css — Allworth Financial brand system (Playfair Display + Lato) */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Lato:ital,wght@0,300;0,400;0,700;0,900;1,400&display=swap');
+
+.pr-root {
+  /* Brand palette — Allworth Financial brand guidelines */
+  --pr-night: #0C2E4E;      /* Night Blue  — headers, dark backgrounds */
+  --pr-indigo: #173D67;     /* Indigo Blue — wordmark, gradients */
+  --pr-cerulean: #3E71B7;   /* Cerulean    — interactive elements, links */
+  --pr-sky: #289FDA;        /* Sky         — accents, highlights */
+  --pr-evergreen: #436434;  /* Evergreen   — positive indicators */
+  --pr-gold: #A99C6C;       /* Gold        — warmth, secondary charts */
+  --pr-pumpkin: #D26D37;    /* Pumpkin     — warnings, CTA */
+  --pr-ice: #EDF2F7;        /* page background */
+  --pr-feather: #F3F4F4;    /* table header background */
+  --pr-linen: #F3F2E5;      /* warm panel background */
+  --pr-pale: #E6E6E6;       /* borders, dividers */
+  --pr-light-gray: #BEBEBE;
+  --pr-med-gray: #828282;
+  --pr-dark-gray: #595959;
+
+  /* Back-compat aliases repointed to brand colors */
+  --pr-navy: var(--pr-indigo);
+  --pr-green: var(--pr-evergreen);
+  --pr-red: #C8102E;
+
+  --pr-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --pr-sans: 'Lato', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  font-family: var(--pr-sans);
+  color: #1a1a1a;
+  max-width: none;
+  margin: 0 auto;
+  padding: 1.5rem 2rem 4rem;
+  position: relative;
+}
+
+/* Clear the fixed SideNav rail (shared across all tool pages). Higher
+   specificity than the .pr-root padding shorthand so content isn't hidden. */
+.pr-root.has-sidenav {
+  padding-left: 236px;
+}
+@media (max-width: 720px) {
+  .pr-root.has-sidenav {
+    padding-left: 2rem;
+  }
+}
+
+/* Full-viewport Ice page background behind the centered container */
+.pr-root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: var(--pr-ice);
+  z-index: -1;
+}
+
+/* Header — Night Blue → Indigo gradient brand band with iris motif */
+.pr-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, var(--pr-night) 0%, var(--pr-indigo) 100%);
+  border-radius: 14px;
+  padding: 1.4rem 1.75rem;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 10px 30px -12px rgba(12, 46, 78, 0.5);
+}
+/* Iris concentric-circle motif (brand unifying graphic) */
+.pr-header::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -60px;
+  width: 260px;
+  height: 260px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 34%, rgba(255,255,255,0.06) 35%, rgba(255,255,255,0.06) 37%, transparent 38%),
+    radial-gradient(circle, transparent 54%, rgba(255,255,255,0.06) 55%, rgba(255,255,255,0.06) 57%, transparent 58%),
+    radial-gradient(circle, transparent 74%, rgba(255,255,255,0.06) 75%, rgba(255,255,255,0.06) 77%, transparent 78%);
+  pointer-events: none;
+}
+.pr-header-brand { display: flex; align-items: center; gap: 1.1rem; position: relative; z-index: 1; }
+.pr-logo { height: 34px; width: auto; display: block; }
+.pr-header-titles { border-left: 1px solid rgba(255,255,255,0.25); padding-left: 1.1rem; }
+.pr-header h1 {
+  margin: 0;
+  font-family: var(--pr-serif);
+  font-weight: 500;
+  font-size: 1.7rem;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+.pr-sub { margin: 0.2rem 0 0; color: rgba(255,255,255,0.82); font-size: 0.85rem; font-weight: 300; }
+.pr-header-actions { display: flex; align-items: center; gap: 0.75rem; position: relative; z-index: 1; }
+.pr-week-select { display: flex; flex-direction: column; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.7); gap: 0.25rem; }
+.pr-week-select select {
+  padding: 0.42rem 0.7rem; border: 1px solid rgba(255,255,255,0.3); border-radius: 7px;
+  font-size: 0.88rem; background: rgba(255,255,255,0.12); color: #fff; font-family: var(--pr-sans);
+}
+.pr-week-select select option { color: #1a1a1a; }
+.pr-btn {
+  background: #fff; color: var(--pr-indigo); border: none; border-radius: 7px;
+  padding: 0.55rem 1.15rem; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+  font-family: var(--pr-sans); transition: transform 0.15s, box-shadow 0.15s;
+}
+.pr-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px -6px rgba(0,0,0,0.4); }
+.pr-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.pr-error {
+  background: #fdecea; color: #a01a1a; border: 1px solid #f5c6cb;
+  padding: 0.6rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem;
+}
+
+/* KPIs */
+.pr-kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+.pr-kpi {
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
+  padding: 1rem 1.2rem; display: flex; flex-direction: column; gap: 0.35rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.pr-kpi-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: #888; }
+.pr-kpi-value { font-size: 1.5rem; font-weight: 700; color: var(--pr-navy); }
+.pr-kpi-accent { background: var(--pr-navy); }
+.pr-kpi-accent .pr-kpi-label { color: #b9c6e0; }
+.pr-kpi-accent .pr-kpi-value { color: #fff; }
+
+@media (max-width: 900px) { .pr-kpis { grid-template-columns: repeat(2, 1fr); } }
+
+/* Charts */
+.pr-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+.pr-chart {
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1rem 1rem 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.pr-chart h3 { margin: 0 0 0.5rem; font-size: 0.9rem; color: var(--pr-navy); }
+@media (max-width: 900px) { .pr-charts { grid-template-columns: 1fr; } }
+
+/* Body: filter rail + list */
+.pr-layout { display: grid; grid-template-columns: 250px 1fr; gap: 1.25rem; align-items: start; }
+.pr-content { min-width: 0; }
+@media (max-width: 900px) { .pr-layout { grid-template-columns: 1fr; } }
+
+/* Filters */
+.pr-filters {
+  background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1rem;
+  position: sticky; top: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  max-height: calc(100vh - 2rem); overflow-y: auto;
+}
+.pr-filter-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.pr-filter-head h3 { margin: 0; font-size: 1rem; color: var(--pr-navy); }
+.pr-link { background: none; border: none; color: var(--pr-red); font-size: 0.78rem; cursor: pointer; padding: 0; }
+.pr-search {
+  width: 100%; box-sizing: border-box; padding: 0.5rem 0.7rem; border: 1px solid #ccc;
+  border-radius: 6px; font-size: 0.85rem; margin-bottom: 0.75rem;
+}
+.pr-check { display: flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; padding: 0.2rem 0; cursor: pointer; }
+.pr-check input { accent-color: var(--pr-navy); }
+.pr-check-strong { font-weight: 600; }
+.pr-slider { display: flex; flex-direction: column; gap: 0.3rem; margin: 0.6rem 0; font-size: 0.78rem; color: #555; }
+.pr-slider input { accent-color: var(--pr-navy); }
+.pr-filter-group { margin-top: 0.9rem; border-top: 1px solid #f0f0f0; padding-top: 0.6rem; max-height: 180px; overflow-y: auto; }
+.pr-filter-group h4 { margin: 0 0 0.4rem; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: #999; }
+
+/* List */
+.pr-list { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.pr-list-head { padding: 0.75rem 1rem; border-bottom: 1px solid #eee; font-size: 0.82rem; color: #666; background: #fafbfc; }
+.pr-loading, .pr-empty { padding: 2.5rem; text-align: center; color: #999; }
+
+.pr-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.pr-table th {
+  text-align: left; padding: 0.6rem 0.75rem; background: #f4f6f9; color: #555;
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; border-bottom: 1px solid #e5e7eb;
+  position: sticky; top: 0;
+}
+.pr-table td { padding: 0.55rem 0.75rem; border-bottom: 1px solid #f2f2f2; }
+.pr-table tbody tr:not(.pr-detail-row) { cursor: pointer; }
+.pr-table tbody tr:not(.pr-detail-row):hover { background: #f8fafc; }
+.pr-num { text-align: right; }
+.pr-col-check { width: 34px; text-align: center; }
+.pr-sortable { cursor: pointer; user-select: none; }
+.pr-sortable:hover { color: var(--pr-navy); }
+
+.pr-name { font-weight: 600; color: #1a1a1a; }
+.pr-stage { display: inline-block; }
+.pr-days { display: inline-block; margin-left: 0.4rem; font-size: 0.72rem; color: #999; }
+.pr-score {
+  display: inline-block; min-width: 2rem; text-align: center; font-weight: 700;
+  background: var(--pr-navy); color: #fff; border-radius: 5px; padding: 0.1rem 0.4rem; font-size: 0.8rem;
+}
+.pr-badge { display: inline-block; margin-left: 0.5rem; padding: 0.1rem 0.45rem; border-radius: 999px; font-size: 0.65rem; font-weight: 700; }
+.pr-badge-risk { background: #fdecea; color: var(--pr-red); }
+
+.pr-at-risk td { box-shadow: inset 3px 0 0 var(--pr-red); }
+.pr-worked td { opacity: 0.5; text-decoration: line-through; }
+.pr-worked .pr-score { background: #999; }
+
+.pr-detail-row td { background: #f8fafc; }
+.pr-detail { display: flex; flex-wrap: wrap; gap: 1.5rem; padding: 0.4rem 0.5rem; font-size: 0.82rem; color: #555; }
+
+/* KPI sub-line + WoW deltas */
+.pr-kpi-sub { font-size: 0.7rem; color: #888; margin-top: 0.15rem; }
+.pr-kpi-delta { font-size: 0.72rem; font-weight: 600; margin-top: 0.25rem; }
+.pr-kpi-delta.up { color: var(--pr-green); }
+.pr-kpi-delta.down { color: var(--pr-red); }
+.pr-kpi-delta.flat { color: #999; }
+.pr-kpi-worked { border-left: 3px solid var(--pr-navy); }
+
+/* Scoring key */
+.pr-scoring { margin: 0 0 1.5rem; background: linear-gradient(180deg, #fbfcfe 0%, #f5f7fb 100%); border: 1px solid #e5e9f0; border-radius: 12px; padding: 1.1rem 1.35rem 1.25rem; }
+.pr-scoring-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
+.pr-scoring-head h3 { margin: 0; color: var(--pr-navy); font-size: 1.02rem; }
+.pr-scoring-note { font-size: 0.75rem; color: #8a94a6; }
+.pr-scoring-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+.pr-score-col { background: #fff; border: 1px solid #e9edf4; border-radius: 10px; padding: 0.75rem 0.9rem; }
+.pr-score-col h4 { margin: 0 0 0.55rem; font-size: 0.72rem; color: var(--pr-navy); text-transform: uppercase; letter-spacing: 0.06em; padding-bottom: 0.4rem; border-bottom: 2px solid #eef1f6; }
+.pr-score-col ul { margin: 0; padding: 0; list-style: none; }
+.pr-score-col li { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.28rem 0; font-size: 0.82rem; color: #374253; }
+.pr-score-col li + li { border-top: 1px solid #f4f6fa; }
+.pr-score-label { flex: 1; }
+.pr-pts { flex: 0 0 auto; min-width: 40px; text-align: center; font-weight: 700; font-size: 0.76rem; padding: 0.12rem 0.5rem; border-radius: 999px; }
+.pr-pts.pos { background: #e7f6ee; color: #1c7a45; }
+.pr-pts.neg { background: #fdecea; color: var(--pr-red); }
+
+/* Sort controls */
+.pr-sort { display: flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; color: #666; }
+.pr-sort button { border: 1px solid #ccc; background: #fff; border-radius: 5px; padding: 0.2rem 0.55rem; font-size: 0.75rem; cursor: pointer; }
+.pr-sort button.on { background: var(--pr-navy); color: #fff; border-color: var(--pr-navy); }
+
+/* Charts */
+.pr-chart h3 { display: flex; align-items: baseline; gap: 0.4rem; }
+.pr-chart-unit { font-size: 0.75rem; font-weight: 400; color: #99a3b3; }
+.pr-chart-empty { display: flex; align-items: center; justify-content: center; height: 230px; color: #98a2b3; font-size: 0.85rem; text-align: center; padding: 0 1.5rem; border: 1px dashed #e0e5ee; border-radius: 8px; background: #fafbfd; }
+
+/* Channel groups */
+.pr-group { margin-bottom: 1.25rem; border: 1px solid #e5e9f0; border-radius: 10px; overflow: hidden; }
+.pr-group-head { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.9rem; color: #fff; }
+.pr-group-name { font-weight: 700; font-size: 0.92rem; }
+.pr-group-stat { font-size: 0.8rem; opacity: 0.9; }
+.pr-group .pr-table { margin: 0; }
+
+/* Dir + status */
+.pr-col-dir { width: 42px; text-align: center; }
+.pr-dir { font-weight: 700; font-size: 0.72rem; }
+.pr-dir-new { color: var(--pr-green); }
+.pr-dir-up { color: #2E9E5B; }
+.pr-dir-flat { color: #bbb; }
+
+.pr-status { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600; }
+.pr-status-on-track { background: #e7f6ee; color: #1c7a45; }
+.pr-status-at-risk { background: #fff4e0; color: #a9701a; }
+.pr-status-overdue { background: #fdecea; color: var(--pr-red); }
+
+.pr-avg { color: #aaa; font-weight: 400; }
+.pr-sales { display: block; font-size: 0.72rem; color: #888; }
+.pr-info { margin-left: 0.25rem; color: #7a8aa5; cursor: help; font-size: 0.75rem; }
+a.pr-name { color: var(--pr-navy); text-decoration: none; font-weight: 600; }
+a.pr-name:hover { text-decoration: underline; }
+
+/* Closed section */
+.pr-closed { margin-top: 2rem; }
+.pr-closed h2, .pr-risks h2 { color: var(--pr-navy); font-size: 1.2rem; border-bottom: 2px solid #e5e9f0; padding-bottom: 0.4rem; }
+
+/* At-risk flags */
+.pr-risks { margin-top: 2rem; }
+.pr-risk-card { margin-bottom: 1.1rem; }
+.pr-risk-head-overdue { background: linear-gradient(90deg, #C8102E 0%, #e0384f 100%); }
+.pr-risk-head-nonext { background: linear-gradient(90deg, #A9701A 0%, #c68a2c 100%); }
+.pr-risk-head-dropped { background: linear-gradient(90deg, #5b6472 0%, #79828f 100%); }
+.pr-badge-overdue { background: #fdecea; color: var(--pr-red); font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.72rem; }
+
+/* Week-over-week progress */
+.pr-progress { margin: 0 0 1.5rem; background: #fff; border: 1px solid #e5e9f0; border-radius: 12px; padding: 1.1rem 1.35rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.pr-progress-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.pr-progress-head h2 { margin: 0; color: var(--pr-navy); font-size: 1.2rem; }
+.pr-progress-sub { margin: 0.3rem 0 0; font-size: 0.85rem; color: #666; }
+.pr-progress-sub strong { color: var(--pr-green); }
+
+.pr-progress-tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem; margin: 1rem 0 1.1rem; }
+.pr-ptile { border: 1px solid #e9edf4; border-radius: 10px; padding: 0.75rem 0.9rem; display: flex; flex-direction: column; gap: 0.15rem; border-top: 3px solid #ccc; }
+.pr-ptile-count { font-size: 1.5rem; font-weight: 700; color: var(--pr-navy); line-height: 1; }
+.pr-ptile-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: #555; font-weight: 600; }
+.pr-ptile-sub { font-size: 0.7rem; color: #999; }
+.pr-ptile-won { background: #f2f7f0; border-top-color: var(--pr-green); }
+.pr-ptile-advanced { background: #eef8fe; border-top-color: #289FDA; }
+.pr-ptile-reengaged { background: #faf6ea; border-top-color: #A99C6C; }
+.pr-ptile-stable { background: #f7f8fa; border-top-color: #9aa4b2; }
+.pr-ptile-dropped { background: #fdf1ea; border-top-color: var(--pr-red); }
+@media (max-width: 900px) { .pr-progress-tiles { grid-template-columns: repeat(2, 1fr); } }
+
+.pr-progress-table { border: 1px solid #eef1f6; border-radius: 8px; overflow: hidden; }
+.pr-score-change { font-variant-numeric: tabular-nums; font-size: 0.8rem; color: #374253; white-space: nowrap; }
+.pr-progress-note { color: #1a1a1a; }
+.pr-progress-foot { margin: 0.75rem 0 0; font-size: 0.78rem; color: #98a2b3; font-style: italic; }
+
+.pr-pstatus { display: inline-block; padding: 0.12rem 0.55rem; border-radius: 999px; font-size: 0.68rem; font-weight: 700; }
+.pr-pstatus-won { background: #e8ede7; color: #1c7a45; }
+.pr-pstatus-advanced { background: #E2F4FE; color: #1668a5; }
+.pr-pstatus-reengaged { background: #f5f0e0; color: #8a7420; }
+.pr-pstatus-stable { background: #eef0f3; color: #5b6472; }
+.pr-pstatus-dropped { background: #fde8db; color: var(--pr-red); }
+
+/* ── Brand refinements (Allworth Financial) ───────────────────────────── */
+/* Premium KPI accent card uses the dark brand gradient */
+.pr-kpi-accent { background: linear-gradient(135deg, var(--pr-night) 0%, var(--pr-indigo) 100%); }
+.pr-kpi-value, .pr-ptile-count, .pr-num, .pr-score-change { font-variant-numeric: tabular-nums; }
+
+/* Playfair Display on the major section headings (brand headline face) */
+.pr-scoring-head h3,
+.pr-closed h2,
+.pr-risks h2,
+.pr-progress-head h2 {
+  font-family: var(--pr-serif);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--pr-indigo);
+}
+
+/* Cards adopt brand borders + a soft Night-Blue shadow */
+.pr-kpi, .pr-chart, .pr-filters, .pr-list, .pr-scoring, .pr-progress {
+  border-color: var(--pr-pale);
+  box-shadow: 0 1px 3px rgba(12, 46, 78, 0.05);
+}
+
+/* Table header → Feather Gray with muted brand label text */
+.pr-table th { background: var(--pr-feather); color: var(--pr-med-gray); }
+
+/* Interactive text → Cerulean Blue per brand link guidance */
+a.pr-name { color: var(--pr-cerulean); }
+.pr-scoring-head h3 { border: none; }
+

@@ -1,0 +1,9 @@
+id: current-household-demographic
+source: wealth_mcp.domain.tables
+description: 'Current-state household attributes: status, advisor/team assignment,
+  office, acquisition source, pipeline status, segment. The household spine — most
+  analyses join here via LeadId (Salesforce) or AVHHID (Advent).'
+business_name: Household (current attributes)
+grain: one row per Salesforce Lead (LeadId)
+pk: LeadId
+domain: Household

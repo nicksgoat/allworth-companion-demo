@@ -1,0 +1,83 @@
+id: client-count-rollforward
+name: Client_Count_Rollforward
+schema: tho
+db: DataWarehouse
+db_table: Client_Count_Rollforward
+guid: e7d8b01a-0883-4e00-b5ee-97f707506454
+business_name: null
+grain: avhhid x Reporting_Period_Key
+pk: null
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Client Count Rollforward
+column_count: 7
+columns:
+- name: Reporting_Period_Key
+  db_column_name: Reporting_Period_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: avhhid
+  db_column_name: avhhid
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: BoP_Client_Count
+  db_column_name: BoP_Client_Count
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: New_Organic_Clients
+  db_column_name: New_Organic_Clients
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: New_Acquisition_Clients
+  db_column_name: New_Acquisition_Clients
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Lost_Clients
+  db_column_name: Lost_Clients
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: EoP_Client_Count
+  db_column_name: EoP_Client_Count
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

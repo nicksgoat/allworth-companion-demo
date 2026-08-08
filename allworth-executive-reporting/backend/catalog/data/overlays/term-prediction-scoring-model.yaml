@@ -1,0 +1,8 @@
+id: term-prediction-scoring-model
+source: wealth_mcp.domain.tables
+description: Current churn-model feature vector and score per household — explains
+  what drives the probability.
+business_name: Churn model feature inputs + score
+grain: one row per avhhid
+pk: avhhid
+domain: ML

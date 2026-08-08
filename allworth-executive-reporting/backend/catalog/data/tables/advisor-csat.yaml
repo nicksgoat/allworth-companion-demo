@@ -1,0 +1,56 @@
+id: advisor-csat
+name: Advisor_CSAT
+schema: tho
+db: DataWarehouse
+db_table: Advisor_CSAT
+guid: 2e85ac41-6ad0-4f45-99c3-86d0eff6c5b9
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Advisor
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Advisor CSAT
+column_count: 4
+columns:
+- name: Survey ID
+  db_column_name: Survey ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Question ID
+  db_column_name: Question ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Weight
+  db_column_name: Weight
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Created Date
+  db_column_name: Created Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

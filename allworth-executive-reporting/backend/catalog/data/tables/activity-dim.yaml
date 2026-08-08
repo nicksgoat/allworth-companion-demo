@@ -1,0 +1,166 @@
+id: activity-dim
+name: Activity_Dim
+schema: tho
+db: DataWarehouse
+db_table: Activity_Dim
+guid: 30be0833-1f6c-4923-826d-b3a5a1d884a6
+business_name: Activity attributes (tasks/events)
+grain: one row per Salesforce Activity Id
+pk: Id
+synonyms: []
+domain: Activity
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Activities
+- Campaigns
+- Practice Management
+column_count: 16
+columns:
+- name: Completed_By
+  db_column_name: Completed_By
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Owner_Client_Service_Type__c
+  db_column_name: Owner_Client_Service_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Call_Disposition
+  db_column_name: Call_Disposition
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Service_Type__c
+  db_column_name: Service_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Is_High_Priority_Client__c
+  db_column_name: Is_High_Priority_Client__c
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Id
+  db_column_name: Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Subject
+  db_column_name: Subject
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Process__c
+  db_column_name: Process__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Update_Time
+  db_column_name: Update_Time
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Process_Type__c
+  db_column_name: Process_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Activity_Type
+  db_column_name: Activity_Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Status
+  db_column_name: Status
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Created_Datetime
+  db_column_name: Created_Datetime
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: LeadId
+  db_column_name: LeadId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Related_Record__c
+  db_column_name: Related_Record__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: FCD_Campaign
+  db_column_name: FCD_Campaign
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

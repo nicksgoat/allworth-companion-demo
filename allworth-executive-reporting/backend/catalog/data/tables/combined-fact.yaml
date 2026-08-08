@@ -1,0 +1,65 @@
+id: combined-fact
+name: Combined_Fact
+schema: tho
+db: DataWarehouse
+db_table: Combined_Fact
+guid: e8ea04e8-267e-426e-a7e1-6fd9537cb4c4
+business_name: null
+grain: LeadId x Goal IDs
+pk: null
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Performance Tracking
+column_count: 5
+columns:
+- name: LeadId
+  db_column_name: LeadId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: RF_ID
+  db_column_name: RF_ID
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Goal_First_Touch_ID
+  db_column_name: Goal_First_Touch_ID
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Goal_Sales_ID
+  db_column_name: Goal_Sales_ID
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Actual
+  db_column_name: Actual
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

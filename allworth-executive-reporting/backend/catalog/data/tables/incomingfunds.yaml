@@ -1,0 +1,315 @@
+id: incomingfunds
+name: IncomingFunds
+schema: tho
+db: DataWarehouse
+db_table: IncomingFunds
+guid: 6db475d4-d974-48a1-b29d-91837f9314d5
+business_name: Expected incoming transfers
+grain: one row per IncomingFunds record
+pk: Id
+synonyms: []
+domain: Transactions
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Account Setups
+- Incoming Funds
+column_count: 24
+columns:
+- name: Household
+  db_column_name: Household
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: CreatedById
+  db_column_name: CreatedById
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Account_Setup__c
+  db_column_name: Account_Setup__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CreatedDate
+  db_column_name: CreatedDate
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Enters_Funded_Status__c
+  db_column_name: Enters_Funded_Status__c
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Financial_Account__c
+  db_column_name: Financial_Account__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Operations_Team__c
+  db_column_name: Operations_Team__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Estimated_Value__c
+  db_column_name: Estimated_Value__c
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: LastModifiedById
+  db_column_name: LastModifiedById
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Actual_Value__c
+  db_column_name: Actual_Value__c
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: OwnerId
+  db_column_name: OwnerId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Transfer_Type__c
+  db_column_name: Transfer_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Status__c
+  db_column_name: Status__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Contra_Firm__c
+  db_column_name: Contra_Firm__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Funds_Expected__c
+  db_column_name: Funds_Expected__c
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Incoming Funds ID
+  db_column_name: Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Account_Number__c
+  db_column_name: Account_Number__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Delivering Account Type
+  db_column_name: Contra_Account_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms:
+  - Contra_Account_Type__c
+  description: ''
+  pii: false
+  hot: false
+- name: Name
+  db_column_name: Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Funds_Overdue__c
+  db_column_name: Funds_Overdue__c
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: IsDeleted
+  db_column_name: IsDeleted
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Overdue_Funds_Tasks_Created__c
+  db_column_name: Overdue_Funds_Tasks_Created__c
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CompletedById
+  db_column_name: CompletedById
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Funding_Source
+  db_column_name: Funding_Source
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: IncFunds to AcctSetup
+  to: AccountSetups
+  to_id: accountsetups
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[IncomingFunds::Account_Setup__c] = [AccountSetups::AcctSetupID]'
+  pairs:
+  - from_table: IncomingFunds
+    from_col: Account_Setup__c
+    to_table: AccountSetups
+    to_col: AcctSetupID
+- join_name: Incoming Funds Owner
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[IncomingFunds::OwnerId] = [User::User ID]'
+  pairs:
+  - from_table: IncomingFunds
+    from_col: OwnerId
+    to_table: User
+    to_col: User ID
+- join_name: Incoming Funds to ACV
+  to: Current_Account_Demographic
+  to_id: current-account-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[IncomingFunds::Account_Number__c] = [Current_Account_Demographic::Account Number]'
+  pairs:
+  - from_table: IncomingFunds
+    from_col: Account_Number__c
+    to_table: Current_Account_Demographic
+    to_col: Account Number
+- join_name: IncomingFunds to HH Fact
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[IncomingFunds::Household] = [Current_Household_Fact::HHID]'
+  pairs:
+  - from_table: IncomingFunds
+    from_col: Household
+    to_table: Current_Household_Fact
+    to_col: HHID
+- join_name: IncomingFundsCreatedBy_to_User
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[IncomingFunds::CreatedById] = [User::User ID]'
+  pairs:
+  - from_table: IncomingFunds
+    from_col: CreatedById
+    to_table: User
+    to_col: User ID
+- join_name: IncomingFunds_CompletedById
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[IncomingFunds::CompletedById] = [User::User ID]'
+  pairs:
+  - from_table: IncomingFunds
+    from_col: CompletedById
+    to_table: User
+    to_col: User ID
+- join_name: Ops Funds Last Modified
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[IncomingFunds::LastModifiedById] = [User::User ID]'
+  pairs:
+  - from_table: IncomingFunds
+    from_col: LastModifiedById
+    to_table: User
+    to_col: User ID

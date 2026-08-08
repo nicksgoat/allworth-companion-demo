@@ -1,0 +1,47 @@
+id: rd-netflows-goals-2025-new
+name: RD_NetFlows_Goals_2025_NEW
+schema: dbo
+db: DataWarehouse
+db_table: RD_NetFlows_Goals_2025_NEW
+guid: 32f3fb34-0f88-49fc-a8b5-ecb338adbe53
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Goals
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Trade Date Rollforward
+column_count: 3
+columns:
+- name: user id
+  db_column_name: user id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Goal
+  db_column_name: Goal
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: reporting_period_key
+  db_column_name: reporting_period_key
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

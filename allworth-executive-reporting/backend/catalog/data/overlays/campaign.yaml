@@ -1,0 +1,7 @@
+id: campaign
+source: wealth_mcp.domain.tables
+description: 'Salesforce campaign master: type, status, dates, costs, lead/opportunity
+  counts.'
+business_name: Salesforce campaign
+pk: Id
+domain: Activity

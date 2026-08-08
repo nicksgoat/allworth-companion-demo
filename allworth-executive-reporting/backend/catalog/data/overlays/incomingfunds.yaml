@@ -1,0 +1,8 @@
+id: incomingfunds
+source: wealth_mcp.domain.tables
+description: 'Expected incoming client money (transfers in flight): amount, expected
+  date, source, household. Feeds projected NCNM / incoming-funds reporting.'
+business_name: Expected incoming transfers
+grain: one row per IncomingFunds record
+pk: Id
+domain: Transactions

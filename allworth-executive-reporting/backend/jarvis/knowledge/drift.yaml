@@ -1,0 +1,11 @@
+name: Drift
+uri: frameworks://drift
+category: Metric Definitions
+description: Absolute deviation of current weights from target policy weights.
+keywords:
+  - drift
+  - portfolio drift
+  - allocation
+  - policy weights
+content: |
+  Absolute deviation of current weights from target policy weights. Drift is a policy-governance measure, not a return measure.

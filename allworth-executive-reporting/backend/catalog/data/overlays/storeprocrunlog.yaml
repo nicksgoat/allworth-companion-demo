@@ -1,0 +1,6 @@
+id: storeprocrunlog
+source: wealth_mcp.domain.tables
+description: 'ETL stored-procedure run log: which warehouse tables were refreshed
+  and when. Freshness source.'
+grain: TableName x StoredProcRunDate
+domain: Logging

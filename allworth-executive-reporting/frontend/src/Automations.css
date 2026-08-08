@@ -1,0 +1,128 @@
+/* Automations page — reuses .t2-* chrome and the .admin-console glass palette;
+   these rules style only the automations-specific UI, scoped under .autom*. */
+
+.autom-hero {
+  margin: 20px 0 18px;
+  padding: 22px 30px 24px;
+  background: var(--admin-card-bg, rgba(255, 255, 255, 0.62));
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--admin-card-border, rgba(255, 255, 255, 0.75));
+  border-radius: 18px;
+  box-shadow: var(--admin-card-shadow, 0 20px 48px -12px rgba(0, 32, 92, 0.14));
+}
+.autom-hero h1 {
+  margin: 6px 0 4px;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--admin-navy, #00205c);
+}
+.autom-kicker {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--admin-orange-deep, #c75b12);
+}
+.autom-sub {
+  margin: 0;
+  color: var(--admin-mute, #6b7280);
+  font-size: 14px;
+}
+
+/* sub-tab bar */
+.autom-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.autom-tab {
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--admin-navy-line, rgba(0, 32, 92, 0.14));
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--admin-navy, #00205c);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+.autom-tab.is-active {
+  background: var(--admin-navy, #00205c);
+  color: #fff;
+  border-color: transparent;
+}
+
+.autom-panel { display: flex; flex-direction: column; gap: 16px; }
+.autom-lead { margin: 0; color: var(--admin-text, #1f2937); font-size: 15px; max-width: 70ch; }
+
+.autom-card {
+  padding: 20px 22px;
+  background: var(--admin-card-bg, rgba(255, 255, 255, 0.62));
+  border: 1px solid var(--admin-card-border, rgba(255, 255, 255, 0.75));
+  border-radius: 16px;
+  box-shadow: var(--admin-card-shadow, 0 20px 48px -12px rgba(0, 32, 92, 0.14));
+}
+.autom-card h3 { margin: 0 0 14px; font-size: 16px; color: var(--admin-navy, #00205c); }
+.autom-card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.autom-card-head h3 { margin: 0; }
+
+.autom-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--admin-text, #1f2937);
+  margin-bottom: 12px;
+}
+.autom-card input {
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid var(--admin-navy-line, rgba(0, 32, 92, 0.18));
+  background: rgba(255, 255, 255, 0.9);
+  font: inherit;
+  color: var(--admin-text, #1f2937);
+}
+.autom-card input:focus { outline: none; border-color: var(--admin-navy, #00205c); }
+.autom-row { display: flex; gap: 14px; flex-wrap: wrap; }
+.autom-row label { flex: 1 1 220px; }
+.autom-req { color: #b3261e; font-weight: 600; font-size: 11px; }
+.autom-opt { color: var(--admin-mute, #6b7280); font-weight: 500; font-size: 11px; }
+
+.autom-btn {
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid var(--admin-navy-line, rgba(0, 32, 92, 0.18));
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--admin-navy, #00205c);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+.autom-btn:disabled { opacity: 0.5; cursor: default; }
+.autom-btn-primary { background: var(--admin-navy, #00205c); color: #fff; border-color: transparent; }
+.autom-btn-danger { color: #b3261e; border-color: rgba(179, 38, 30, 0.3); }
+
+.autom-rules { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.autom-rule {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--admin-navy-line, rgba(0, 32, 92, 0.12));
+  border-radius: 12px;
+}
+.autom-rule-main { min-width: 0; }
+.autom-rule-target { font-weight: 700; color: var(--admin-navy, #00205c); word-break: break-all; }
+.autom-rule-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; font-size: 12px; color: var(--admin-mute, #6b7280); }
+
+.autom-muted { color: var(--admin-mute, #6b7280); font-size: 14px; margin: 0; }
+.autom-warn { padding: 12px 16px; border-radius: 12px; background: #fdf3e0; color: #9a5b00; font-size: 13px; border: 1px solid rgba(154, 91, 0, 0.2); }
+.autom-error { padding: 12px 16px; border-radius: 12px; background: #fdeceb; color: #b3261e; font-size: 13px; border: 1px solid rgba(179, 38, 30, 0.2); }
+.autom-note { padding: 12px 16px; border-radius: 12px; background: #e8f6ee; color: #157a4c; font-size: 13px; border: 1px solid rgba(21, 122, 76, 0.2); }

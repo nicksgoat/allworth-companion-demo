@@ -1,0 +1,146 @@
+id: project-stages
+name: Project_Stages
+schema: tho
+db: DataWarehouse
+db_table: Project_Stages
+guid: 84fa6cab-310e-49c1-b96b-f3bfe5392e3f
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Pipeline
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Integrated Services
+column_count: 14
+columns:
+- name: project_id
+  db_column_name: project_id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: first_status
+  db_column_name: first_status
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: first_status_ts
+  db_column_name: first_status_ts
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: current_status
+  db_column_name: current_status
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: current_status_ts
+  db_column_name: current_status_ts
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: dt_planned
+  db_column_name: dt_planned
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: dt_ready_to_start
+  db_column_name: dt_ready_to_start
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: dt_open
+  db_column_name: dt_open
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: dt_preparation
+  db_column_name: dt_preparation
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: dt_review
+  db_column_name: dt_review
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: dt_delivery
+  db_column_name: dt_delivery
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: dt_completed
+  db_column_name: dt_completed
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: dt_canceled
+  db_column_name: dt_canceled
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: dt_extension
+  db_column_name: dt_extension
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

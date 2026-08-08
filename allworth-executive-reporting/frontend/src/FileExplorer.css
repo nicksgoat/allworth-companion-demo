@@ -1,0 +1,550 @@
+/* FileExplorer.css — scoped under .file-explorer. Shares the app brand palette. */
+
+.file-explorer {
+  --fe-navy: #00205c;
+  --fe-orange: #c75b12;
+  --fe-bg: #f4f6fb;
+  --fe-panel: #ffffff;
+  --fe-border: rgba(0, 32, 92, 0.12);
+  --fe-border-strong: rgba(0, 32, 92, 0.2);
+  --fe-text: #0a0e1a;
+  --fe-muted: #5a6478;
+  --fe-danger: #b3261e;
+  --fe-shadow: 0 18px 40px -16px rgba(0, 32, 92, 0.18), 0 2px 8px rgba(0, 32, 92, 0.06);
+
+  min-height: 100vh;
+  background: var(--fe-bg);
+  color: var(--fe-text);
+}
+
+.file-explorer .fe-main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 32px 64px;
+}
+
+.file-explorer .fe-header h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--fe-navy);
+}
+
+.file-explorer .fe-subtitle {
+  margin: 6px 0 0;
+  color: var(--fe-muted);
+}
+
+/* ── tabs ── */
+.file-explorer .fe-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 28px 0 24px;
+  border-bottom: 1px solid var(--fe-border);
+}
+
+.file-explorer .fe-tab {
+  position: relative;
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 12px 18px;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--fe-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.file-explorer .fe-tab.active {
+  color: var(--fe-navy);
+  border-bottom-color: var(--fe-orange);
+}
+
+.file-explorer .fe-tab.disabled {
+  color: #9aa3b5;
+  cursor: not-allowed;
+}
+
+.file-explorer .fe-soon {
+  margin-left: 8px;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: rgba(0, 32, 92, 0.08);
+  color: var(--fe-muted);
+  padding: 2px 6px;
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+/* ── downloads list ── */
+.file-explorer .fe-group {
+  margin-bottom: 28px;
+}
+
+.file-explorer .fe-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px;
+}
+
+.file-explorer .fe-group-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--fe-navy);
+  margin: 0 0 12px;
+}
+
+.file-explorer .fe-group-header .fe-group-title {
+  margin: 0;
+}
+
+.file-explorer .fe-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.file-explorer .fe-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--fe-panel);
+  border: 1px solid var(--fe-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: var(--fe-shadow);
+}
+
+.file-explorer .fe-file-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--fe-navy);
+  flex: none;
+}
+
+.file-explorer .fe-file-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.file-explorer .fe-row-name {
+  font-weight: 600;
+  flex: 1;
+  word-break: break-word;
+}
+
+.file-explorer .fe-row-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.file-explorer .fe-row-meta .fe-row-name {
+  flex: none;
+}
+
+.file-explorer .fe-row-modified {
+  font-size: 0.72rem;
+  color: var(--fe-muted);
+}
+
+.file-explorer .fe-tree-modified {
+  margin-left: 8px;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--fe-muted);
+}
+
+.file-explorer .fe-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-explorer .fe-format {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.68rem;
+  color: var(--fe-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.file-explorer select,
+.file-explorer .fe-input {
+  border: 1px solid var(--fe-border-strong);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 0.9rem;
+  background: #fff;
+  color: var(--fe-text);
+}
+
+.file-explorer .fe-btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.file-explorer .fe-btn.primary {
+  background: var(--fe-navy);
+  color: #fff;
+}
+
+.file-explorer .fe-btn.primary:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.file-explorer .fe-btn .fe-spinner {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  margin-right: 7px;
+  vertical-align: -2px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: fe-spin 0.6s linear infinite;
+}
+
+@keyframes fe-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.file-explorer .fe-btn.ghost {
+  background: #fff;
+  border-color: var(--fe-border-strong);
+  color: var(--fe-navy);
+}
+
+.file-explorer .fe-btn.sm {
+  padding: 5px 10px;
+  font-size: 0.82rem;
+}
+
+.file-explorer .fe-muted {
+  color: var(--fe-muted);
+}
+
+.file-explorer .fe-error {
+  color: var(--fe-danger);
+  font-weight: 600;
+}
+
+/* ── uploads ── */
+.file-explorer .fe-uploads {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.file-explorer .fe-upload-card {
+  background: var(--fe-panel);
+  border: 1px solid var(--fe-border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: var(--fe-shadow);
+}
+
+.file-explorer .fe-upload-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.file-explorer .fe-upload-head .fe-group-title {
+  margin: 0;
+}
+
+.file-explorer .fe-upload-type {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--fe-navy);
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.file-explorer .fe-upload-hint {
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+}
+
+.file-explorer .fe-linkish {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--fe-navy);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.file-explorer .fe-upload-columns {
+  margin: 0 0 14px;
+  padding-left: 20px;
+  columns: 2;
+  font-size: 0.82rem;
+  color: var(--fe-muted);
+}
+
+.file-explorer .fe-upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.file-explorer .fe-file-btn {
+  cursor: pointer;
+}
+
+.file-explorer .fe-upload-filename {
+  flex: 1;
+  min-width: 120px;
+  font-size: 0.88rem;
+  color: var(--fe-muted);
+  word-break: break-all;
+}
+
+.file-explorer .fe-upload-error {
+  margin: 12px 0 0;
+}
+
+.file-explorer .fe-upload-ok {
+  margin: 12px 0 0;
+  color: var(--fe-navy);
+  font-weight: 600;
+}
+
+.file-explorer .fe-empty {
+  background: var(--fe-panel);
+  border: 1px dashed var(--fe-border-strong);
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+}
+
+.file-explorer .fe-empty p {
+  margin: 4px 0;
+}
+
+/* ── sharing panel ── */
+.file-explorer .fe-sharing {
+  margin-bottom: 26px;
+  background: var(--fe-panel);
+  border: 1px solid var(--fe-border);
+  border-radius: 12px;
+  box-shadow: var(--fe-shadow);
+}
+
+.file-explorer .fe-sharing-toggle {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--fe-navy);
+  cursor: pointer;
+}
+
+.file-explorer .fe-sharing-chevron {
+  display: inline-block;
+  width: 16px;
+  color: var(--fe-orange);
+}
+
+.file-explorer .fe-sharing-body {
+  padding: 4px 16px 16px;
+  border-top: 1px solid var(--fe-border);
+}
+
+.file-explorer .fe-tree-root {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--fe-border);
+}
+
+.file-explorer .fe-tree-root:last-child {
+  border-bottom: none;
+}
+
+.file-explorer .fe-tree-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.file-explorer .fe-tree-dir {
+  font-weight: 700;
+}
+
+.file-explorer .fe-tree-tables {
+  list-style: none;
+  margin: 4px 0 0;
+  padding-left: 22px;
+}
+
+/* ── share modal ── */
+.file-explorer .fe-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 14, 26, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.file-explorer .fe-modal {
+  background: #fff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.file-explorer .fe-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--fe-border);
+}
+
+.file-explorer .fe-modal-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--fe-navy);
+}
+
+.file-explorer .fe-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--fe-muted);
+  cursor: pointer;
+}
+
+.file-explorer .fe-share-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  flex-wrap: wrap;
+}
+
+.file-explorer .fe-share-add .fe-input {
+  flex: 1;
+  min-width: 180px;
+}
+
+.file-explorer .fe-seg {
+  display: inline-flex;
+  border: 1px solid var(--fe-border-strong);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.file-explorer .fe-seg button {
+  background: #fff;
+  border: none;
+  padding: 7px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--fe-muted);
+  cursor: pointer;
+}
+
+.file-explorer .fe-seg button.active {
+  background: var(--fe-navy);
+  color: #fff;
+}
+
+.file-explorer .fe-share-list {
+  padding: 0 20px 20px;
+}
+
+.file-explorer .fe-share-list h4 {
+  margin: 8px 0 10px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--fe-muted);
+}
+
+.file-explorer .fe-share-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.file-explorer .fe-share-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-explorer .fe-principal {
+  flex: 1;
+  word-break: break-word;
+}
+
+.file-explorer .fe-pill {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.file-explorer .fe-pill.user {
+  background: rgba(0, 32, 92, 0.1);
+  color: var(--fe-navy);
+}
+
+.file-explorer .fe-pill.group {
+  background: rgba(199, 91, 18, 0.14);
+  color: var(--fe-orange);
+}
+
+@media (max-width: 720px) {
+  .file-explorer .fe-row {
+    flex-wrap: wrap;
+  }
+  .file-explorer .fe-row-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

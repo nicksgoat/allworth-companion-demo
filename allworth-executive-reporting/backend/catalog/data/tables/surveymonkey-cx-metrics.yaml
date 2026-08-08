@@ -1,0 +1,133 @@
+id: surveymonkey-cx-metrics
+name: SurveyMonkey_CX_Metrics
+schema: tho
+db: DataWarehouse
+db_table: SurveyMonkey_CX_Metrics
+guid: b274f952-6bbc-400c-a783-3022629b8ad8
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Allworth 360
+- Survey Monkey Results
+column_count: 10
+columns:
+- name: Survey Name
+  db_column_name: Survey_Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Question ID
+  db_column_name: Question_ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Question Text
+  db_column_name: Question_Text
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Weight
+  db_column_name: Weight
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Created Date
+  db_column_name: Created_Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Answer Text
+  db_column_name: Answer_Text
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Person ID
+  db_column_name: Person_ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Comments
+  db_column_name: Comments
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Email
+  db_column_name: Email
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Name
+  db_column_name: Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: SurveyMonkeyEmail_to_SurveyMonkey_CX_Metrics
+  to: SurveyMonkeyEmail
+  to_id: surveymonkeyemail
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[SurveyMonkey_CX_Metrics::Person ID] = [SurveyMonkeyEmail::Person ID]'
+  pairs:
+  - from_table: SurveyMonkey_CX_Metrics
+    from_col: Person ID
+    to_table: SurveyMonkeyEmail
+    to_col: Person ID
+- join_name: SurveyMonkey_CX_Metrics_to_Contact_Demographic
+  to: Contact_Demographic
+  to_id: contact-demographic
+  type: INNER
+  one_to_one: false
+  'on': '[SurveyMonkey_CX_Metrics::Email] = [Contact_Demographic::Email]'
+  pairs:
+  - from_table: SurveyMonkey_CX_Metrics
+    from_col: Email
+    to_table: Contact_Demographic
+    to_col: Email

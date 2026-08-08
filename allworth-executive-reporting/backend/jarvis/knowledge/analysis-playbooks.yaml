@@ -1,0 +1,41 @@
+name: Analysis Playbooks
+uri: frameworks://analysis-playbooks
+description: Practical playbooks for choosing the right analytical path by business question.
+keywords:
+  - playbook
+  - how should i analyze
+  - analysis path
+  - workflow
+  - drilldown
+directive: >
+  Consult when choosing between multiple analysis paths or when the user asks
+  a broad business question that needs a structured investigation.
+content: |
+  # Analysis Playbooks
+
+  ## Growth Playbook
+  1. Start with a top-level growth brief.
+  2. Separate realized growth from projected pipeline.
+  3. Break growth into net flows, client adds/losses, and projected pipeline.
+  4. Identify whether concentration, source mix, or pipeline aging is driving the result.
+
+  ## Profitability Playbook
+  1. Start with profitability overview or revenue decomposition.
+  2. Compare fee yield, concentration, and advisor efficiency together.
+  3. Check whether revenue strength is being offset by fee compression or cost drag.
+  4. Benchmark advisor/division differences before concluding the issue is firm-wide.
+
+  ## Risk Playbook
+  1. Separate regulatory/compliance risk from client/portfolio risk.
+  2. Review exposure, compliance status, operational cases, and termination signals together.
+  3. Escalate any compliance gaps ahead of performance interpretation.
+
+  ## Client Outcomes Playbook
+  1. Start with client outcomes or practice management overview.
+  2. Compare engagement, satisfaction, annual review completion, and retention risk.
+  3. Segment by advisor, client tier, or service model to find the true driver.
+
+  ## Pipeline Playbook
+  1. Separate lead-phase inventory from opportunity-phase inventory.
+  2. Focus on aging, close-date pressure, and recent activity.
+  3. Distinguish future assets from current pipeline so forecasts are not overstated.

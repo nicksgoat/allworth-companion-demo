@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fee Calculator — Allworth</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    // Redirect to the SPA which is served from the Vite build
+    // In production, the React frontend handles /fee-calculator
+    // This page only exists as a Flask-level fallback
+    if (!document.getElementById('root').children.length) {
+      document.getElementById('root').innerHTML = '<p style="padding:2rem;font-family:sans-serif;">Loading Fee Calculator...</p>';
+    }
+  </script>
+</body>
+</html>

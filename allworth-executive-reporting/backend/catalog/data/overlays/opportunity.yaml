@@ -1,0 +1,8 @@
+id: opportunity
+source: wealth_mcp.domain.tables
+description: 'Opportunities including tax and wealth-service offerings: stage, amount,
+  close date, household linkage.'
+business_name: Opportunities (tax, wealth services)
+grain: Opportunity_Id
+pk: Opportunity_Id
+domain: Pipeline

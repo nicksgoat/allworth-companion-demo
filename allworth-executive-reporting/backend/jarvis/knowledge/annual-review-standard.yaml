@@ -1,0 +1,36 @@
+name: Annual Review Standard
+uri: frameworks://annual-review-standard
+category: Reference
+description: What constitutes a completed annual review — date recorded on LastAnnualReview plus plan-tracker structured fields.
+keywords:
+  - annual review
+  - annual review completion
+  - service standard
+  - review cadence
+content: |
+  This entry defines the operational standard behind the `annual-review-completion` metric.
+
+  ## Data Sources
+  1. **`Current_Household_Fact.LastAnnualReview`** (see `client_outcomes.py:81`) — date of the most recent annual review.
+  2. **`AWF_New_Plan_Tracker_V2.annual_review_date`** (see `client_outcomes.py:1580`) — structured plan-review tracking.
+
+  ## Completion Tracking
+  - `get_client_snapshot()` surfaces `last_annual_review` at household level.
+  - `get_financial_plan_tracker()` reports `annual_review_date` alongside planning-status flags.
+  - Satisfaction flag: `pm.annual_review_satisfied` (`client_outcomes.py:1586`) — binary "has this household had a compliant review within the expected cadence".
+
+  ## Service Standard Cadence
+  (from `service-standards`)
+  - Platinum — quarterly (≤90 days).
+  - Gold — semi-annual (≤180 days).
+  - Silver — annual (≤365 days).
+  - Bronze — annual check-in per request.
+
+  ## What Counts as "Completed"
+  The code takes the **date recorded** as the source of truth — it does not verify that a meeting occurred, deliverables were shared, or plan updates were made. That's an administrative trust-but-verify relationship with the CRM.
+
+  In practice this means:
+  - If the date is missing or stale → household is flagged as "overdue for annual review".
+  - If the date is current but no substantive work happened → the data system can't tell, and ops-level QA is the only corrective path.
+
+  Document completion-quality standards separately if needed (what artifacts must exist, what meetings must occur). The metric only cares about recency of the recorded date.

@@ -1,0 +1,74 @@
+id: marketinggoals-2025
+name: MarketingGoals_2025
+schema: dbo
+db: DataWarehouse
+db_table: MarketingGoals_2025
+guid: 0a63fb21-3ee1-46a5-ad95-a4b8d6023143
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Goals
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Rollforward Historical
+column_count: 6
+columns:
+- name: Channel
+  db_column_name: Channel
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Marketing Channel
+  db_column_name: Marketing Channel
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: reporting_period_key
+  db_column_name: reporting_period_key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Goal
+  db_column_name: Goal
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Appointments
+  db_column_name: Appointments
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Clients
+  db_column_name: Clients
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

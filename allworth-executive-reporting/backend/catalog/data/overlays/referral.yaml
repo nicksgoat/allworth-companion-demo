@@ -1,0 +1,6 @@
+id: referral
+source: wealth_mcp.domain.tables
+description: 'Client referral records (Client Referral Program): referrer, referee,
+  service type, outcome.'
+grain: Referral Id
+domain: Reference

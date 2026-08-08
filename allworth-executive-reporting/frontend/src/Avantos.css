@@ -1,0 +1,59 @@
+.av-shell {
+  min-height: 100vh;
+  background: #f4f6f9;
+}
+
+.av-header {
+  background: #12283f !important;
+}
+
+.av-brand {
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  font-size: 1.05rem;
+  color: #d8ae64;
+}
+
+.av-product {
+  font-size: 0.78rem;
+  color: #b9c6d4;
+}
+
+.av-chip {
+  background: rgba(216, 174, 100, 0.16) !important;
+  color: #d8ae64 !important;
+}
+
+.av-loading {
+  display: flex;
+  justify-content: center;
+  padding: 64px 0;
+}
+
+.av-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.av-tile__label {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+}
+
+.av-tile__value {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #12283f;
+}
+
+.av-table-card {
+  border-radius: 12px;
+}
+
+.av-row {
+  cursor: pointer;
+}

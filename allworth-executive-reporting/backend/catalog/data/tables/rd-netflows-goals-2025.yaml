@@ -1,0 +1,46 @@
+id: rd-netflows-goals-2025
+name: RD_Netflows_Goals_2025
+schema: dbo
+db: DataWarehouse
+db_table: RD_Netflows_Goals_2025
+guid: d18642b5-9e36-40b1-b7b0-1d5c941f14c3
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Goals
+deprecated: true
+spotter_enabled: false
+description: ''
+notes: null
+worksheets: []
+column_count: 3
+columns:
+- name: advisorid
+  db_column_name: advisorid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: reporting_period_key
+  db_column_name: reporting_period_key
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Goal
+  db_column_name: Goal
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

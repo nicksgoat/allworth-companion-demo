@@ -1,0 +1,73 @@
+id: sql-query-usage
+name: sql_query_usage
+schema: tho
+db: DataWarehouse
+db_table: sql_query_usage
+guid: 8734d9d1-8e00-4d83-baf4-9bf3d8f444ac
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets: []
+column_count: 6
+columns:
+- name: login_name
+  db_column_name: login_name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: end_time
+  db_column_name: end_time
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: runtime_minutes
+  db_column_name: runtime_minutes
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: queue_minutes
+  db_column_name: queue_minutes
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: start_time
+  db_column_name: start_time
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: request_id
+  db_column_name: request_id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

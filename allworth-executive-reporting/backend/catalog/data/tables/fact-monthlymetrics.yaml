@@ -1,0 +1,55 @@
+id: fact-monthlymetrics
+name: Fact_MonthlyMetrics
+schema: dbo
+db: DataWarehouse
+db_table: Fact_MonthlyMetrics
+guid: 13efd22b-e727-499d-9810-5237b8c46107
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets: []
+column_count: 4
+columns:
+- name: reportingperiod
+  db_column_name: reportingperiod
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: measure
+  db_column_name: measure
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: roworder
+  db_column_name: roworder
+  data_type: INT32
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: amount
+  db_column_name: amount
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

@@ -1,0 +1,31 @@
+name: User Profile Context
+uri: context://user-profile
+description: >
+  Active user identity, department context, default filters, vocabulary,
+  disambiguation rules, schema notes, SQL join patterns, and query templates.
+  MUST be applied before answering any business question.
+
+content: |
+  # User Profile Context
+
+  This resource contains the active user's profile, loaded from a YAML file at server startup.
+  The profile tells you:
+
+  1. **Who is asking** — name, team, role, data access scope
+  2. **Default filters** — always-on WHERE clauses unless overridden
+  3. **Schema notes** — column naming quirks, DateKey rules, join gotchas
+  4. **Performance tracking model** — the user's primary analytical model with join topology
+  5. **Standard SQL joins** — exact FROM/JOIN patterns to copy into queries
+  6. **Vocabulary** — how this user's words map to database columns and metrics
+  7. **Disambiguation** — what vague questions actually mean for this user
+  8. **Metrics dictionary** — SQL expressions for every metric the user tracks
+  9. **Query patterns** — the user's most frequent analytical intents with full SQL templates
+
+  **Apply this context to every response.** When the user asks a question:
+  - Check **schema notes** first — they override any assumptions about column names or types
+  - Check **disambiguation rules** for intent routing on vague questions
+  - Apply **default filters** automatically (e.g., Organic = 1)
+  - Use the **vocabulary mapping** for metric/column resolution
+  - Use the **performance tracking model** when the question involves goals, pacing, or funnel metrics
+  - Copy **standard join patterns** exactly — do not improvise joins
+  - Prefer the user's **frequent query patterns** when generating SQL

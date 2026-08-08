@@ -1,0 +1,100 @@
+id: update-log
+name: update_log
+schema: tho
+db: DataWarehouse
+db_table: update_log
+guid: 9d06949b-7f3b-41aa-98a7-f1ba2e4f57fc
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Logging
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets: []
+column_count: 9
+columns:
+- name: Schema
+  db_column_name: Schema
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Table
+  db_column_name: Table
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Unique_Id
+  db_column_name: Unique_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Start_Time
+  db_column_name: Start_Time
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: End_Time
+  db_column_name: End_Time
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Minutes
+  db_column_name: Minutes
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Latest_Version_Flag
+  db_column_name: Latest_Version_Flag
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: RowCount
+  db_column_name: RowCount
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Trigger
+  db_column_name: Trigger
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

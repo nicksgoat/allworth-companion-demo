@@ -1,0 +1,58 @@
+name: Client Priority Matrix
+uri: frameworks://client-priority
+category: Policies
+description: Weighted composite to triage client outreach — retention risk, AUM, plan success, engagement gap, revenue at risk.
+keywords:
+  - client priority
+  - prioritize
+  - engagement score
+  - triage
+  - action plan
+  - tier 1
+
+content: |
+  # Client Priority Matrix
+
+  ## Priority Scoring
+
+  Clients are prioritized using a weighted composite score:
+
+  | Factor | Weight | Measurement |
+  |---|---|---|
+  | Retention Risk | 30% | Composite risk score (0-1) |
+  | AUM Size | 25% | Higher AUM = higher priority |
+  | Plan Off-Track | 20% | Probability of success < 75% |
+  | Engagement Gap | 15% | Days since last contact |
+  | Revenue at Risk | 10% | Projected fee impact if client leaves |
+
+  ## Action Tiers
+
+  ### Tier 1: Immediate (This Week)
+  - Retention risk score > 0.7
+  - No contact in 180+ days AND AUM > $1M
+  - IPS violation AND client tier Platinum/Gold
+  - Probability of success < 50%
+
+  ### Tier 2: Urgent (This Month)
+  - Retention risk score 0.5 - 0.7
+  - No contact in 90+ days
+  - Probability of success 50-75%
+  - Significant outflows (>10% of AUM in quarter)
+
+  ### Tier 3: Scheduled (This Quarter)
+  - Routine annual/semi-annual reviews due
+  - Plan updates needed
+  - Rebalancing triggers hit
+  - Routine engagement cadence
+
+  ### Tier 4: Monitoring
+  - All other clients
+  - Automated alerts for threshold breaches
+  - Digital engagement maintained
+
+  ## Signal Sources
+  - Retention risk: `Term_Prediction_Scoring_Model.churn_risk_score` (see `termination-risk-model`).
+  - AUM: `Current_Household_Fact.AUM`.
+  - Plan success: `AWF_New_Plan_Tracker_V2` probability-of-success columns.
+  - Engagement gap: derived from `Activity_Fact` / `Interactions_LTM` (see `engagement-behavior-standard`).
+  - Revenue at risk: `Run_Rate_Revenue × churn_probability`.

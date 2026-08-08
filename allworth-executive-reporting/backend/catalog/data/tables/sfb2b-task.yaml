@@ -1,0 +1,149 @@
+id: sfb2b-task
+name: sfb2b_Task
+schema: tho
+db: DataWarehouse
+db_table: sfb2b_Task
+guid: 745278bd-a7ac-487f-a98e-4b4c65630f2c
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Activity
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Partner Program Tasks
+- Partner Program
+column_count: 13
+columns:
+- name: TaskId
+  db_column_name: TaskId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Type
+  db_column_name: Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ActivityDate
+  db_column_name: ActivityDate
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Subject
+  db_column_name: Subject
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AssignedTo
+  db_column_name: AssignedTo
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Whatid
+  db_column_name: Whatid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Whoid
+  db_column_name: Whoid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AccountId
+  db_column_name: AccountId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Status
+  db_column_name: Status
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: KPIType
+  db_column_name: KPIType
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: DiscoveryCalls
+  db_column_name: DiscoveryCalls
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Completed_Date
+  db_column_name: Completed_Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: First_Call_Date
+  db_column_name: First_Call_Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: Due Date to DimDate
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[sfb2b_Task::ActivityDate] = [DateDimension::Date]'
+  pairs:
+  - from_table: sfb2b_Task
+    from_col: ActivityDate
+    to_table: DateDimension
+    to_col: Date

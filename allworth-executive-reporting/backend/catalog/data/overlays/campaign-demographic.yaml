@@ -1,0 +1,8 @@
+id: campaign-demographic
+source: wealth_mcp.domain.tables
+description: Campaign membership and response per member — links households/leads
+  to marketing campaigns.
+business_name: Campaign membership / response
+grain: Campaign_Member_ID
+pk: Campaign_Member_ID
+domain: Activity

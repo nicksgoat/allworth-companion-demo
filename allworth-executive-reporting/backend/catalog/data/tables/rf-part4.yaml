@@ -1,0 +1,29 @@
+id: rf-part4
+name: RF_Part4
+schema: dbo
+db: DataWarehouse
+db_table: RF_Part4
+guid: afd5835c-79a1-4008-9afa-508db87cffec
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- RF Column View 12-31-2025
+column_count: 1
+columns:
+- name: ClientID
+  db_column_name: ClientID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

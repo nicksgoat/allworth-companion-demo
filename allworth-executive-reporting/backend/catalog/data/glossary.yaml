@@ -1,0 +1,48 @@
+glossary:
+  AVHHID: Advent Household ID (numeric); joins a household across systems.
+  HHID: Household ID (Salesforce-side, varchar).
+  LeadId: Salesforce Lead ID — primary key of the household demographic tables.
+  Upload Account ID: Account-level key linking custodial account uploads across tables.
+  DateKey: YYYYMMDD integer date key; joins DateDimension.
+  Reporting Period Key: DateKey of a rollforward snapshot's month-end reporting period.
+  AUM: Assets Under Management ($). A snapshot measure — anchor to one reporting period.
+  PAUM: 'Projected AUM: current AUM plus pipeline-weighted opportunities.'
+  BoP / EoP: Beginning / End of Period AUM. True BoP for bridge math is prior-period
+    EoP.
+  Total Account Value: End-of-period AUM column on the rollforward (EoP snapshot).
+  VMAC: Variable Managed Account Value.
+  NCNM: New Client Net Money — organic funded inflows from clients new in the period.
+    Excludes acquisitions and projected NCNM.
+  ECNM: 'Existing Client Net Money — organic new receipts from existing clients. Not
+    net flows: do not subtract distributions or attrition.'
+  Organic Inflows: NCNM + ECNM — organic new money, separate from acquired inflows.
+  Acquired Inflows: Cash deposits + security receipts net of organic inflows (NCNM
+    + ECNM); inorganic.
+  Net Flows: NCNM + ECNM + Distribution + Attrition + expenses (sign-aware). Cite
+    components used.
+  NNA: 'Net New Assets: NCNM + ECNM + Distribution + Attrition. Confirm organic-only
+    vs total.'
+  Distribution: Client withdrawal flow. TML/RF-Commentary 'Withdrawals' maps to this
+    column.
+  Attrition: Outflow from a terminated/lost client household. Distinct from ordinary
+    distributions.
+  Outflows: Withdrawals (Distribution) plus Attrition; expenses reported separately.
+  Acquisition: Assets from acquired books of business (inorganic).
+  Incoming Funds: Expected client money in flight (transfers); feeds projected NCNM.
+  Rollforward: Monthly snapshot reconciling BoP AUM through flow components to EoP
+    AUM.
+  Trade Date RF: Rollforward variant using trade date instead of entry/settlement
+    date; do not mix bases.
+  CRP: Client Referral Program.
+  RPS: Retirement Plan Services.
+  PWS: Private Wealth Services.
+  RMD: Required Minimum Distribution.
+  Practice Management Score: Count of services delivered to a household (tax, estate,
+    insurance, FP, annual review).
+  Catchlight Score: Third-party household wealth-propensity score.
+  Term Prediction: ML churn model output — probability a household terminates (see
+    Term_Prediction_* tables).
+  Spice / Compass: Marketing engagement platforms.
+  AdvisorKey / AdvisorTeam: Rep grouping used for goal aggregation.
+  RLS: Row-Level Security mapping (advisor → visible offices/teams); applied by BI
+    tools.

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pipeline Review — Allworth</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    // The React frontend (Vite build) handles /pipeline-review in production.
+    // This page only exists as a Flask-level fallback.
+    if (!document.getElementById('root').children.length) {
+      document.getElementById('root').innerHTML = '<p style="padding:2rem;font-family:sans-serif;">Loading Pipeline Review...</p>';
+    }
+  </script>
+</body>
+</html>

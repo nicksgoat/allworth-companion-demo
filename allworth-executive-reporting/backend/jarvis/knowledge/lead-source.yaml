@@ -1,0 +1,35 @@
+name: Lead Source
+uri: frameworks://lead-source
+category: Data Model
+description: Origin of a lead or client acquisition; segmentation dimension for conversion analytics.
+keywords:
+  - lead source
+  - acquisition source
+  - conversion
+  - pipeline source
+content: |
+  ## Source Columns
+  - `leadsource` on `Current_Household_Demographic` (see `client_outcomes.py:95`).
+  - `Lead Source` on `Historical_Household_Demographic` (see `growth.py:107`).
+  - `leadsource` on `AWF_New_Plan_Tracker_V2` (see `client_outcomes.py:1391`).
+
+  ## Usage
+  - Segmentation in `get_conversion_analytics()`:
+    `segment_by: Literal["firm", "advisor", "division", "lead_source", "activity_type"]`.
+  - Lead-scoring boost (`pipeline_analytics.py:117–124`):
+    **high-certainty sources** add +10 points — these include 401k rollover, retirement, pension, business sale, inheritance.
+  - Flow analysis via `get_client_flow_analysis(segment_by="source")`.
+
+  ## Values
+  Lead source values originate from the Salesforce Lead object and flow through to the warehouse. The enumeration is not hardcoded — query the warehouse for the current set:
+
+  ```sql
+  SELECT DISTINCT leadsource, COUNT(*) AS n
+  FROM [tav].[Current_Household_Demographic]
+  GROUP BY leadsource ORDER BY n DESC
+  ```
+
+  ## Typical Questions
+  - "Which sources produce the highest-funded new clients?" → segment NCNM by `lead_source`.
+  - "Where does our pipeline come from?" → segment PAUM / conversion-rate by `lead_source`.
+  - "Are referrals converting faster than paid leads?" → segment days-in-stage by `lead_source`.

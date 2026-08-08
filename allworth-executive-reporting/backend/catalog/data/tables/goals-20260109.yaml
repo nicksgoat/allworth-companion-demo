@@ -1,0 +1,92 @@
+id: goals-20260109
+name: goals_20260109
+schema: aip
+db: DataWarehouse
+db_table: goals_20260109
+guid: 27de0dfa-6e47-41d1-aa66-6fc14311b21e
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Goals
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Performance Tracking
+column_count: 8
+columns:
+- name: Metric
+  db_column_name: Metric
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Channel
+  db_column_name: Channel
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Date
+  db_column_name: Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Goal
+  db_column_name: Goal
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: unique_id
+  db_column_name: unique_id
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Date_Key
+  db_column_name: Date_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Employer
+  db_column_name: Employer
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Channel_Core
+  db_column_name: Channel_Core
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

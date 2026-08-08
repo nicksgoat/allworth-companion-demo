@@ -1,0 +1,143 @@
+id: hh-fact
+name: hh_fact
+schema: tho
+db: DataWarehouse
+db_table: hh_fact
+guid: 2ed965fc-d240-40d2-82b3-816f2061981c
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Household
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Activities
+- Allworth 360
+- Integrated Services
+- IS Referrals
+- Pipeline 360
+- Projected NCNM
+- Stage Change History
+column_count: 13
+columns:
+- name: Leadid
+  db_column_name: Leadid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AUM
+  db_column_name: AUM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: PAUM
+  db_column_name: PAUM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Open_Activities
+  db_column_name: Open_Activities
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: HHID
+  db_column_name: HHID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: run_rate_revenue
+  db_column_name: run_rate_revenue
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: avhhid
+  db_column_name: avhhid
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: aum_billed
+  db_column_name: aum_billed
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ncnm
+  db_column_name: ncnm
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: days_in_current_stage
+  db_column_name: days_in_current_stage
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: expected_close_rate
+  db_column_name: expected_close_rate
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: weighted_paum
+  db_column_name: weighted_paum
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Projected_Close_Date
+  db_column_name: Projected_Close_Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

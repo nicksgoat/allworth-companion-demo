@@ -1,0 +1,9 @@
+id: pipeline-fact
+source: wealth_mcp.domain.tables
+description: 'Wide, sparse pipeline-stage fact: one row per lead with stage-entry
+  dates as columns. Prefer stage_change_history / mart event tables for stage-flow
+  analysis.'
+business_name: Pipeline stages (wide, sparse - prefer fact_pipeline_event in mart)
+grain: one row per LeadId
+pk: LeadId
+domain: Pipeline

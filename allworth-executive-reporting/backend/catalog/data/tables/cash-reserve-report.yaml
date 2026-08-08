@@ -1,0 +1,380 @@
+id: cash-reserve-report
+name: Cash_Reserve_Report
+schema: tho
+db: DataWarehouse
+db_table: Cash_Reserve_Report
+guid: 364f7d19-da58-4efd-b859-177df0d08ff0
+business_name: null
+grain: Upload Account ID
+pk: null
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Cash Reserves
+column_count: 40
+columns:
+- name: Primary Household ID
+  db_column_name: Primary Household ID
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Total Cash Reserve Goal Dollar
+  db_column_name: Total Cash Reserve Goal Dollar
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Cash Needed
+  db_column_name: Cash Needed
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: '% Of Account'
+  db_column_name: '% Of Account'
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Upload Account ID
+  db_column_name: Upload Account ID
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Monthly Dist - Value
+  db_column_name: Monthly Dist - Value
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Monthly Dist - Amount
+  db_column_name: Monthly Dist - Amount
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Monthly Dist - Start Date
+  db_column_name: Monthly Dist - Start Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Monthly Dist - End Date
+  db_column_name: Monthly Dist - End Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Monthly Dist - Note
+  db_column_name: Monthly Dist - Note
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Cash Carve Out - Value
+  db_column_name: Cash Carve Out - Value
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Cash Carve Out - Amount
+  db_column_name: Cash Carve Out - Amount
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Cash Carve Out - Start Date
+  db_column_name: Cash Carve Out - Start Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Cash Carve Out - End Date
+  db_column_name: Cash Carve Out - End Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Cash Carve Out - Note
+  db_column_name: Cash Carve Out - Note
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: 1 Time Wdrl - Value
+  db_column_name: 1 Time Wdrl - Value
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: 1 Time Wdrl - Amount
+  db_column_name: 1 Time Wdrl - Amount
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: 1 Time Wdrl - Start Date
+  db_column_name: 1 Time Wdrl - Start Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: 1 Time Wdrl - End Date
+  db_column_name: 1 Time Wdrl - End Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: 1 Time Wdrl - Note
+  db_column_name: 1 Time Wdrl - Note
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: No Fee Buffer - Value
+  db_column_name: No Fee Buffer - Value
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: No Fee Buffer - Amount
+  db_column_name: No Fee Buffer - Amount
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: No Fee Buffer - Start Date
+  db_column_name: No Fee Buffer - Start Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: No Fee Buffer - End Date
+  db_column_name: No Fee Buffer - End Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: No Fee Buffer - Note
+  db_column_name: No Fee Buffer - Note
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Other - Value
+  db_column_name: Other - Value
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Other - Amount
+  db_column_name: Other - Amount
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Other - Start Date
+  db_column_name: Other - Start Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Other - End Date
+  db_column_name: Other - End Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Other - Note
+  db_column_name: Other - Note
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Account Name
+  db_column_name: Account Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Rebalancing Model Name
+  db_column_name: Rebalancing Model Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Account Type
+  db_column_name: Account Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Primary Advisor
+  db_column_name: Primary Advisor
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Account Number
+  db_column_name: Account Number
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Billing Definitions
+  db_column_name: Billing Definitions
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Performance Inception Date
+  db_column_name: Performance Inception Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Custodian
+  db_column_name: Custodian
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Total Account Value
+  db_column_name: Total Account Value
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Total Cash Reserve Actual Dollar
+  db_column_name: Total Cash Reserve Actual Dollar
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

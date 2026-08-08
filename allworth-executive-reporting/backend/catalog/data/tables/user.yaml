@@ -1,0 +1,347 @@
+id: user
+name: User
+schema: tho
+db: DataWarehouse
+db_table: User
+guid: 935953c9-bef4-4496-a64d-d1a226a6412f
+business_name: User / Advisor
+grain: User_ID
+pk: User_ID
+synonyms: []
+domain: Advisor
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Account Rollforward
+- Account Setups
+- Account Team Member
+- Activities
+- Advisor 360
+- Advisor Conversion Worksheet
+- Allworth 360
+- Campaigns
+- Case
+- Cash Reserves
+- Client Count Rollforward
+- Comparison 360
+- Comparison Rollforward - Trade Date
+- Contact 360
+- CRP Reps with Flows
+- Distribution Requests
+- Download Version of 360
+- Events Worksheet (Migrate to Activities Model)
+- Financial Account 360
+- Incoming Funds
+- Integrated Services
+- IS Referrals
+- Jira FSI
+- Outflow/Term Reason Audit
+- Performance Tracking
+- Pipeline 360
+- Practice Management External Sources
+- Practice Management
+- RMD Model
+- Rollforward Historical
+- Stage Change History
+- Survey Monkey Results
+- Tasks (Migrate to Activities Model)
+- Tax Retention
+- Trade Date Rollforward
+- Trade Requests
+- Transactions
+- Zoom Call Log External
+column_count: 31
+columns:
+- name: ADP_Id
+  db_column_name: ADP_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: DOB
+  db_column_name: DOB
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Manager
+  db_column_name: Manager
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Title
+  db_column_name: Title
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: LastLoginDate
+  db_column_name: LastLoginDate
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Operations Team
+  db_column_name: Ops_Team__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: UserCreatedDate
+  db_column_name: UserCreatedDate
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AdvisorKey
+  db_column_name: AdvisorKey
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Name
+  db_column_name: Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Department
+  db_column_name: Department
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Book Type
+  db_column_name: BookType
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Operational Region
+  db_column_name: Operational_Region
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: RD Region
+  db_column_name: RD_Region
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Office Location
+  db_column_name: Office_Location
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: AdvisorTeam
+  db_column_name: AdvisorTeam
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Repricing_Project_Group
+  db_column_name: Repricing_Project_Group
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Email
+  db_column_name: Email
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: User ID
+  db_column_name: User_ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: HR Acquired Source
+  db_column_name: HR_Acquired_Source
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: IsActive
+  db_column_name: IsActive
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Net_Flows_Monthly_Goal
+  db_column_name: Net_Flows_Monthly_Goal
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Referral Rate
+  db_column_name: Referral_Rate
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Regional Director
+  db_column_name: Regional_Director
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Advisor_Segment
+  db_column_name: Advisor_Segment
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Paid_Leads
+  db_column_name: Paid_Leads
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Credentials
+  db_column_name: Credentials
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CRP
+  db_column_name: CRP
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Phone
+  db_column_name: Phone
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: advisor_state
+  db_column_name: advisor_state
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: hire_date
+  db_column_name: hire_date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Practice_Growth_Consultant
+  db_column_name: Practice_Growth_Consultant
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: User to Acquisition
+  to: Acquisition
+  to_id: acquisition
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[User::HR Acquired Source] = [Acquisition::AcqCode]'
+  pairs:
+  - from_table: User
+    from_col: HR Acquired Source
+    to_table: Acquisition
+    to_col: AcqCode

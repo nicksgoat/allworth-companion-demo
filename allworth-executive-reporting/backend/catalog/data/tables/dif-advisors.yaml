@@ -1,0 +1,317 @@
+id: dif-advisors
+name: Dif_Advisors
+schema: aip
+db: DataWarehouse
+db_table: Dif_Advisors
+guid: cfb7d1a6-8e56-4478-97cd-31b0cde190a9
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Advisor
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Diff Advisor
+column_count: 33
+columns:
+- name: SF Account Id Tam_Join
+  db_column_name: SF Account Id Tam_Join
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF Account Name Tam_Join
+  db_column_name: SF Account Name Tam_Join
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF Account Advisor Tam_Join
+  db_column_name: SF Account Advisor Tam_Join
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Primary Household Id Tam_Join
+  db_column_name: Primary Household Id Tam_Join
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Tam Account Name
+  db_column_name: Tam Account Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Tam Advisor
+  db_column_name: Tam Advisor
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Tam Fin Acct Number
+  db_column_name: Tam Fin Acct Number
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF Primary Household Id Tam_Join
+  db_column_name: SF Primary Household Id Tam_Join
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF Managed Value Tam_Join
+  db_column_name: SF Managed Value Tam_Join
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Fin Acct Total Value Tam_Join
+  db_column_name: Fin Acct Total Value Tam_Join
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Master Category
+  db_column_name: Master Category
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Account Category
+  db_column_name: Account Category
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Account Type
+  db_column_name: Account Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Broker Dealer
+  db_column_name: Broker Dealer
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Custodian
+  db_column_name: Custodian
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF Advisor Ops Team
+  db_column_name: SF Advisor Ops Team
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF Advisor Manager
+  db_column_name: SF Advisor Manager
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF User is Active
+  db_column_name: SF User is Active
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: WM Opp Id
+  db_column_name: WM Opp Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Opportunity Name
+  db_column_name: Opportunity Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: 55ip_Fee_Waiver
+  db_column_name: 55ip_Fee_Waiver
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Tam_SF Advisor Different
+  db_column_name: Tam_SF Advisor Different
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF_Opp Account Id
+  db_column_name: SF_Opp Account Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF_Opp Household Name
+  db_column_name: SF_Opp Household Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF_Opp Account Advisor
+  db_column_name: SF_Opp Account Advisor
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Opp Id
+  db_column_name: Opp Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Opp Name
+  db_column_name: Opp Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF_Opp Opp Advisor
+  db_column_name: SF_Opp Opp Advisor
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF Different Advisor
+  db_column_name: SF Different Advisor
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF_Opp Managed Value
+  db_column_name: SF_Opp Managed Value
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SF_Opp Total Value
+  db_column_name: SF_Opp Total Value
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Previous_Advisor_Date__c
+  db_column_name: Previous_Advisor_Date__c
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Previous Advisor Date 2 Weeks Old
+  db_column_name: Previous Advisor Date 2 Weeks Old
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

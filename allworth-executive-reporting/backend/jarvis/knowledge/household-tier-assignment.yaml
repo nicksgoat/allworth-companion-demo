@@ -1,0 +1,36 @@
+name: Household Tier Assignment
+uri: frameworks://household-tier-assignment
+category: Data Model
+description: How households are classified into service tiers (Platinum/Gold/Silver/Bronze) — primarily AUM-driven, enforced via PM_Service_Level.
+keywords:
+  - service tier
+  - household tier
+  - AUM-driven
+  - classification
+  - PM_Service_Level
+content: |
+  ## Data Source
+  - **`PM_Service_Level`** on `Current_Household_Demographic` (see `client_outcomes.py:92`).
+  - **`Classification`** on the same table (alternate tier/model indicator).
+
+  ## Default Tier Bands (AUM-driven)
+  Tiers (see `service-standards`) are assigned principally by current household AUM on `Current_Household_Fact.AUM`:
+
+  - Platinum: $5M+
+  - Gold: $1M – $5M
+  - Silver: $250K – $1M
+  - Bronze: < $250K
+
+  ## Override Mechanism
+  The `PM_Service_Level` field reflects the **operationally assigned** tier. This is normally AUM-driven but can be overridden by ops/advisor assignment (e.g. a $400K relationship may be Gold if they're an established referrer, or a transitioning family expected to hit the next tier).
+
+  There is no Python calculation of the tier — the assignment happens upstream (CRM / onboarding workflow), and the warehouse reflects the assignment. If an AUM/tier mismatch needs investigating, start with the CRM record, not the MCP.
+
+  ## Queryable Attributes
+  - `Current_Household_Demographic.PM_Service_Level` — the tier.
+  - `Current_Household_Demographic.Classification` — alternate segmentation.
+  - `Current_Household_Fact.AUM` — actual AUM to compare against tier bands.
+
+  ## Typical Use
+  - "Show households where AUM tier ≠ PM_Service_Level" — surface mis-tiered accounts.
+  - Segment any metric by `PM_Service_Level` to compare outcomes by tier.

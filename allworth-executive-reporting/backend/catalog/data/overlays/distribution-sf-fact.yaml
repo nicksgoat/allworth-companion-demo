@@ -1,0 +1,8 @@
+id: distribution-sf-fact
+source: wealth_mcp.domain.tables
+description: Salesforce-originated client distribution/withdrawal requests and their
+  workflow status.
+business_name: Salesforce distribution requests
+grain: one row per Distribution record
+pk: Id
+domain: Transactions

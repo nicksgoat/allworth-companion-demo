@@ -1,0 +1,36 @@
+name: Model Suite
+uri: frameworks://model-suite
+category: Playbooks
+description: Rebalancing model portfolio definitions that define target asset allocations for account-level drift monitoring.
+keywords:
+  - model portfolio
+  - model suite
+  - allocation model
+  - rebalancing model
+  - target allocation
+content: |
+  Source: `risk.py:_ar_segment_config("model_suite")` and `check_ips_compliance()`.
+
+  ## Model Assignment
+  - Each account has a `Rebalancing_Model_Name` on `Current_Account_Demographic`.
+  - Unassigned accounts show up as `'Unassigned'` in segment queries.
+  - Time-series analysis references `Account_Rollforward.[modelsuite]`.
+
+  ## Model Definition
+  - Stored in `Asset_Allocation_Security_Weights` with columns `Allocation_Model_Name`, `Ticker`, `Weight`.
+  - Weights are normalized per model to 1.0 (or renormalized if cash is excluded).
+  - Ticker → asset class mapping via `Security_Info.Asset_Class` lookup.
+
+  ## Usage in Rebalancing
+  1. Resolve the account's model name from demographic.
+  2. Load target weights keyed by that model.
+  3. Compute actual weights from `Account_Daily_Holdings`.
+  4. `drift = actual − target` per asset class.
+  5. Flag if `|drift| > threshold` (default 5%).
+
+  ## Reporting
+  - Segment growth/profitability/exposure analysis by `model_suite`.
+  - Drift compliance checked per (account × model) combination.
+  - Missing model assignment surfaced as an operational gap.
+
+  The concrete list of models (aggressive, moderate, conservative variants; sector-tilted; income-focused) is database-driven and refreshed independently. Query `Asset_Allocation_Security_Weights` for the authoritative current list.

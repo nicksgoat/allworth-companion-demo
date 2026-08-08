@@ -1,0 +1,67 @@
+name: Risk Tolerance Framework
+uri: frameworks://risk-tolerance
+category: Policies
+description: Risk profile definitions with target allocations, expected returns, and drawdown tolerances by risk score band.
+keywords:
+  - risk tolerance
+  - risk profile
+  - conservative
+  - aggressive
+  - moderate
+  - risk score
+  - allocation band
+draft: true
+
+content: |
+  # Risk Tolerance Framework
+
+  ## Risk Profiles
+
+  ### Conservative (Risk Score 1-2)
+  - **Target Equity**: 20-30%
+  - **Target Fixed Income**: 55-65%
+  - **Alternatives**: 5-10%
+  - **Cash**: 5-10%
+  - **Expected Return**: 4-5% | **Max Drawdown Tolerance**: -10%
+
+  ### Moderate Conservative (Risk Score 3-4)
+  - **Target Equity**: 35-45%
+  - **Target Fixed Income**: 40-50%
+  - **Alternatives**: 5-10%
+  - **Cash**: 0-5%
+  - **Expected Return**: 5-6% | **Max Drawdown Tolerance**: -15%
+
+  ### Moderate (Risk Score 5-6)
+  - **Target Equity**: 50-60%
+  - **Target Fixed Income**: 25-35%
+  - **Alternatives**: 5-15%
+  - **Cash**: 0-5%
+  - **Expected Return**: 6-7% | **Max Drawdown Tolerance**: -20%
+
+  ### Moderate Aggressive (Risk Score 7-8)
+  - **Target Equity**: 65-75%
+  - **Target Fixed Income**: 15-25%
+  - **Alternatives**: 5-15%
+  - **Cash**: 0-5%
+  - **Expected Return**: 7-8% | **Max Drawdown Tolerance**: -25%
+
+  ### Aggressive (Risk Score 9-10)
+  - **Target Equity**: 80-90%
+  - **Target Fixed Income**: 0-10%
+  - **Alternatives**: 5-15%
+  - **Cash**: 0-5%
+  - **Expected Return**: 8-10% | **Max Drawdown Tolerance**: -35%
+
+  ## Reassessment Triggers
+  - Life event (marriage, divorce, retirement, inheritance)
+  - Market drawdown exceeding max tolerance
+  - Annual review meeting
+  - Client-requested change
+
+  ## Code Linkage
+  - Allocation compliance: `risk.py:check_ips_compliance()` flags `ABS(actual − target) > 5%`.
+  - Model assignment: `Rebalancing_Model_Name` on `Current_Account_Demographic`.
+  - Target weights stored in `Asset_Allocation_Security_Weights`.
+  - Risk scoring: `Term_Prediction_Scoring_Model.risk_category` (see `risk-tolerance` scoring factors in `termination-risk-model`).
+
+  This entry is flagged `draft: true` because the score-to-band mapping and expected-return assumptions are presumptive numbers — replace with the authoritative Allworth IPS framework when available. The code enforces drift against `Asset_Allocation_Security_Weights`, not against the numeric bands here.

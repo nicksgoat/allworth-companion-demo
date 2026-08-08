@@ -1,0 +1,53 @@
+id: household-rollforward
+source: wealth_mcp.domain.tables
+description: 'Monthly household-level AUM reconciliation: BoP AUM plus flow components
+  (NCNM, ECNM, Distribution, Attrition, expenses, market movement) to EoP AUM (Total_Account_Value).
+  Canonical dataset for all flow metrics — the code-authored metrics in wealth_mcp.domain.metrics
+  are defined on this table.'
+notes: Entry/settlement-date basis; use Household_Rollforward(Trade Date) for trade-date
+  analysis.
+business_name: Monthly AUM rollforward (calendar)
+grain: avhhid x reportingperiod (month-end)
+pk: RF_ID
+domain: Household
+columns:
+  RF_ID:
+    description: Surrogate key of the rollforward row.
+  avhhid:
+    description: Advent Household ID — joins the household across systems.
+  reportingperiod:
+    description: Month-end reporting period of the snapshot.
+  Reporting_Period_Key:
+    description: YYYYMMDD key of the reporting period; joins DateDimension.DateKey.
+  BoP_AUM:
+    description: Beginning-of-period AUM. For bridge math, true BoP is prior-period
+      EoP.
+  total account value:
+    description: End-of-period AUM (EoP). Snapshot — never sum across periods.
+  NCNM:
+    description: New Client New Money — organic funded assets from clients new in
+      the period.
+  NCNM_Goal:
+    description: NCNM goal/target for the reporting period.
+  ECNM:
+    description: Existing Client New Money — organic new receipts from existing clients.
+  Distribution:
+    description: Client withdrawal/distribution flow (signed). TML 'Withdrawals' maps
+      here.
+  Attrition:
+    description: Signed lost-client/terminated-household outflow. Distinct from distributions.
+  expenses:
+    description: Expense flow component in the net-flow bridge; excludes billed management
+      fees.
+  mgntfee:
+    description: Management-fee revenue recognized on the rollforward for the period.
+  Acquisition:
+    description: Acquisition-sourced (inorganic) net flows for the period.
+  cashdeposit:
+    description: Cash-deposit component of transaction-derived movement.
+  cashwithdrawal:
+    description: Cash-withdrawal component of transaction-derived movement.
+  receiptsecurities:
+    description: Securities-receipt (transfer-in) component of movement.
+  withdrawalsecurities:
+    description: Securities-withdrawal (transfer-out) component of movement.

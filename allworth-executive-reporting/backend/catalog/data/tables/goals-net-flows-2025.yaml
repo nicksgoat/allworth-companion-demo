@@ -1,0 +1,93 @@
+id: goals-net-flows-2025
+name: Goals_Net_Flows_2025
+schema: aip
+db: DataWarehouse
+db_table: Goals_Net_Flows_2025
+guid: 876d6bfd-344c-4d68-ad7b-1d94d7d43b78
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Goals
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Rollforward Historical
+- Trade Date Rollforward
+column_count: 8
+columns:
+- name: Net Flow Goal
+  db_column_name: Goal
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ECNM Goal
+  db_column_name: ECNM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Attrition Goal
+  db_column_name: Attrition
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: NCNM Goal
+  db_column_name: NCNM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Reporting_Period_Key
+  db_column_name: Reporting_Period_Key
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Distribution Goal
+  db_column_name: Distributions
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: NCNM_6
+  db_column_name: NCNM_6
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Goal_6
+  db_column_name: Goal_6
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

@@ -1,0 +1,24 @@
+name: NCNM
+uri: frameworks://ncnm
+description: Net new client net money — actual net funded assets from new clients.
+keywords:
+- ncnm
+- net new client net money
+- growth
+- new clients
+- funded assets
+- roll forward
+category: Metric Definitions
+related_tables:
+- Household_Rollforward
+- Current_Household_Fact
+related_columns:
+- table: Household_Rollforward
+  column: NCNM
+- table: Current_Household_Fact
+  column: ttm_ncnm
+content: 'Net new client net money. Treat this as actual net funded assets attributable to new clients
+  over the reporting period, not raw pipeline or projected assets.
+
+
+  Published in RollForward.'

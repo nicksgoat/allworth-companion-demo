@@ -1,0 +1,355 @@
+id: account-rollforward
+name: Account_Rollforward
+schema: tho
+db: DataWarehouse
+db_table: Account_Rollforward
+guid: 646fb3fa-071d-471f-88c0-7f591028da1b
+business_name: null
+grain: avaccountuploadid x reportingperiod
+pk: null
+synonyms: []
+domain: Account
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Account Rollforward
+column_count: 33
+columns:
+- name: Distribution
+  db_column_name: Distribution
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: total account value
+  db_column_name: total_account_value
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Acquisition
+  db_column_name: Acquisition
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Reporting Period
+  db_column_name: reportingperiod
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: expenses
+  db_column_name: expenses
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: avhhid
+  db_column_name: avhhid
+  data_type: INT64
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ECNM
+  db_column_name: ECNM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: NCNM
+  db_column_name: NCNM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: mgntfee
+  db_column_name: mgntfee
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Attrition
+  db_column_name: Attrition
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: avaccountuploadid
+  db_column_name: avaccountuploadid
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_unclassified
+  db_column_name: asset_allocation_unclassified
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: modelsuite
+  db_column_name: modelsuite
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_alternative_illiquid
+  db_column_name: asset_allocation_alternative_illiquid
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_other
+  db_column_name: asset_allocation_other
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_asset_allocation
+  db_column_name: asset_allocation_asset_allocation
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_US_equities
+  db_column_name: asset_allocation_US_equities
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: managementtype
+  db_column_name: managementtype
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: beta
+  db_column_name: beta
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: duration
+  db_column_name: duration
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: weighted_average_yield
+  db_column_name: weighted_average_yield
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_fixed_income
+  db_column_name: asset_allocation_fixed_income
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_alternative_liquid
+  db_column_name: asset_allocation_alternative_liquid
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_alternative_fixed_income
+  db_column_name: asset_allocation_alternative_fixed_income
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_cash
+  db_column_name: asset_allocation_cash
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: allocation
+  db_column_name: allocation
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_equities
+  db_column_name: asset_allocation_equities
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_international_equities
+  db_column_name: asset_allocation_international_equities
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: avmodel
+  db_column_name: avmodel
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_401K
+  db_column_name: asset_allocation_401K
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: asset_allocation_alternative
+  db_column_name: asset_allocation_alternative
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: total_duration_sum
+  db_column_name: total_duration_sum
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: RF_ID
+  db_column_name: RF_ID
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: Acct RF to ACV
+  to: Current_Account_Demographic
+  to_id: current-account-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Account_Rollforward::avaccountuploadid] = [Current_Account_Demographic::Upload Account ID]'
+  pairs:
+  - from_table: Account_Rollforward
+    from_col: avaccountuploadid
+    to_table: Current_Account_Demographic
+    to_col: Upload Account ID
+- join_name: Acct RF to Current HH
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Account_Rollforward::avhhid] = [Current_Household_Demographic::AVHHID]'
+  pairs:
+  - from_table: Account_Rollforward
+    from_col: avhhid
+    to_table: Current_Household_Demographic
+    to_col: AVHHID
+- join_name: Acct RF to Historical HH
+  to: Historical_Household_Demographic
+  to_id: historical-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Account_Rollforward::avhhid] = [Historical_Household_Demographic::avhhid] AND [Account_Rollforward::Reporting
+    Period] = [Historical_Household_Demographic::Reporting Period]'
+  pairs:
+  - from_table: Account_Rollforward
+    from_col: avhhid
+    to_table: Historical_Household_Demographic
+    to_col: avhhid
+  - from_table: Account_Rollforward
+    from_col: Reporting Period
+    to_table: Historical_Household_Demographic
+    to_col: Reporting Period

@@ -1,0 +1,323 @@
+id: contact-demographic
+name: Contact_Demographic
+schema: tho
+db: DataWarehouse
+db_table: Contact_Demographic
+guid: 43390f75-ff40-43fc-adfd-6c92c5a05a97
+business_name: Contact (individuals within a household)
+grain: contact_id
+pk: contact_id
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Account Rollforward
+- Activities
+- Allworth 360
+- Campaigns
+- Comparison 360
+- Contact 360
+- Download Version of 360
+- Financial Account 360
+- Integrated Services
+- RMD Model
+- Rollforward Historical
+- Survey Monkey Results
+- Tax Clients
+- Zoom Call Log External
+column_count: 31
+columns:
+- name: Seat
+  db_column_name: seat
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Status
+  db_column_name: status
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Preferred Name
+  db_column_name: preferred_name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Salutation
+  db_column_name: salutation
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Employer
+  db_column_name: employer
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Contact Name
+  db_column_name: contact_name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Job Title
+  db_column_name: job_title
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: DOB
+  db_column_name: dob
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: true
+- name: Current/NonCurrent
+  db_column_name: current_noncurrent
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Deceased Date
+  db_column_name: deceased_date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Mobile Phone
+  db_column_name: mobile_phone
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Contact ID
+  db_column_name: contact_id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Email
+  db_column_name: email
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: HH ID
+  db_column_name: hh_id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Primary or Secondary
+  db_column_name: primary_or_secondary
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Is Promoter
+  db_column_name: is_promoter
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: LastName
+  db_column_name: last_name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: true
+- name: FirstName
+  db_column_name: first_name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: true
+- name: Rep_Termination_Date
+  db_column_name: rep_termination_date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Rep_Onboarding_Date
+  db_column_name: rep_onboarding_date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Retire_Date
+  db_column_name: retire_date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Gender
+  db_column_name: gender
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Employment_Status
+  db_column_name: employment_status
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Account_ID
+  db_column_name: account_id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: deceased flag
+  db_column_name: deceased_flag
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Tax_Email
+  db_column_name: tax_email
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Contract_Type
+  db_column_name: Contract_Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Compass_Email_Subscription
+  db_column_name: Compass_Email_Subscription
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Role
+  db_column_name: Role
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: shared_email
+  db_column_name: shared_email
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: Has_Opted_Out_Of_Email
+  db_column_name: Has_Opted_Out_Of_Email
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+relationships:
+- join_name: All Contacts
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Contact_Demographic::HH ID] = [Current_Household_Demographic::HHID]'
+  pairs:
+  - from_table: Contact_Demographic
+    from_col: HH ID
+    to_table: Current_Household_Demographic
+    to_col: HHID

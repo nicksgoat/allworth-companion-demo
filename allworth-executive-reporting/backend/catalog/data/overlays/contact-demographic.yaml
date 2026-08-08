@@ -1,0 +1,7 @@
+id: contact-demographic
+source: wealth_mcp.domain.tables
+description: Individual people (contacts) within a household, with demographic attributes.
+business_name: Contact (individuals within a household)
+grain: contact_id
+pk: contact_id
+domain: Household

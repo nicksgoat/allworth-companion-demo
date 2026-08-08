@@ -1,0 +1,266 @@
+id: activity-fact
+name: Activity_Fact
+schema: tho
+db: DataWarehouse
+db_table: Activity_Fact
+guid: cedc2a30-ad75-4055-bada-41ebe38e5e37
+business_name: Activity measures
+grain: one row per Salesforce Activity Id
+pk: Id
+synonyms: []
+domain: Activity
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Activities
+- Allworth 360
+- Campaigns
+- Practice Management
+column_count: 16
+columns:
+- name: Campaign_Member_ID
+  db_column_name: Campaign_Member_ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Created_By_Delegate_ID
+  db_column_name: Created_By_Delegate_ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CreatedDateKey
+  db_column_name: CreatedDateKey
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: OwnerId
+  db_column_name: OwnerId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: LeadID
+  db_column_name: LeadID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: DueDateKey
+  db_column_name: DueDateKey
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Days_To_Contact
+  db_column_name: Days_To_Contact
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: CreatedById
+  db_column_name: CreatedById
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: CompletedDateKey
+  db_column_name: CompletedDateKey
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Spice_Contacted
+  db_column_name: Spice_Contacted
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Id
+  db_column_name: Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Sentiment_Score
+  db_column_name: Sentiment_Score
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Account_ID
+  db_column_name: Account_ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Contact_Made
+  db_column_name: Contact_Made
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Attempt_Number
+  db_column_name: Attempt_Number
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: EventCompletedDateKey
+  db_column_name: EventCompletedDateKey
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: Activity_Assigned_To
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Activity_Fact::OwnerId] = [User::User ID]'
+  pairs:
+  - from_table: Activity_Fact
+    from_col: OwnerId
+    to_table: User
+    to_col: User ID
+- join_name: Activity_CreatedDate
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Activity_Fact::CreatedDateKey] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Activity_Fact
+    from_col: CreatedDateKey
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Activity_Created_By
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Activity_Fact::CreatedById] = [User::User ID]'
+  pairs:
+  - from_table: Activity_Fact
+    from_col: CreatedById
+    to_table: User
+    to_col: User ID
+- join_name: Activity_Created_By_Delegate
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Activity_Fact::Created_By_Delegate_ID] = [User::User ID]'
+  pairs:
+  - from_table: Activity_Fact
+    from_col: Created_By_Delegate_ID
+    to_table: User
+    to_col: User ID
+- join_name: Activity_DueDate
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Activity_Fact::DueDateKey] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Activity_Fact
+    from_col: DueDateKey
+    to_table: DateDimension
+    to_col: DateKey
+- join_name: Activity_Fact_to_Activity_Dim
+  to: Activity_Dim
+  to_id: activity-dim
+  type: INNER
+  one_to_one: true
+  'on': '[Activity_Fact::Id] = [Activity_Dim::Id]'
+  pairs:
+  - from_table: Activity_Fact
+    from_col: Id
+    to_table: Activity_Dim
+    to_col: Id
+- join_name: Activity_Fact_to_Current_Household_Demographic
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Activity_Fact::LeadID] = [Current_Household_Demographic::LeadId]'
+  pairs:
+  - from_table: Activity_Fact
+    from_col: LeadID
+    to_table: Current_Household_Demographic
+    to_col: LeadId
+- join_name: Activity_Fact_to_Current_Household_Fact
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Activity_Fact::LeadID] = [Current_Household_Fact::LeadId]'
+  pairs:
+  - from_table: Activity_Fact
+    from_col: LeadID
+    to_table: Current_Household_Fact
+    to_col: LeadId
+- join_name: Activity_Fact_to_DateDimension
+  to: DateDimension
+  to_id: datedimension
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Activity_Fact::CompletedDateKey] = [DateDimension::DateKey]'
+  pairs:
+  - from_table: Activity_Fact
+    from_col: CompletedDateKey
+    to_table: DateDimension
+    to_col: DateKey

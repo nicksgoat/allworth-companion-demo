@@ -1,0 +1,36 @@
+flask>=2.3.0
+flask-cors>=4.0.0
+flask-compress>=1.14
+orjson>=3.9
+pandas>=2.0.0
+pyodbc>=5.0.0
+python-dateutil>=2.8.0
+python-dotenv>=1.0.0
+deltalake>=0.19
+pyarrow>=16.0
+# Fee Calculator: read .xlsx billing uploads + generate Excel exports
+openpyxl>=3.1
+# Jarvis knowledge-base blueprint
+pyyaml>=6.0
+markdown>=3.5
+# NFBC agentic console
+anthropic>=0.40
+openai>=1.40
+requests>=2.31
+# NFBC + SFP2: Key Vault credential fetch (allworthsynapse vault)
+azure-identity>=1.15
+azure-keyvault-secrets>=4.7
+azure-storage-file-datalake>=12.14
+simple-salesforce>=1.12
+# Investments (Bond Analyzer + Advisor Mailer): DW queries, schemas, PDF proposals
+pydantic>=2.10
+SQLAlchemy>=2.0
+weasyprint>=61.0
+cairosvg>=2.7
+# Financial Planning (PlanEngine) module — Flask blueprint under backend/planning
+# + framework-agnostic engine under backend/planengine.
+numpy>=1.26
+azure-storage-blob>=12.19
+# Mock Rebalancer — CVXPY tax-transition optimizer vendored from ProposalGen @ TaxToolDev
+polars>=1.0
+cvxpy>=1.4

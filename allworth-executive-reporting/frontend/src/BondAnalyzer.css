@@ -1,0 +1,236 @@
+/* ─── Allworth Bond Analyzer — brand-aligned web styles ─────────────────────── */
+
+/* Hero banner: Night Blue → Allworth Navy gradient (brand premium surface) */
+.aw-hero {
+  background: linear-gradient(160deg, #0C2E4E 0%, #173D67 100%);
+  position: relative;
+  overflow: hidden;
+  padding: 40px 32px 36px;
+  /* Cerulean glow — mirrors the mobile NetWorthHero radial gradient */
+  --glow: radial-gradient(ellipse 65% 80% at 78% 14%, rgba(62,113,183,0.34) 0%, transparent 100%);
+  background-image: var(--glow), linear-gradient(160deg, #0C2E4E 0%, #173D67 100%);
+}
+
+.aw-hero__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 6px;
+}
+
+.aw-hero__home {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.aw-hero__home:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.aw-hero__eyebrow {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255,255,255,0.55);
+  margin: 0;
+}
+
+.aw-hero__title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.aw-hero__subtitle {
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  margin: 0;
+}
+
+.aw-auth-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  max-width: min(360px, 48vw);
+  padding: 5px 6px 5px 8px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+}
+
+.aw-auth-control--loading {
+  justify-content: center;
+  width: 42px;
+  padding: 0;
+}
+
+.aw-auth-avatar.MuiAvatar-root {
+  width: 28px;
+  height: 28px;
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  color: #173D67;
+  background: rgba(255,255,255,0.92);
+}
+
+.aw-auth-copy {
+  min-width: 0;
+}
+
+.aw-auth-label.MuiTypography-root {
+  display: block;
+  font-family: 'Lato', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.52);
+}
+
+.aw-auth-name.MuiTypography-root {
+  display: block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: rgba(255,255,255,0.92);
+}
+
+.aw-auth-button.MuiButton-root {
+  min-height: 34px;
+  border-color: rgba(255,255,255,0.28);
+  border-radius: 999px;
+  color: rgba(255,255,255,0.92);
+  font-family: 'Lato', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: none;
+  background: rgba(255,255,255,0.08);
+}
+
+.aw-auth-button.Mui-disabled {
+  color: rgba(255,255,255,0.58);
+  border-color: rgba(255,255,255,0.16);
+}
+
+.aw-auth-logout.MuiButton-root {
+  min-width: 30px;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  color: rgba(255,255,255,0.74);
+}
+
+.aw-auth-logout.MuiButton-root:hover {
+  color: #ffffff;
+  background: rgba(255,255,255,0.12);
+}
+
+@media (max-width: 640px) {
+  .aw-hero {
+    padding: 28px 18px 26px;
+  }
+
+  .aw-hero__topline {
+    align-items: flex-start;
+  }
+
+  .aw-auth-control {
+    max-width: 52vw;
+  }
+
+  .aw-auth-name.MuiTypography-root {
+    max-width: 110px;
+  }
+
+  .aw-auth-label.MuiTypography-root {
+    display: none;
+  }
+}
+
+/* KPI stat card — mirrors HeroNumber in the mobile app */
+.aw-kpi-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(23,61,103,0.05);
+  box-shadow: 0 2px 8px rgba(12,46,78,0.05);
+  padding: 20px;
+}
+
+.aw-kpi-card__label {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #828282;
+  margin: 0 0 8px;
+}
+
+.aw-kpi-card__value {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: #000000;
+  line-height: 1;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.aw-kpi-card__value--gain { color: #436434; }
+.aw-kpi-card__value--loss { color: #D26D37; }
+
+/* Section header — 11px Lato Bold uppercase (mirrors sectionHeader in mobile theme) */
+.aw-section-header {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #828282;
+  margin: 0 0 16px;
+}
+
+/* Card surface */
+.aw-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(23,61,103,0.05);
+  box-shadow: 0 2px 8px rgba(12,46,78,0.05);
+  padding: 20px;
+}
+
+/* Hairline divider */
+.aw-hairline {
+  height: 1px;
+  background: #E6E6E6;
+  margin: 0;
+  border: none;
+}

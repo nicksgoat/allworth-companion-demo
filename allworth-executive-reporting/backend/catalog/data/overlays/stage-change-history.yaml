@@ -1,0 +1,6 @@
+id: stage-change-history
+source: wealth_mcp.domain.tables
+description: 'Pipeline stage-change events: lead, from/to stage, timestamp. Event-grain
+  source for funnel conversion.'
+grain: Stage_Change_Id
+domain: Pipeline

@@ -1,0 +1,11 @@
+name: Days In Stage
+uri: frameworks://days-in-stage
+category: Metric Definitions
+description: Aging metric for the current pipeline stage.
+keywords:
+  - days in stage
+  - aging
+  - pipeline
+  - stale
+content: |
+  Aging metric for the current pipeline stage. Use it to identify bottlenecks and stale opportunities, not as a standalone quality score.

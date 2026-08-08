@@ -1,0 +1,71 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kpi-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      # Azure Synapse connection settings (set these via environment or .env file)
+      - SYNAPSE_SERVER=${SYNAPSE_SERVER:-allworthsynapse.sql.azuresynapse.net}
+      - SYNAPSE_DATABASE=${SYNAPSE_DATABASE:-DataWarehouse}
+      - AUTH_METHOD=${AUTH_METHOD:-ServicePrincipal}
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+      - SYNAPSE_USERNAME=${SYNAPSE_USERNAME}
+      - SYNAPSE_PASSWORD=${SYNAPSE_PASSWORD}
+      # NFBC agentic console
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - NFBC_CLAUDE_MODEL=${NFBC_CLAUDE_MODEL:-claude-opus-4-8}
+      - JIRA_URL=${JIRA_URL:-https://allworthfinancial.atlassian.net}
+      - JIRA_EMAIL=${JIRA_EMAIL}
+      - JIRA_API_TOKEN=${JIRA_API_TOKEN}
+      - NFBC_QUEUE_TTL_SECONDS=${NFBC_QUEUE_TTL_SECONDS:-600}
+    volumes:
+      # Persist the admin roster (users/groups/tool grants) across container
+      # rebuilds & redeploys. Without this the git-ignored state dir starts
+      # empty on every deploy and the roster would rely solely on the ADLS
+      # restore. See backend/admin/store.py.
+      - admin-state:/app/admin/.admin-state
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - kpi-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+    container_name: kpi-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - kpi-network
+
+networks:
+  kpi-network:
+    driver: bridge
+
+volumes:
+  # Named volume backing the admin roster so it survives container recreation.
+  admin-state:

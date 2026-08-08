@@ -1,0 +1,182 @@
+id: accountteammember
+name: AccountTeamMember
+schema: sfp
+db: DataWarehouse
+db_table: AccountTeamMember
+guid: 86026400-b2b4-40d5-b675-2c235bc87175
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Account
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Account Team Member
+column_count: 18
+columns:
+- name: Id
+  db_column_name: Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AccountId
+  db_column_name: AccountId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: UserId
+  db_column_name: UserId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: TeamMemberRole
+  db_column_name: TeamMemberRole
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: PhotoUrl
+  db_column_name: PhotoUrl
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Title
+  db_column_name: Title
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AccountAccessLevel
+  db_column_name: AccountAccessLevel
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: OpportunityAccessLevel
+  db_column_name: OpportunityAccessLevel
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CaseAccessLevel
+  db_column_name: CaseAccessLevel
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ContactAccessLevel
+  db_column_name: ContactAccessLevel
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CreatedDate
+  db_column_name: CreatedDate
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: CreatedById
+  db_column_name: CreatedById
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LastModifiedDate
+  db_column_name: LastModifiedDate
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LastModifiedById
+  db_column_name: LastModifiedById
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SystemModstamp
+  db_column_name: SystemModstamp
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: IsDeleted
+  db_column_name: IsDeleted
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: User_Id__c
+  db_column_name: User_Id__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Client_Service_Mismatch__c
+  db_column_name: Client_Service_Mismatch__c
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

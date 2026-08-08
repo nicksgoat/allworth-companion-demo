@@ -1,0 +1,92 @@
+id: 1stappt-routed-advisors
+name: 1stAppt_Routed_Advisors
+schema: aip
+db: DataWarehouse
+db_table: 1stAppt_Routed_Advisors
+guid: 04de3cd9-3489-4e0b-a1f6-9560d7337202
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Advisor
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Allworth 360
+column_count: 8
+columns:
+- name: RD_Region
+  db_column_name: RD_Region
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Operational_Region
+  db_column_name: Operational_Region
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Monthly_Appt_Expectation
+  db_column_name: Monthly_Appt_Expectation
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AUM_Range
+  db_column_name: AUM_Range
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Email
+  db_column_name: Email
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: true
+  hot: false
+- name: SF_userId
+  db_column_name: SF_userId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Advisor_Appt_Date_Range
+  db_column_name: Advisor_Appt_Date_Range
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: name
+  db_column_name: name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

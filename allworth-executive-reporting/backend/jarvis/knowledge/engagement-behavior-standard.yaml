@@ -1,0 +1,38 @@
+name: Engagement Behavior Standard
+uri: frameworks://engagement-behavior-standard
+category: Reference
+description: What qualifies as "engagement" — completion of a defined service or touchpoint, not generic contact volume.
+keywords:
+  - engagement
+  - engagement rate
+  - touchpoint
+  - service behavior
+content: |
+  Anchors the definition behind the `engagement-rate` metric:
+
+  > Share of target households completing the desired engagement behavior during the period. Engagement should be anchored to the defined service or touchpoint, not generic contact volume.
+
+  ## How It's Measured in Code
+  - Aggregated via `Activity_Fact` / `Activity_Dim` in `client_outcomes.py` tools.
+  - `Interactions_LTM` on `Current_Household_Fact` (see `client_outcomes.py:79`) gives a lifetime count.
+  - `get_engagement_summary()` calculates engagement per household segmented by advisor, division, and service tier.
+
+  ## What Counts
+  - Meeting / call activity logged with a completion date.
+  - Service deliverables: annual review, rebalancing, plan update, tax-strategy review.
+  - Advisor-initiated outreach that advances a client's service cadence.
+
+  ## What Doesn't Count (even though it's contact)
+  - Bulk-emailed newsletters and market commentaries.
+  - Administrative confirmations (trade confirms, statements).
+  - Passive digital engagement (portal logins) unless tied to a service outcome.
+
+  ## Tier-Anchored Cadence
+  Per `service-standards`, engagement is expected at different cadences by tier:
+
+  - Platinum — quarterly reviews (≤90 days between touchpoints).
+  - Gold — semi-annual (≤180 days).
+  - Silver — annual (≤365 days).
+  - Bronze — annual check-in per client request.
+
+  A Platinum household with no substantive touchpoint in 120 days is underserved, regardless of how many newsletters they received. That's what the engagement metric is designed to catch.

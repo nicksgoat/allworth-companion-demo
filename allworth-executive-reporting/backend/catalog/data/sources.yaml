@@ -1,0 +1,144 @@
+note: Source systems - generated from wealth_mcp.domain.sources; do not hand-edit.
+sources:
+- source_id: salesforce
+  name: Salesforce (wealth org)
+  kind: crm
+  ingestion: db-mirror
+  tag: Salesforce
+  landing: sfp schema (full object mirror)
+  connector: wealth_mcp.tools.integrations.salesforce
+  description: 'Primary CRM: households (Accounts/Leads), contacts, opportunities,
+    activities, campaigns, distributions, referrals. Mirrored object-for-object into
+    the sfp schema; tho notebooks reshape it into the reporting tables. Largest source
+    — the majority of documented column lineage traces here.'
+  notes: null
+- source_id: salesforce-b2b
+  name: Salesforce (B2B org)
+  kind: crm
+  ingestion: db-mirror
+  tag: Salesforce (B2B)
+  landing: sfb2b_* tables
+  connector: wealth_mcp.tools.integrations.salesforce
+  description: Separate Salesforce org for B2B/partner-program records (sfb2b_Account,
+    sfb2b_Opp, sfb2b_Task).
+  notes: null
+- source_id: tamarac
+  name: Tamarac (Envestnet)
+  kind: portfolio-mgmt
+  ingestion: api
+  tag: Tamarac
+  landing: account/holdings/transaction uploads
+  connector: wealth_mcp.tools.integrations.tamarac
+  description: 'Portfolio management and rebalancing platform: accounts, holdings,
+    transactions, billing. Source of account values and transaction flows that feed
+    the rollforwards (Upload_Account_ID lineage).'
+  notes: null
+- source_id: fidelity
+  name: Fidelity (custodian)
+  kind: custodian
+  ingestion: sftp-feed
+  tag: Fidelity
+  landing: bronze datalake (file feeds)
+  connector: wealth_mcp.tools.custodians.fidelity_api
+  description: 'Custodial file feeds over SFTP: positions, balances, transactions
+    for Fidelity-custodied accounts.'
+  notes: null
+- source_id: schwab
+  name: Schwab (custodian)
+  kind: custodian
+  ingestion: api
+  tag: null
+  landing: bronze datalake
+  connector: wealth_mcp.tools.custodians.schwab_api
+  description: 'Custodial bulk API: account profiles, positions, transactions for
+    Schwab-custodied accounts.'
+  notes: null
+- source_id: aip
+  name: AIP (internal)
+  kind: internal
+  ingestion: notebook
+  tag: AIP (internal)
+  landing: aip schema
+  connector: null
+  description: 'Allworth internal reference and operational data: date dimension,
+    acquisition codes, advisor routing/expectations, goals. Second-largest lineage
+    source.'
+  notes: null
+- source_id: fnp
+  name: FNP
+  kind: internal
+  ingestion: notebook
+  tag: FNP
+  landing: tho load notebooks
+  connector: null
+  description: Financial planning source tagged on plan/goal-related columns in the
+    load notebooks.
+  notes: Tag adopted from notebook lineage; confirm the upstream system name with
+    the data team.
+- source_id: datalake
+  name: ADLS datalake (dlallworthai)
+  kind: staging
+  ingestion: notebook
+  tag: null
+  landing: bronze/silver Delta tables
+  connector: wealth_mcp.tools.custodians.datalake_ops
+  description: 'Staging layer, not an origin: custodial and vendor feeds land as bronze/silver
+    Delta tables before the tho notebooks load the warehouse.'
+  notes: null
+- source_id: hubspot
+  name: HubSpot
+  kind: marketing
+  ingestion: api
+  tag: null
+  landing: campaign/engagement tables
+  connector: null
+  description: 'Marketing automation: campaigns and engagement metrics (list/metrics
+    API operations).'
+  notes: null
+- source_id: on24
+  name: ON24
+  kind: webinar
+  ingestion: notebook
+  tag: ON24
+  landing: registrants/attendees tables
+  connector: null
+  description: 'Webinar platform: event registrants and attendees feeding marketing
+    engagement reporting.'
+  notes: null
+- source_id: surveymonkey
+  name: SurveyMonkey
+  kind: survey
+  ingestion: notebook
+  tag: null
+  landing: CX metrics tables
+  connector: null
+  description: Client-experience surveys (CSAT/CX metrics) loaded via the tho_SurveyMonkey_CX_Metrics
+    notebook.
+  notes: null
+- source_id: zoom
+  name: Zoom
+  kind: telephony
+  ingestion: api
+  tag: null
+  landing: ZoomCallLog2
+  connector: null
+  description: Call logs for advisor call activity reporting.
+  notes: null
+- source_id: jira
+  name: Jira
+  kind: project-tracking
+  ingestion: api
+  tag: Jira
+  landing: projects/stages tables
+  connector: null
+  description: Project and ticket tracking; feeds integration/project reporting tables.
+  notes: null
+- source_id: catchlight
+  name: Catchlight
+  kind: scoring
+  ingestion: api
+  tag: null
+  landing: household scores
+  connector: null
+  description: Third-party household wealth-propensity scoring (Catchlight Score).
+  notes: null

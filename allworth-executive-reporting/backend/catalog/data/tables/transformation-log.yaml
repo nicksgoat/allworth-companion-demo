@@ -1,0 +1,73 @@
+id: transformation-log
+name: transformation_log
+schema: tho
+db: DataWarehouse
+db_table: transformation_log
+guid: 6884c91f-81ef-4444-9745-70739ef518e4
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Logging
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets: []
+column_count: 6
+columns:
+- name: notebook_name
+  db_column_name: notebook_name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: start_time
+  db_column_name: start_time
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: run_time_minutes
+  db_column_name: run_time_minutes
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: result
+  db_column_name: result
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: last_successful_run
+  db_column_name: last_successful_run
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: error_message
+  db_column_name: error_message
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

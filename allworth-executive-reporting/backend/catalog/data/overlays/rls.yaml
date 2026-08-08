@@ -1,0 +1,7 @@
+id: rls
+source: wealth_mcp.domain.tables
+description: 'Row-Level Security mapping: which offices/teams each user may see. Applied
+  by BI tools; not a business fact.'
+business_name: Row-Level Security mapping
+pk: User_Id
+domain: Advisor

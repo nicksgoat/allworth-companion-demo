@@ -1,0 +1,11 @@
+name: Conversion Rate
+uri: frameworks://conversion-rate
+category: Metric Definitions
+description: Ratio of leads or opportunities that become clients.
+keywords:
+  - conversion rate
+  - conversion
+  - close rate
+  - funnel
+content: |
+  Ratio of leads or opportunities that become clients. Always specify the denominator and stage window when reporting conversion.

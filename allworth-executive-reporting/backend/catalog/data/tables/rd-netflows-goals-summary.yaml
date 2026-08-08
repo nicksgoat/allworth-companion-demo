@@ -1,0 +1,38 @@
+id: rd-netflows-goals-summary
+name: RD_NetFlows_Goals_Summary
+schema: dbo
+db: DataWarehouse
+db_table: RD_NetFlows_Goals_Summary
+guid: 48ef1cd8-02b9-4699-89be-0c5c26d4f371
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Goals
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Trade Date Rollforward
+column_count: 2
+columns:
+- name: userid
+  db_column_name: userid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Goal
+  db_column_name: Goal
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

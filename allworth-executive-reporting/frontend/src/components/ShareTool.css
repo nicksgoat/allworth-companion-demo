@@ -1,0 +1,216 @@
+/* src/components/ShareTool.css
+ * Scoped styles for the reusable <ShareTool /> button + popover. Light theme to
+ * match the tool pages (white cards on a soft grey page, Allworth navy accents). */
+
+.sharetool {
+  position: relative;
+  display: inline-flex;
+}
+
+.sharetool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 15px;
+  border-radius: 8px;
+  border: 1px solid #d3dcec;
+  background: #fff;
+  color: #00205c;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.sharetool-btn:hover,
+.sharetool-btn.active {
+  background: #e8eef8;
+  border-color: #b7c6e0;
+}
+.sharetool-btn svg {
+  opacity: 0.85;
+}
+
+.sharetool-pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  width: 320px;
+  max-width: 88vw;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f2;
+  background: #fff;
+  box-shadow: 0 18px 44px rgba(0, 32, 92, 0.18);
+  color: #1c2434;
+}
+
+.sharetool-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+.sharetool-head strong {
+  font-size: 0.95rem;
+  color: #00205c;
+}
+.sharetool-sub {
+  font-size: 0.75rem;
+  color: #6b7690;
+}
+
+.sharetool-add {
+  display: flex;
+  gap: 8px;
+}
+.sharetool-add input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d3dcec;
+  background: #fff;
+  color: #1c2434;
+  font-size: 0.85rem;
+}
+.sharetool-add input:focus {
+  outline: none;
+  border-color: #00205c;
+}
+.sharetool-grant {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: #00205c;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sharetool-grant:hover:not(:disabled) {
+  background: #003a8c;
+}
+.sharetool-grant:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.sharetool-suggest {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f2;
+}
+.sharetool-suggest-item {
+  text-align: left;
+  padding: 8px 10px;
+  background: #fff;
+  border: none;
+  color: #1c2434;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.sharetool-suggest-item:hover {
+  background: #eef3fb;
+}
+.sharetool-suggest-item.new {
+  color: #00205c;
+  font-weight: 600;
+}
+
+.sharetool-msg {
+  margin-top: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+}
+.sharetool-msg.err {
+  background: rgba(220, 53, 69, 0.1);
+  color: #b42330;
+}
+.sharetool-msg.ok {
+  background: rgba(40, 167, 69, 0.12);
+  color: #1c7d43;
+}
+
+.sharetool-list-label {
+  margin: 14px 0 6px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7690;
+}
+.sharetool-empty {
+  font-size: 0.8rem;
+  color: #6b7690;
+}
+
+.sharetool-noaccess {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f4f6fb;
+  border: 1px solid #e2e8f2;
+  color: #6b7690;
+  font-size: 0.85rem;
+}
+
+.sharetool-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sharetool-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: #f4f6fb;
+}
+.sharetool-row.muted {
+  opacity: 0.75;
+}
+.sharetool-email {
+  font-size: 0.82rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sharetool-remove {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid rgba(220, 53, 69, 0.35);
+  background: rgba(220, 53, 69, 0.08);
+  color: #b42330;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.sharetool-remove:hover:not(:disabled) {
+  background: rgba(220, 53, 69, 0.18);
+}
+.sharetool-remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.sharetool-tag {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #e6ebf4;
+  color: #6b7690;
+}

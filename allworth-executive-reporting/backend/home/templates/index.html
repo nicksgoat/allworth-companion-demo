@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Home — Allworth Team Hub</title>
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300205C'/><path d='M16 6 L6 14 L6 26 L13 26 L13 19 L19 19 L19 26 L26 26 L26 14 Z' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linejoin='round'/></svg>">
+<style>
+  :root {
+    --brand-navy: #00205C;
+    --brand-navy-soft: #1a3c5e;
+    --brand-sky: #4a7bb8;
+    --brand-orange: #C75B12;
+    --brand-orange-warm: #E67E22;
+
+    --bg: #f4f6fb;
+    --glass: rgba(255, 255, 255, 0.60);
+    --glass-strong: rgba(255, 255, 255, 0.82);
+    --glass-soft: rgba(255, 255, 255, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.75);
+    --glass-edge: rgba(255, 255, 255, 0.92);
+    --border: rgba(0, 32, 92, 0.08);
+    --border-strong: rgba(0, 32, 92, 0.14);
+    --text: #0a0e1a;
+    --text-muted: #4a5468;
+    --text-subtle: #8a94a8;
+    --accent: var(--brand-navy);
+    --accent-strong: #001a4a;
+    --pop: var(--brand-orange);
+    --shadow-sm: 0 1px 2px rgba(0, 32, 92, 0.04);
+    --shadow: 0 20px 48px -12px rgba(0, 32, 92, 0.14), 0 4px 12px rgba(0, 32, 92, 0.06);
+    --shadow-lg: 0 32px 72px -18px rgba(0, 32, 92, 0.22), 0 8px 20px rgba(0, 32, 92, 0.08);
+    --highlight: inset 0 1px 0 var(--glass-edge);
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --sidebar-w: 280px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.003em;
+    overflow: hidden;
+  }
+
+  .bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .bg::after {
+    content: ""; position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(0, 32, 92, 0.04) 1px, transparent 1px);
+    background-size: 4px 4px; opacity: 0.5; mix-blend-mode: multiply;
+  }
+  .orb { position: absolute; border-radius: 50%; filter: blur(100px); }
+  .orb-a { width: 620px; height: 620px; top: -220px; left: -180px;
+    background: radial-gradient(circle, rgba(0, 32, 92, 0.28), rgba(0, 32, 92, 0) 70%); }
+  .orb-b { width: 540px; height: 540px; bottom: -240px; right: -160px;
+    background: radial-gradient(circle, rgba(230, 126, 34, 0.22), rgba(230, 126, 34, 0) 70%); }
+  .orb-c { width: 420px; height: 420px; top: 40%; right: 10%;
+    background: radial-gradient(circle, rgba(74, 123, 184, 0.18), rgba(74, 123, 184, 0) 70%); }
+
+  .app { position: relative; z-index: 1; display: grid; grid-template-columns: var(--sidebar-w) 1fr; height: 100vh; }
+
+  .sidebar {
+    padding: 18px 12px 16px 16px;
+    border-right: 1px solid var(--border);
+    background: var(--glass-soft);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .sidebar-brand {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 6px 16px; margin-bottom: 12px;
+    border-bottom: 1px solid var(--border); text-decoration: none;
+  }
+  .sidebar-brand img { height: 22px; width: auto; }
+  .sidebar-brand .bar { flex: 1; }
+  .sidebar-brand .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    font-weight: 600; color: var(--text-muted);
+    padding: 3px 8px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+    border-radius: 5px; box-shadow: var(--highlight);
+  }
+  .sidebar-brand .chip .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--pop); box-shadow: 0 0 6px var(--pop); }
+
+  .nav { flex: 1; overflow-y: auto; margin: 0 -6px; padding: 0 6px; }
+  .nav::-webkit-scrollbar { width: 8px; }
+  .nav::-webkit-scrollbar-thumb { background: rgba(0, 32, 92, 0.12); border-radius: 4px; }
+  .nav-group { margin-bottom: 18px; }
+  .nav-group h6 { font-size: 10.5px; font-weight: 600; color: var(--text-subtle); letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 10px 4px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 7px 10px; margin: 1px 0;
+    font-size: 13.5px; color: var(--text-muted);
+    border-radius: 7px; cursor: pointer;
+    border: 1px solid transparent; transition: all 140ms var(--ease);
+    text-decoration: none; letter-spacing: -0.003em;
+  }
+  .nav-item:hover { background: var(--glass); color: var(--text); border-color: var(--glass-border); }
+  .nav-item.active { background: var(--glass-strong); color: var(--accent); border-color: var(--glass-border); font-weight: 560; box-shadow: var(--shadow-sm), var(--highlight); }
+  .nav-item .icon { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.78; }
+  .nav-item.active .icon { opacity: 1; }
+  .nav-item .soon { margin-left: auto; font-size: 9px; font-weight: 700; letter-spacing: 0.08em; color: var(--text-subtle); text-transform: uppercase; }
+
+  .sidebar-footer { padding: 10px 6px 4px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-subtle); display: flex; justify-content: space-between; align-items: center; }
+  .sidebar-footer strong { color: var(--text-muted); font-weight: 600; }
+
+  .main { position: relative; overflow-y: auto; height: 100vh; padding: 48px 52px 80px; }
+  .main-inner { max-width: 1200px; margin: 0 auto; }
+
+  .hero {
+    position: relative; overflow: hidden;
+    padding: 44px 44px 40px;
+    border-radius: 24px;
+    background: linear-gradient(130deg, #00205C 0%, #1a3c5e 45%, #4a7bb8 100%);
+    color: #fff;
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 44px;
+    animation: fadeUp 0.5s var(--ease) both;
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(900px 320px at 92% -20%, rgba(230, 126, 34, 0.40), transparent 55%),
+                radial-gradient(520px 280px at -10% 130%, rgba(74, 123, 184, 0.55), transparent 60%);
+    pointer-events: none;
+  }
+  .hero-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 1.3fr auto; gap: 36px; align-items: end; }
+  .hero-kicker {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em;
+    font-weight: 700; color: rgba(255, 255, 255, 0.78);
+    margin-bottom: 14px; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .hero-kicker .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand-orange-warm); box-shadow: 0 0 10px var(--brand-orange-warm); }
+  .hero h1 { font-size: 36px; font-weight: 640; letter-spacing: -0.028em; line-height: 1.1; margin-bottom: 14px; }
+  .hero p.lede { color: rgba(255, 255, 255, 0.84); font-size: 15.5px; max-width: 640px; line-height: 1.55; }
+  .hero-actions { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; white-space: nowrap; }
+  .hero-btn {
+    font: inherit; font-size: 13px;
+    padding: 11px 18px; border-radius: 10px;
+    letter-spacing: -0.003em; font-weight: 560;
+    transition: all 160ms var(--ease);
+    background: rgba(255, 255, 255, 0.97); color: var(--accent);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+    display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+  }
+  .hero-btn:hover { transform: translateY(-1px); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22); }
+  .hero-btn.ghost { background: rgba(255, 255, 255, 0.12); color: #fff; border-color: rgba(255, 255, 255, 0.28); box-shadow: none; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .hero-btn.ghost:hover { background: rgba(255, 255, 255, 0.22); }
+  .hero-btn .icon { width: 14px; height: 14px; }
+
+  .hero-stats { display: flex; gap: 28px; margin-top: 28px; padding-top: 22px; border-top: 1px solid rgba(255, 255, 255, 0.12); position: relative; z-index: 1; }
+  .hero-stat { min-width: 0; }
+  .hero-stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.68); font-weight: 600; margin-bottom: 6px; }
+  .hero-stat .value { font-size: 22px; font-weight: 640; letter-spacing: -0.02em; color: #fff; }
+  .hero-stat .value .hint { font-size: 12px; font-weight: 500; color: rgba(255, 255, 255, 0.7); margin-left: 6px; letter-spacing: normal; }
+
+  .section-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin: 10px 4px 16px;
+  }
+  .section-head h2 { font-size: 19px; font-weight: 620; letter-spacing: -0.018em; color: var(--text); }
+  .section-head p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  .section-head .count { font-size: 12px; color: var(--text-subtle); letter-spacing: 0.01em; padding: 3px 9px; border: 1px solid var(--border); border-radius: 999px; }
+
+  .card-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 18px; margin-bottom: 44px;
+  }
+
+  .card {
+    position: relative; display: flex; flex-direction: column; gap: 12px;
+    padding: 24px 24px 22px;
+    background: var(--glass);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm), var(--highlight);
+    color: var(--text); text-decoration: none;
+    overflow: hidden;
+    transition: transform 220ms var(--ease), box-shadow 220ms var(--ease), background 220ms var(--ease);
+    animation: fadeUp 0.5s var(--ease) both;
+  }
+  .card::after {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px;
+    background: linear-gradient(90deg, var(--brand-navy), var(--brand-sky));
+    opacity: 0; transition: opacity 200ms var(--ease);
+  }
+  .card:hover { transform: translateY(-3px); background: var(--glass-strong); box-shadow: var(--shadow), var(--highlight); }
+  .card:hover::after { opacity: 1; }
+  .card.disabled { cursor: not-allowed; opacity: 0.6; }
+  .card.disabled:hover { transform: none; background: var(--glass); box-shadow: var(--shadow-sm), var(--highlight); }
+  .card.disabled:hover::after { opacity: 0; }
+
+  .card-top { display: flex; align-items: flex-start; gap: 14px; }
+  .card-icon {
+    width: 44px; height: 44px; flex-shrink: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--brand-navy), var(--brand-sky));
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(0, 32, 92, 0.22), var(--highlight);
+  }
+  .card-icon.orange { background: linear-gradient(135deg, var(--brand-orange), var(--brand-orange-warm)); box-shadow: 0 6px 14px rgba(199, 91, 18, 0.28), var(--highlight); }
+  .card-icon.sky { background: linear-gradient(135deg, var(--brand-sky), #6fa8d8); box-shadow: 0 6px 14px rgba(74, 123, 184, 0.26), var(--highlight); }
+  .card-icon.slate { background: linear-gradient(135deg, #495a77, #6f8099); box-shadow: 0 6px 14px rgba(73, 90, 119, 0.22), var(--highlight); }
+  .card-icon.teal { background: linear-gradient(135deg, #157a4c, #2fa36a); box-shadow: 0 6px 14px rgba(21, 122, 76, 0.22), var(--highlight); }
+  .card-icon svg { width: 20px; height: 20px; }
+
+  .card-title-wrap { min-width: 0; flex: 1; }
+  .card-kicker { font-size: 10.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-subtle); margin-bottom: 4px; }
+  .card-title { font-size: 16px; font-weight: 620; letter-spacing: -0.013em; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .card-tag { font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; }
+  .card-tag.live { background: rgba(21, 122, 76, 0.1); color: #157a4c; border: 1px solid rgba(21, 122, 76, 0.25); }
+  .card-tag.soon { background: rgba(138, 148, 168, 0.12); color: var(--text-subtle); border: 1px solid rgba(138, 148, 168, 0.25); }
+  .card-tag.new { background: rgba(199, 91, 18, 0.12); color: var(--pop); border: 1px solid rgba(199, 91, 18, 0.28); }
+
+  .card-desc { font-size: 13.5px; color: var(--text-muted); line-height: 1.55; flex: 1; }
+  .card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; font-size: 12.5px; color: var(--text-subtle); padding-top: 12px; border-top: 1px solid var(--border); }
+  .card-foot .host { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 11.5px; }
+  .card-foot .arrow { width: 16px; height: 16px; color: var(--text-subtle); transition: transform 200ms var(--ease), color 200ms var(--ease); }
+  .card:hover .card-foot .arrow { transform: translateX(3px); color: var(--accent); }
+
+  @media (max-width: 960px) {
+    :root { --sidebar-w: 220px; }
+    .main { padding: 32px 24px 60px; }
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-actions { flex-direction: row; align-items: flex-start; }
+    .hero h1 { font-size: 26px; }
+    .hero-stats { flex-wrap: wrap; gap: 18px; }
+  }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+</style>
+</head>
+<body>
+
+<div class="bg" aria-hidden="true">
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-c"></div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <a class="sidebar-brand" href="{{ base_url }}/" title="Home">
+      <img src="{{ base_url }}/logo.png" alt="Allworth Financial">
+      <div class="bar"></div>
+      <span class="chip"><span class="dot"></span>Hub</span>
+    </a>
+
+    <nav class="nav" aria-label="Workspace">
+      <div class="nav-group">
+        <h6>Workspace</h6>
+        <a class="nav-item active" href="{{ base_url }}/">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12 12 3l9 9"/><path d="M5 10v10h14V10"/></svg>
+          Home
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <h6>Live tools</h6>
+        <a class="nav-item" href="/reporting/kpi" data-tool="performance">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 20h8"/><path d="M7 12l3-3 3 3 4-5"/></svg>
+          Performance
+        </a>
+        <a class="nav-item" href="/jarvis/" data-tool="jarvis">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H4z"/><path d="M14 4v6h6"/><path d="M8 14h8"/><path d="M8 18h5"/></svg>
+          Jarvis
+        </a>
+        <a class="nav-item" href="/nfbc" data-tool="nfbc">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M4 14h16"/><path d="M9 4v16"/></svg>
+          NFBC Adjustments
+        </a>
+        <a class="nav-item" href="/fee-calculator" data-tool="fee_calculator">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h8"/><path d="M8 14h4"/><path d="M8 18h6"/></svg>
+          Fee Calculator
+        </a>
+        <a class="nav-item" href="/admin" data-tool="admin">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5z"/><circle cx="12" cy="10" r="2.4"/><path d="M8.5 16a3.7 3.7 0 0 1 7 0"/></svg>
+          Admin
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <h6>Analytics &amp; reports</h6>
+        <a class="nav-item" href="/tamarac" data-tool="pipeline_logging">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10"/><path d="M4 12h16"/><path d="M4 17h7"/><circle cx="18" cy="7" r="2"/><circle cx="14" cy="17" r="2"/></svg>
+          Pipeline Logging
+        </a>
+        <a class="nav-item" href="/pipeline-review" data-tool="pipeline_review">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>
+          Pipeline Review
+        </a>
+        <a class="nav-item" href="#heatmaps" aria-disabled="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Heatmaps
+          <span class="soon">soon</span>
+        </a>
+        <a class="nav-item" href="#reports" aria-disabled="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/></svg>
+          HTML Reports
+          <span class="soon">soon</span>
+        </a>
+        <a class="nav-item" href="#recon" aria-disabled="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+          Reconciliations
+          <span class="soon">soon</span>
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <h6>Utilities</h6>
+        <a class="nav-item" href="/sfp2" data-tool="sfp2">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/><circle cx="18" cy="18" r="2"/></svg>
+          Salesforce Column Updater
+        </a>
+        <a class="nav-item" href="/repcodes" data-tool="repcodes">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 4v16"/></svg>
+          Rep Codes
+        </a>
+        <a class="nav-item" href="#fieldmap" aria-disabled="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/><circle cx="7" cy="6" r="1.2" fill="currentColor"/><circle cx="13" cy="12" r="1.2" fill="currentColor"/><circle cx="17" cy="18" r="1.2" fill="currentColor"/></svg>
+          Field Mapping
+          <span class="soon">soon</span>
+        </a>
+        <a class="nav-item" href="#custodian" aria-disabled="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18v10H3z"/><path d="M7 9V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3"/></svg>
+          Custodian Dashboard
+          <span class="soon">soon</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span>Powered by <strong>Jarvis</strong></span>
+      <span id="today"></span>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="main-inner">
+
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <div class="hero-kicker"><span class="dot"></span>Team workspace</div>
+            <h1 id="hero-title">Everything your team ships, in one place.</h1>
+            <p class="lede">
+              Jump into the performance dashboard, search the knowledge base, or open any of
+              the tools and reports the team uses day-to-day.
+            </p>
+          </div>
+          <div class="hero-actions">
+            <a class="hero-btn" href="/reporting/kpi">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+              Open Performance
+            </a>
+            <a class="hero-btn ghost" href="/jarvis/">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              Search Jarvis
+            </a>
+          </div>
+        </div>
+        <div class="hero-stats" aria-hidden="true">
+          <div class="hero-stat">
+            <div class="label">Live tools</div>
+            <div class="value">4</div>
+          </div>
+          <div class="hero-stat">
+            <div class="label">In planning</div>
+            <div class="value">5</div>
+          </div>
+          <div class="hero-stat">
+            <div class="label">Categories</div>
+            <div class="value">3</div>
+          </div>
+          <div class="hero-stat">
+            <div class="label">Today</div>
+            <div class="value" id="today-big">—</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-head">
+        <div>
+          <h2>Live tools</h2>
+          <p>Shipped and in production for the team to use today.</p>
+        </div>
+        <span class="count">5 available</span>
+      </div>
+      <div class="card-grid">
+
+        <a class="card" href="/reporting/kpi" style="animation-delay: 40ms" data-tool="performance">
+          <div class="card-top">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 4 4 5-6"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Dashboard</div>
+              <div class="card-title">Performance by Channel <span class="card-tag live">Live</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            KPI matrix for NCNM, Clients, Appointments and Leads across every acquisition
+            channel — with plan, prior-year and prorated current-month values.
+          </div>
+          <div class="card-foot">
+            <span class="host">/reporting/kpi</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </div>
+        </a>
+
+        <a class="card" href="/jarvis/" style="animation-delay: 80ms" data-tool="jarvis">
+          <div class="card-top">
+            <span class="card-icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H4z"/><path d="M14 4v6h6"/><path d="M8 14h8"/><path d="M8 18h5"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Knowledge base</div>
+              <div class="card-title">Jarvis Encyclopedia <span class="card-tag live">Live</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            Searchable source-of-truth for metric definitions, policies and playbooks — edit
+            YAMLs inline and keep MCP + the web in sync.
+          </div>
+          <div class="card-foot">
+            <span class="host">/jarvis/</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </div>
+        </a>
+
+        <a class="card" href="/nfbc" style="animation-delay: 120ms" data-tool="nfbc">
+          <div class="card-top">
+            <span class="card-icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/><path d="M4 14h16"/><path d="M9 4v16"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Agentic ops</div>
+              <div class="card-title">NFBC Adjustments <span class="card-tag new">New</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            Review and confirm proposed NFBC flow adjustments across open Jira tickets — edit
+            inline, then one click writes Synapse, runs rollforward, and posts the reply back to Jira.
+          </div>
+          <div class="card-foot">
+            <span class="host">/nfbc</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </div>
+        </a>
+
+        <a class="card" href="/fee-calculator" style="animation-delay: 160ms" data-tool="fee_calculator">
+          <div class="card-top">
+            <span class="card-icon teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h8"/><path d="M8 14h4"/><path d="M8 18h6"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Pricing</div>
+              <div class="card-title">Fee Calculator <span class="card-tag live">Live</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            Tiered fee computation for new client pricing — search households, pull AUM from
+            rollforward, compare schedules, and upload billing history.
+          </div>
+          <div class="card-foot">
+            <span class="host">/fee-calculator</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </div>
+        </a>
+
+        <a class="card" href="/executive-report" style="animation-delay: 200ms" data-tool="executive_report">
+          <div class="card-top">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="4" width="3" height="13"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Executive</div>
+              <div class="card-title">Executive Report <span class="card-tag new">New</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            CEO-level company flows and NCNM forecast — appointment PAUM YoY, channel funnel,
+            the 3-component end-of-month NCNM projection, and a GPT-4.1 executive summary.
+          </div>
+          <div class="card-foot">
+            <span class="host">/executive-report</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </div>
+        </a>
+
+        <a class="card" href="/admin" style="animation-delay: 240ms" data-tool="admin">
+          <div class="card-top">
+            <span class="card-icon slate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5z"/><circle cx="12" cy="10" r="2.4"/><path d="M8.5 16a3.7 3.7 0 0 1 7 0"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Access control</div>
+              <div class="card-title">Admin <span class="card-tag new">New</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            Grant tool access by email, build groups, and let group access cascade to every
+            member — one place to manage who can open which tool.
+          </div>
+          <div class="card-foot">
+            <span class="host">/admin</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </div>
+        </a>
+
+      </div>
+
+      <div class="section-head">
+        <div>
+          <h2>Analytics &amp; reports</h2>
+          <p>Visual analytics, static exports, and partner-facing deliverables.</p>
+        </div>
+        <span class="count">2 available · 3 in planning</span>
+      </div>
+      <div class="card-grid">
+
+        <a class="card" href="/tamarac" style="animation-delay: 80ms" data-tool="pipeline_logging">
+          <div class="card-top">
+            <span class="card-icon sky">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10"/><path d="M4 12h16"/><path d="M4 17h7"/><circle cx="18" cy="7" r="2"/><circle cx="14" cy="17" r="2"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Pipeline observability</div>
+              <div class="card-title">Pipeline Logging <span class="card-tag live">Live</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            Pipeline ingestion + transformation logging — the Tamarac pipeline view and the
+            full refresh log, read from the ADLS transformation log.
+          </div>
+          <div class="card-foot">
+            <span class="host">/tamarac</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </div>
+        </a>        <a class="card" href="/pipeline-review" style="animation-delay: 120ms" data-tool="pipeline_review">
+          <div class="card-top">
+            <span class="card-icon teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Prospect focus list</div>
+              <div class="card-title">Pipeline Review <span class="card-tag live">Live</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            Weekly high-value prospect focus list with scoring, week-over-week trends,
+            at-risk flags, check-off, and XLSX export.
+          </div>
+          <div class="card-foot">
+            <span class="host">/pipeline-review</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </div>
+        </a>
+        <div class="card disabled" style="animation-delay: 120ms" aria-disabled="true">
+          <div class="card-top">
+            <span class="card-icon sky">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Visual analytics</div>
+              <div class="card-title">Heatmaps <span class="card-tag soon">Soon</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            Density views for advisor activity, client engagement and portfolio drift — ties
+            into ThoughtSpot liveboards.
+          </div>
+          <div class="card-foot"><span class="host">—</span></div>
+        </div>
+
+        <div class="card disabled" style="animation-delay: 160ms" aria-disabled="true">
+          <div class="card-top">
+            <span class="card-icon slate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8"/><path d="M8 17h6"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Ad-hoc</div>
+              <div class="card-title">HTML Reports <span class="card-tag soon">Soon</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            Drop-in viewer for static HTML exports — reconciliations, recon diffs, and one-off
+            deliverables the team ships to partners.
+          </div>
+          <div class="card-foot"><span class="host">—</span></div>
+        </div>
+
+        <div class="card disabled" style="animation-delay: 200ms" aria-disabled="true">
+          <div class="card-top">
+            <span class="card-icon teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Data quality</div>
+              <div class="card-title">Reconciliations <span class="card-tag soon">Soon</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            Cross-system flow and balance recon — Synapse vs. custodian, rollforward bridges,
+            and drill-down to the row-level diffs.
+          </div>
+          <div class="card-foot"><span class="host">—</span></div>
+        </div>
+
+      </div>
+
+      <div class="section-head">
+        <div>
+          <h2>Utilities</h2>
+          <p>Small internal apps and lookup tools spun up by the team.</p>
+        </div>
+        <span class="count">2 available · 2 in planning</span>
+      </div>
+      <div class="card-grid">
+
+        <a class="card" href="/sfp2" style="animation-delay: 200ms" data-tool="sfp2">
+          <div class="card-top">
+            <span class="card-icon sky">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/><circle cx="18" cy="18" r="2"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Developer tool</div>
+              <div class="card-title">Salesforce Column Updater <span class="card-tag live">Live</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            Diff bronze Delta tables against the live Salesforce describe() and apply column
+            schema updates — keeps the Salesforce ingestion schema in sync.
+          </div>
+          <div class="card-foot">
+            <span class="host">/sfp2</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </div>
+        </a>
+
+        <a class="card" href="/repcodes" style="animation-delay: 240ms" data-tool="repcodes">
+          <div class="card-top">
+            <span class="card-icon teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 4v16"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Reference data</div>
+              <div class="card-title">Rep Codes <span class="card-tag live">Live</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            Editable lookup table for advisor rep codes backed by Synapse — add, edit, and
+            track recent changes to the rep-code mapping.
+          </div>
+          <div class="card-foot">
+            <span class="host">/repcodes</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </div>
+        </a>
+
+        <div class="card disabled" style="animation-delay: 280ms" aria-disabled="true">
+          <div class="card-top">
+            <span class="card-icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 12h18"/><path d="M3 18h18"/><circle cx="7" cy="6" r="1.2" fill="currentColor"/><circle cx="13" cy="12" r="1.2" fill="currentColor"/><circle cx="17" cy="18" r="1.2" fill="currentColor"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Developer tool</div>
+              <div class="card-title">Field Mapping Explorer <span class="card-tag soon">Soon</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            Navigate stored-procedure field lineage across rollforward, fact tables, and
+            Tamarac — wired up to the <code>field-mapping</code> repo.
+          </div>
+          <div class="card-foot"><span class="host">—</span></div>
+        </div>
+
+        <div class="card disabled" style="animation-delay: 280ms" aria-disabled="true">
+          <div class="card-top">
+            <span class="card-icon slate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18v10H3z"/><path d="M7 9V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3"/></svg>
+            </span>
+            <div class="card-title-wrap">
+              <div class="card-kicker">Operations</div>
+              <div class="card-title">Custodian Dashboard <span class="card-tag soon">Soon</span></div>
+            </div>
+          </div>
+          <div class="card-desc">
+            Monitor custodian feed health, trade volumes, and reconciliation breaks across
+            Fidelity, Schwab, and internal.
+          </div>
+          <div class="card-foot"><span class="host">—</span></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const d = new Date();
+  const short = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const long  = d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  document.getElementById("today").textContent = long;
+  const big = document.getElementById("today-big");
+  if (big) big.innerHTML = short + '<span class="hint">' + d.getFullYear() + '</span>';
+
+  document.querySelectorAll('[aria-disabled="true"]').forEach((el) => {
+    el.addEventListener("click", (e) => e.preventDefault());
+  });
+
+  // Per-user tool filtering. `allowed` is null when identity is unknown or the
+  // user is all-access (show everything); otherwise hide launchers for tools
+  // the user lacks. The tool pages enforce access server/client-side too.
+  (function () {
+    var allowed = {{ allowed_tools_json|safe }};
+    if (!allowed) return;
+    var set = new Set(allowed);
+    document.querySelectorAll('[data-tool]').forEach(function (el) {
+      if (!set.has(el.getAttribute('data-tool'))) el.remove();
+    });
+  })();
+</script>
+</body>
+</html>

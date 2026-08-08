@@ -1,0 +1,7 @@
+id: acquisition
+source: wealth_mcp.domain.tables
+description: Reference list of acquired books of business / partner firms (AcqCode);
+  classifies inorganic AUM.
+business_name: Acquisition / partner books
+pk: AcqCode
+domain: Reference

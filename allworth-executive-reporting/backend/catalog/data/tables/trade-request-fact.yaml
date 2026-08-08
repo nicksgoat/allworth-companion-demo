@@ -1,0 +1,287 @@
+id: trade-request-fact
+name: Trade_Request_Fact
+schema: tho
+db: DataWarehouse
+db_table: Trade_Request_Fact
+guid: 145da179-74bb-4998-a393-acc4660ed658
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Trade Requests
+column_count: 26
+columns:
+- name: Trade_Request_Id
+  db_column_name: Trade_Request_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Executed_Same_Day
+  db_column_name: Executed_Same_Day
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: HHID
+  db_column_name: HHID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: UploadAccountId
+  db_column_name: UploadAccountId
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Created_Date
+  db_column_name: Created_Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: New_Date
+  db_column_name: New_Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Execute_Date
+  db_column_name: Execute_Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Verify_Date
+  db_column_name: Verify_Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Confirm_Date
+  db_column_name: Confirm_Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Completed_Date
+  db_column_name: Completed_Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Entered_New_By
+  db_column_name: Entered_New_By
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Executed_By
+  db_column_name: Executed_By
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Verified_By
+  db_column_name: Verified_By
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Confirmed_By
+  db_column_name: Confirmed_By
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Completed_By
+  db_column_name: Completed_By
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Configured_Execute_Date
+  db_column_name: Configured_Execute_Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: AccountNumber
+  db_column_name: AccountNumber
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Type
+  db_column_name: Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Configured_Verify_Date
+  db_column_name: Configured_Verify_Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Cancelled
+  db_column_name: Cancelled
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Reg_T_Violation
+  db_column_name: Reg_T_Violation
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Trade_Request_Type
+  db_column_name: Trade_Request_Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: BusinessMin
+  db_column_name: BusinessMin
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Execution_Delay
+  db_column_name: Execution_Delay
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Remove_Account
+  db_column_name: Remove_Account
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Executing_Trader__c
+  db_column_name: Executing_Trader__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: Trade Request Executed By
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Trade_Request_Fact::Executed_By] = [User::User ID]'
+  pairs:
+  - from_table: Trade_Request_Fact
+    from_col: Executed_By
+    to_table: User
+    to_col: User ID
+- join_name: Trade Request to ACV
+  to: Current_Account_Demographic
+  to_id: current-account-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Trade_Request_Fact::UploadAccountId] = [Current_Account_Demographic::Upload Account ID]'
+  pairs:
+  - from_table: Trade_Request_Fact
+    from_col: UploadAccountId
+    to_table: Current_Account_Demographic
+    to_col: Upload Account ID
+- join_name: Trade Requests to HH Dim
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Trade_Request_Fact::HHID] = [Current_Household_Demographic::HHID]'
+  pairs:
+  - from_table: Trade_Request_Fact
+    from_col: HHID
+    to_table: Current_Household_Demographic
+    to_col: HHID

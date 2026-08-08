@@ -1,0 +1,83 @@
+id: storeprocrunlog
+name: StoreProcRunLog
+schema: tho
+db: DataWarehouse
+db_table: StoreProcRunLog
+guid: 30e2a3c1-4858-421b-84a6-e06877e1e31a
+business_name: null
+grain: TableName x StoredProcRunDate
+pk: null
+synonyms: []
+domain: Logging
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: ETL log
+worksheets:
+- Stored Proc Log
+column_count: 7
+columns:
+- name: TableName
+  db_column_name: TableName
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: MaxReportingPeriod
+  db_column_name: MaxReportingPeriod
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: StoredProcRunDate
+  db_column_name: StoredProcRunDate
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: MaxDateKey
+  db_column_name: MaxDateKey
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Max_ID
+  db_column_name: Max_ID
+  data_type: INT64
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: End_Date
+  db_column_name: End_Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Duration_Minutes
+  db_column_name: Duration_Minutes
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

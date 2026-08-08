@@ -1,0 +1,119 @@
+id: stage-change-history
+name: stage_change_history
+schema: tho
+db: DataWarehouse
+db_table: stage_change_history
+guid: 78a5263e-55a5-43d7-9cd6-4ff8056545da
+business_name: null
+grain: Stage_Change_Id
+pk: null
+synonyms: []
+domain: Pipeline
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Stage Change History
+column_count: 11
+columns:
+- name: Stage_Change_Id
+  db_column_name: Stage_Change_Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LeadId
+  db_column_name: LeadId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Entered_Stage_Date
+  db_column_name: Entered_Stage_Date
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Stage
+  db_column_name: Stage
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Is_Current_Stage
+  db_column_name: Is_Current_Stage
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Days_In_Stage
+  db_column_name: Days_In_Stage
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Previous_Stage
+  db_column_name: Previous_Stage
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Skipped_Stage
+  db_column_name: Skipped_Stage
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Successful_Stage_Move
+  db_column_name: Successful_Stage_Move
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Latest_Stage_Instance
+  db_column_name: Latest_Stage_Instance
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Days_to_Client
+  db_column_name: Days_to_Client
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

@@ -1,0 +1,92 @@
+id: sfb2b-account
+name: sfb2b_Account
+schema: tho
+db: DataWarehouse
+db_table: sfb2b_Account
+guid: 5cfc93ef-d802-484b-9a7c-f41c74d4ad1b
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Account
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Partner Program
+column_count: 8
+columns:
+- name: Type
+  db_column_name: Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Escalation_Date
+  db_column_name: Escalation_Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Total_Assets
+  db_column_name: Total_Assets__c
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: createddate
+  db_column_name: createddate
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Id
+  db_column_name: Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Owner
+  db_column_name: Owner
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Name
+  db_column_name: Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Account_Status
+  db_column_name: Account_Status
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

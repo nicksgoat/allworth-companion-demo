@@ -1,0 +1,6 @@
+id: account-rollforward
+source: wealth_mcp.domain.tables
+description: Account-level monthly AUM rollforward — the account-grain decomposition
+  of Household_Rollforward, including flow components and management fees per account.
+grain: avaccountuploadid x reportingperiod
+domain: Account

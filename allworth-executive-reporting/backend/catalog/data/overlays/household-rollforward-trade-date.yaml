@@ -1,0 +1,8 @@
+id: household-rollforward-trade-date
+source: wealth_mcp.domain.tables
+description: Household AUM rollforward using trade date instead of entry/settlement
+  date. Same shape as Household_Rollforward; do not mix bases in one analysis.
+business_name: Monthly AUM rollforward (trade-date basis)
+grain: avhhid x reportingperiod
+pk: RF_ID
+domain: Household

@@ -1,0 +1,40 @@
+name: Run-Rate Revenue
+uri: frameworks://run-rate-revenue
+category: Metric Definitions
+description: Current annualized fee revenue based on present AUM and scheduled billing cadence, not historical billings.
+keywords:
+  - run rate
+  - run-rate revenue
+  - annualized
+  - current revenue
+  - forward-looking revenue
+related_tables:
+  - Current_Household_Fact
+related_columns:
+  - table: Current_Household_Fact
+    column: Run_Rate_Revenue
+  - table: Current_Household_Fact
+    column: AUM_Billed
+content: |
+  Source: `profitability.py:get_profitability_breakdown()` — `Current_Household_Fact.Run_Rate_Revenue`.
+
+  Run-rate revenue is forward-looking annualized revenue based on **current client state**, not historical billings.
+
+  ```
+  RRR = SUM(all households' current scheduled annual fees)
+  Run-Rate Yield (bps) = (RRR / Current_AUM) × 10,000
+  ```
+
+  ## Data
+  - **Table**: `Current_Household_Fact` (filtered `Current_Client = 1`).
+  - **Household-level column**: `Run_Rate_Revenue` — pre-calculated by applying the fee-schedule tier to `AUM_Billed`.
+  - **AUM variants**:
+    - `AUM_Billed` — billable subset (excludes non-billable holdings).
+    - `AUM` — total account value.
+  - **Not date-segmented** — reflects the latest state snapshot, refreshed with each data load.
+
+  ## Realized vs Run-Rate
+  - **Realized** = actual billed fees YTD ÷ average AUM over the period = historical yield.
+  - **Run-rate** = current billing schedule applied to current balances = forward-looking estimate.
+
+  When citing "revenue" in growth/pipeline analysis, be explicit about which you mean — they can diverge materially during periods of flows or tier changes.

@@ -1,0 +1,38 @@
+id: transaction-activity-type
+name: Transaction_Activity_Type
+schema: tho
+db: DataWarehouse
+db_table: Transaction_Activity_Type
+guid: 06493698-2c63-490d-8660-18459121b2f7
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Activity
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Transactions
+column_count: 2
+columns:
+- name: Activity_Id
+  db_column_name: Activity_Id
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Activity_Type
+  db_column_name: Activity_Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships: []

@@ -1,0 +1,11 @@
+name: Weighted PAUM
+uri: frameworks://weighted-paum
+category: Metric Definitions
+description: PAUM multiplied by a close-rate assumption — probability-adjusted pipeline.
+keywords:
+  - weighted paum
+  - probability-adjusted pipeline
+  - close rate
+  - forecast
+content: |
+  PAUM multiplied by a close-rate assumption. This is a forecast-oriented metric and should be described as expected or probability-adjusted pipeline value.

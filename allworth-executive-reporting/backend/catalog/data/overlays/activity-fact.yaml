@@ -1,0 +1,8 @@
+id: activity-fact
+source: wealth_mcp.domain.tables
+description: Measures per Salesforce activity, joined to Activity_Dim; supports engagement
+  scorecards.
+business_name: Activity measures
+grain: one row per Salesforce Activity Id
+pk: Id
+domain: Activity

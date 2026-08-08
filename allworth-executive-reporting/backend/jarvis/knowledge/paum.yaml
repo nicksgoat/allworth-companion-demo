@@ -1,0 +1,17 @@
+name: PAUM
+uri: frameworks://paum
+category: Metric Definitions
+description: Prospect assets under management — opportunity size, not funded AUM.
+keywords:
+  - paum
+  - prospect assets under management
+  - pipeline
+  - opportunity
+related_tables:
+  - Current_Household_Fact
+  - Opportunity
+related_columns:
+  - table: Current_Household_Fact
+    column: PAUM
+content: |
+  Prospect assets under management. This is opportunity size, not funded AUM. It is useful for pipeline prioritization but should not be described as realized growth.

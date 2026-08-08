@@ -1,0 +1,153 @@
+name: Industry Benchmarks & Thresholds
+uri: frameworks://industry-benchmarks
+description: >
+  Industry-standard benchmarks, warning thresholds, and directional
+  guidance for interpreting wealth management metrics.
+keywords:
+  - benchmark
+  - is this good
+  - how does this compare
+  - industry average
+  - threshold
+  - warning
+directive: >
+  Present benchmarks as reference points in an aside, not definitive
+  judgments.
+
+content: |
+  # Industry Benchmarks & Thresholds
+
+  > **Usage note**: These are industry reference points for directional guidance.
+  > Consult this resource when the user asks "is this good?" or when you need
+  > context to interpret a metric. Present benchmarks as reference points,
+  > not definitive judgments — every firm's situation is different.
+
+  ---
+
+  ## Growth Benchmarks
+
+  ### Organic Growth Rate
+  | Metric | Threshold | Interpretation |
+  |---|---|---|
+  | Organic growth rate | >5% annually | Strong organic growth |
+  | Organic growth rate | 3–5% annually | Industry average |
+  | Organic growth rate | <3% annually | Below average — investigate |
+  | Net client loss | Negative net adds | Attrition exceeding new clients |
+  | Attrition ratio | >50% of new adds | High relative attrition |
+
+  ### Fee Yield
+  | Metric | Threshold | Interpretation |
+  |---|---|---|
+  | Blended fee yield | 75 bps | Industry average advisory fee yield |
+  | Blended fee yield | <60 bps | Below average — check fee compression |
+  | Blended fee yield | >90 bps | Above average — verify not losing to competitors |
+
+  ---
+
+  ## Profitability Benchmarks
+
+  ### Revenue per Advisor
+  | Metric | Threshold | Interpretation |
+  |---|---|---|
+  | Revenue per advisor | $800K–$1.2M | Industry average |
+  | Revenue per advisor | >$1.5M | Top quartile |
+  | Revenue per household | >$3,500 | Top quartile |
+
+  ### Efficiency Metrics
+  | Metric | Threshold | Interpretation |
+  |---|---|---|
+  | AUM per advisor | >$200M | Top quartile capacity |
+  | AUM per advisor | $100M–$200M | Typical range |
+  | AUM per advisor | <$100M | May be under-capacity |
+  | Households per advisor | 50–100 | Typical range |
+
+  ### Billing Rate Flags
+  | Metric | Threshold | Interpretation |
+  |---|---|---|
+  | Effective annual rate | >1.50% | Unusually high — verify |
+  | Effective annual rate | <0.25% | Unusually low — may be special arrangement |
+  | Industry avg advisory fee | 0.75%–1.00% | Typical range |
+
+  ---
+
+  ## Concentration Risk Thresholds
+
+  | Metric | Warning | Critical | Interpretation |
+  |---|---|---|---|
+  | Top-N AUM as % of firm | >15% | >20% | Revenue concentration risk |
+  | Single household % of AUM | >2% | >3% | Key-person dependency |
+  | Top-10 household cumulative | >25% | >35% | Portfolio concentration |
+
+  ---
+
+  ## Client Outcomes Benchmarks
+
+  ### Engagement Health
+  | Metric | Threshold | Interpretation |
+  |---|---|---|
+  | Days since last contact | >90 days | Engagement gap |
+  | Days since last contact | >180 days | Significant disengagement risk |
+  | Annual review completion | <80% | Below service standard |
+  | Pre-conversion contact rate | <50% | Low prospect engagement |
+
+  ### Retention & Satisfaction
+  | Metric | Threshold | Interpretation |
+  |---|---|---|
+  | Client retention rate | >95% | Industry top quartile |
+  | Client retention rate | 90–95% | Average |
+  | Client retention rate | <90% | Below average — investigate |
+  | NPS score | >50 | Excellent |
+  | NPS score | 30–50 | Good |
+  | NPS score | <30 | Needs improvement |
+
+  ---
+
+  ## Risk Benchmarks
+
+  ### Portfolio Allocation (Moderate Profile)
+  | Metric | Typical Range | Flag If |
+  |---|---|---|
+  | Equity allocation | 50–60% | >80% or <30% for moderate |
+  | Cash allocation | 0–5% | >10% (cash drag) |
+  | Single position | <5% of portfolio | >10% (concentration) |
+  | Sector concentration | <30% of equities | >40% |
+
+  ### Trading & Compliance
+  | Metric | Threshold | Interpretation |
+  |---|---|---|
+  | Same-day execution rate | >90% | Good operational efficiency |
+  | Same-day execution rate | <75% | Investigate delays |
+  | Reg T violations | Any | Requires immediate attention |
+  | RMD satisfaction rate | 100% | Regulatory requirement |
+  | RMD unsatisfied | Any | 25% IRS excise tax penalty risk |
+
+  ### Unrealized Gains/Losses
+  | Metric | Threshold | Interpretation |
+  |---|---|---|
+  | Single-position UGL | >$100K | Large tax lot — flag for tax planning |
+
+  ---
+
+  ## Operational Benchmarks
+
+  ### Account Onboarding
+  | Metric | Threshold | Interpretation |
+  |---|---|---|
+  | Avg days to fund | <30 days | Good |
+  | Avg days to fund | 30–60 days | Typical |
+  | Avg days to fund | >60 days | Slow — investigate |
+  | Overdue incoming funds | Any | Requires follow-up |
+
+  ### Service Cases
+  | Metric | Threshold | Interpretation |
+  |---|---|---|
+  | Case resolution time | <5 days avg | Good |
+  | Case resolution time | 5–14 days avg | Typical |
+  | Case resolution time | >14 days avg | Slow |
+  | Escalation rate | <5% | Good |
+  | Escalation rate | >10% | High — review processes |
+
+  ---
+
+  *These benchmarks are industry reference points and should be customized
+  to reflect Allworth Financial's specific targets and context.*

@@ -1,0 +1,143 @@
+/* SideNav — fixed left rail shared by the standalone tool pages. Glass theme to
+   match the /home hub and the .t2-* pages. Pages that render it add the
+   `has-sidenav` class to their root so content clears the rail. */
+
+.side-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  width: 236px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 14px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border-right: 1px solid rgba(0, 32, 92, 0.1);
+  box-shadow: 2px 0 24px -12px rgba(0, 32, 92, 0.18);
+}
+
+.side-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px 14px;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 32, 92, 0.08);
+  margin-bottom: 12px;
+}
+.side-nav-brand img { height: 26px; width: auto; }
+.side-nav-brand-chip {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #00205c;
+  background: rgba(0, 32, 92, 0.08);
+  border: 1px solid rgba(0, 32, 92, 0.14);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.side-nav-scroll {
+  flex: 1;
+  overflow-y: auto;
+  margin: 0 -6px;
+  padding: 0 6px;
+}
+.side-nav-scroll::-webkit-scrollbar { width: 8px; }
+.side-nav-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 32, 92, 0.12);
+  border-radius: 4px;
+}
+
+.side-nav-group { margin-bottom: 16px; }
+.side-nav-group h6 {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 10px 4px;
+  margin: 0;
+}
+
+.side-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #33415c;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.side-nav-item:hover {
+  background: rgba(0, 32, 92, 0.05);
+  color: #0a0e1a;
+  border-color: rgba(0, 32, 92, 0.1);
+}
+.side-nav-item.active {
+  background: rgba(0, 32, 92, 0.09);
+  color: #00205c;
+  border-color: rgba(0, 32, 92, 0.16);
+  font-weight: 600;
+}
+.side-nav-icon { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.8; }
+.side-nav-item.active .side-nav-icon { opacity: 1; }
+
+/* Reporting drill-in: the "Reporting" entry is a button that swaps the pane to
+   the reports list; reuse `.side-nav-item` chrome but reset button defaults. */
+.side-nav-drill {
+  width: 100%;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+.side-nav-chevron {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+.side-nav-drill .side-nav-chevron { margin-left: auto; }
+
+/* "Back to hub" — shown at the top of a drilled-in sub-view (e.g. Reporting).
+   Matches the unified back-to-hub control used on the tool pages. */
+.side-nav-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #00205c;
+  background: rgba(0, 32, 92, 0.06);
+  border: 1px solid rgba(0, 32, 92, 0.14);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.side-nav-back:hover {
+  background: rgba(0, 32, 92, 0.12);
+  border-color: rgba(0, 32, 92, 0.2);
+}
+.side-nav-back .side-nav-chevron { opacity: 0.8; }
+
+/* Pages add `has-sidenav` to their root to make room for the fixed rail. */
+.has-sidenav { padding-left: 236px; }
+
+@media (max-width: 1024px) {
+  .side-nav { display: none; }
+  .has-sidenav { padding-left: 0; }
+}

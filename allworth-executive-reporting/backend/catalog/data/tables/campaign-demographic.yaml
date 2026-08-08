@@ -1,0 +1,406 @@
+id: campaign-demographic
+name: Campaign_Demographic
+schema: tho
+db: DataWarehouse
+db_table: Campaign_Demographic
+guid: 39d9ba52-5f40-4653-bdf7-7657c8dc9eaa
+business_name: Campaign membership / response
+grain: Campaign_Member_ID
+pk: Campaign_Member_ID
+synonyms: []
+domain: Activity
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Allworth 360
+- Campaigns
+- Download Version of 360
+column_count: 39
+columns:
+- name: Leadid
+  db_column_name: Leadid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: End Date
+  db_column_name: EndDate
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Venue Name
+  db_column_name: Venue_Name__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Business Line
+  db_column_name: Business_line__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Start Date
+  db_column_name: StartDate
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Status
+  db_column_name: Status
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Campaign Name
+  db_column_name: CampaignName
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Type
+  db_column_name: Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Has Responded
+  db_column_name: Hasresponded
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ContactId
+  db_column_name: ContactId
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Marketing Event
+  db_column_name: Marketing_Event__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Description
+  db_column_name: Description
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: campaignid
+  db_column_name: campaignid
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: contact_attempts__c
+  db_column_name: contact_attempts__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Next_Call_Date__c
+  db_column_name: Next_Call_Date__c
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Marketing_Disposition__c
+  db_column_name: Marketing_Disposition__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: ActualCost
+  db_column_name: ActualCost
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: First_Campaign_Submission_Date
+  db_column_name: First_Campaign_Submission_Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Campaign_Member_Created_Date
+  db_column_name: Campaign_Member_Created_Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Marketing_Contact_Created_Date__c
+  db_column_name: Marketing_Contact_Created_Date__c
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Allworth_Segment_Data__c
+  db_column_name: Allworth_Segment_Data__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Merkle_Segment_Data__c
+  db_column_name: Merkle_Segment_Data__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Marketing_Segment__c
+  db_column_name: Marketing_Segment__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Most_Recent_Campaign
+  db_column_name: Most_Recent_Campaign
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Parent Campaign
+  db_column_name: Parent_Campaign
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Most_Recent_Campaign_Submission_Date
+  db_column_name: Most_Recent_Campaign_Submission_Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Primary_RM_Household__c
+  db_column_name: Primary_RM_Household__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Responded_Categories__c
+  db_column_name: Responded_Categories__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Sentiment__c
+  db_column_name: Sentiment__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: General_Theme__c
+  db_column_name: General_Theme__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Response_Type__c
+  db_column_name: Response_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Contacted_Old_Legacy_List
+  db_column_name: Contacted_Old_Legacy_List
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Other_Details
+  db_column_name: Other_Details__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Call_Summary
+  db_column_name: Call_Summary__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Campaign_Member_ID
+  db_column_name: Campaign_Member_ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Campaign_Channel
+  db_column_name: Campaign_Channel
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Campaign_Owner_id
+  db_column_name: Campaign_Owner_id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Delivery_Type__c
+  db_column_name: Delivery_Type__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Ad_Version
+  db_column_name: Ad_Version
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: Campaign_Demographic_to_Current_Household_Demographic_1
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Campaign_Demographic::Leadid] = [Current_Household_Demographic::LeadId]'
+  pairs:
+  - from_table: Campaign_Demographic
+    from_col: Leadid
+    to_table: Current_Household_Demographic
+    to_col: LeadId
+- join_name: Campaign_Owner_to_User
+  to: User
+  to_id: user
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Campaign_Demographic::Campaign_Owner_id] = [User::User ID]'
+  pairs:
+  - from_table: Campaign_Demographic
+    from_col: Campaign_Owner_id
+    to_table: User
+    to_col: User ID
+- join_name: HH Fact to Campaign
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  type: RIGHT_OUTER
+  one_to_one: false
+  'on': '[Campaign_Demographic::Leadid] = [Current_Household_Fact::LeadId]'
+  pairs:
+  - from_table: Campaign_Demographic
+    from_col: Leadid
+    to_table: Current_Household_Fact
+    to_col: LeadId

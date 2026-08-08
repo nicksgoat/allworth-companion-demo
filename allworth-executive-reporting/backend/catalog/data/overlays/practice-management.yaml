@@ -1,0 +1,9 @@
+id: practice-management
+source: wealth_mcp.domain.tables
+description: 'Practice Management scorecard per household: which services (tax, estate,
+  insurance, financial planning, annual review) have been delivered. Source of the
+  PM score.'
+business_name: Practice Management scorecard
+grain: LeadId
+pk: Leadid
+domain: Household

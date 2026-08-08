@@ -1,0 +1,169 @@
+/* ─── Allworth Financial Planning — brand-aligned styles (mirrors BondAnalyzer.css) ── */
+
+.plan-shell {
+  min-height: 100vh;
+  background-color: #F3F4F4; /* Feather Gray — surfacePrimary */
+}
+
+/* Hero banner: Night Blue → Allworth Navy gradient with cerulean glow */
+.plan-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 40px 32px 36px;
+  --glow: radial-gradient(ellipse 65% 80% at 78% 14%, rgba(62,113,183,0.34) 0%, transparent 100%);
+  background-image: var(--glow), linear-gradient(160deg, #0C2E4E 0%, #173D67 100%);
+}
+
+.plan-hero__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 6px;
+}
+
+.plan-hero__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.plan-hero__eyebrow {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255,255,255,0.55);
+  margin: 0;
+}
+
+.plan-hero__title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.plan-hero__subtitle {
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+  color: rgba(255,255,255,0.65);
+  margin: 0;
+}
+
+.plan-source-chip {
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,0.22) !important;
+  background: rgba(255,255,255,0.08) !important;
+  backdrop-filter: blur(10px);
+}
+
+/* KPI stat card — mirrors .aw-kpi-card */
+.plan-kpi {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(23,61,103,0.05);
+  box-shadow: 0 2px 8px rgba(12,46,78,0.05);
+  padding: 20px;
+}
+
+.plan-kpi__label {
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #828282;
+  margin: 0 0 8px;
+}
+
+.plan-kpi__value {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: #000000;
+  line-height: 1;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.plan-kpi__value--gain { color: #436434; }
+.plan-kpi__value--loss { color: #D26D37; }
+
+/* Layout */
+.plan-loading { min-height: 55vh; display: grid; place-items: center; }
+
+.plan-empty {
+  min-height: 48vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: #173D67;
+  text-align: center;
+}
+
+.plan-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.plan-panel { padding-top: 24px; }
+
+/* Decision Center presentation mode (fullscreen) */
+.plan-present:fullscreen {
+  background: #F3F4F4;
+  overflow: auto;
+  padding: 40px 56px;
+}
+
+.plan-present:fullscreen .plan-kpi__value { font-size: 40px; }
+
+.plan-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.plan-decision {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 20px;
+}
+
+.plan-data pre {
+  overflow: auto;
+  max-height: 540px;
+  background: #F3F4F4;
+  border-radius: 10px;
+  padding: 18px;
+  font-size: 0.78rem;
+  color: #173D67;
+}
+
+.plan-report-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .plan-hero { padding: 28px 18px 26px; }
+  .plan-metrics { grid-template-columns: repeat(2, 1fr); }
+  .plan-decision { grid-template-columns: 1fr; }
+  .plan-source-chip { display: none !important; }
+  .plan-report-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+  .plan-metrics { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,11 @@
+name: Concentration Risk
+uri: frameworks://concentration-risk
+category: Metric Definitions
+description: Share of firm revenue or AUM in a small number of households.
+keywords:
+  - concentration risk
+  - concentration
+  - top households
+  - fragility
+content: |
+  Share of firm revenue or AUM attributable to a small number of households. Interpret high concentration as fragility, not necessarily poor performance.

@@ -1,0 +1,365 @@
+id: datedimension
+name: DateDimension
+schema: aip
+db: DataWarehouse
+db_table: DateDimension
+guid: 530c87ed-e8f2-41de-a26a-19e0d18f56fc
+business_name: Date dimension
+grain: DateKey (YYYYMMDD int)
+pk: DateKey
+synonyms: []
+domain: Reference
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Account Rollforward
+- Account Setups
+- Activities
+- Advisor Conversion Worksheet
+- Allworth 360
+- Campaigns
+- Client Count Rollforward
+- Comparison 360
+- Comparison Rollforward - Trade Date
+- Contact 360
+- CRP Reps with Flows
+- Distribution Requests
+- Download Version of 360
+- Events Worksheet (Migrate to Activities Model)
+- Financial Account 360
+- Incoming Funds
+- Integrated Services
+- IS Referrals
+- Jira FSI
+- Outflow/Term Reason Audit
+- Partner Program Tasks
+- Pipeline 360
+- Practice Management External Sources
+- Practice Management
+- Rollforward Historical
+- Stage Change History
+- Tasks (Migrate to Activities Model)
+- Tax Retention
+- Trade Date Rollforward
+- Transactions
+- Zoom Call Log External
+column_count: 35
+columns:
+- name: Date
+  db_column_name: Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Day
+  db_column_name: Day
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: DaySuffix
+  db_column_name: DaySuffix
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Weekday
+  db_column_name: Weekday
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: WeekDayName
+  db_column_name: WeekDayName
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: IsWeekend
+  db_column_name: IsWeekend
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: IsHoliday
+  db_column_name: IsHoliday
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: HolidayText
+  db_column_name: HolidayText
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: DOWInMonth
+  db_column_name: DOWInMonth
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: DayOfYear
+  db_column_name: DayOfYear
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: WeekOfMonth
+  db_column_name: WeekOfMonth
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: WeekOfYear
+  db_column_name: WeekOfYear
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ISOWeekOfYear
+  db_column_name: ISOWeekOfYear
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Month
+  db_column_name: Month
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: MonthName
+  db_column_name: MonthName
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Quarter
+  db_column_name: Quarter
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: QuarterName
+  db_column_name: QuarterName
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Year
+  db_column_name: Year
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: MMYYYY
+  db_column_name: MMYYYY
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: MonthYear
+  db_column_name: MonthYear
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: LastDateOfWeek
+  db_column_name: LastDateOfWeek
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ISOLastDateOfWeek
+  db_column_name: ISOLastDateOfWeek
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: FirstDayOfMonth
+  db_column_name: FirstDayOfMonth
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: LastDayOfMonth
+  db_column_name: LastDayOfMonth
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: FirstDayOfQuarter
+  db_column_name: FirstDayOfQuarter
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LastDayOfQuarter
+  db_column_name: LastDayOfQuarter
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: FirstDayOfYear
+  db_column_name: FirstDayOfYear
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: LastDayOfYear
+  db_column_name: LastDayOfYear
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: FirstDayOfNextMonth
+  db_column_name: FirstDayOfNextMonth
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: FirstDayOfNextYear
+  db_column_name: FirstDayOfNextYear
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ISOYear
+  db_column_name: ISOYear
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: DaysInMonth
+  db_column_name: DaysInMonth
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: ISOFirstDateOfWeek
+  db_column_name: ISOFirstDateOfWeek
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: DateKey
+  db_column_name: DateKey
+  data_type: INT32
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: ProrateMonth
+  db_column_name: ProrateMonth
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+relationships: []

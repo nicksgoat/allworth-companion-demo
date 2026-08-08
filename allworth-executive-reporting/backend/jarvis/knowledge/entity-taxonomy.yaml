@@ -1,0 +1,47 @@
+name: Entity Taxonomy
+uri: frameworks://entity-taxonomy
+description: Normalized entity map for household, advisor, account, lead, campaign, and operational record lookups.
+keywords:
+  - entity
+  - household
+  - advisor
+  - account
+  - lead
+  - campaign
+  - taxonomy
+directive: >
+  Consult when mapping a user request to the correct record type or identifier.
+content: |
+  # Entity Taxonomy
+
+  ## Core Entity Types
+
+  ### Household
+  The core client or prospect container. Use for household-level AUM, service, planning, and relationship analysis.
+
+  ### Advisor
+  Book-of-business owner or servicing advisor. Use for productivity, pipeline ownership, and service segmentation.
+
+  ### Account
+  Custodial or financial account, often sourced from Tamarac or Salesforce financial account objects.
+
+  ### Contact
+  Person-level record tied to a household. Use for demographics and relationship participants.
+
+  ### Lead
+  Pre-client pipeline entity. Use for source, qualification, and early-stage pipeline analysis.
+
+  ### Opportunity / Sale
+  Later-stage pipeline entity with projected asset potential and stage progression.
+
+  ### Campaign
+  Marketing program or outreach grouping used for response and pipeline attribution.
+
+  ### Case
+  Service or operational issue record used for resolution-time and service-friction analysis.
+
+  ## Identifier Guidance
+  - Prefer stable internal IDs when available.
+  - Use household ID for household-centric views.
+  - Use account number or upload account ID for Tamarac account workflows.
+  - Use advisor name only when the workflow explicitly supports name-based matching.

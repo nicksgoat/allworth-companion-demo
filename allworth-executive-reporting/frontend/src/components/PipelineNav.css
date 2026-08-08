@@ -1,0 +1,49 @@
+/* PipelineNav — compact inline pill group, designed to sit inside the hero
+   kicker row so it doesn't consume its own vertical band. */
+
+.pipeline-nav {
+  display: inline-flex;
+  align-items: center;
+}
+
+.pipeline-nav-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: rgba(0, 32, 92, 0.06);
+  border: 1px solid rgba(0, 32, 92, 0.1);
+  border-radius: 999px;
+}
+
+.pipeline-nav-brand {
+  /* Brand label is redundant now that the kicker shows the section name. */
+  display: none;
+}
+
+.pipeline-nav-links {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.pipeline-nav-link {
+  padding: 4px 12px;
+  border-radius: 999px;
+  color: #4a5468;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.pipeline-nav-link:hover {
+  background: rgba(0, 32, 92, 0.08);
+  color: #00205C;
+}
+
+.pipeline-nav-link.active {
+  background: linear-gradient(135deg, #00205C, #1a3c5e);
+  color: #ffffff;
+  box-shadow: 0 2px 8px -2px rgba(0, 32, 92, 0.4);
+}

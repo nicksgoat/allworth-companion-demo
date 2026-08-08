@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ---------------------------------------------------------------------------
+   Global design tokens (ThoughtSpot palette) + root base.
+   Loaded once in main.tsx so every page and report shares the same theme.
+   Report-specific styling lives in each report's own stylesheet
+   (e.g. Reporting.css); put nothing report-specific here.
+   --------------------------------------------------------------------------- */
+:root {
+  --ts-primary: #1d1d1d;
+  --ts-accent: #4b7cf3;
+  --ts-accent-light: #e8f0fe;
+  --ts-bg: #ffffff;
+  --ts-bg-secondary: #f8f9fa;
+  --ts-surface: #ffffff;
+  --ts-border: #e8eaed;
+  --ts-border-light: #f1f3f4;
+  --ts-text-chart-header: #3b3b3b;
+  --ts-text-primary: #202124;
+  --ts-text-secondary: #5f6368;
+  --ts-text-muted: #666a6e;
+  --ts-success: #1e8e3e;
+  --ts-warning: #f9ab00;
+  --ts-danger: #d93025;
+  --ts-shadow-sm: 0 1px 2px 0 rgba(60, 64, 67, 0.1), 0 1px 3px 1px rgba(60, 64, 67, 0.08);
+  --ts-shadow-md: 0 1px 3px 0 rgba(60, 64, 67, 0.15), 0 4px 8px 3px rgba(60, 64, 67, 0.1);
+  --ts-radius: 8px;
+}
+
+#root {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  background: var(--ts-bg-secondary);
+  color: var(--ts-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

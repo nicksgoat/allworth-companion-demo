@@ -1,0 +1,121 @@
+id: tax-time-tracking
+name: Tax_Time_Tracking
+schema: tho
+db: DataWarehouse
+db_table: Tax_Time_Tracking
+guid: 2d95d73a-7a68-4eb8-b262-1c59a3f7289c
+business_name: null
+grain: null
+pk: null
+synonyms: []
+domain: Other
+deprecated: false
+spotter_enabled: false
+description: ''
+notes: null
+worksheets:
+- Integrated Services
+column_count: 10
+columns:
+- name: Id
+  db_column_name: Id
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: IsDeleted
+  db_column_name: IsDeleted
+  data_type: BOOL
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Project_ID
+  db_column_name: Project_ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Role
+  db_column_name: Role
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Team_Member
+  db_column_name: Team_Member
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Duration_Hours
+  db_column_name: Duration_Hours
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Budget_Hours
+  db_column_name: Budget_Hours
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Start_Date
+  db_column_name: Start_Date
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Role_Project_ID
+  db_column_name: Role_Project_ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Billing_Type
+  db_column_name: Billing_Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: Tax_Time_Tracking_to_Projects
+  to: Projects
+  to_id: projects
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Tax_Time_Tracking::Project_ID] = [Projects::Project_ID]'
+  pairs:
+  - from_table: Tax_Time_Tracking
+    from_col: Project_ID
+    to_table: Projects
+    to_col: Project_ID

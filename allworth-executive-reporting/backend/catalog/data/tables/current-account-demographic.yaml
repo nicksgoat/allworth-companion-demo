@@ -1,0 +1,727 @@
+id: current-account-demographic
+name: Current_Account_Demographic
+schema: tho
+db: DataWarehouse
+db_table: Current_Account_Demographic
+guid: b6bfbf21-2a23-459a-9705-1413069b4c21
+business_name: Account (current attributes + measures)
+grain: one row per account upload
+pk: Upload Account ID
+synonyms:
+- account
+- financial account
+domain: Account
+deprecated: false
+spotter_enabled: true
+description: ''
+notes: null
+worksheets:
+- Account Rollforward
+- Account Setups
+- Cash Reserves
+- Financial Account 360
+- Integration Tracker
+- Position Reconciliation
+- RMD Model
+- Trade Requests
+- Transactions
+column_count: 75
+columns:
+- name: Sage ID
+  db_column_name: Sage ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Non billed
+  db_column_name: Non billed
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Last Order Date
+  db_column_name: Last Order Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Managed Account Value
+  db_column_name: Managed Account Value
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Closing Value
+  db_column_name: Closing Value
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Taxable
+  db_column_name: Taxable
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Date
+  db_column_name: Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Performance Inception Date
+  db_column_name: Performance Inception Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Billing Inception Date
+  db_column_name: Billing Inception Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Rebalancing Model Name
+  db_column_name: Rebalancing Model Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Management Fees
+  db_column_name: Management Fees
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: RMD-Current-Satisfied
+  db_column_name: RMD-Current-Satisfied
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Primary Household ID
+  db_column_name: Primary Household ID
+  data_type: INT64
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Upload Account ID
+  db_column_name: Upload Account ID
+  data_type: INT64
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Billing Definitions
+  db_column_name: Billing Definitions
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Custodian Fee Schedule
+  db_column_name: Custodian Fee Schedule
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Exclude All Securities From Billing
+  db_column_name: Exclude All Securities From Billing
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Account Number
+  db_column_name: Account Number
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Reconciliation Status
+  db_column_name: Reconciliation Status
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Total Cash Dollar
+  db_column_name: Total Cash Dollar
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Last Reconciliation Date
+  db_column_name: Last Reconciliation Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Sleeve Account Type
+  db_column_name: Sleeve Account Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Date_string
+  db_column_name: Date_string
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Primary Advisor
+  db_column_name: Primary Advisor
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Account Name
+  db_column_name: Account Name
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Closed Date
+  db_column_name: Closed Date
+  data_type: DATE_TIME
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Master Category
+  db_column_name: Master Category
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Broker Dealer
+  db_column_name: Broker Dealer
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Wash Sale Group ID
+  db_column_name: Wash Sale Group ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Record Source
+  db_column_name: Record Source
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Initial Value
+  db_column_name: Initial Value
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Household Assignments
+  db_column_name: Household Assignments
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Billing_Sets
+  db_column_name: Billing_Sets
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SDBA
+  db_column_name: SDBA
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Payment_Method
+  db_column_name: Payment_Method
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Total Cash Reserve Actual Dollar
+  db_column_name: Total Cash Reserve Actual Dollar
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Total Cash Reserve Goal Dollar
+  db_column_name: Total Cash Reserve Goal Dollar
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Acquisition_Expected_AUM
+  db_column_name: Acquisition_Expected_AUM
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Account Type
+  db_column_name: Account Type
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Total Account Value
+  db_column_name: Total Account Value
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Allow Rebalancing
+  db_column_name: Allow Rebalancing
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Current Cash
+  db_column_name: Current Cash
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Direct Business Advisory
+  db_column_name: Direct Business Advisory
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: TPFG
+  db_column_name: TPFG
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: RMD-Prev-Total Amount
+  db_column_name: RMD-Prev-Total Amount
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Billing Groups
+  db_column_name: Billing Groups
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Financial_Account_SFID
+  db_column_name: Financial_Account_SFID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Custodian
+  db_column_name: Custodian
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: Cash to Raise
+  db_column_name: Cash to Raise
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Account Category
+  db_column_name: Account Category
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Discretionary
+  db_column_name: Discretionary
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: RMD-Current-Total Amount
+  db_column_name: RMD-Current-Total Amount
+  data_type: DOUBLE
+  kind: measure
+  aggregation: SUM
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: State of Primary Residence
+  db_column_name: State of Primary Residence
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: DCA - Dollar Cost Averaging
+  db_column_name: DCA - Dollar Cost Averaging
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Plan/Private
+  db_column_name: Plan/Private
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: true
+- name: RMD-Prev-Satisfied
+  db_column_name: RMD-Prev-Satisfied
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Account_ID
+  db_column_name: Account_ID
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Tax Smart
+  db_column_name: Tax Smart
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Direct_Business_Group
+  db_column_name: Direct_Business_Group
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Direct_Business_Account_Category
+  db_column_name: Direct_Business_Account_Category
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Investment_Objective_1__c
+  db_column_name: Investment_Objective_1__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Client_Net_Worth_BD__c
+  db_column_name: Client_Net_Worth_BD__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Client_Annual_Income_BD__c
+  db_column_name: Client_Annual_Income_BD__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Investment_Time_Horizon_BD__c
+  db_column_name: Investment_Time_Horizon_BD__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Federal_Tax_Bracket_BD__c
+  db_column_name: Federal_Tax_Bracket_BD__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Client_Liquid_Net_Worth_BD__c
+  db_column_name: Client_Liquid_Net_Worth_BD__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Last_36_Month_Letter_Mail_Date__c
+  db_column_name: Last_36_Month_Letter_Mail_Date__c
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Risk_Tolerance__c
+  db_column_name: Risk_Tolerance__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Recommendation_Model_Minimums
+  db_column_name: Recommendation_Model_Minimums
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: FinServ__PrimaryOwner__c
+  db_column_name: FinServ__PrimaryOwner__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: SecondaryOwner
+  db_column_name: SecondaryOwner
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: FinServ__JointOwner__c
+  db_column_name: FinServ__JointOwner__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: FBO_Full_Name__c
+  db_column_name: FBO_Full_Name__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Last_Suitability_Update__c
+  db_column_name: Last_Suitability_Update__c
+  data_type: DATE
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+- name: Broker_Dealer_of_Record__c
+  db_column_name: Broker_Dealer_of_Record__c
+  data_type: VARCHAR
+  kind: attribute
+  aggregation: null
+  synonyms: []
+  description: ''
+  pii: false
+  hot: false
+relationships:
+- join_name: ACV to HH
+  to: Current_Household_Demographic
+  to_id: current-household-demographic
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Account_Demographic::Primary Household ID] = [Current_Household_Demographic::AVHHID]'
+  pairs:
+  - from_table: Current_Account_Demographic
+    from_col: Primary Household ID
+    to_table: Current_Household_Demographic
+    to_col: AVHHID
+- join_name: ACV to HH Fact
+  to: Current_Household_Fact
+  to_id: current-household-fact
+  type: LEFT_OUTER
+  one_to_one: false
+  'on': '[Current_Account_Demographic::Primary Household ID] = [Current_Household_Fact::AVHHID]'
+  pairs:
+  - from_table: Current_Account_Demographic
+    from_col: Primary Household ID
+    to_table: Current_Household_Fact
+    to_col: AVHHID

@@ -1,0 +1,42 @@
+name: Investment Philosophy
+uri: frameworks://investment-philosophy
+category: Policies
+description: Firm-wide investment beliefs, asset class preferences, and portfolio construction principles.
+keywords:
+  - investment philosophy
+  - asset allocation
+  - portfolio construction
+  - investment beliefs
+draft: true
+
+content: |
+  # Investment Philosophy
+
+  ## Core Beliefs
+  - Markets are largely efficient over long horizons, but short-term dislocations create opportunities.
+  - Asset allocation is the primary driver of long-term returns; security selection is secondary.
+  - Diversification across asset classes, geographies, and styles reduces drawdown risk.
+  - Costs matter: we favor low-cost index and factor-based strategies where alpha is unlikely.
+  - Active management is reserved for less-efficient markets (small cap, EM, alternatives).
+
+  ## Asset Class Preferences
+  | Asset Class | Role | Preferred Vehicles |
+  |---|---|---|
+  | US Large Cap | Core equity exposure | Index funds, factor ETFs |
+  | US Small/Mid | Growth & diversification | Active + index blend |
+  | International Dev | Geographic diversification | Index ETFs |
+  | Emerging Markets | Higher return potential | Active managers |
+  | US Aggregate Bond | Stability & income | Index funds |
+  | TIPS | Inflation protection | Direct + ETFs |
+  | Alternatives | Diversification, return enhancement | Managed futures, real assets |
+  | Cash | Liquidity | Money markets |
+
+  ## Portfolio Construction Principles
+  1. Target allocations set by client risk profile and time horizon
+  2. Rebalance when drift exceeds ±5% per asset class
+  3. Tax-loss harvesting applied systematically
+  4. No single security >5% of portfolio (excluding indices)
+  5. Maximum sector concentration: 30% of equity allocation
+
+  ## Code Linkage
+  The MCP enforces a subset of this via `risk.py:check_ips_compliance()` (5% drift threshold) and stores target allocations in `Asset_Allocation_Security_Weights`. The rest is firm policy and should be confirmed against the authoritative Allworth IPS document before being cited externally — this entry is flagged `draft: true`.
