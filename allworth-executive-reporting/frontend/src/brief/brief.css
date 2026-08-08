@@ -18,24 +18,25 @@
 @source "./";
 
 @theme {
-  --color-ink: #16181d;
-  --color-ink-soft: #4b5160;
-  --color-ink-faint: #8a90a0;
-  --color-paper: #f6f7f9;
+  --color-paper: #f3f4f4;
   --color-card: #ffffff;
-  --color-line: #e6e8ee;
-  --color-accent: #2f3a8f;
-  --color-accent-soft: #eceefb;
-  --color-critical: #b3261e;
-  --color-critical-soft: #fdeceb;
-  --color-high: #9a5b00;
-  --color-high-soft: #fdf3e0;
-  --color-medium: #1d5c96;
-  --color-medium-soft: #e8f1f9;
-  --color-low: #5c6370;
-  --color-low-soft: #eef0f3;
-  --color-miss: #7a3e9d;
-  --color-miss-soft: #f6effb;
+  --color-line: #e6e6e6;
+  --color-ink: #171717;
+  --color-ink-soft: #595959;
+  --color-ink-faint: #828282;
+  --color-accent: #173d67;
+  --color-accent-soft: #edf2f7;
+  --color-critical: #a63d35;
+  --color-critical-soft: #fbefed;
+  --color-high: #d26d37;
+  --color-high-soft: #fbf1ec;
+  --color-medium: #a99c6c;
+  --color-medium-soft: #f5f2e8;
+  --color-low: #595959;
+  --color-low-soft: #f3f4f4;
+  --color-miss: #3e71b7;
+  --color-miss-soft: #edf2f7;
+  --font-sans: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 @layer base {
@@ -43,8 +44,7 @@
     min-height: 100vh;
     background: var(--color-paper);
     color: var(--color-ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
-      sans-serif;
+    font-family: var(--font-sans);
     font-size: 16px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -106,4 +106,11 @@
 }
 .brief-app .animate-sheet-up {
   animation: brief-sheet-up 0.22s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brief-app * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

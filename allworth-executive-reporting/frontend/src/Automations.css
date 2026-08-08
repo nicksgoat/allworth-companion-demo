@@ -1,28 +1,22 @@
-/* Automations page — reuses .t2-* chrome and the .admin-console glass palette;
-   these rules style only the automations-specific UI, scoped under .autom*. */
+/* Automations — configuration stays secondary to the job being managed. */
 
 .autom-hero {
   margin: 20px 0 18px;
-  padding: 22px 30px 24px;
-  background: var(--admin-card-bg, rgba(255, 255, 255, 0.62));
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid var(--admin-card-border, rgba(255, 255, 255, 0.75));
-  border-radius: 18px;
-  box-shadow: var(--admin-card-shadow, 0 20px 48px -12px rgba(0, 32, 92, 0.14));
+  padding: 22px 0 24px;
+  background: transparent;
+  border-bottom: 1px solid var(--aw-line, #e6e6e6);
 }
 .autom-hero h1 {
   margin: 6px 0 4px;
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--admin-navy, #00205c);
+  font: 600 34px/1.15 var(--aw-font-display, Georgia, serif);
+  color: var(--aw-night, #0c2e4e);
 }
 .autom-kicker {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--admin-orange-deep, #c75b12);
+  color: var(--aw-cerulean, #3e71b7);
 }
 .autom-sub {
   margin: 0;
@@ -40,9 +34,9 @@
 .autom-tab {
   min-height: 40px;
   padding: 0 18px;
-  border-radius: 999px;
+  border-radius: var(--aw-radius, 10px);
   border: 1px solid var(--admin-navy-line, rgba(0, 32, 92, 0.14));
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--aw-surface, #fff);
   color: var(--admin-navy, #00205c);
   font-weight: 600;
   font-size: 14px;
@@ -59,10 +53,10 @@
 
 .autom-card {
   padding: 20px 22px;
-  background: var(--admin-card-bg, rgba(255, 255, 255, 0.62));
-  border: 1px solid var(--admin-card-border, rgba(255, 255, 255, 0.75));
-  border-radius: 16px;
-  box-shadow: var(--admin-card-shadow, 0 20px 48px -12px rgba(0, 32, 92, 0.14));
+  background: var(--aw-surface, #fff);
+  border: 1px solid var(--aw-line, #e6e6e6);
+  border-radius: var(--aw-radius-lg, 14px);
+  box-shadow: none;
 }
 .autom-card h3 { margin: 0 0 14px; font-size: 16px; color: var(--admin-navy, #00205c); }
 .autom-card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }

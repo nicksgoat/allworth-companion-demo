@@ -1,6 +1,6 @@
 
 
-import { greeting, isDeadlineToday } from "../format";
+import { isDeadlineToday } from "../format";
 import { getAnalysis } from "../analysis";
 import type { ExecutiveEmail } from "../types";
 
@@ -25,8 +25,8 @@ export function ExecutiveBrief({ emails }: { emails: ExecutiveEmail[] }) {
   ];
 
   return (
-    <section className="rounded-2xl bg-card p-5 shadow-sm ring-1 ring-line">
-      <h1 className="text-xl font-bold tracking-tight">{greeting()}</h1>
+    <section className="border-b border-line pb-5">
+      <h1 className="text-2xl font-bold tracking-tight">Needs your attention</h1>
       <ul className="mt-3 space-y-1.5">
         {lines
           .filter((l) => l.count > 0)

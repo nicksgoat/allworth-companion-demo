@@ -36,7 +36,7 @@ export function CategoryTabs({
   onSelect: (v: ViewKey) => void;
 }) {
   return (
-    <nav aria-label="Email categories" className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:flex-wrap lg:px-0">
+    <nav aria-label="Email categories" className="no-scrollbar -mx-4 flex gap-5 overflow-x-auto border-b border-line px-4 lg:mx-0 lg:px-0">
       {VIEWS.map((v) => {
         const isActive = v.key === active;
         return (
@@ -44,12 +44,12 @@ export function CategoryTabs({
             key={v.key}
             onClick={() => onSelect(v.key)}
             aria-pressed={isActive}
-            className={`flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition-colors ${
-              isActive ? "bg-ink text-white" : "bg-card text-ink-soft ring-1 ring-line active:bg-line"
+            className={`flex min-h-11 shrink-0 items-center gap-1.5 border-b-2 px-1 text-sm font-semibold transition-colors ${
+              isActive ? "border-accent text-accent" : "border-transparent text-ink-soft hover:text-ink"
             }`}
           >
             {v.label}
-            <span className={`tabular-nums ${isActive ? "text-white/70" : "text-ink-faint"}`}>{counts[v.key]}</span>
+            <span className="tabular-nums text-ink-faint">{counts[v.key]}</span>
           </button>
         );
       })}

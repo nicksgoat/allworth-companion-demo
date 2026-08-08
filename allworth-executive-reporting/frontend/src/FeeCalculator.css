@@ -1,28 +1,28 @@
-/* FeeCalculator.css — Jarvis-style glassmorphism layout */
+/* FeeCalculator.css — Allworth operational workspace */
 
 :root {
-  --brand-navy: #00205C;
-  --brand-navy-soft: #1a3c5e;
-  --brand-sky: #4a7bb8;
-  --brand-orange: #C75B12;
-  --brand-orange-warm: #E67E22;
-  --fc-bg: #f4f6fb;
-  --fc-glass: rgba(255, 255, 255, 0.60);
-  --fc-glass-strong: rgba(255, 255, 255, 0.78);
-  --fc-glass-border: rgba(255, 255, 255, 0.75);
-  --fc-glass-edge: rgba(255, 255, 255, 0.92);
-  --fc-border: rgba(0, 32, 92, 0.08);
-  --fc-border-strong: rgba(0, 32, 92, 0.14);
-  --fc-text: #0a0e1a;
-  --fc-text-muted: #4a5468;
-  --fc-text-subtle: #8a94a8;
+  --brand-navy: #173D67;
+  --brand-navy-soft: #0C2E4E;
+  --brand-sky: #3E71B7;
+  --brand-orange: #D26D37;
+  --brand-orange-warm: #D26D37;
+  --fc-bg: #f3f4f4;
+  --fc-glass: #ffffff;
+  --fc-glass-strong: #ffffff;
+  --fc-glass-border: #e6e6e6;
+  --fc-glass-edge: transparent;
+  --fc-border: #e6e6e6;
+  --fc-border-strong: rgba(23, 61, 103, 0.2);
+  --fc-text: #171717;
+  --fc-text-muted: #595959;
+  --fc-text-subtle: #828282;
   --fc-accent: var(--brand-navy);
   --fc-pop: var(--brand-orange);
   --fc-success: #157a4c;
   --fc-danger: #b3261e;
   --fc-shadow-sm: 0 1px 2px rgba(0, 32, 92, 0.04);
-  --fc-shadow: 0 20px 48px -12px rgba(0, 32, 92, 0.14), 0 4px 12px rgba(0, 32, 92, 0.06);
-  --fc-highlight: inset 0 1px 0 var(--fc-glass-edge);
+  --fc-shadow: none;
+  --fc-highlight: none;
   --fc-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -33,62 +33,6 @@
   overflow: hidden;
 }
 
-.fee-calc-bg {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.fee-calc-bg::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(0, 32, 92, 0.04) 1px, transparent 1px);
-  background-size: 4px 4px;
-  opacity: 0.5;
-  mix-blend-mode: multiply;
-}
-
-.fee-calc-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(90px);
-  will-change: transform;
-}
-
-.fee-calc-orb-1 {
-  width: 640px;
-  height: 640px;
-  top: -200px;
-  left: -180px;
-  background: radial-gradient(circle, rgba(0, 32, 92, 0.38), rgba(0, 32, 92, 0) 70%);
-  animation: fcFloat1 42s ease-in-out infinite;
-}
-
-.fee-calc-orb-2 {
-  width: 520px;
-  height: 520px;
-  top: -160px;
-  right: -140px;
-  background: radial-gradient(circle, rgba(230, 126, 34, 0.32), rgba(230, 126, 34, 0) 70%);
-  animation: fcFloat2 38s ease-in-out infinite;
-}
-
-.fee-calc-orb-3 {
-  width: 440px;
-  height: 440px;
-  top: 35%;
-  left: 55%;
-  background: radial-gradient(circle, rgba(74, 123, 184, 0.28), rgba(74, 123, 184, 0) 70%);
-  animation: fcFloat3 46s ease-in-out infinite;
-}
-
-@keyframes fcFloat1 { 0%,100%{transform:translate(0,0) scale(1);} 25%{transform:translate(120px,80px) scale(1.1);} 50%{transform:translate(60px,180px) scale(0.95);} 75%{transform:translate(-40px,120px) scale(1.05);} }
-@keyframes fcFloat2 { 0%,100%{transform:translate(0,0) scale(1);} 30%{transform:translate(-100px,60px) scale(1.12);} 60%{transform:translate(-60px,160px) scale(0.92);} }
-@keyframes fcFloat3 { 0%,100%{transform:translate(0,0) scale(1);} 20%{transform:translate(-80px,-60px) scale(1.08);} 50%{transform:translate(-140px,40px) scale(1.15);} 80%{transform:translate(20px,80px) scale(0.95);} }
-
 .fee-calc-container {
   position: relative;
   z-index: 1;
@@ -96,7 +40,7 @@
   max-width: none;
   margin: 0 auto;
   padding: 48px 48px 80px;
-  font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  font: 400 15px/1.6 var(--aw-font-body, 'Lato', sans-serif);
   -webkit-font-smoothing: antialiased;
   color: var(--fc-text);
   letter-spacing: -0.003em;
@@ -111,10 +55,11 @@
 .fee-calc-header h1 {
   margin: 0;
   font-size: 30px;
-  font-weight: 640;
+  font-family: var(--aw-font-display, Georgia, serif);
+  font-weight: 600;
   letter-spacing: -0.025em;
   line-height: 1.15;
-  color: var(--fc-text);
+  color: var(--aw-night, #0c2e4e);
 }
 
 .fee-calc-subtitle {
@@ -166,10 +111,8 @@
 .fee-schedule-table-wrap {
   overflow-x: auto;
   background: var(--fc-glass-strong);
-  backdrop-filter: blur(32px) saturate(180%);
-  -webkit-backdrop-filter: blur(32px) saturate(180%);
   border: 1px solid var(--fc-glass-border);
-  border-radius: 14px;
+  border-radius: var(--aw-radius, 10px);
   box-shadow: var(--fc-shadow);
   padding: 4px;
 }
@@ -239,10 +182,8 @@
 /* Glass panels */
 .fee-calc-panel {
   background: var(--fc-glass-strong);
-  backdrop-filter: blur(32px) saturate(180%);
-  -webkit-backdrop-filter: blur(32px) saturate(180%);
   border: 1px solid var(--fc-glass-border);
-  border-radius: 18px;
+  border-radius: var(--aw-radius, 10px);
   box-shadow: var(--fc-shadow), var(--fc-highlight);
   padding: 24px 28px;
   margin-bottom: 20px;
@@ -257,10 +198,8 @@
   margin-bottom: 16px;
   padding: 14px 18px;
   background: var(--fc-glass);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
   border: 1px solid var(--fc-glass-border);
-  border-radius: 14px;
+  border-radius: var(--aw-radius, 10px);
   box-shadow: var(--fc-shadow-sm), var(--fc-highlight);
 }
 
@@ -284,8 +223,6 @@
   font-family: inherit;
   color: var(--fc-text);
   background: var(--fc-glass);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
   border: 1px solid var(--fc-glass-border);
   border-radius: 10px;
   box-shadow: var(--fc-shadow-sm), var(--fc-highlight);
@@ -327,10 +264,8 @@
   display: flex;
   align-items: center;
   background: var(--fc-glass);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
   border: 1px solid var(--fc-glass-border);
-  border-radius: 14px;
+  border-radius: var(--aw-radius, 10px);
   box-shadow: var(--fc-shadow-sm), var(--fc-highlight);
   transition: border-color 220ms var(--fc-ease), box-shadow 220ms var(--fc-ease), background 220ms var(--fc-ease);
 }
@@ -401,10 +336,8 @@
   padding: 0;
   margin: 8px 0 0;
   background: var(--fc-glass-strong);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--fc-glass-border);
-  border-radius: 14px;
+  border-radius: var(--aw-radius, 10px);
   max-height: 320px;
   overflow-y: auto;
   box-shadow: var(--fc-shadow), var(--fc-highlight);
@@ -463,10 +396,8 @@
   margin-top: 16px;
   padding: 18px 22px;
   background: var(--fc-glass);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--fc-glass-border);
-  border-radius: 14px;
+  border-radius: var(--aw-radius, 10px);
   box-shadow: var(--fc-shadow-sm), var(--fc-highlight);
 }
 
@@ -516,8 +447,6 @@
   font-size: 14px;
   color: var(--fc-text);
   background: var(--fc-glass);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
   border: 1px solid var(--fc-glass-border);
   border-radius: 10px;
   box-shadow: var(--fc-shadow-sm), var(--fc-highlight);
@@ -602,11 +531,9 @@
 
 .fee-summary-item {
   background: var(--fc-glass);
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
   border: 1px solid var(--fc-glass-border);
   padding: 14px 16px;
-  border-radius: 12px;
+  border-radius: var(--aw-radius, 10px);
   text-align: center;
   box-shadow: var(--fc-shadow-sm), var(--fc-highlight);
 }
@@ -807,7 +734,7 @@
   overflow-x: hidden;
   background: var(--fc-glass-strong);
   border: 1px solid var(--fc-glass-border);
-  border-radius: 14px;
+  border-radius: var(--aw-radius, 10px);
   box-shadow: var(--fc-shadow-sm);
   margin-bottom: 24px;
 }
@@ -1225,10 +1152,8 @@
   overflow-y: auto;
   overflow-x: auto;
   border: 1px solid var(--fc-glass-border);
-  border-radius: 14px;
+  border-radius: var(--aw-radius, 10px);
   background: var(--fc-glass);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
 }
 
 .billing-hh-table {
@@ -1261,11 +1186,11 @@
 /* Responsive */
 @media (max-width: 768px) {
   .fee-calc-container {
-    padding: 24px 16px 60px;
+    padding: 80px 16px 60px;
   }
   .fee-calc-panel {
     padding: 18px 16px;
-    border-radius: 14px;
+    border-radius: var(--aw-radius, 10px);
   }
   .fee-calc-filters {
     flex-direction: column;
@@ -1540,4 +1465,3 @@
   background: #f1f5f9;
   border-color: #94a3b8;
 }
-

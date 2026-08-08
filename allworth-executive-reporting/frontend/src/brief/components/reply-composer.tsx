@@ -109,18 +109,18 @@ export function ReplyComposer({
   };
 
   const pill = (active: boolean) =>
-    `min-h-11 rounded-full px-4 text-sm font-semibold transition-colors ${
-      active ? "bg-ink text-white" : "bg-card text-ink-soft ring-1 ring-line active:bg-line"
+    `min-h-11 rounded-lg px-4 text-sm font-semibold transition-colors ${
+      active ? "bg-accent text-white" : "bg-card text-ink-soft ring-1 ring-line active:bg-line"
     }`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-label="Reply composer">
-      <div className="flex max-h-full w-full flex-col overflow-hidden bg-paper animate-sheet-up sm:max-h-[90vh] sm:max-w-2xl sm:rounded-2xl sm:shadow-xl">
+      <div className="flex max-h-full w-full flex-col overflow-hidden bg-paper animate-sheet-up sm:max-h-[90vh] sm:max-w-2xl sm:rounded-lg sm:shadow-md">
         <header className="flex items-center gap-3 border-b border-line bg-card px-4 py-3">
           <button
             onClick={onClose}
             aria-label="Close composer"
-            className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-xl text-ink-soft hover:bg-paper"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-xl text-ink-soft hover:bg-paper"
           >
             ✕
           </button>
@@ -186,7 +186,7 @@ export function ReplyComposer({
               disabled={generating}
               rows={8}
               placeholder="Choose an intent above to generate a draft, or write your own."
-              className="mt-2 w-full rounded-2xl border border-line bg-card p-4 text-[15px] leading-relaxed text-ink outline-none placeholder:text-ink-faint focus:border-accent disabled:text-ink-faint"
+              className="mt-2 w-full rounded-lg border border-line bg-card p-4 text-[15px] leading-relaxed text-ink outline-none placeholder:text-ink-faint focus:border-accent disabled:text-ink-faint"
             />
             <div className="no-scrollbar -mx-4 mt-2 flex gap-2 overflow-x-auto px-4">
               {(
@@ -201,7 +201,7 @@ export function ReplyComposer({
                   key={r}
                   onClick={() => refine(r)}
                   disabled={!hasDraft || generating}
-                  className="min-h-11 shrink-0 rounded-full bg-card px-4 text-sm font-semibold text-ink-soft ring-1 ring-line active:bg-line disabled:opacity-40"
+                  className="min-h-11 shrink-0 rounded-lg bg-card px-4 text-sm font-semibold text-ink-soft ring-1 ring-line active:bg-line disabled:opacity-40"
                 >
                   {label}
                 </button>
@@ -209,7 +209,7 @@ export function ReplyComposer({
               <button
                 onClick={() => intent && generate(intent)}
                 disabled={!intent || generating}
-                className="min-h-11 shrink-0 rounded-full bg-card px-4 text-sm font-semibold text-ink-soft ring-1 ring-line active:bg-line disabled:opacity-40"
+                className="min-h-11 shrink-0 rounded-lg bg-card px-4 text-sm font-semibold text-ink-soft ring-1 ring-line active:bg-line disabled:opacity-40"
               >
                 ↻ Regenerate
               </button>
@@ -233,7 +233,7 @@ export function ReplyComposer({
             <button
               onClick={save}
               disabled={!hasDraft || generating || sending}
-              className="min-h-12 flex-1 rounded-full bg-card text-[15px] font-semibold text-ink ring-1 ring-line active:bg-line disabled:opacity-40"
+              className="min-h-12 flex-1 rounded-lg bg-card text-[15px] font-semibold text-ink ring-1 ring-line active:bg-line disabled:opacity-40"
             >
               Save draft
             </button>
@@ -241,8 +241,8 @@ export function ReplyComposer({
               <button
                 onClick={send}
                 disabled={!hasDraft || generating || sending}
-                className={`min-h-12 flex-1 rounded-full text-[15px] font-semibold text-white active:opacity-80 disabled:opacity-40 ${
-                  confirmingSend ? "bg-critical" : "bg-ink"
+                className={`min-h-12 flex-1 rounded-lg text-[15px] font-semibold text-white active:opacity-80 disabled:opacity-40 ${
+                  confirmingSend ? "bg-critical" : "bg-accent"
                 }`}
               >
                 {sending ? "Sending…" : confirmingSend ? "Confirm send" : "Send"}
@@ -251,7 +251,7 @@ export function ReplyComposer({
             <button
               onClick={confirmingSend ? () => setConfirmingSend(false) : onClose}
               disabled={sending}
-              className="min-h-12 rounded-full px-4 text-sm font-semibold text-ink-soft disabled:opacity-40"
+              className="min-h-12 rounded-lg px-4 text-sm font-semibold text-ink-soft disabled:opacity-40"
             >
               {confirmingSend ? "Cancel" : "Discard"}
             </button>

@@ -5,6 +5,7 @@ import type { KpiDataset, TrendPoint, TrendTarget } from './types/kpi';
 import { KpiTile } from './components/KpiTile';
 import { ExpandableRow } from './components/ExpandableRow';
 import { TrendlineModal } from './components/TrendlineModal';
+import SideNav from './components/SideNav';
 import {
   buildBucketDescriptors,
   aggregateEntries,
@@ -189,23 +190,12 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], i
   }, [trendTarget, metrics, netFlowsMetrics, detailedMetrics]);
 
   return (
-    <div className="t2-page">
-      <div className="t2-bg" aria-hidden="true">
-        <div className="t2-orb t2-orb-1" />
-        <div className="t2-orb t2-orb-2" />
-        <div className="t2-orb t2-orb-3" />
-        <div className="t2-orb t2-orb-4" />
-        <div className="t2-orb t2-orb-5" />
-      </div>
-
+    <div className="t2-page has-sidenav">
+      <SideNav />
       <div className="t2-shell perf-console">
         <header className="perf-hero">
           <div className="perf-hero-left">
             <div className="perf-kicker-row">
-              <a className="perf-home" href="/">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-                Back to hub
-              </a>
               <span className="perf-kicker">Dashboard</span>
             </div>
             <div className="perf-title"><h1>Performance by Channel</h1></div>
@@ -215,14 +205,15 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], i
             </p>
           </div>
         <div className="header-controls perf-hero-right">
-          <div className="threshold-control">
+          <div className="threshold-control" role="group" aria-label="Watch threshold percentage">
+            <span className="threshold-label">Watch at</span>
             <button
               type="button"
               className="threshold-arrow"
               onClick={() => setYellowThreshold((prev) => Math.max(0, prev - 5))}
               aria-label="Decrease threshold by 5"
             >
-              ▼
+              −
             </button>
             <input
               type="number"
@@ -240,7 +231,7 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], i
               onClick={() => setYellowThreshold((prev) => Math.min(100, prev + 5))}
               aria-label="Increase threshold by 5"
             >
-              ▲
+              +
             </button>
           </div>
           <div className="last-updated">

@@ -319,15 +319,6 @@ const Tamarac2 = () => {
   return (
     <div className="t2-page has-sidenav">
       <SideNav />
-      {/* Animated background orbs (Jarvis-style) */}
-      <div className="t2-bg" aria-hidden="true">
-        <div className="t2-orb t2-orb-1" />
-        <div className="t2-orb t2-orb-2" />
-        <div className="t2-orb t2-orb-3" />
-        <div className="t2-orb t2-orb-4" />
-        <div className="t2-orb t2-orb-5" />
-      </div>
-
       <div className="t2-shell">
         <header className="t2-hero">
           <div className="t2-kicker-row">

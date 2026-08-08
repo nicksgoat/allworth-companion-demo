@@ -246,22 +246,10 @@ export default function AppUsage() {
   return (
     <div className="t2-page has-sidenav">
       <SideNav />
-      <div className="t2-bg" aria-hidden="true">
-        <div className="t2-orb t2-orb-1" />
-        <div className="t2-orb t2-orb-2" />
-        <div className="t2-orb t2-orb-3" />
-        <div className="t2-orb t2-orb-4" />
-        <div className="t2-orb t2-orb-5" />
-      </div>
-
       <div className="t2-shell usage-console">
         <header className="usage-hero">
           <div className="usage-hero-left">
             <div className="usage-kicker-row">
-              <a className="usage-home" href="/">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-                Back to hub
-              </a>
               <span className="usage-kicker">Admin · Analytics</span>
             </div>
             <div className="usage-title"><h1>App Usage</h1></div>

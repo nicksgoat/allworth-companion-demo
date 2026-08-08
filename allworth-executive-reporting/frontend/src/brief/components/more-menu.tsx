@@ -66,14 +66,14 @@ export function MoreMenu({
         }}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-lg font-bold text-ink-faint hover:bg-paper"
+        className="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-lg font-bold text-ink-faint hover:bg-paper"
       >
         ⋯
       </button>
       {open ? (
         <div
           role="menu"
-          className={`absolute z-30 mt-1 w-56 overflow-hidden rounded-xl bg-card py-1 shadow-lg ring-1 ring-line ${
+          className={`absolute z-30 mt-1 w-56 overflow-hidden rounded-lg bg-card py-1 shadow-sm ring-1 ring-line ${
             align === "right" ? "right-0" : "left-0"
           } bottom-full mb-1`}
           onClick={(e) => e.stopPropagation()}

@@ -24,7 +24,7 @@ function sortEmails(list: ExecutiveEmail[]): ExecutiveEmail[] {
 function Toast({ message }: { message: string }) {
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-24 z-[60] flex justify-center px-4">
-      <p className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white shadow-lg">{message}</p>
+      <p className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-sm">{message}</p>
     </div>
   );
 }
@@ -84,7 +84,6 @@ function DashboardInner() {
     const expired = inbox.reconnect === "load_failed";
     return (
       <div className="mx-auto flex min-h-dvh max-w-lg flex-col items-center justify-center px-6 text-center">
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-accent-soft text-2xl">✉️</div>
         <h1 className="text-xl font-bold">{expired ? "Reconnect your mailbox" : "Connect your mailbox"}</h1>
         <p className="mt-2 text-sm text-ink-soft">
           {expired
@@ -95,7 +94,7 @@ function DashboardInner() {
           onClick={() => {
             window.location.href = "/.auth/login/aad?post_login_redirect_uri=/brief";
           }}
-          className="mt-6 min-h-12 rounded-full bg-ink px-6 text-[15px] font-semibold text-white active:opacity-80"
+          className="mt-6 min-h-12 rounded-lg bg-accent px-6 text-[15px] font-semibold text-white active:opacity-80"
         >
           Sign in with Microsoft
         </button>
@@ -150,14 +149,14 @@ function DashboardInner() {
         <div className="pt-1">
           <button
             onClick={() => setShowSnoozed((s) => !s)}
-            className="min-h-11 w-full rounded-2xl bg-card px-4 text-left text-sm font-semibold text-ink-soft ring-1 ring-line"
+            className="min-h-11 w-full rounded-lg bg-card px-4 text-left text-sm font-semibold text-ink-soft ring-1 ring-line"
           >
-            🕐 Snoozed · {snoozed.length} {showSnoozed ? "▾" : "▸"}
+            Snoozed · {snoozed.length} {showSnoozed ? "▾" : "▸"}
           </button>
           {showSnoozed ? (
             <ul className="mt-2 space-y-2">
               {snoozed.map((e) => (
-                <li key={e.id} className="flex items-center gap-3 rounded-2xl bg-card px-4 py-3 ring-1 ring-line">
+                <li key={e.id} className="flex items-center gap-3 border-b border-line bg-card px-4 py-3">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold">{e.subject}</p>
                     <p className="text-xs text-ink-faint">
@@ -169,7 +168,7 @@ function DashboardInner() {
                       inbox.unsnooze(e.id);
                       notify("Unsnoozed");
                     }}
-                    className="min-h-11 shrink-0 rounded-full bg-accent-soft px-4 text-sm font-semibold text-accent"
+                    className="min-h-11 shrink-0 rounded-lg bg-accent-soft px-4 text-sm font-semibold text-accent"
                   >
                     Unsnooze
                   </button>
@@ -204,7 +203,7 @@ function DashboardInner() {
             onAction={notify}
           />
         ) : (
-          <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-line text-sm text-ink-faint">
+          <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-line text-sm text-ink-faint">
             Select an email to review it here
           </div>
         )}

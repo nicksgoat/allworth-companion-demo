@@ -11,6 +11,7 @@ import { QueueSummary } from './components/QueueSummary';
 import { QueueSkeleton } from './components/QueueSkeleton';
 import { PastAdjustments } from './components/PastAdjustments';
 import { RowDetail } from './components/RowDetail';
+import SideNav from '../components/SideNav';
 
 type AdjRow = AuditResponse['db_adjustments'][number];
 const pastKey = (avhhid: unknown, period: unknown, amount: unknown) =>
@@ -44,7 +45,11 @@ export default function Nfbc() {
 
   const toast = useCallback((kind: Toast['kind'], msg: string) => {
     const id = Date.now() + Math.random();
-    setToasts((t) => [...t, { id, kind, msg }]);
+    setToasts((t) => (
+      t.some((item) => item.kind === kind && item.msg === msg)
+        ? t
+        : [...t, { id, kind, msg }]
+    ));
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 6000);
   }, []);
 
@@ -185,7 +190,8 @@ export default function Nfbc() {
   }, [toast]);
 
   return (
-    <div className="t2-page">
+    <div className="t2-page has-sidenav">
+      <SideNav />
       <div className="t2-bg" aria-hidden="true">
         <div className="t2-orb t2-orb-1" />
         <div className="t2-orb t2-orb-2" />
@@ -198,10 +204,6 @@ export default function Nfbc() {
         <header className="nfbc-hero">
           <div className="nfbc-hero-left">
             <div className="nfbc-kicker-row">
-              <a className="nfbc-home" href="/">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-                Back to hub
-              </a>
               <span className="nfbc-kicker">Agentic ops</span>
             </div>
             <div className="nfbc-title"><h1>NFBC Adjustments</h1></div>

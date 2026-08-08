@@ -1,11 +1,11 @@
-/* Sfp2.css — admin schema-manager page, light glass-morphism mirroring Tamarac2 */
+/* SFP2 — restrained schema-management workspace. */
 
 .sfp2-page {
   position: relative;
   min-height: 100vh;
-  background: #f4f6fb;
-  color: #0a0e1a;
-  font: 14px/1.55 Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--aw-feather, #f3f4f4);
+  color: var(--aw-ink, #171717);
+  font: 400 14px/1.55 var(--aw-font-body, 'Lato', sans-serif);
   letter-spacing: -0.003em;
 }
 
@@ -37,8 +37,9 @@
 
 .sfp2-title {
   font-size: 22px;
-  font-weight: 700;
-  color: #00205C;
+  font-family: var(--aw-font-display, Georgia, serif);
+  font-weight: 600;
+  color: var(--aw-night, #0c2e4e);
   margin: 4px 0 0;
 }
 
@@ -75,12 +76,11 @@
 }
 
 .sfp2-card {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(0, 32, 92, 0.1);
-  border-radius: 16px;
+  background: var(--aw-surface, #fff);
+  border: 1px solid var(--aw-line, #e6e6e6);
+  border-radius: var(--aw-radius-lg, 14px);
   padding: 16px;
-  box-shadow: 0 4px 16px -8px rgba(0, 32, 92, 0.18);
-  backdrop-filter: blur(8px);
+  box-shadow: none;
 }
 
 .sfp2-card h3 {

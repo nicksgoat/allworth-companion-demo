@@ -23,7 +23,7 @@ export function EmailCard({
 
   return (
     <article
-      className={`rounded-2xl bg-card p-4 shadow-sm ring-1 ring-line transition-shadow hover:shadow-md ${
+      className={`rounded-lg bg-card p-4 ring-1 ring-line transition-colors hover:bg-paper ${
         email.unread ? "" : "opacity-80"
       }`}
     >
@@ -52,20 +52,20 @@ export function EmailCard({
         <div className="mt-1.5 flex flex-wrap items-center gap-2">
           {email.deadline ? (
             <span
-              className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                isDeadlineToday(email.deadline) ? "bg-critical-soft text-critical" : "bg-low-soft text-ink-soft"
+              className={`text-xs font-semibold ${
+                isDeadlineToday(email.deadline) ? "text-critical" : "text-ink-soft"
               }`}
             >
               ⏰ {formatDeadline(email.deadline)}
             </span>
           ) : null}
           {email.delegatedTo ? (
-            <span className="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent">
+            <span className="text-xs font-semibold text-accent">
               → {email.delegatedTo}
             </span>
           ) : null}
           {hasDraft ? (
-            <span className="rounded-full bg-medium-soft px-2 py-0.5 text-xs font-semibold text-medium">Draft saved</span>
+            <span className="text-xs font-semibold text-medium">Draft saved</span>
           ) : null}
         </div>
       </button>
@@ -73,13 +73,13 @@ export function EmailCard({
       <div className="mt-3 flex items-center gap-2 border-t border-line pt-3">
         <button
           onClick={onReview}
-          className="min-h-11 flex-1 rounded-full bg-ink text-sm font-semibold text-white active:opacity-80"
+          className="min-h-11 flex-1 rounded-lg bg-accent text-sm font-semibold text-white active:opacity-80"
         >
           Review
         </button>
         <button
           onClick={onReply}
-          className="min-h-11 flex-1 rounded-full bg-accent-soft text-sm font-semibold text-accent active:opacity-80"
+          className="min-h-11 flex-1 rounded-lg bg-accent-soft text-sm font-semibold text-accent active:opacity-80"
         >
           Reply
         </button>

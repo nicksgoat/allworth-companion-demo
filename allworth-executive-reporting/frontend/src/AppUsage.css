@@ -1,33 +1,24 @@
-/* AppUsage.css — App Usage dashboard. Page chrome reuses the .t2-* glass theme
-   (background, orbs, shell, has-sidenav offset). All page-specific UI is scoped
-   under .usage-console to avoid leaking styles into other tools. */
+/* App Usage — adoption evidence with restrained operational chrome. */
 
 .usage-console {
-  --u-navy: #00205c;
-  --u-navy-soft: rgba(0, 32, 92, 0.08);
-  --u-navy-line: rgba(0, 32, 92, 0.14);
-  --u-orange: #e67e22;
-  --u-orange-deep: #c75b12;
-  --u-text: #1f2937;
-  --u-mute: #6b7280;
-  --u-card-bg: rgba(255, 255, 255, 0.62);
-  --u-card-border: rgba(255, 255, 255, 0.75);
-  --u-card-shadow:
-    0 20px 48px -12px rgba(0, 32, 92, 0.14),
-    0 4px 12px rgba(0, 32, 92, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  --u-navy: var(--aw-indigo, #173d67);
+  --u-navy-soft: rgba(23, 61, 103, 0.07);
+  --u-navy-line: rgba(23, 61, 103, 0.18);
+  --u-orange: var(--aw-pumpkin, #d26d37);
+  --u-orange-deep: #a8522c;
+  --u-text: var(--aw-ink, #171717);
+  --u-mute: var(--aw-ink-secondary, #595959);
+  --u-card-bg: var(--aw-surface, #fff);
+  --u-card-border: var(--aw-line, #e6e6e6);
+  --u-card-shadow: none;
 }
 
 /* ── hero ──────────────────────────────────────────────────────────────── */
 .usage-hero {
   margin: 20px 0 20px;
-  padding: 24px 32px 28px;
-  background: var(--u-card-bg);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid var(--u-card-border);
-  border-radius: 18px;
-  box-shadow: var(--u-card-shadow);
+  padding: 24px 0 26px;
+  background: transparent;
+  border-bottom: 1px solid var(--u-card-border);
 }
 .usage-hero-left { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .usage-kicker-row { display: flex; align-items: center; gap: 12px; }
@@ -50,14 +41,13 @@
   letter-spacing: 0.14em;
   font-size: 11px;
   font-weight: 700;
-  color: var(--u-orange-deep);
+  color: var(--aw-cerulean, #3e71b7);
 }
 .usage-title h1 {
   margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--u-navy);
-  letter-spacing: -0.01em;
+  font: 600 34px/1.15 var(--aw-font-display, Georgia, serif);
+  color: var(--aw-night, #0c2e4e);
+  letter-spacing: -0.02em;
 }
 .usage-tagline { margin: 4px 0 0; color: var(--u-mute); font-size: 14px; max-width: 64ch; }
 
@@ -73,9 +63,9 @@
   flex-direction: column;
   gap: 8px;
   padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--u-card-bg);
   border: 1px solid var(--u-navy-line);
-  border-radius: 14px;
+  border-radius: var(--aw-radius, 10px);
 }
 .usage-filter-grow { flex: 1; min-width: 300px; }
 .usage-filter-label {

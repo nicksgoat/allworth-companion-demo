@@ -8,10 +8,8 @@ export function MissingContextPanel({ analysis }: { analysis: EmailAnalysis }) {
   if (analysis.missing_context.length === 0 && analysis.risks.length === 0) return null;
 
   return (
-    <section className="rounded-2xl border-l-4 border-miss bg-miss-soft p-4" aria-label="What you might miss">
-      <h3 className="flex items-center gap-2 text-sm font-bold text-miss">
-        <span aria-hidden>👁</span> What you might miss
-      </h3>
+    <section className="border-y border-line bg-miss-soft p-4" aria-label="What you might miss">
+      <h3 className="text-sm font-bold text-miss">What you might miss</h3>
       {analysis.missing_context.length > 0 ? (
         <ul className="mt-2 space-y-1.5">
           {analysis.missing_context.map((item) => (

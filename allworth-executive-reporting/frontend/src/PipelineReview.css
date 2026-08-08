@@ -37,7 +37,7 @@
 /* Clear the fixed SideNav rail (shared across all tool pages). Higher
    specificity than the .pr-root padding shorthand so content isn't hidden. */
 .pr-root.has-sidenav {
-  padding-left: 236px;
+  padding-left: calc(var(--aw-nav-width, 252px) + 2rem);
 }
 @media (max-width: 720px) {
   .pr-root.has-sidenav {
@@ -212,7 +212,7 @@
 .pr-kpi-worked { border-left: 3px solid var(--pr-navy); }
 
 /* Scoring key */
-.pr-scoring { margin: 0 0 1.5rem; background: linear-gradient(180deg, #fbfcfe 0%, #f5f7fb 100%); border: 1px solid #e5e9f0; border-radius: 12px; padding: 1.1rem 1.35rem 1.25rem; }
+.pr-scoring { margin: 0 0 1.5rem; background: #fff; border: 1px solid #e5e9f0; border-radius: var(--aw-radius, 10px); padding: 1.1rem 1.35rem 1.25rem; }
 .pr-scoring-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
 .pr-scoring-head h3 { margin: 0; color: var(--pr-navy); font-size: 1.02rem; }
 .pr-scoring-note { font-size: 0.75rem; color: #8a94a6; }
@@ -333,4 +333,3 @@ a.pr-name:hover { text-decoration: underline; }
 /* Interactive text → Cerulean Blue per brand link guidance */
 a.pr-name { color: var(--pr-cerulean); }
 .pr-scoring-head h3 { border: none; }
-

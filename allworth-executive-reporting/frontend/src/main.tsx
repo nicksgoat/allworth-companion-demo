@@ -392,11 +392,11 @@ const renderError = (message: string) => {
   const container = document.getElementById('root');
   if (container) {
     container.innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#0f172a;color:#f8fafc;font-family:Inter,system-ui,sans-serif;padding:2rem;text-align:center;">
-        <div style="font-size:3rem;margin-bottom:1rem;">⚠️</div>
-        <h1 style="font-size:1.5rem;margin:0 0 1rem;color:#f87171;">Connection Error</h1>
-        <p style="color:#94a3b8;max-width:400px;margin:0 0 1.5rem;">${message}</p>
-        <button onclick="location.reload()" style="padding:0.75rem 1.5rem;background:linear-gradient(135deg,#6366f1,#0ea5e9);color:white;border:none;border-radius:8px;cursor:pointer;font-size:1rem;">Retry</button>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#f3f4f4;color:#171717;font-family:Lato,system-ui,sans-serif;padding:2rem;text-align:center;">
+        <p style="margin:0 0 10px;color:#a63d35;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;">Workspace unavailable</p>
+        <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:2rem;font-weight:600;margin:0 0 .75rem;color:#0c2e4e;">Unable to load the workspace</h1>
+        <p style="color:#595959;max-width:420px;margin:0 0 1.5rem;line-height:1.55;">${message}</p>
+        <button onclick="location.reload()" style="padding:.7rem 1.1rem;background:#173d67;color:white;border:none;border-radius:10px;cursor:pointer;font:700 .9rem Lato,system-ui,sans-serif;">Try again</button>
       </div>
     `;
   }
@@ -406,20 +406,11 @@ const renderLoading = (statusMessage: string = 'Connecting to database...') => {
   const container = document.getElementById('root');
   if (container) {
     container.innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);color:#f8fafc;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:2rem;text-align:center;">
-        <div style="position:relative;width:60px;height:60px;margin-bottom:2rem;">
-          <div style="position:absolute;width:60px;height:60px;border:3px solid rgba(99,102,241,0.2);border-radius:50%;"></div>
-          <div style="position:absolute;width:60px;height:60px;border:3px solid transparent;border-top-color:#6366f1;border-radius:50%;animation:spin 1s linear infinite;"></div>
-        </div>
-        <h1 style="font-size:1.5rem;font-weight:600;margin:0 0 0.75rem;background:linear-gradient(135deg,#6366f1,#0ea5e9);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Allworth Executive Reporting</h1>
-        <p id="loading-status" style="color:#94a3b8;font-size:0.95rem;margin:0;">${statusMessage}</p>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#f3f4f4;color:#171717;font-family:Lato,system-ui,sans-serif;padding:2rem;text-align:center;">
+        <p style="margin:0 0 10px;color:#3e71b7;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;">Allworth Financial</p>
+        <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:2rem;font-weight:600;margin:0 0 .75rem;color:#0c2e4e;">Opening your workspace</h1>
+        <p id="loading-status" role="status" style="color:#595959;font-size:.95rem;margin:0;">${statusMessage}</p>
       </div>
-      <style>
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      </style>
     `;
   }
 };

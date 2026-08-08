@@ -5,8 +5,9 @@
 // it works on any page regardless of router context. Links are filtered to the
 // tools the current user (or impersonated user) can access.
 
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { canAccessTool, useEffectiveAccess } from '../services/access';
+import allworthLogoWhite from '../assets/allworth-logo-white.png';
 import './SideNav.css';
 
 interface NavLink {
@@ -87,6 +88,11 @@ const chevronLeft = (
   <svg className="side-nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
 );
 
+const searchIcon = icon(<><circle cx="11" cy="11" r="7" /><path d="m20 20-3.6-3.6" /></>);
+const panelIcon = icon(<><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16" /></>);
+const menuIcon = icon(<><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></>);
+const closeIcon = icon(<><path d="m6 6 12 12" /><path d="m18 6-12 12" /></>);
+
 // ── access resolution ──────────────────────────────────────────────────────
 // Effective access (with "view as" impersonation applied) is resolved by the
 // shared services/access module so the rail, the Home hub, and the route guard
@@ -95,6 +101,45 @@ const chevronLeft = (
 
 const SideNav = () => {
   const access = useEffectiveAccess();
+  const searchInput = useRef<HTMLInputElement>(null);
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    setCollapsed(window.localStorage.getItem('allworth-nav-collapsed') === 'true');
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--aw-nav-width', collapsed ? '72px' : '252px');
+    return () => {
+      document.documentElement.style.removeProperty('--aw-nav-width');
+    };
+  }, [collapsed]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setSearchOpen((open) => !open);
+      }
+      if (event.key === 'Escape') {
+        setSearchOpen(false);
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (!searchOpen) {
+      setQuery('');
+      return;
+    }
+    window.requestAnimationFrame(() => searchInput.current?.focus());
+  }, [searchOpen]);
 
   const current = (() => {
     try {
@@ -129,6 +174,8 @@ const SideNav = () => {
       href={link.href}
       className={isActive(link) ? 'side-nav-item active' : 'side-nav-item'}
       aria-current={isActive(link) ? 'page' : undefined}
+      title={collapsed ? link.label : undefined}
+      onClick={() => setMobileOpen(false)}
     >
       {link.icon}
       <span>{link.label}</span>
@@ -147,12 +194,55 @@ const SideNav = () => {
   const workspaceGroup = visibleGroups.find((g) => g.heading === 'Workspace');
   const otherGroups = visibleGroups.filter((g) => g.heading !== 'Workspace');
 
+  const searchResults = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    const entries = [
+      ...GROUPS.flatMap((group) => group.links.map((link) => ({ ...link, group: group.heading }))),
+      ...REPORTS.map((link) => ({ ...link, group: 'Reporting' })),
+    ].filter(canSee);
+    if (!needle) return entries;
+    return entries.filter((entry) => `${entry.label} ${entry.group}`.toLowerCase().includes(needle));
+  }, [access, query]);
+
+  const toggleCollapsed = () => {
+    setCollapsed((value) => {
+      window.localStorage.setItem('allworth-nav-collapsed', String(!value));
+      return !value;
+    });
+  };
+
   return (
-    <aside className="side-nav" aria-label="Primary">
-      <a className="side-nav-brand" href="/">
-        <img src="/home/logo.png" alt="Allworth" onError={(e) => (e.currentTarget.style.display = 'none')} />
-        <span className="side-nav-brand-chip">Hub</span>
-      </a>
+    <>
+      <button
+        type="button"
+        className="side-nav-mobile-trigger"
+        aria-label="Open navigation"
+        aria-expanded={mobileOpen}
+        onClick={() => setMobileOpen(true)}
+      >
+        {menuIcon}
+      </button>
+      {mobileOpen && <button type="button" className="side-nav-scrim" aria-label="Close navigation" onClick={() => setMobileOpen(false)} />}
+      <aside className={`side-nav${collapsed ? ' is-collapsed' : ''}${mobileOpen ? ' is-mobile-open' : ''}`} aria-label="Primary">
+      <div className="side-nav-brand-row">
+        <a className="side-nav-brand" href="/" aria-label="Allworth workspace">
+          <img
+            src={allworthLogoWhite}
+            alt="Allworth"
+            onError={(event) => {
+              event.currentTarget.hidden = true;
+              event.currentTarget.nextElementSibling?.classList.add('visible');
+            }}
+          />
+          <span className="side-nav-brand-fallback">Allworth</span>
+        </a>
+        <button type="button" className="side-nav-mobile-close" aria-label="Close navigation" onClick={() => setMobileOpen(false)}>{closeIcon}</button>
+      </div>
+      <button type="button" className="side-nav-search" onClick={() => { setMobileOpen(false); setSearchOpen(true); }} title={collapsed ? 'Find a tool' : undefined}>
+        {searchIcon}
+        <span>Find a tool</span>
+        <kbd>⌘ K</kbd>
+      </button>
       <nav className="side-nav-scroll">
         {view === 'reporting' ? (
           <>
@@ -203,7 +293,39 @@ const SideNav = () => {
           </>
         )}
       </nav>
-    </aside>
+      <button type="button" className="side-nav-collapse" onClick={toggleCollapsed} aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}>
+        {panelIcon}
+        <span>{collapsed ? 'Expand' : 'Collapse'}</span>
+      </button>
+      </aside>
+
+      {searchOpen && (
+        <div className="side-nav-command" role="dialog" aria-modal="true" aria-label="Find a tool" onMouseDown={(event) => event.target === event.currentTarget && setSearchOpen(false)}>
+          <div className="side-nav-command-panel">
+            <div className="side-nav-command-input">
+              {searchIcon}
+              <input
+                ref={searchInput}
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search tools and reports"
+                aria-label="Search tools and reports"
+              />
+              <button type="button" onClick={() => setSearchOpen(false)}>Esc</button>
+            </div>
+            <div className="side-nav-command-results">
+              {searchResults.length ? searchResults.map((entry) => (
+                <a key={`${entry.group}-${entry.href}`} href={entry.href} onClick={() => { setSearchOpen(false); setMobileOpen(false); }}>
+                  {entry.icon}
+                  <span>{entry.label}<small>{entry.group}</small></span>
+                  {chevronRight}
+                </a>
+              )) : <p>No matching tools.</p>}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

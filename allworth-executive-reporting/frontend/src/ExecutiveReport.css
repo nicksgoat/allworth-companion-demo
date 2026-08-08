@@ -27,7 +27,11 @@
 }
 
 .er-root.has-sidenav {
-  padding-left: 236px;
+  padding-left: calc(var(--aw-nav-width, 252px) + 2rem);
+}
+
+@media (max-width: 900px) {
+  .er-root.has-sidenav { padding-left: 2rem; padding-top: 4.75rem; }
 }
 
 /* ── Header ─────────────────────────────────────────────────────────── */

@@ -14,7 +14,7 @@ import { PriorityBadge } from "./priority-badge";
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-2xl bg-card p-4 ring-1 ring-line">
+    <section className="border-b border-line pb-4">
       <h3 className="text-xs font-bold uppercase tracking-wide text-ink-faint">{title}</h3>
       <div className="mt-2 text-sm leading-relaxed text-ink">{children}</div>
     </section>
@@ -79,17 +79,17 @@ export function EmailDetailSheet({
 
   return (
     <div
-      className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-paper animate-sheet-up lg:relative lg:inset-auto lg:z-auto lg:h-full lg:animate-none lg:rounded-2xl lg:ring-1 lg:ring-line"
+      className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-paper animate-sheet-up lg:relative lg:inset-auto lg:z-auto lg:h-full lg:animate-none lg:rounded-lg lg:ring-1 lg:ring-line"
       role="dialog"
       aria-modal="true"
       aria-label={`Email from ${email.senderName}: ${email.subject}`}
     >
       {/* Header */}
-      <header className="flex items-center gap-3 border-b border-line bg-card px-4 py-3 lg:rounded-t-2xl">
+      <header className="flex items-center gap-3 border-b border-line bg-card px-4 py-3 lg:rounded-t-lg">
         <button
           onClick={onClose}
           aria-label="Close"
-          className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-xl text-ink-soft hover:bg-paper"
+          className="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-xl text-ink-soft hover:bg-paper"
         >
           ←
         </button>
@@ -109,13 +109,13 @@ export function EmailDetailSheet({
         <p className="text-xs text-ink-faint">Received {formatFullDate(email.receivedAt)}</p>
 
         {email.delegatedTo ? (
-          <p className="rounded-xl bg-accent-soft px-3 py-2 text-sm font-semibold text-accent">
+          <p className="border-b border-line bg-paper px-3 py-2 text-sm font-semibold text-accent">
             Delegated to {email.delegatedTo}
           </p>
         ) : null}
 
         {loadingLive && !analysis ? (
-          <p className="rounded-xl bg-accent-soft px-3 py-2 text-sm font-medium text-accent">
+          <p className="border-b border-line bg-paper px-3 py-2 text-sm font-medium text-accent">
             Analyzing this email…
           </p>
         ) : null}
@@ -127,7 +127,7 @@ export function EmailDetailSheet({
               {analysis.request}
               {analysis.deadline ? (
                 <p className="mt-2">
-                  <span className="rounded-full bg-critical-soft px-2 py-0.5 text-xs font-semibold text-critical">
+                  <span className="text-xs font-semibold text-critical">
                     ⏰ Due {formatDeadline(analysis.deadline)}
                   </span>
                 </p>
@@ -167,11 +167,11 @@ export function EmailDetailSheet({
               <Section title="Attachments">
                 <ul className="space-y-2">
                   {analysis.attachments.map((a) => (
-                    <li key={a.name} className="flex items-center gap-2 rounded-xl bg-paper px-3 py-2.5">
+                    <li key={a.name} className="flex items-center gap-2 border-t border-line py-2.5">
                       <span aria-hidden>📎</span>
                       <span className="min-w-0 flex-1 truncate font-medium">{a.name}</span>
                       {a.needs_review ? (
-                        <span className="shrink-0 rounded-full bg-high-soft px-2 py-0.5 text-[11px] font-semibold text-high">
+                        <span className="shrink-0 text-[11px] font-semibold text-high">
                           Needs review
                         </span>
                       ) : null}
@@ -187,7 +187,7 @@ export function EmailDetailSheet({
             </p>
           </>
         ) : (
-          <div className="rounded-2xl border-l-4 border-high bg-high-soft p-4 text-sm text-ink">
+          <div className="border-y border-line bg-high-soft p-4 text-sm text-ink">
             {fallbackAnalysisNotice()}
           </div>
         )}
@@ -220,10 +220,10 @@ export function EmailDetailSheet({
       </div>
 
       {/* Sticky bottom actions */}
-      <div className="fixed inset-x-0 bottom-0 z-10 flex items-center gap-2 border-t border-line bg-card px-4 pb-[max(env(safe-area-inset-bottom),12px)] pt-3 lg:absolute lg:rounded-b-2xl">
+      <div className="fixed inset-x-0 bottom-0 z-10 flex items-center gap-2 border-t border-line bg-card px-4 pb-[max(env(safe-area-inset-bottom),12px)] pt-3 lg:absolute lg:rounded-b-lg">
         <button
           onClick={onReply}
-          className="min-h-12 flex-1 rounded-full bg-ink text-[15px] font-semibold text-white active:opacity-80"
+          className="min-h-12 flex-1 rounded-lg bg-accent text-[15px] font-semibold text-white active:opacity-80"
         >
           Draft Reply
         </button>
@@ -233,7 +233,7 @@ export function EmailDetailSheet({
             onAction?.("Marked done");
             onClose();
           }}
-          className="min-h-12 rounded-full bg-accent-soft px-5 text-sm font-semibold text-accent active:opacity-80"
+          className="min-h-12 rounded-lg bg-accent-soft px-5 text-sm font-semibold text-accent active:opacity-80"
         >
           Done
         </button>

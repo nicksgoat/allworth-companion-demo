@@ -5,7 +5,7 @@
 // the "view as" impersonation overlay hides the same cards/nav a real user
 // would never see. Card launchers are gated by effective tool access.
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import SideNav from './components/SideNav';
 import { canAccessTool, useEffectiveAccess } from './services/access';
@@ -250,16 +250,52 @@ const SECTIONS: HubSection[] = [
         icon: svg(<><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5z" /><circle cx="12" cy="10" r="2.4" /><path d="M8.5 16a3.7 3.7 0 0 1 7 0" /></>),
       },
       {
+        id: 'app_usage',
+        toolId: 'admin',
+        kicker: 'Adoption',
+        title: 'App Usage',
+        tag: 'live',
+        color: 'navy',
+        href: '/app-usage',
+        host: '/app-usage',
+        desc: 'See which workspace tools people are using.',
+        icon: svg(<><path d="M3 3v18h18" /><rect x="7" y="11" width="3" height="6" /><rect x="12" y="7" width="3" height="10" /><rect x="17" y="13" width="3" height="4" /></>),
+      },
+      {
+        id: 'automations',
+        toolId: 'admin',
+        kicker: 'Operations',
+        title: 'Automations',
+        tag: 'live',
+        color: 'sky',
+        href: '/automations',
+        host: '/automations',
+        desc: 'Review and manage recurring workspace jobs.',
+        icon: svg(<><path d="M12 2v4" /><path d="m16.2 7.8 2.9-2.9" /><path d="M18 12h4" /><circle cx="12" cy="12" r="4" /><path d="M4.9 4.9 7.8 7.8" /><path d="M2 12h4" /></>),
+      },
+      {
         id: 'pipeline_logging',
         toolId: 'pipeline_logging',
         kicker: 'Pipeline observability',
-        title: 'Pipeline Logging',
+        title: 'Tamarac',
         tag: 'live',
         color: 'sky',
         href: '/tamarac',
         host: '/tamarac',
-        desc: 'Pipeline ingestion + transformation logging — the Tamarac pipeline view and the full refresh log, read from the ADLS transformation log.',
+        desc: 'Inspect Tamarac ingestion and transformation runs.',
         icon: svg(<><path d="M4 7h10" /><path d="M4 12h16" /><path d="M4 17h7" /><circle cx="18" cy="7" r="2" /><circle cx="14" cy="17" r="2" /></>),
+      },
+      {
+        id: 'refresh_log',
+        toolId: 'pipeline_logging',
+        kicker: 'Pipeline history',
+        title: 'Full Log',
+        tag: 'live',
+        color: 'slate',
+        href: '/refresh_log',
+        host: '/refresh_log',
+        desc: 'Review complete refresh and transformation history.',
+        icon: svg(<><path d="M21 12a9 9 0 1 1-3-6.7" /><path d="M21 3v6h-6" /></>),
       },
     ],
   },
@@ -269,26 +305,41 @@ const arrow = (
   <svg className="hub-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></svg>
 );
 
-const tagLabel: Record<CardTag, string> = { live: 'Live', new: 'New', soon: 'Soon' };
+const cardSummary: Record<string, string> = {
+  performance: 'Review growth against plan across every acquisition channel.',
+  nfbc: 'Review, edit, and confirm proposed flow adjustments.',
+  fee_calculator: 'Compare fee schedules and calculate client pricing.',
+  pipeline_review: 'Focus the team on the prospects that need attention now.',
+  executive_report: 'See company flows, forecasts, and the executive summary.',
+  crm: 'Find clients, activity, opportunities, and advisor relationships.',
+  file_explorer: 'Find, download, and share approved data-lake tables.',
+  data_catalog: 'Understand warehouse fields, tables, and relationships.',
+  brief: 'Triage the executive inbox and prepare decision-ready replies.',
+  financial_planning: 'Build and compare retirement, tax, and estate scenarios.',
+  avantos: 'Review acquisition-channel performance and growth trends.',
+  rebalancer: 'Model portfolio rebalancing decisions before execution.',
+  sfp2: 'Keep Salesforce ingestion columns aligned with the live schema.',
+  repcodes: 'Maintain advisor rep-code mappings and review changes.',
+  bond_analyzer: 'Analyze fixed-income holdings and build proposals.',
+  advisor_mailer: 'Review and send advisor communications in batches.',
+  admin: 'Manage who can view and share each workspace tool.',
+  app_usage: 'See which workspace tools people are using.',
+  automations: 'Review and manage recurring workspace jobs.',
+  pipeline_logging: 'Inspect Tamarac ingestion and transformation runs.',
+  refresh_log: 'Review complete refresh and transformation history.',
+};
 
 function Card({ card }: { card: HubCard }) {
   const disabled = !card.href;
   const body = (
     <>
       <div className="hub-card-top">
-        <span className={`hub-card-icon ${card.color}`}>{card.icon}</span>
+        <span className="hub-card-icon">{card.icon}</span>
         <div className="hub-card-title-wrap">
-          <div className="hub-card-kicker">{card.kicker}</div>
-          <div className="hub-card-title">
-            {card.title}
-            <span className={`hub-card-tag ${card.tag}`}>{tagLabel[card.tag]}</span>
-          </div>
+          <div className="hub-card-title">{card.title}</div>
+          <div className="hub-card-desc">{cardSummary[card.id] ?? card.desc}</div>
         </div>
-      </div>
-      <div className="hub-card-desc">{card.desc}</div>
-      <div className="hub-card-foot">
-        <span className="hub-host">{card.host}</span>
-        {!disabled && arrow}
+        {disabled ? <span className="hub-card-status">In planning</span> : arrow}
       </div>
     </>
   );
@@ -309,10 +360,20 @@ function Card({ card }: { card: HubCard }) {
 
 export default function Home() {
   const access = useEffectiveAccess();
+  const searchInput = useRef<HTMLInputElement>(null);
+  const [query, setQuery] = useState('');
 
-  const now = useMemo(() => new Date(), []);
-  const shortDate = now.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-  const longDate = now.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (event.key === '/' && !target?.matches('input, textarea, select, [contenteditable="true"]')) {
+        event.preventDefault();
+        searchInput.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   // Filter each section's cards to those the (possibly impersonated) user can
   // reach. Placeholder "soon" cards have no toolId and are always shown.
@@ -325,79 +386,55 @@ export default function Home() {
     [access]
   );
 
-  const stats = useMemo(() => {
-    const all = visibleSections.flatMap((s) => s.cards);
-    const available = all.filter((c) => c.href).length;
-    const planning = all.filter((c) => !c.href).length;
-    return { available, planning, categories: visibleSections.length };
-  }, [visibleSections]);
+  const availableSections = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return visibleSections.map((section) => ({
+      ...section,
+      cards: section.cards.filter((card) => {
+        if (!card.href) return false;
+        if (!needle) return true;
+        return `${card.title} ${card.kicker} ${card.desc}`.toLowerCase().includes(needle);
+      }),
+    })).filter((section) => section.cards.length > 0);
+  }, [query, visibleSections]);
+
+  const planningCards = useMemo(
+    () => visibleSections.flatMap((section) => section.cards).filter((card) => !card.href),
+    [visibleSections]
+  );
+  const availableCount = visibleSections.flatMap((section) => section.cards).filter((card) => card.href).length;
+  const resultCount = availableSections.reduce((total, section) => total + section.cards.length, 0);
 
   return (
     <div className="home-hub has-sidenav">
-      <div className="hub-bg" aria-hidden="true">
-        <div className="hub-orb hub-orb-a" />
-        <div className="hub-orb hub-orb-b" />
-        <div className="hub-orb hub-orb-c" />
-      </div>
-
       <SideNav />
 
       <div className="hub-main">
         <div className="hub-inner">
-          <section className="hub-hero" aria-labelledby="hub-hero-title">
-            <div className="hub-hero-inner">
-              <div className="hub-hero-copy">
-                <div className="hub-hero-kicker"><span className="hub-dot" />Team workspace</div>
-                <h1 id="hub-hero-title">Allworth Analytics Hub</h1>
-                <p className="hub-lede">
-                  The unified platform for performance, planning, and the reporting your team
-                  relies on to run the business.
-                </p>
-              </div>
-              <div className="hub-hero-actions">
-                <a className="hub-hero-btn" href="/reporting/kpi">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m13 6 6 6-6 6" /></svg>
-                  Open Performance
-                </a>
-                <a className="hub-hero-btn ghost" href="/jarvis/">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-                  Search Jarvis
-                </a>
-              </div>
+          <header className="hub-intro">
+            <p className="hub-eyebrow">Allworth workspace</p>
+            <h1>What do you need to do?</h1>
+            <div className="hub-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+              <input
+                ref={searchInput}
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Find a tool or report"
+                aria-label="Find a tool or report"
+              />
+              {!query && <kbd>/</kbd>}
             </div>
-            <div className="hub-hero-stats" aria-hidden="true">
-              <div className="hub-hero-stat">
-                <div className="label">Available</div>
-                <div className="value">{stats.available}</div>
-              </div>
-              <div className="hub-hero-stat">
-                <div className="label">In planning</div>
-                <div className="value">{stats.planning}</div>
-              </div>
-              <div className="hub-hero-stat">
-                <div className="label">Categories</div>
-                <div className="value">{stats.categories}</div>
-              </div>
-              <div className="hub-hero-stat">
-                <div className="label">Today</div>
-                <div className="value">{shortDate}<span className="hint">{now.getFullYear()}</span></div>
-              </div>
-            </div>
-          </section>
+            <p className="hub-availability">{query ? `${resultCount} matching ${resultCount === 1 ? 'tool' : 'tools'}` : `${availableCount} tools available to you`}</p>
+          </header>
 
-          {visibleSections.map((section) => {
-            const available = section.cards.filter((c) => c.href).length;
-            const planning = section.cards.filter((c) => !c.href).length;
-            return (
+          {availableSections.map((section) => (
               <div key={section.heading}>
                 <div className="hub-section-head">
                   <div>
                     <h2>{section.heading}</h2>
-                    <p>{section.blurb}</p>
                   </div>
-                  <span className="hub-count">
-                    {available} available{planning ? ` · ${planning} in planning` : ''}
-                  </span>
                 </div>
                 <div className="hub-card-grid">
                   {section.cards.map((card) => (
@@ -405,12 +442,29 @@ export default function Home() {
                   ))}
                 </div>
               </div>
-            );
-          })}
+          ))}
+
+          {query && resultCount === 0 && (
+            <div className="hub-empty">
+              <h2>No tools found</h2>
+              <p>Try a task, report name, or data source.</p>
+              <button type="button" onClick={() => { setQuery(''); searchInput.current?.focus(); }}>Clear search</button>
+            </div>
+          )}
+
+          {!query && planningCards.length > 0 && (
+            <details className="hub-planning">
+              <summary>In planning <span>{planningCards.length}</span></summary>
+              <div className="hub-card-grid">
+                {planningCards.map((card) => <Card key={card.id} card={card} />)}
+              </div>
+            </details>
+          )}
         </div>
 
         <div className="hub-footer">
-          <span>{longDate}</span>
+          <span><strong>Allworth Financial</strong></span>
+          <span>Internal workspace</span>
         </div>
       </div>
     </div>

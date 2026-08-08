@@ -1,39 +1,71 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap');
 
-/* ---------------------------------------------------------------------------
-   Global design tokens (ThoughtSpot palette) + root base.
-   Loaded once in main.tsx so every page and report shares the same theme.
-   Report-specific styling lives in each report's own stylesheet
-   (e.g. Reporting.css); put nothing report-specific here.
-   --------------------------------------------------------------------------- */
+/*
+ * Shared Allworth product foundation.
+ *
+ * The legacy --ts-* names remain as compatibility aliases for report styles,
+ * while new surfaces use the semantic --aw-* tokens. These values are drawn
+ * from the official November 2024 brand dashboard.
+ */
 :root {
-  --ts-primary: #1d1d1d;
-  --ts-accent: #4b7cf3;
-  --ts-accent-light: #e8f0fe;
-  --ts-bg: #ffffff;
-  --ts-bg-secondary: #f8f9fa;
-  --ts-surface: #ffffff;
-  --ts-border: #e8eaed;
-  --ts-border-light: #f1f3f4;
-  --ts-text-chart-header: #3b3b3b;
-  --ts-text-primary: #202124;
-  --ts-text-secondary: #5f6368;
-  --ts-text-muted: #666a6e;
-  --ts-success: #1e8e3e;
-  --ts-warning: #f9ab00;
-  --ts-danger: #d93025;
-  --ts-shadow-sm: 0 1px 2px 0 rgba(60, 64, 67, 0.1), 0 1px 3px 1px rgba(60, 64, 67, 0.08);
-  --ts-shadow-md: 0 1px 3px 0 rgba(60, 64, 67, 0.15), 0 4px 8px 3px rgba(60, 64, 67, 0.1);
-  --ts-radius: 8px;
+  --aw-indigo: #173d67;
+  --aw-cerulean: #3e71b7;
+  --aw-night: #0c2e4e;
+  --aw-sky: #289fda;
+  --aw-evergreen: #436434;
+  --aw-gold: #a99c6c;
+  --aw-pumpkin: #d26d37;
+  --aw-beige: #ebe9dd;
+  --aw-linen: #f3f2e5;
+  --aw-ice: #edf2f7;
+  --aw-feather: #f3f4f4;
+  --aw-ink: #171717;
+  --aw-ink-secondary: #595959;
+  --aw-ink-muted: #828282;
+  --aw-line: #e6e6e6;
+  --aw-surface: #ffffff;
+  --aw-focus: rgba(62, 113, 183, 0.22);
+  --aw-radius-sm: 6px;
+  --aw-radius: 10px;
+  --aw-radius-lg: 14px;
+  --aw-shadow: 0 12px 32px rgba(12, 46, 78, 0.08);
+  --aw-shadow-sm: 0 2px 8px rgba(12, 46, 78, 0.06);
+  --aw-font-display: 'Playfair Display', Georgia, serif;
+  --aw-font-body: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --aw-nav-width: 252px;
+
+  --ts-primary: var(--aw-night);
+  --ts-accent: var(--aw-cerulean);
+  --ts-accent-light: var(--aw-ice);
+  --ts-bg: var(--aw-surface);
+  --ts-bg-secondary: var(--aw-feather);
+  --ts-surface: var(--aw-surface);
+  --ts-border: var(--aw-line);
+  --ts-border-light: #f1f1f1;
+  --ts-text-chart-header: var(--aw-ink-secondary);
+  --ts-text-primary: var(--aw-ink);
+  --ts-text-secondary: var(--aw-ink-secondary);
+  --ts-text-muted: var(--aw-ink-muted);
+  --ts-success: var(--aw-evergreen);
+  --ts-warning: var(--aw-gold);
+  --ts-danger: #a63d35;
+  --ts-shadow-sm: var(--aw-shadow-sm);
+  --ts-shadow-md: var(--aw-shadow);
+  --ts-radius: var(--aw-radius);
 }
 
 #root {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  background: var(--ts-bg-secondary);
-  color: var(--ts-text-primary);
+  font-family: var(--aw-font-body);
+  background: var(--aw-feather);
+  color: var(--aw-ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+:focus-visible {
+  outline: 3px solid var(--aw-focus);
+  outline-offset: 2px;
 }

@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import './FeeCalculator.css';
+import SideNav from './components/SideNav';
 
 interface TierBreakdown {
   from: number;
@@ -1070,17 +1071,9 @@ const FeeCalculator = () => {
   };
 
   return (
-    <div className="fee-calc-page">
-      <div className="fee-calc-bg" aria-hidden="true">
-        <div className="fee-calc-orb fee-calc-orb-1" />
-        <div className="fee-calc-orb fee-calc-orb-2" />
-        <div className="fee-calc-orb fee-calc-orb-3" />
-      </div>
+    <div className="fee-calc-page has-sidenav">
+      <SideNav />
       <div className="fee-calc-container">
-      <a className="fee-calc-back" href="/">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-        Back to hub
-      </a>
       <header className="fee-calc-header">
         <h1>Fee Calculator</h1>
         <p className="fee-calc-subtitle">Tiered fee computation for new client pricing</p>
