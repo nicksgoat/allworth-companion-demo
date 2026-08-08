@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import './Tamarac2.css';
 import './Reporting.css';
-import type { KpiDataset, TrendPoint, TrendTarget, PredictionsPayload, ChannelProjection } from './types/kpi';
+import type { KpiDataset, TrendPoint, TrendTarget } from './types/kpi';
 import { KpiTile } from './components/KpiTile';
 import { ExpandableRow } from './components/ExpandableRow';
 import { TrendlineModal } from './components/TrendlineModal';
-import { ProjectionPanel, type ChannelPacing } from './components/ProjectionPanel';
 import {
   buildBucketDescriptors,
   aggregateEntries,
@@ -39,15 +38,12 @@ type ReportingProps = {
   metrics: KpiDataset;
   netFlowsMetrics: KpiDataset;
   detailedMetrics?: KpiDataset;
-  // Current-month EoM predictions (NCNM grid row + Net Flows column). Optional —
-  // when absent the tiles render exactly as before.
-  predictions?: PredictionsPayload;
   // While true, the page shell renders immediately and only the KPI matrix
   // shows a loading placeholder (data is still being fetched).
   isLoading?: boolean;
 };
 
-function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], predictions, isLoading = false }: ReportingProps) {
+function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], isLoading = false }: ReportingProps) {
   const [lastRefresh] = useState<Date>(new Date());
   const [yellowThreshold, setYellowThreshold] = useState(80);
   const [bucketMode, setBucketMode] = useState<BucketMode>('monthly');
@@ -93,21 +89,6 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], p
   // Whether the active bucket includes the (prorated) current month
   const isCurrentMonth = activeBucket?.includesCurrentMonth ?? false;
 
-  // Predictions are only meaningful for the current partial month, and (for v1)
-  // only in Monthly mode. In Quarterly/YTD the tiles render exactly as before.
-  const showPredictions =
-    predictions?.success !== false && bucketMode === 'monthly' && isCurrentMonth;
-
-  const gridNcnmProjection = useMemo(
-    () => new Map<string, ChannelProjection>(Object.entries(predictions?.grid_ncnm ?? {})),
-    [predictions],
-  );
-
-  const netFlowsProjection = useMemo(
-    () => new Map<string, ChannelProjection>(Object.entries(predictions?.net_flows ?? {})),
-    [predictions],
-  );
-
   // Aggregate the monthly-grained datasets into the active bucket
   const bucketMetrics = useMemo(
     () => aggregateEntries(metrics, memberPeriods, bucketKey),
@@ -133,34 +114,6 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], p
     });
     return map;
   }, [bucketMetrics]);
-
-  // Per-channel pacing rows for the projection panel below the matrix: the
-  // model's EoM projection (+ confidence) against the current-month NCNM plan,
-  // with the booked-so-far actual. Only built when predictions are in play.
-  const pacingRows = useMemo<ChannelPacing[]>(() => {
-    if (!showPredictions) return [];
-    const comps = predictions?.grid_components ?? {};
-    return CHANNELS.map((channel) => {
-      const entry = metricsMap.get(`NCNM-${channel}`);
-      const proj = gridNcnmProjection.get(channel);
-      if (!entry || !proj) return null;
-      const comp = comps[channel];
-      return {
-        channel,
-        actual: entry.actual,
-        projection: proj.projection,
-        low: proj.low,
-        high: proj.high,
-        goal: entry.goal ?? 0,
-        a: comp?.a ?? 0,
-        b: comp?.b ?? 0,
-        c: comp?.c ?? 0,
-        recruiting: comp?.recruiting ?? 0,
-        currency: entry.currency ?? 'USD',
-        unit: entry.unit ?? 'millions',
-      } as ChannelPacing;
-    }).filter((r): r is ChannelPacing => r !== null);
-  }, [showPredictions, metricsMap, gridNcnmProjection, predictions]);
 
   // Create a lookup map for Net Flows metrics
   const netFlowsMap = useMemo(() => {
@@ -230,33 +183,10 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], p
         py: entry.pyActual ?? null,
       });
     });
-    const series = Array.from(byPeriod.values())
+    return Array.from(byPeriod.values())
       .sort((a, b) => Date.parse(a.period) - Date.parse(b.period))
       .slice(-12);
-
-    // Overlay the current-month EoM projection onto the current-month point so
-    // the trendline ends on the projected value instead of the partial actual.
-    if (predictions?.success !== false) {
-      const label = predictions?.current_month_label;
-      let projValue: number | null = null;
-      if (!trendTarget.channelMiddle) {
-        if (trendTarget.metric === 'NCNM') {
-          projValue = gridNcnmProjection.get(trendTarget.channel)?.projection ?? null;
-        } else {
-          projValue = netFlowsProjection.get(trendTarget.metric)?.projection ?? null;
-        }
-      }
-      if (label && projValue != null) {
-        const point = series.find((p) => p.period === label);
-        if (point) {
-          point.actual = projValue;
-          point.projected = true;
-        }
-      }
-    }
-
-    return series;
-  }, [trendTarget, metrics, netFlowsMetrics, detailedMetrics, predictions, gridNcnmProjection, netFlowsProjection]);
+  }, [trendTarget, metrics, netFlowsMetrics, detailedMetrics]);
 
   return (
     <div className="t2-page">
@@ -278,7 +208,7 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], p
               </a>
               <span className="perf-kicker">Dashboard</span>
             </div>
-            <div className="perf-title"><h1>Growth KPIs</h1></div>
+            <div className="perf-title"><h1>Performance by Channel</h1></div>
             <p className="perf-tagline">
               KPI matrix for NCNM, Clients, Appointments and Leads across every
               acquisition channel — with plan, prior-year and prorated current-month values.
@@ -365,7 +295,6 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], p
               {NET_FLOW_METRICS.map((metric, index) => {
                 const entry = netFlowsMap.get(metric);
                 const displayName = NET_FLOW_DISPLAY_NAMES[metric] || metric;
-                const proj = showPredictions ? netFlowsProjection.get(metric) : undefined;
                 return (
                   <KpiTile 
                     key={metric}
@@ -374,9 +303,6 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], p
                     title={displayName}
                     yellowThreshold={yellowThreshold}
                     onShowTrendline={handleShowTrendline}
-                    projection={proj?.projection}
-                    projectionLow={proj?.low}
-                    projectionHigh={proj?.high}
                   />
                 );
               })}
@@ -394,18 +320,10 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], p
                   detailedMetricsMap={detailedMetricsMap}
                   yellowThreshold={yellowThreshold}
                   onShowTrendline={handleShowTrendline}
-                  ncnmProjection={showPredictions ? gridNcnmProjection.get(channel) : undefined}
                 />
               ))}
             </div>
           </div>
-        )}
-        {showPredictions && pacingRows.length > 0 && (
-          <ProjectionPanel
-            rows={pacingRows}
-            yellowThreshold={yellowThreshold}
-            asOfLabel={predictions?.current_month_label}
-          />
         )}
         {isCurrentMonth && (
           <p className="prorated-note">* PY and Plan values are prorated to reflect the current day of the month.</p>

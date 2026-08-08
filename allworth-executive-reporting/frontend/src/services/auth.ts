@@ -27,15 +27,6 @@ interface EasyAuthMe {
   provider_name?: string;
 }
 
-export interface AuthUserProfile {
-  email: string | null;
-  name: string | null;
-  provider: string | null;
-  authenticated: boolean;
-  ssoConfigured: boolean;
-  authAvailable: boolean;
-}
-
 // Paths served by the Flask backend that require an authenticated identity.
 // Anything else (static assets) is served by nginx and is not gated here.
 const BACKEND_PATH_PREFIXES = ['/api/', '/jarvis/', '/home/'];
@@ -43,7 +34,6 @@ const BACKEND_PATH_PREFIXES = ['/api/', '/jarvis/', '/home/'];
 // App Service Authentication platform endpoints (same-origin).
 const AUTH_ME_ENDPOINT = '/.auth/me';
 const AUTH_LOGIN_ENDPOINT = '/.auth/login/aad';
-const AUTH_LOGOUT_ENDPOINT = '/.auth/logout';
 
 // Build-time SSO switch.  The deploy workflows pass VITE_ENTRA_CLIENT_ID only
 // where SSO should be enforced (production).  The dev workflow leaves it empty,
@@ -139,19 +129,6 @@ function redirectToLogin(): Promise<never> {
   return new Promise<never>(() => {});
 }
 
-/** Navigate to the Easy Auth AAD login, returning to the current page after. */
-export function signIn(): void {
-  void redirectToLogin();
-}
-
-/** Sign out via Easy Auth and land back on the Home hub. */
-export function signOut(): void {
-  const url = `${AUTH_LOGOUT_ENDPOINT}?post_logout_redirect_uri=${encodeURIComponent(
-    '/',
-  )}`;
-  window.location.assign(url);
-}
-
 /** Initialize auth state.  Safe to call multiple times. */
 export async function initAuth(): Promise<void> {
   await loadMe();
@@ -210,32 +187,6 @@ export async function getIdToken(): Promise<string | null> {
 export async function resolveUserEmail(): Promise<string | null> {
   const account = await loadMe();
   return emailFromMe(account);
-}
-
-function nameFromMe(account: EasyAuthMe | null): string | null {
-  if (!account) return null;
-  const claims = account.user_claims ?? [];
-  const byType = (t: string): string | undefined =>
-    claims.find((c) => c.typ === t || c.typ.endsWith('/' + t))?.val;
-  const email = emailFromMe(account);
-  return (
-    byType('name') ||
-    byType('givenname') ||
-    (email ? email.split('@')[0].replace(/[._-]+/g, ' ') : null)
-  );
-}
-
-/** Resolve the signed-in user's profile from the Easy Auth identity. */
-export async function resolveUserProfile(): Promise<AuthUserProfile> {
-  const account = await loadMe();
-  return {
-    email: emailFromMe(account),
-    name: nameFromMe(account),
-    provider: account?.provider_name ?? null,
-    authenticated: Boolean(account),
-    ssoConfigured: isAuthConfigured(),
-    authAvailable,
-  };
 }
 
 /**

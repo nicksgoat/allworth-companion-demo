@@ -11,8 +11,7 @@
 #   label:     display name shown in the UI
 #   container: ADLS Gen2 filesystem/container (e.g. "silver")
 #   path:      path within the container (no leading/trailing slash)
-#   formats:   allowed download formats — subset of [csv, txt]; the first entry
-#              is the default selected in the UI's format dropdown
+#   formats:   allowed download formats — subset of [csv, txt]
 # =============================================================================
 
 roots:
@@ -20,50 +19,4 @@ roots:
     label: Reconciliation
     container: silver
     path: recon
-    formats: [txt, csv]
-
-# =============================================================================
-# Upload targets — data-lake landing zones users may push files into.
-# =============================================================================
-# Each target validates an uploaded file before writing it to ADLS Gen2. The
-# stored file is written as "<path>/<UTC-timestamp>_<original-name>" so repeated
-# uploads never overwrite each other.
-#
-# Schema per target:
-#   id:          required, unique slug
-#   label:       display name shown in the UI
-#   container:   ADLS Gen2 filesystem/container (e.g. "bronze")
-#   path:        landing directory within the container (no leading/trailing /)
-#   format:      required file type — currently only "csv"
-#   header_rows: 1-based rows the header may appear on; the file is valid if the
-#                header matches on ANY of them (data starts after the header row).
-#                A single-column row 1 (a title/banner) is skipped automatically.
-#   columns:     the exact, ordered header the file must contain. An entry may be
-#                a list to accept more than one spelling for that column, e.g.
-#                ``[Legal Entitiy name, Legal Entity name]``.
-# =============================================================================
-
-uploads:
-  - id: accounting-gl
-    label: Accounting GL File
-    container: bronze
-    path: gl_data/gl_raw
-    format: csv
-    header_rows: [1, 3]
-    columns:
-      - GL
-      - Description
-      - Posted dt.
-      - Doc dt.
-      - Doc
-      - Memo/Description
-      - Department name
-      - Vendor name
-      - [Legal Entitiy name, Legal Entity name]
-      - Location name
-      - Project name
-      - JNL
-      - Debit
-      - Credit
-      - Balance
-
+    formats: [csv, txt]

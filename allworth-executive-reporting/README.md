@@ -1,153 +1,271 @@
-# GitHub Actions Deployment
+# Allworth Executive Reporting
 
-This repository uses GitHub Actions to automatically build and deploy to Azure Web App on every push to `main`.
+A real-time executive reporting dashboard for tracking organic growth metrics and net flows across acquisition channels. Built with React + TypeScript frontend and Flask + Python backend, containerized with Docker, and connected to Azure Synapse.
 
-## Setup Instructions
+## Repository
 
-### 1. Azure Container Registry (ACR)
+**URL**: https://allworth.ghe.com/AllworthIntelligence/allworth-executive-reporting
 
-First, create an Azure Container Registry if you don't have one:
+| Branch | Description |
+|--------|-------------|
+| `main` | Production-ready code |
+| `dev` | Development and testing |
 
-```bash
-# Create ACR (if needed)
-az acr create \
-  --resource-group analytics-insights-westus \
-  --name allworthacr \
-  --sku Basic \
-  --admin-enabled true
+![Dashboard Preview](docs/dashboard-preview.png)
 
-# Get ACR credentials
-az acr credential show --name allworthacr
+## Features
+
+- **Real-time metrics** from Azure Synapse dedicated SQL pool
+- **Two data panels**:
+  - **Net Flows Column** (left): Net Flows, NCNM, ECNM, Distributions, Attrition
+  - **Organic Growth Grid** (right): NCNM, Clients, Appointments, Leads across channels
+- **Channel breakdown**: Total, Advisor Enabled, CRP, Paid Leads, Media
+- **Period comparison**: View current month vs prior months
+- **Pro-rated comparisons**: Current month values are pro-rated based on days elapsed
+- **Previous Year (PY) and Plan comparisons** for each metric
+
+## Architecture
+
+```
+┌─────────────┐         ┌─────────────┐         ┌──────────────┐
+│   Browser   │ ──────▶ │   Nginx     │ ──────▶ │    Flask     │
+│             │  :80    │  (Frontend) │  :5000  │   (Backend)  │
+└─────────────┘         └─────────────┘         └──────────────┘
+                              │                         │
+                              │                         │
+                         React App               Azure Synapse
+                         (TypeScript)            (SQL Server)
 ```
 
-### 2. Configure Azure Web App for Containers
+## Quick Start (Docker)
+
+### Prerequisites
+
+- Docker Desktop installed and running
+- Azure Synapse credentials (SQL auth or Service Principal)
+
+### 1. Configure Credentials
 
 ```bash
-# Enable multi-container support with docker-compose
-az webapp config container set \
-  --resource-group analytics-insights-westus \
-  --name allworth-executive-reporting \
-  --multicontainer-config-type compose \
-  --multicontainer-config-file docker-compose.azure.yml
+# Copy the example environment file
+cp .env.example .env
 
-# Enable container logging
-az webapp log config \
-  --resource-group analytics-insights-westus \
-  --name allworth-executive-reporting \
-  --docker-container-logging filesystem
+# Edit .env and add your credentials:
+# - For SQL Auth: SYNAPSE_USERNAME and SYNAPSE_PASSWORD
+# - For Service Principal: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID
 ```
 
-### 3. Set Up GitHub Secrets
-
-Go to your repository Settings → Secrets and variables → Actions, and add these secrets:
-
-#### Required Secrets:
-
-1. **ACR_USERNAME** - Azure Container Registry username
-   ```bash
-   az acr credential show --name allworthacr --query username -o tsv
-   ```
-
-2. **ACR_PASSWORD** - Azure Container Registry password
-   ```bash
-   az acr credential show --name allworthacr --query passwords[0].value -o tsv
-   ```
-
-3. **AZURE_CREDENTIALS** - Azure service principal credentials
-   ```bash
-   az ad sp create-for-rbac \
-     --name "github-actions-allworth-reporting" \
-     --role contributor \
-     --scopes /subscriptions/a9fc166f-1e2f-45f9-81d7-d721c141dd2d/resourceGroups/analytics-insights-westus \
-     --sdk-auth
-   ```
-   Copy the entire JSON output as the secret value.
-
-4. **AUTH_METHOD** - `SqlPassword` or `ServicePrincipal`
-
-5. **SYNAPSE_SERVER** - `allworthsynapse.sql.azuresynapse.net`
-
-6. **SYNAPSE_DATABASE** - `DataWarehouse`
-
-7. **SYNAPSE_USERNAME** - Your SQL admin username
-
-8. **SYNAPSE_PASSWORD** - Your SQL admin password
-
-9. **SF_USERNAME** - Salesforce integration username (used by SFP2)
-
-10. **SF_PASSWORD** - Salesforce integration password (used by SFP2)
-
-11. **SF_TOKEN** - Salesforce security token (used by SFP2)
-
-### 4. Update Workflow Configuration
-
-Edit `.github/workflows/azure-deploy.yml` and update:
-- `ACR_NAME` if your ACR has a different name
-- Any other environment-specific values
-
-### 5. Deploy
-
-Once secrets are configured, push to `main` branch:
+### 2. Build and Run
 
 ```bash
-git push origin main
+# Build and start all containers
+./build-local.sh
+
+# Or manually:
+docker-compose up -d
 ```
 
-The workflow will automatically:
-1. Build both Docker images (backend + frontend)
-2. Push images to Azure Container Registry
-3. Deploy to Azure Web App
-4. Configure application settings
+### 3. Access the Dashboard
 
-### 6. Monitor Deployment
+- **Frontend**: http://localhost
+- **Backend API**: http://localhost:5000/api/health
 
-- **GitHub Actions**: Check the Actions tab in GitHub
-- **Azure Portal**: Monitor deployment in Azure Web App deployment center
-- **Logs**: View container logs in Azure Portal or via CLI:
-  ```bash
-  az webapp log tail --name allworth-executive-reporting --resource-group analytics-insights-westus
-  ```
+### 4. View Logs
 
-## Manual Deployment
+```bash
+# All services
+docker-compose logs -f
 
-To manually trigger a deployment without pushing code:
+# Specific service
+docker-compose logs -f backend
+docker-compose logs -f frontend
+```
 
-1. Go to Actions tab in GitHub
-2. Select "Build and Deploy to Azure Web App"
-3. Click "Run workflow"
-4. Select `main` branch
-5. Click "Run workflow"
+### 5. Stop Containers
+
+```bash
+docker-compose down
+```
+
+## Local Development (Non-Docker)
+
+See [DOCKER_TESTING.md](DOCKER_TESTING.md) for alternative local development setup.
+
+## Local Preview (No Auth, No Backend)
+
+Use this when you just want to **view and update visual changes** to the
+dashboard without signing in or connecting to Synapse. It renders bundled demo
+data with Vite hot-reload.
+
+```bash
+cd frontend
+npm install
+npm run dev:demo
+```
+
+Then open the printed URL (default http://localhost:5173). Edits to
+`src/**` (e.g. `App.tsx`, `App.css`, `components/`) hot-reload instantly.
+
+- No Entra/SSO sign-in (`VITE_ENTRA_CLIENT_ID` is unset).
+- No Flask backend or Synapse connection required (data comes from
+  `src/data/demoMetrics.ts`).
+- Enabled by `VITE_DEMO_MODE=true` in `frontend/.env.demo` (loaded via
+  `vite --mode demo`).
+
+
+## Project Structure
+
+```
+allworth-executive-reporting/
+├── backend/
+│   ├── app.py              # Flask API server
+│   ├── requirements.txt    # Python dependencies
+│   ├── Dockerfile          # Backend container image
+│   └── .dockerignore       # Docker build exclusions
+├── frontend/
+│   ├── src/
+│   │   ├── App.tsx         # Main dashboard component
+│   │   ├── App.css         # Dashboard styles
+│   │   ├── main.tsx        # Bootstrap and data fetching
+│   │   ├── components/
+│   │   │   └── KpiTile.tsx # Individual KPI tile component
+│   │   ├── services/
+│   │   │   └── api.ts      # API client for backend
+│   │   └── types/
+│   │       └── kpi.ts      # TypeScript types
+│   ├── package.json        # Node dependencies
+│   ├── Dockerfile          # Frontend container image
+│   ├── nginx.conf          # Nginx configuration
+│   └── .dockerignore       # Docker build exclusions
+├── docker-compose.yml      # Multi-container orchestration
+├── build-local.sh          # Automated build script
+├── .env.example            # Environment template
+├── .gitignore              # Git exclusions
+├── DOCKER_TESTING.md       # Container testing guide
+├── CONTAINER_STATUS.md     # Container build status
+└── README.md
+```
+
+## API Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/health` | Health check |
+| `GET /api/all-metrics` | **Combined** — returns KPI, net flows, and detailed metrics in one response (preferred) |
+| `GET /api/kpi-metrics` | Organic growth metrics (NCNM, Clients, Appointments, Leads) |
+| `GET /api/net-flows` | Net flows metrics (Net Flows, NCNM, ECNM, Distributions, Attrition) |
+| `GET /api/kpi-metrics-detailed` | Detailed KPI metrics with channel_middle granularity |
+| `POST /api/cache-clear` | Force-clear the server-side response cache |
+| `POST /api/track` | Record a page-view event (fire-and-forget from frontend) |
+| `GET /api/analytics` | Page-view analytics summary (total views, unique visitors, daily breakdown) |
+| `* /api/nfbc/*` | **NFBC Adjustment Console** — Jira queue, household investigation, and write-capable NFBC flow adjustments (see below) |
+
+### NFBC Adjustment Console (`/nfbc`)
+
+A self-contained module for the Net Flows Bonus Calculation (NFBC) adjustment
+workflow: read an NFBC Jira ticket, auto-resolve the household(s), review the
+recommended flow adjustment, then **preview → confirm** the write into
+`tho.NFBC_Adjustment` and re-run the rollforward stored procedures so the
+advisor scorecard reflects the correction.
+
+- **UI**: React page at `/nfbc` (SSO-gated, styles scoped under `.nfbc-console`).
+- **Backend**: blueprint at `/api/nfbc` (`backend/nfbc/`). Reuses the shared
+  `get_database_connection()` pool and the global JWT middleware; writes go
+  through a 5-minute SHA-256 preview token. Physical table/column names are
+  resolved from the TML semantic-layer registry in `backend/nfbc/semantic_layer/`.
+- **Config**: requires `JIRA_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` in `backend/.env`
+  (see `.env.example`). Without them the page loads but the ticket queue is empty.
+
+Key endpoints (all under `/api/nfbc`): `GET /tickets`, `GET /resolve-ticket/<key>`,
+`GET /investigate/<avhhid>`, `POST /preview`, `POST /confirm`,
+`POST /rollforward`, `GET /audit`, and `POST|PUT|DELETE /adjustment`.
+
+## Data Sources
+
+### Organic Growth Metrics (`/api/kpi-metrics`)
+- **Source Tables**: `aip.goals_20260109`, `tho.Combined_Fact_Hashed`
+- **Metrics**: Leads, Appointments, New Clients, NCNM
+- **Channels**: Advisor Driven, CRP, Paid Leads, Radio, Other Media, Target Market (aggregated to Media)
+
+### Net Flows Metrics (`/api/net-flows`)
+- **Source Tables**: `tho.Household_Rollforward`, `aip.Goals_Net_Flows_2025`, `aip.DateDimension`
+- **Metrics**: Net Flows, NCNM, ECNM, Distributions, Attrition
+
+## Configuration
+
+### Backend Environment
+
+The backend connects to Azure Synapse using Azure AD Interactive authentication. Configure in `backend/app.py`:
+
+```python
+SERVER = 'allworthsynapse.sql.azuresynapse.net'
+DATABASE = 'DataWarehouse'
+```
+
+### Frontend Environment
+
+Create a `.env` file in the frontend directory:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+## Development
+
+### Running Tests
+
+```bash
+# Backend
+cd backend
+python -m pytest
+
+# Frontend
+cd frontend
+npm test
+```
+
+### Building for Production
+
+```bash
+# Frontend
+cd frontend
+npm run build
+```
 
 ## Troubleshooting
 
-### Check container status
+### Deployed Code Not Showing on Website
+If you push changes to the dev or main branch and the deployment succeeds but the website still shows old code:
+
+**Cause**: Azure Web Apps can cache Docker images even when new images are built with unique SHA tags.
+
+**Solution**: The deployment workflow now includes:
+1. `pull_policy: always` in the docker-compose configuration to force pulling fresh images
+2. An explicit restart step after deployment to ensure containers use the new images
+
+If issues persist, manually restart the web app in Azure Portal or run:
 ```bash
-az webapp show \
-  --name allworth-executive-reporting \
-  --resource-group analytics-insights-westus \
-  --query state
+# For dev slot
+az webapp restart --name allworth-executive-reporting --resource-group analytics-insights-westus --slot dev
+
+# For production
+az webapp restart --name allworth-executive-reporting --resource-group analytics-insights-westus
 ```
 
-### View container logs
-```bash
-az webapp log tail \
-  --name allworth-executive-reporting \
-  --resource-group analytics-insights-westus
-```
+### "Connection is busy with results for another command"
+This occurs when parallel requests hit Azure Synapse. The frontend fetches endpoints sequentially to avoid this.
 
-### Restart the app
-```bash
-az webapp restart \
-  --name allworth-executive-reporting \
-  --resource-group analytics-insights-westus
-```
+### Azure AD Authentication Popup Not Appearing
+1. Ensure you're logged into Azure AD
+2. Check your network connection
+3. Verify you have access to the DataWarehouse
+4. Try accessing Synapse in Azure Portal first
 
-## Web App Configuration
+### ODBC Driver Not Found
+Install ODBC Driver 17 for SQL Server:
+- Windows: [Download from Microsoft](https://docs.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server)
+- macOS: `brew install msodbcsql17`
 
-The workflow automatically configures these app settings:
-- `WEBSITES_ENABLE_APP_SERVICE_STORAGE=false`
-- `WEBSITES_PORT=80`
-- `DOCKER_ENABLE_CI=true`
-- Database connection settings (from secrets)
+## License
 
-Additional settings can be configured in the Azure Portal or added to the workflow.
+Internal use only - Allworth Financial

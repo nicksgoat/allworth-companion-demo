@@ -1,8 +1,15 @@
-"""Shared backend core — cross-cutting modules used by multiple tool packages.
+"""Shared infrastructure for the executive-reporting backend.
 
-Tool packages (backend/<tool>/) may import from ``core`` and from their own
-package only; they must not import from each other. app.py composes the tools.
+Feature packages (mailer, brief, nfbc, sfp2, catalog, admin, file_explorer)
+were each re-implementing the same three concerns: Synapse ODBC connections,
+Azure credential/Key Vault access, and the Microsoft Graph HTTP layer. Those
+now live here so there is a single, tested implementation of each.
 
-- ``core.auth_middleware`` — global JWT (Entra ID) validation middleware.
-- ``core.delta_reader`` — ADLS Gen2 Delta Lake reader (delta-rs).
+    from core import db            # build_conn_str(), connect()
+    from core import azure_auth    # storage_credential(), keyvault_client()/secret()
+    from core import graph         # GRAPH_BASE, call(), headers(), plain(), addr()
 """
+
+from __future__ import annotations
+
+__all__ = ["azure_auth", "db", "graph"]

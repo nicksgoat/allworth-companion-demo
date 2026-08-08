@@ -8,7 +8,6 @@ group/manager lookups are all mocked. Run from the backend/ directory:
 from __future__ import annotations
 
 import os
-from io import BytesIO
 
 import pandas as pd
 import pytest
@@ -30,14 +29,9 @@ def _isolate(monkeypatch, tmp_path):
     monkeypatch.setattr(shares, "_DIR", tmp_path)
     monkeypatch.setattr(shares, "_STATE", tmp_path / "shares.json")
     monkeypatch.setattr(routes, "_roots_cache", None)
-    monkeypatch.setattr(routes, "_uploads_cache", None)
     monkeypatch.setattr(routes, "_discovery_cache", {})
     # Default: two discovered tables under any root.
     monkeypatch.setattr(adls, "list_delta_tables", lambda c, p: ["cust_positions", "trade_recon"])
-    # Last-modified lookups are mocked so discovery never touches ADLS.
-    monkeypatch.setattr(
-        adls, "table_last_modified", lambda c, p, t: "2026-01-15T12:00:00Z"
-    )
 
 
 def _admin(monkeypatch, *, admins=(), groups=None, users=None, enforcement=True):
@@ -140,7 +134,6 @@ def test_manager_sees_everything(monkeypatch, client):
         "recon/trade_recon",
     }
     assert body["can_manage"] is True
-    assert all(x["last_modified"] == "2026-01-15T12:00:00Z" for x in body["resources"])
 
 
 # ── download conversion + access ─────────────────────────────────────────────
@@ -242,137 +235,3 @@ def test_principals_manager_only(monkeypatch, client):
     body = ok.get_json()
     assert body["users"] == ["sam@allworth.com"]
     assert body["groups"] == [{"id": "analysts", "name": "Analysts"}]
-
-
-# ── uploads (validation + storage) ───────────────────────────────────────────
-
-GL_COLUMNS = [
-    "GL", "Description", "Posted dt.", "Doc dt.", "Doc", "Memo/Description",
-    "Department name", "Vendor name", "Legal Entitiy name", "Location name",
-    "Project name", "JNL", "Debit", "Credit", "Balance",
-]
-
-# What GET /uploads reports: column 9 accepts either spelling.
-GL_COLUMNS_DISPLAY = GL_COLUMNS.copy()
-GL_COLUMNS_DISPLAY[8] = "Legal Entitiy name (or Legal Entity name)"
-
-
-def _gl_csv(header: list[str], *, lead_rows: int = 0) -> bytes:
-    lines = ["Report title,,," for _ in range(lead_rows)]
-    lines.append(",".join(header))
-    lines.append(",".join(["x"] * len(header)))  # one data row
-    return ("\n".join(lines) + "\n").encode("utf-8")
-
-
-def _gl_csv_titled(header: list[str]) -> bytes:
-    """A single-column title on row 1, blank row 2, real header on row 3."""
-    lines = ["Monthly GL Export", "", ",".join(header), ",".join(["x"] * len(header))]
-    return ("\n".join(lines) + "\n").encode("utf-8")
-
-
-def _capture_upload(monkeypatch):
-    captured: dict[str, Any] = {}
-
-    def _upload(container, path, filename, data):
-        captured.update(container=container, path=path, filename=filename, data=data)
-        return f"{path}/{filename}"
-
-    monkeypatch.setattr(adls, "upload_bytes", _upload)
-    return captured
-
-
-def _post_gl(client, email, content: bytes, name: str = "gl.csv"):
-    return client.post(
-        "/api/file-explorer/upload/accounting-gl",
-        data={"file": (BytesIO(content), name)},
-        content_type="multipart/form-data",
-        headers=_hdr(email),
-    )
-
-
-def test_uploads_listed_for_manager_only(monkeypatch, client):
-    _admin(monkeypatch, admins=["admin@allworth.com"], groups=[])
-    denied = client.get("/api/file-explorer/uploads", headers=_hdr("jane@allworth.com"))
-    body = denied.get_json()
-    assert body["can_manage"] is False and body["uploads"] == []
-    ok = client.get("/api/file-explorer/uploads", headers=_hdr("admin@allworth.com"))
-    data = ok.get_json()
-    assert data["can_manage"] is True
-    gl = next(u for u in data["uploads"] if u["id"] == "accounting-gl")
-    assert gl["label"] == "Accounting GL File"
-    assert gl["columns"] == GL_COLUMNS_DISPLAY
-
-
-def test_upload_manager_only(monkeypatch, client):
-    _admin(monkeypatch, groups=[])
-    _capture_upload(monkeypatch)
-    r = _post_gl(client, "jane@allworth.com", _gl_csv(GL_COLUMNS))
-    assert r.status_code == 403
-
-
-def test_upload_rejects_non_csv(monkeypatch, client):
-    _admin(monkeypatch, admins=["admin@allworth.com"], groups=[])
-    _capture_upload(monkeypatch)
-    r = _post_gl(client, "admin@allworth.com", _gl_csv(GL_COLUMNS), name="gl.xlsx")
-    assert r.status_code == 400
-    assert ".csv" in r.get_json()["error"]
-
-
-def test_upload_accepts_header_on_row_1(monkeypatch, client):
-    _admin(monkeypatch, admins=["admin@allworth.com"], groups=[])
-    captured = _capture_upload(monkeypatch)
-    r = _post_gl(client, "admin@allworth.com", _gl_csv(GL_COLUMNS))
-    assert r.status_code == 200
-    body = r.get_json()
-    assert body["success"] is True
-    assert captured["container"] == "bronze"
-    assert captured["path"] == "gl_data/gl_raw"
-    assert captured["filename"].endswith("_gl.csv")
-
-
-def test_upload_accepts_header_on_row_3(monkeypatch, client):
-    _admin(monkeypatch, admins=["admin@allworth.com"], groups=[])
-    captured = _capture_upload(monkeypatch)
-    r = _post_gl(client, "admin@allworth.com", _gl_csv(GL_COLUMNS, lead_rows=2))
-    assert r.status_code == 200
-    assert captured["path"] == "gl_data/gl_raw"
-
-
-def test_upload_rejects_wrong_column_count(monkeypatch, client):
-    _admin(monkeypatch, admins=["admin@allworth.com"], groups=[])
-    _capture_upload(monkeypatch)
-    r = _post_gl(client, "admin@allworth.com", _gl_csv(GL_COLUMNS[:-1]))
-    assert r.status_code == 422
-    err = r.get_json()["error"]
-    assert "Expected 15 columns" in err and "found 14" in err
-
-
-def test_upload_rejects_wrong_column_name(monkeypatch, client):
-    _admin(monkeypatch, admins=["admin@allworth.com"], groups=[])
-    _capture_upload(monkeypatch)
-    bad = GL_COLUMNS.copy()
-    bad[7] = "Vender name"  # column 8 misspelled
-    r = _post_gl(client, "admin@allworth.com", _gl_csv(bad))
-    assert r.status_code == 422
-    err = r.get_json()["error"]
-    assert "Column 8" in err
-    assert "Vendor name" in err and "Vender name" in err
-
-
-def test_upload_accepts_alternate_legal_entity_spelling(monkeypatch, client):
-    _admin(monkeypatch, admins=["admin@allworth.com"], groups=[])
-    captured = _capture_upload(monkeypatch)
-    alt = GL_COLUMNS.copy()
-    alt[8] = "Legal Entity name"  # accepted alternate for column 9
-    r = _post_gl(client, "admin@allworth.com", _gl_csv(alt))
-    assert r.status_code == 200
-    assert captured["path"] == "gl_data/gl_raw"
-
-
-def test_upload_skips_single_column_title_row(monkeypatch, client):
-    _admin(monkeypatch, admins=["admin@allworth.com"], groups=[])
-    captured = _capture_upload(monkeypatch)
-    r = _post_gl(client, "admin@allworth.com", _gl_csv_titled(GL_COLUMNS))
-    assert r.status_code == 200
-    assert captured["path"] == "gl_data/gl_raw"
-

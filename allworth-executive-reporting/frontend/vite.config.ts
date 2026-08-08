@@ -8,20 +8,6 @@ export default defineConfig({
   // limits class scanning via @source and ships no preflight, so it cannot
   // affect other tools' styles.
   plugins: [react(), tailwindcss()],
-  build: {
-    // Split the heavyweight vendor libraries into stable, cacheable chunks so
-    // a app-code deploy doesn't invalidate the MUI/recharts downloads and the
-    // first paint of non-planning pages doesn't pay for chart libraries.
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          react: ['react', 'react-dom', 'react-router-dom'],
-          mui: ['@mui/material', '@mui/icons-material'],
-          charts: ['recharts'],
-        },
-      },
-    },
-  },
   server: {
     proxy: {
       '/fee-calculator/api': 'http://127.0.0.1:5000',

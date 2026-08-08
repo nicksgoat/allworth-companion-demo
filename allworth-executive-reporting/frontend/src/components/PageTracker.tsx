@@ -11,7 +11,7 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { trackPageView } from '../services/api';
-import { isAuthConfigured, resolveUserEmail } from '../services/auth';
+import { resolveUserEmail } from '../services/auth';
 
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
@@ -32,48 +32,17 @@ export default function PageTracker() {
     if (DEMO_MODE) return; // no backend in the offline demo preview
     const first = firstRef.current;
     firstRef.current = false;
-
-    let cancelled = false;
-
-    const record = () => {
-      void resolveUserEmail()
-        .catch(() => null)
-        .then((email) => {
-          if (cancelled) return;
-          // SSO builds enforce sign-in, so a missing identity means the caller
-          // is unauthenticated (or an embed where identity can't be read).
-          // Skip it rather than record an unattributable "anonymous" view.
-          if (isAuthConfigured() && !email) return;
-          trackPageView({
-            isEmbedded,
-            // Only the initial load has a meaningful load time; omit it for
-            // subsequent client-side navigations.
-            loadTimeMs: first ? performance.now() - startRef.current : undefined,
-            userEmail: email ?? null,
-          });
+    void resolveUserEmail()
+      .catch(() => null)
+      .then((email) => {
+        trackPageView({
+          isEmbedded,
+          // Only the initial load has a meaningful load time; omit it for
+          // subsequent client-side navigations.
+          loadTimeMs: first ? performance.now() - startRef.current : undefined,
+          userEmail: email ?? null,
         });
-    };
-
-    // Don't record a view the user never saw: defer until the page is actually
-    // visible so background/prerendered tabs are only counted if viewed.
-    let onVisible: (() => void) | undefined;
-    if (document.visibilityState === 'visible') {
-      record();
-    } else {
-      onVisible = () => {
-        if (document.visibilityState === 'visible') {
-          document.removeEventListener('visibilitychange', onVisible!);
-          onVisible = undefined;
-          record();
-        }
-      };
-      document.addEventListener('visibilitychange', onVisible);
-    }
-
-    return () => {
-      cancelled = true;
-      if (onVisible) document.removeEventListener('visibilitychange', onVisible);
-    };
+      });
   }, [location.pathname]);
 
   return null;

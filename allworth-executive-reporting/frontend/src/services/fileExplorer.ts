@@ -15,7 +15,6 @@ export interface DownloadResource {
   root_id: string;
   root_label: string;
   formats: string[];
-  last_modified?: string | null;
 }
 
 export interface DownloadsResponse {
@@ -28,7 +27,7 @@ export interface ResourceTreeNode {
   label: string;
   type: 'dir';
   formats: string[];
-  tables: { id: string; label: string; type: 'table'; last_modified?: string | null }[];
+  tables: { id: string; label: string; type: 'table' }[];
   error?: string;
 }
 
@@ -43,23 +42,6 @@ export interface ShareEntry {
   principal_id: string;
   created_at?: string;
   created_by?: string;
-}
-
-export interface UploadTarget {
-  id: string;
-  label: string;
-  format: string;
-  columns: string[];
-}
-
-export interface UploadsResponse {
-  uploads: UploadTarget[];
-  can_manage: boolean;
-}
-
-export interface UploadResult {
-  stored: string;
-  filename: string;
 }
 
 // ── auth headers ─────────────────────────────────────────────────────────────
@@ -177,21 +159,6 @@ const realApi = {
     });
     await parseJson<{ ok: boolean }>(res);
   },
-  async getUploads(): Promise<UploadsResponse> {
-    const res = await fetch(`${API_BASE_URL}/file-explorer/uploads`, {
-      headers: { ...(await userHeaders()) },
-    });
-    return await parseJson<UploadsResponse>(res);
-  },
-  async uploadFile(targetId: string, file: File): Promise<UploadResult> {
-    const form = new FormData();
-    form.append('file', file);
-    const res = await fetch(
-      `${API_BASE_URL}/file-explorer/upload/${encodeURIComponent(targetId)}`,
-      { method: 'POST', headers: { ...(await userHeaders()) }, body: form }
-    );
-    return await parseJson<UploadResult>(res);
-  },
 };
 
 // ── demo store (offline preview) ─────────────────────────────────────────────
@@ -201,10 +168,10 @@ const DEMO_TREE: ResourceTreeNode[] = [
     id: 'recon',
     label: 'Reconciliation',
     type: 'dir',
-    formats: ['txt', 'csv'],
+    formats: ['csv', 'txt'],
     tables: [
-      { id: 'recon/cust_positions', label: 'cust_positions', type: 'table', last_modified: '2026-01-15T09:30:00Z' },
-      { id: 'recon/trade_recon', label: 'trade_recon', type: 'table', last_modified: '2026-01-14T22:05:00Z' },
+      { id: 'recon/cust_positions', label: 'cust_positions', type: 'table' },
+      { id: 'recon/trade_recon', label: 'trade_recon', type: 'table' },
     ],
   },
 ];
@@ -222,7 +189,6 @@ const demoApi: typeof realApi = {
           root_id: r.id,
           root_label: r.label,
           formats: r.formats,
-          last_modified: t.last_modified ?? null,
         }))
       ),
     };
@@ -275,26 +241,6 @@ const demoApi: typeof realApi = {
           s.principal_id === principalId
         )
     );
-  },
-  async getUploads() {
-    return {
-      can_manage: true,
-      uploads: [
-        {
-          id: 'accounting-gl',
-          label: 'Accounting GL File',
-          format: 'csv',
-          columns: [
-            'GL', 'Description', 'Posted dt.', 'Doc dt.', 'Doc', 'Memo/Description',
-            'Department name', 'Vendor name', 'Legal Entitiy name (or Legal Entity name)',
-            'Location name', 'Project name', 'JNL', 'Debit', 'Credit', 'Balance',
-          ],
-        },
-      ],
-    };
-  },
-  async uploadFile(_targetId, file) {
-    return { stored: `gl_data/gl_raw/demo_${file.name}`, filename: `demo_${file.name}` };
   },
 };
 

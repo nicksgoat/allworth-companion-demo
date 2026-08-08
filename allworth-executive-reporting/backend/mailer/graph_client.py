@@ -116,18 +116,16 @@ def _recipients(values: list[str] | None) -> list[dict[str, Any]]:
 # Raw operations (used by the friendly wrappers)
 # --------------------------------------------------------------------------- #
 def raw_send(token: str | None, mailbox: str | None, subject: str, body: str,
-             to: list[str], cc: list[str] | None, html_body: bool,
-             reply_to: list[str] | None = None) -> None:
-    message: dict[str, Any] = {
-        "subject": subject,
-        "body": {"contentType": "html" if html_body else "text", "content": body},
-        "toRecipients": _recipients(to),
-        "ccRecipients": _recipients(cc),
+             to: list[str], cc: list[str] | None, html_body: bool) -> None:
+    payload = {
+        "message": {
+            "subject": subject,
+            "body": {"contentType": "html" if html_body else "text", "content": body},
+            "toRecipients": _recipients(to),
+            "ccRecipients": _recipients(cc),
+        },
+        "saveToSentItems": True,
     }
-    reply_recipients = _recipients(reply_to)
-    if reply_recipients:
-        message["replyTo"] = reply_recipients
-    payload = {"message": message, "saveToSentItems": True}
     _request("POST", f"{_root(token, mailbox)}/sendMail", token, json=payload)
 
 

@@ -1,24 +1,20 @@
-import os
-import time
-from datetime import datetime
-from pathlib import Path
-from threading import Lock
-
-import pandas as pd
-import pyodbc
-from dateutil.relativedelta import relativedelta
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+import pandas as pd
+import pyodbc
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from threading import Lock
+import time
+import os
+from pathlib import Path
 
 # Load .env file for local development (ignored if file doesn't exist)
 try:
     from dotenv import load_dotenv
     # Load .env from the same directory as app.py
     env_path = Path(__file__).parent / '.env'
-    # override=True: the local .env is authoritative over stray shell exports
-    # (e.g. empty SYNAPSE_USERNAME= inherited from the IDE terminal). Deployed
-    # containers have no .env (.dockerignore), so this is local-dev only.
-    load_dotenv(env_path, override=True)
+    load_dotenv(env_path)
 except ImportError:
     pass  # python-dotenv not installed, use environment variables directly
 
@@ -31,14 +27,12 @@ except ImportError:
 # Optional: ADLS Gen2 Delta Lake reader (isolated from Synapse code path).
 # A failure here must not prevent the Synapse endpoints from booting.
 try:
-    from core.delta_reader import (
+    from delta_reader import (
+        read_delta_table,
+        get_schema as get_delta_schema,
+        TRANSFORMATION_LOG_PATH,
         DELTA_AVAILABLE,
         DELTA_IMPORT_ERROR,
-        TRANSFORMATION_LOG_PATH,
-        read_delta_table,
-    )
-    from core.delta_reader import (
-        get_schema as get_delta_schema,
     )
     print(f"🪵 Delta reader loaded (available={DELTA_AVAILABLE}) path={TRANSFORMATION_LOG_PATH}")
 except Exception as _delta_e:  # pragma: no cover - defensive
@@ -52,38 +46,12 @@ except Exception as _delta_e:  # pragma: no cover - defensive
 app = Flask(__name__)
 CORS(app)  # Enable CORS for React frontend
 
-# orjson response serialization — measurably faster than stdlib json for the
-# large planning projection / cockpit payloads. Falls back silently when the
-# optional dependency is missing.
-try:
-    import orjson
-    from flask.json.provider import JSONProvider
-
-    class ORJSONProvider(JSONProvider):
-        def dumps(self, obj, **kwargs):
-            return orjson.dumps(obj, default=str,
-                                option=orjson.OPT_NON_STR_KEYS).decode()
-
-        def loads(self, s, **kwargs):
-            return orjson.loads(s)
-
-    app.json = ORJSONProvider(app)
-    print("orjson JSON provider enabled")
-except ImportError:
-    pass
-
-# gzip/brotli compression for API responses (flask-compress is in requirements
-# but was never activated).
-if Compress is not None:
-    Compress(app)
-    print("Response compression enabled")
-
 # JWT validation middleware — must be installed BEFORE any blueprint registers
 # its own before_request hooks so the auth check runs first.  Configured via
 # ENTRA_TENANT_ID + ENTRA_CLIENT_ID env vars; bypassed entirely if either is
 # unset (logged as a warning) or if AUTH_DISABLE=1 (local dev).
 try:
-    from core.auth_middleware import install as install_auth_middleware
+    from auth_middleware import install as install_auth_middleware
     install_auth_middleware(app)
 except Exception as _auth_e:  # pragma: no cover - defensive
     print(f"⚠️  auth_middleware unavailable: {type(_auth_e).__name__}: {_auth_e}")
@@ -92,7 +60,6 @@ except Exception as _auth_e:  # pragma: no cover - defensive
 # Read-side: serves an HTML page + JSON API backed by YAMLs in backend/jarvis/knowledge/.
 # Write-side: the in-app editor writes YAMLs to the same dir and appends to .jarvis-history/events.jsonl.
 from jarvis.routes import bp as jarvis_bp
-
 app.register_blueprint(jarvis_bp, url_prefix="/jarvis")
 
 # Data Catalog — searchable, visual dictionary of the tho warehouse mounted at
@@ -108,7 +75,6 @@ except Exception as _catalog_e:  # pragma: no cover - defensive
 
 # Home — team hub / landing page mounted at /home
 from home.routes import bp as home_bp
-
 app.register_blueprint(home_bp, url_prefix="/home")
 
 # SFP2 schema manager — admin tool to diff bronze Delta tables vs live Salesforce
@@ -209,98 +175,15 @@ try:
 except Exception as _exec_e:  # pragma: no cover - defensive
     print(f"⚠️  Executive Report blueprint unavailable: {type(_exec_e).__name__}: {_exec_e}")
 
-# CRM — read-only Client 360 + Advisor book views over the Synapse warehouse
-try:
-    from crm.routes import bp as crm_bp
-    app.register_blueprint(crm_bp, url_prefix="/api/crm")
-    print("👥 CRM blueprint registered at /api/crm")
-except Exception as _crm_e:  # pragma: no cover - defensive
-    print(f"⚠️  CRM blueprint unavailable: {type(_crm_e).__name__}: {_crm_e}")
-
 # File Explorer — download (and later upload) data-lake files. Reuses the shared
 # JWT middleware; Delta tables are surfaced from ADLS Gen2 and shared per user or
 # per Admin-console group.
 try:
     from file_explorer.routes import bp as file_explorer_bp
     app.register_blueprint(file_explorer_bp, url_prefix="/api/file-explorer")
-    from file_explorer import shares as _file_explorer_shares
-    _file_explorer_shares.init_persistence()
     print("🗂️  File Explorer blueprint registered at /api/file-explorer")
 except Exception as _fe_e:  # pragma: no cover - defensive
     print(f"⚠️  File Explorer blueprint unavailable: {type(_fe_e).__name__}: {_fe_e}")
-
-# Investments — Bond Analyzer (bond ladder, account lookup, sample portfolio).
-# Ported from the investment_platform branch; blueprints declare their own
-# /api/* url_prefixes.
-try:
-    from investments.routers import (
-        account_analysis as _inv_account_analysis,
-    )
-    from investments.routers import (
-        accounts as _inv_accounts,
-    )
-    from investments.routers import (
-        bond_ladder as _inv_bond_ladder,
-    )
-    from investments.routers import (
-        dashboard as _inv_dashboard,
-    )
-    from investments.routers import (
-        sample_portfolio as _inv_sample_portfolio,
-    )
-    from investments.routers import (
-        upload as _inv_upload,
-    )
-    for _inv_mod in (
-        _inv_account_analysis, _inv_accounts, _inv_bond_ladder, _inv_dashboard,
-        _inv_sample_portfolio, _inv_upload,
-    ):
-        app.register_blueprint(_inv_mod.bp)
-    print("📈 Investments blueprints registered (bond analyzer)")
-    # Warm the bond-ladder cache + keep the DW pool alive to avoid cold-start stalls.
-    from investments import warmup as _inv_warmup
-    _inv_warmup.start()
-except Exception as _inv_e:  # pragma: no cover - defensive
-    print(f"⚠️  Investments blueprints unavailable: {type(_inv_e).__name__}: {_inv_e}")
-
-# Advisor Mailer — email-batch workflow (upload, preview, batch send) through
-# the shared Graph mailer.
-try:
-    from email_batch.routes import bp as email_batch_bp
-    app.register_blueprint(email_batch_bp)
-    print("📧 Advisor Mailer blueprint registered at /api/email-batch")
-except Exception as _eb_e:  # pragma: no cover - defensive
-    print(f"⚠️  Advisor Mailer blueprint unavailable: {type(_eb_e).__name__}: {_eb_e}")
-
-# Financial Planning — PlanEngine retirement/estate/tax planning module. Ported
-# from a standalone FastAPI app to a Flask blueprint; reuses the framework-
-# agnostic backend/planengine core and backend/planning services (thread-safe
-# in-memory store with optional Synapse persistence). Defensive import so a
-# missing optional dep (e.g. numpy/sqlalchemy) can't break the rest of the app.
-try:
-    from planning.routes import bp as planning_bp
-    app.register_blueprint(planning_bp, url_prefix="/api/v1")
-    print("📐 Financial Planning blueprint registered at /api/v1")
-except Exception as _plan_e:  # pragma: no cover - defensive
-    print(f"⚠️  Financial Planning blueprint unavailable: {type(_plan_e).__name__}: {_plan_e}")
-
-# Avantos — advisor operating console. Read-only cockpit aggregation over the
-# planning store, projection cache, and publication registry.
-try:
-    from avantos.routes import bp as avantos_bp
-    app.register_blueprint(avantos_bp, url_prefix="/api/avantos")
-    print("Avantos cockpit registered at /api/avantos")
-except Exception as _av_e:  # pragma: no cover - defensive
-    print(f"Avantos blueprint unavailable: {type(_av_e).__name__}: {_av_e}")
-
-# Mock Rebalancer — tax-transition what-if optimizer (engine vendored from
-# ProposalGen @ TaxToolDev). Read-only warehouse access, no trade submission.
-try:
-    from rebalancer.routes import bp as rebalancer_bp
-    app.register_blueprint(rebalancer_bp, url_prefix="/api/rebalancer")
-    print("Mock Rebalancer registered at /api/rebalancer")
-except Exception as _rb_e:  # pragma: no cover - defensive
-    print(f"Rebalancer blueprint unavailable: {type(_rb_e).__name__}: {_rb_e}")
 
 
 @app.after_request
@@ -414,21 +297,21 @@ def get_database_connection():
                 cursor.close()
                 print("♻️  Reusing existing connection")
                 return _connection_pool['conn']
-            except Exception:
-                print("Previous connection expired, reconnecting...")
+            except:
+                print("🔄 Previous connection expired, reconnecting...")
                 _connection_pool['conn'] = None
-
+        
         # Build connection string based on auth method
         print(f"🔐 Authenticating with method: {AUTH_METHOD}")
-
+        
         if AUTH_METHOD == 'ServicePrincipal':
             client_id = os.getenv('AZURE_CLIENT_ID')
             client_secret = os.getenv('AZURE_CLIENT_SECRET')
             tenant_id = os.getenv('AZURE_TENANT_ID')
-
+            
             if not all([client_id, client_secret, tenant_id]):
                 raise ValueError("Service Principal credentials not configured. Set AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, and AZURE_TENANT_ID")
-
+            
             conn_str = (
                 f'DRIVER={DRIVER};'
                 f'SERVER={SERVER};'
@@ -439,14 +322,14 @@ def get_database_connection():
                 f'Encrypt=yes;'
                 f'TrustServerCertificate=no'
             )
-
+            
         elif AUTH_METHOD == 'SqlPassword':
             username = os.getenv('SYNAPSE_USERNAME')
             password = os.getenv('SYNAPSE_PASSWORD')
-
+            
             if not all([username, password]):
                 raise ValueError("SQL credentials not configured. Set SYNAPSE_USERNAME and SYNAPSE_PASSWORD")
-
+            
             conn_str = (
                 f'DRIVER={DRIVER};'
                 f'SERVER={SERVER};'
@@ -456,7 +339,7 @@ def get_database_connection():
                 f'Encrypt=yes;'
                 f'TrustServerCertificate=no'
             )
-
+            
         elif AUTH_METHOD == 'ActiveDirectoryInteractive':
             print("⚠️  Interactive auth requires browser - only works locally, not in containers")
             conn_str = (
@@ -469,7 +352,7 @@ def get_database_connection():
             )
         else:
             raise ValueError(f"Unknown AUTH_METHOD: {AUTH_METHOD}. Use ServicePrincipal, SqlPassword, or ActiveDirectoryInteractive")
-
+        
         conn = pyodbc.connect(conn_str, timeout=30)
         # Bound every query on this connection (including the reuse liveness
         # check above) so a stale/half-open socket can't hang a request.
@@ -493,44 +376,44 @@ def get_kpi_metrics():
         print(f"Server: {SERVER}")
         print(f"Database: {DATABASE}")
         print("=" * 60)
-
+        
         conn = get_database_connection()
         print("✅ Connected to Synapse successfully!")
-
+        
         # Get current month and calculate days elapsed for pro-rating
         today = datetime.now()
         current_month_start = today.replace(day=1)
         days_in_month = (current_month_start + relativedelta(months=1) - relativedelta(days=1)).day
         days_elapsed = today.day
         prorate_factor = days_elapsed / days_in_month
-
+        
         print(f"📅 Today: {today.strftime('%Y-%m-%d')}, Days elapsed: {days_elapsed}/{days_in_month}, Prorate: {prorate_factor:.2f}")
-
+        
         query = """
         WITH CurrentData AS (
-            SELECT
+            SELECT 
                 g.Metric AS metric_name,
                 g.Channel AS channel,
                 g.Date AS raw_date,
                 FORMAT(g.Date, 'MMM yyyy') AS period,
                 COALESCE(SUM(cf.Actual), 0) AS actual_value,
                 MAX(g.Goal) AS goal_value,
-                CASE
+                CASE 
                     WHEN g.Metric = '4 - NCNM' THEN 'USD'
-                    ELSE NULL
+                    ELSE NULL 
                 END AS currency,
-                CASE
+                CASE 
                     WHEN g.Metric = '4 - NCNM' THEN 'millions'
                     ELSE 'count'
                 END AS unit
             FROM aip.goals_20260109 g
-            LEFT JOIN tho.Combined_Fact cf
+            LEFT JOIN tho.Combined_Fact cf 
                 ON cf.Goal_First_Touch_ID = g.Unique_ID
             WHERE g.Metric IN ('1 - Leads', '2 - Appointments Completed', '3 - New Clients', '4 - NCNM')
                 AND g.Date >= DATEADD(month, -15, GETDATE())
                 AND g.Date <= EOMONTH(GETDATE())
                 AND LOWER(g.Channel) IN ('advisor driven', 'advisor recruiting', 'beneficiary', 'referral', 'promoter', 'self-sourced', 'other', 'media driven', 'paid leads', 'crp', 'fidelity', 'schwab', 'radio', 'other media', 'target market')
-            GROUP BY
+            GROUP BY 
                 g.Metric,
                 g.Channel,
                 g.Date,
@@ -538,23 +421,23 @@ def get_kpi_metrics():
                 CASE WHEN g.Metric = '4 - NCNM' THEN 'millions' ELSE 'count' END
         ),
         PriorYearData AS (
-            SELECT
+            SELECT 
                 g.Metric AS metric_name,
                 g.Channel AS channel,
                 DATEADD(year, 1, g.Date) AS mapped_date,
                 COALESCE(SUM(cf.Actual), 0) AS py_actual_value
             FROM aip.goals_20260109 g
-            LEFT JOIN tho.Combined_Fact cf
+            LEFT JOIN tho.Combined_Fact cf 
                 ON cf.Goal_First_Touch_ID = g.Unique_ID
             WHERE g.Metric IN ('1 - Leads', '2 - Appointments Completed', '3 - New Clients', '4 - NCNM')
                 AND g.Date >= DATEADD(month, -27, GETDATE())
                 AND g.Date < DATEADD(month, -3, GETDATE())
-            GROUP BY
+            GROUP BY 
                 g.Metric,
                 g.Channel,
                 g.Date
         )
-        SELECT
+        SELECT 
             c.metric_name,
             c.channel,
             c.period,
@@ -565,32 +448,32 @@ def get_kpi_metrics():
             c.unit,
             COALESCE(py.py_actual_value, 0) AS py_actual_value
         FROM CurrentData c
-        LEFT JOIN PriorYearData py
-            ON c.metric_name = py.metric_name
+        LEFT JOIN PriorYearData py 
+            ON c.metric_name = py.metric_name 
             AND LOWER(c.channel) = LOWER(py.channel)
             AND c.raw_date = py.mapped_date
-        ORDER BY
+        ORDER BY 
             c.raw_date DESC,
             c.metric_name,
             c.channel
         """
-
+        
         print("🔍 Executing query...")
         df = pd.read_sql(query, conn)
-
+        
         print(f"✅ Query successful! Retrieved {len(df)} rows")
         print(f"📋 Channels from DB: {df['channel'].unique().tolist()}")
         print(f"📋 Metrics from DB: {df['metric_name'].unique().tolist()}")
-
+        
         # Map metric names to frontend names
         df['metric_name'] = df['metric_name'].map(METRIC_MAP).fillna(df['metric_name'])
-
+        
         # Map channel names to frontend names (case-insensitive)
         df['channel'] = df['channel'].str.lower().map(CHANNEL_MAP).fillna(df['channel'])
-
+        
         print(f"📋 Channels after mapping: {df['channel'].unique().tolist()}")
         print(f"📋 Metrics after mapping: {df['metric_name'].unique().tolist()}")
-
+        
         # Aggregate rows that map to the same channel
         df = df.groupby(['metric_name', 'channel', 'period']).agg({
             'actual_value': 'sum',
@@ -599,20 +482,20 @@ def get_kpi_metrics():
             'currency': 'first',
             'unit': 'first'
         }).reset_index()
-
+        
         print(f"📋 After channel aggregation: {len(df)} rows")
-
+        
         # Convert NCNM from dollars to millions
         mask = df['metric_name'] == 'NCNM'
         if mask.any():
             df.loc[mask, 'actual_value'] = df.loc[mask, 'actual_value'] / 1000000
             df.loc[mask, 'goal_value'] = df.loc[mask, 'goal_value'] / 1000000
             df.loc[mask, 'py_actual_value'] = df.loc[mask, 'py_actual_value'] / 1000000
-
+        
         # Prorate PY and goal for current month
         current_month_str = today.strftime('%b %Y')
         print(f"📅 Current month string: {current_month_str}, Prorate factor: {prorate_factor:.2f}")
-
+        
         is_current_month = df['period'] == current_month_str
         if is_current_month.any():
             df.loc[is_current_month, 'py_prorated'] = df.loc[is_current_month, 'py_actual_value'] * prorate_factor
@@ -621,10 +504,10 @@ def get_kpi_metrics():
         else:
             df['py_prorated'] = df['py_actual_value']
             df['goal_prorated'] = df['goal_value']
-
+        
         df.loc[~is_current_month, 'py_prorated'] = df.loc[~is_current_month, 'py_actual_value']
         df.loc[~is_current_month, 'goal_prorated'] = df.loc[~is_current_month, 'goal_value']
-
+        
         # Calculate totals per metric/period
         totals = df.groupby(['metric_name', 'period']).agg({
             'actual_value': 'sum',
@@ -636,33 +519,33 @@ def get_kpi_metrics():
             'unit': 'first'
         }).reset_index()
         totals['channel'] = 'Total'
-
+        
         print(f"📋 Totals calculated: {len(totals)} rows")
-
+        
         if 'raw_date' in df.columns:
             df = df.drop(columns=['raw_date'])
-
+        
         df = pd.concat([df, totals], ignore_index=True)
-
+        
         # Replace NaN with None for proper JSON serialization
         df = df.replace({pd.NA: None, float('nan'): None})
         import numpy as np
         df = df.replace({np.nan: None})
-
+        
         metrics = df.to_dict('records')
-
+        
         print(f"📤 Returning {len(metrics)} metrics to frontend (including totals)")
         print("=" * 60)
-
+        
         response_data = {
             'success': True,
             'data': metrics,
             'count': len(metrics)
         }
         _set_cached('kpi-metrics', response_data)
-
+        
         return jsonify(response_data)
-
+        
     except pyodbc.Error as db_error:
         error_msg = str(db_error)
         print("=" * 60)
@@ -675,7 +558,7 @@ def get_kpi_metrics():
             'details': error_msg,
             'help': 'Please ensure you are logged into Azure AD and have access to the Synapse DataWarehouse'
         }), 500
-
+        
     except Exception as e:
         error_msg = str(e)
         print("=" * 60)
@@ -839,7 +722,7 @@ def _build_kpi_metrics():
 
     query = """
     WITH CurrentData AS (
-        SELECT
+        SELECT 
             g.Metric AS metric_name,
             g.Channel AS channel,
             g.Date AS raw_date,
@@ -859,7 +742,7 @@ def _build_kpi_metrics():
                  CASE WHEN g.Metric='4 - NCNM' THEN 'millions' ELSE 'count' END
     ),
     PriorYearData AS (
-        SELECT
+        SELECT 
             g.Metric AS metric_name, g.Channel AS channel,
             DATEADD(year,1,g.Date) AS mapped_date,
             COALESCE(SUM(cf.Actual),0) AS py_actual_value
@@ -931,7 +814,7 @@ def _build_net_flows():
 
     query = """
     WITH ActualFlows AS (
-        SELECT
+        SELECT 
             DATEFROMPARTS(YEAR(CAST(d.Date AS date)),MONTH(CAST(d.Date AS date)),1) AS period_date,
             COALESCE(SUM(rf.NCNM),0) AS ncnm_actual,
             COALESCE(SUM(rf.ECNM),0) AS ecnm_actual,
@@ -945,7 +828,7 @@ def _build_net_flows():
         GROUP BY DATEFROMPARTS(YEAR(CAST(d.Date AS date)),MONTH(CAST(d.Date AS date)),1), g.Reporting_Period_Key
     ),
     PYFlows AS (
-        SELECT
+        SELECT 
             DATEADD(year,1,DATEFROMPARTS(YEAR(CAST(d.Date AS date)),MONTH(CAST(d.Date AS date)),1)) AS period_date,
             COALESCE(SUM(rf.NCNM),0) AS ncnm_py, COALESCE(SUM(rf.ECNM),0) AS ecnm_py,
             COALESCE(SUM(rf.Distribution),0) AS distributions_py, COALESCE(SUM(rf.Attrition),0) AS attrition_py,
@@ -1027,7 +910,7 @@ def _build_detailed_metrics():
 
     query = """
     WITH CurrentData AS (
-        SELECT
+        SELECT 
             g.Metric AS metric_name, g.Channel AS channel_middle,
             g.Date AS raw_date, FORMAT(g.Date,'MMM yyyy') AS period,
             COALESCE(SUM(cf.Actual),0) AS actual_value, MAX(g.Goal) AS goal_value,
@@ -1093,146 +976,12 @@ def _build_detailed_metrics():
     return result
 
 
-def _build_flows_forecast():
-    """Internal helper: current-month EoM predictions for the NCNM grid row and
-    the Net Flows column.
-
-    Two prediction methods, blended into one payload (all values in $millions to
-    match the existing tiles):
-
-    * NCNM  — the 3-component pipeline model (``executive_report.ncnm_model``),
-      per display channel plus a firm Total, with a p25/p75 confidence band.
-      Advisor Recruiting (excluded from the model) is folded 1:1 into the
-      Advisor Enabled and Total projections so the projection is comparable to
-      the tab's recruiting-inclusive actuals.
-    * ECNM / Distributions / Attrition / expenses — the monthly flows model
-      (``executive_report.flows_model``). ECNM and Distributions are a blend of a
-      seasonal-trend on each channel's history and a TAV-band funding-cycle
-      (channelized like the NCNM model); Attrition and expenses use a firm-total
-      seasonal-trend. All history is COMPLETE months only, so the partial
-      in-progress rollforward load never distorts the estimate.
-
-    Net Flows prediction = NCNM(model) + ECNM + Distributions + Attrition +
-    expenses (signed sum; outflows are already negative). Cached like the other
-    builders; wrapped by ``_safe_build`` at the endpoint so any failure hides the
-    predictions rather than breaking the tab.
-    """
-    cached = _get_cached('flows-forecast')
-    if cached is not None:
-        return cached
-
-    from executive_report import ncnm_model, flows_model
-
-    conn = get_database_connection()
-    M = 1_000_000.0
-
-    # --- NCNM pipeline model (forward-looking, raw dollars) ---
-    nc = ncnm_model.compute_forecast(conn, months_n=1)
-    recruit_mtd = float((nc.get('recruiting') or {}).get('mtd') or 0.0)
-
-    grp_to_tab = {
-        'Advisor Driven': 'Advisor Enabled',
-        'CRP': 'CRP',
-        'Media Driven': 'Media',
-        'Paid Leads': 'Paid Leads',
-    }
-    grid: dict[str, dict[str, float]] = {}
-    for row in nc.get('by_channel', []):
-        tab = grp_to_tab.get(row.get('channel'))
-        if not tab:
-            continue
-        g = grid.setdefault(tab, {'projection': 0.0, 'low': 0.0, 'high': 0.0})
-        g['projection'] += float(row.get('projection') or 0) / M
-        g['low'] += float(row.get('p25') or 0) / M
-        g['high'] += float(row.get('p75') or 0) / M
-
-    # Advisor Recruiting folds into Advisor Enabled (and the Total below).
-    ae = grid.setdefault('Advisor Enabled', {'projection': 0.0, 'low': 0.0, 'high': 0.0})
-    ae['projection'] += recruit_mtd / M
-    ae['low'] += recruit_mtd / M
-    ae['high'] += recruit_mtd / M
-
-    conf = nc.get('confidence') or {}
-    eom = float(nc.get('eom_projection') or 0)
-    grid['Total'] = {
-        'projection': (eom + recruit_mtd) / M,
-        'low': (float(conf.get('low') or 0) + recruit_mtd) / M,
-        'high': (float(conf.get('high') or 0) + recruit_mtd) / M,
-    }
-
-    # --- Monthly flows model: ECNM / Distributions / Attrition / expenses ---
-    # Predicts the full current month from COMPLETE-month history only (seasonal
-    # trend + TAV-band funding-cycle, channelized like the NCNM model), so the
-    # partial in-progress rollforward load never distorts the estimate.
-    fm = flows_model.compute_flows_forecast(conn)
-    ecnm_pred = float(fm['ecnm']['total']) / M
-    dist_pred = float(fm['distributions']['total']) / M
-    attr_pred = float(fm['attrition']['total']) / M
-    exp_pred = float(fm['expenses']['total']) / M
-
-    ncnm_total = grid['Total']
-    net_flows_proj = (
-        ncnm_total['projection'] + ecnm_pred + dist_pred + attr_pred + exp_pred
-    )
-
-    net_flows = {
-        'Net Flows':     {'projection': net_flows_proj},
-        'NCNM_NF':       {'projection': ncnm_total['projection'],
-                          'low': ncnm_total['low'], 'high': ncnm_total['high']},
-        'ECNM':          {'projection': ecnm_pred},
-        'Distributions': {'projection': dist_pred},
-        'Attrition':     {'projection': attr_pred},
-    }
-
-    # --- Per-channel model-bucket composition (A/B/C) for the diagnosis ---
-    # component_detail carries each bucket's expected NCNM per model channel; roll
-    # it up to the tab channels so the frontend can show which bucket (Tail
-    # Funding / Unfunded Closes / Active Pipeline) is short of plan. Recruiting is
-    # booked NCNM outside the A/B/C model, tracked separately as "committed".
-    detail = nc.get('component_detail') or {}
-    comp_by_tab: dict[str, dict[str, float]] = {}
-    for letter in ('A', 'B', 'C'):
-        for row in detail.get(letter, []):
-            tab = grp_to_tab.get(row.get('channel'))
-            if not tab:
-                continue
-            d = comp_by_tab.setdefault(tab, {'a': 0.0, 'b': 0.0, 'c': 0.0, 'recruiting': 0.0})
-            d[letter.lower()] += float(row.get('expected_ncnm') or 0) / M
-
-    grid_components: dict[str, dict[str, float]] = {}
-    total_c = {'a': 0.0, 'b': 0.0, 'c': 0.0, 'recruiting': 0.0}
-    for tab, d in comp_by_tab.items():
-        grid_components[tab] = {'a': d['a'], 'b': d['b'], 'c': d['c'], 'recruiting': 0.0}
-        for k in ('a', 'b', 'c'):
-            total_c[k] += d[k]
-    # Advisor Recruiting folds into Advisor Enabled + Total as committed NCNM.
-    ae_comp = grid_components.setdefault('Advisor Enabled', {'a': 0.0, 'b': 0.0, 'c': 0.0, 'recruiting': 0.0})
-    ae_comp['recruiting'] = recruit_mtd / M
-    total_c['recruiting'] = recruit_mtd / M
-    grid_components['Total'] = total_c
-
-    # Current-month anchor for the payload labels (the flows model targets the
-    # current calendar month, e.g. "2026-08").
-    anchor_dt = datetime.strptime(fm['target_ym'], '%Y-%m')
-
-    result = {
-        'success': True,
-        'as_of_period': anchor_dt.strftime('%Y-%m'),
-        'current_month_label': anchor_dt.strftime('%b %Y'),
-        'grid_ncnm': grid,
-        'grid_components': grid_components,
-        'net_flows': net_flows,
-    }
-    _set_cached('flows-forecast', result)
-    return result
-
-
 @app.route('/api/all-metrics', methods=['GET'])
 def get_all_metrics():
     """
-    Combined endpoint – returns kpi-metrics, net-flows, detailed metrics, and
-    current-month predictions in a single HTTP response.  This eliminates
-    sequential HTTP round-trips from the frontend.
+    Combined endpoint – returns kpi-metrics, net-flows, and detailed metrics
+    in a single HTTP response.  This eliminates 3 sequential HTTP round-trips
+    from the frontend.
 
     Queries run sequentially on the shared Synapse connection to avoid
     "connection busy" errors, but the server-side cache means most requests
@@ -1248,14 +997,12 @@ def get_all_metrics():
     kpi = _safe_build('kpiMetrics', _build_kpi_metrics)
     nf  = _safe_build('netFlows', _build_net_flows)
     det = _safe_build('detailedMetrics', _build_detailed_metrics)
-    pred = _safe_build('predictions', _build_flows_forecast)
 
     return jsonify({
         'success': True,
         'kpiMetrics': kpi,
         'netFlows': nf,
         'detailedMetrics': det,
-        'predictions': pred,
     })
 
 
@@ -1310,41 +1057,41 @@ def get_kpi_metrics_detailed():
         print("=" * 60)
         print("📊 Fetching detailed KPI metrics (channel_middle)...")
         print("=" * 60)
-
+        
         conn = get_database_connection()
-
+        
         today = datetime.now()
         current_month_start = today.replace(day=1)
         days_in_month = (current_month_start + relativedelta(months=1) - relativedelta(days=1)).day
         days_elapsed = today.day
         prorate_factor = days_elapsed / days_in_month
-
+        
         # Query returns non-aggregated channel data
         query = """
         WITH CurrentData AS (
-            SELECT
+            SELECT 
                 g.Metric AS metric_name,
                 g.Channel AS channel_middle,
                 g.Date AS raw_date,
                 FORMAT(g.Date, 'MMM yyyy') AS period,
                 COALESCE(SUM(cf.Actual), 0) AS actual_value,
                 MAX(g.Goal) AS goal_value,
-                CASE
+                CASE 
                     WHEN g.Metric = '4 - NCNM' THEN 'USD'
-                    ELSE NULL
+                    ELSE NULL 
                 END AS currency,
-                CASE
+                CASE 
                     WHEN g.Metric = '4 - NCNM' THEN 'millions'
                     ELSE 'count'
                 END AS unit
             FROM aip.goals_20260109 g
-            LEFT JOIN tho.Combined_Fact cf
+            LEFT JOIN tho.Combined_Fact cf 
                 ON cf.Goal_First_Touch_ID = g.Unique_ID
             WHERE g.Metric IN ('1 - Leads', '2 - Appointments Completed', '3 - New Clients', '4 - NCNM')
                 AND g.Date >= DATEADD(month, -15, GETDATE())
                 AND g.Date <= EOMONTH(GETDATE())
                 AND LOWER(g.Channel) IN ('advisor driven', 'advisor recruiting', 'beneficiary', 'referral', 'promoter', 'self-sourced', 'other', 'media driven', 'paid leads', 'crp', 'fidelity', 'schwab', 'radio', 'other media', 'target market')
-            GROUP BY
+            GROUP BY 
                 g.Metric,
                 g.Channel,
                 g.Date,
@@ -1352,23 +1099,23 @@ def get_kpi_metrics_detailed():
                 CASE WHEN g.Metric = '4 - NCNM' THEN 'millions' ELSE 'count' END
         ),
         PriorYearData AS (
-            SELECT
+            SELECT 
                 g.Metric AS metric_name,
                 g.Channel AS channel_middle,
                 DATEADD(year, 1, g.Date) AS mapped_date,
                 COALESCE(SUM(cf.Actual), 0) AS py_actual_value
             FROM aip.goals_20260109 g
-            LEFT JOIN tho.Combined_Fact cf
+            LEFT JOIN tho.Combined_Fact cf 
                 ON cf.Goal_First_Touch_ID = g.Unique_ID
             WHERE g.Metric IN ('1 - Leads', '2 - Appointments Completed', '3 - New Clients', '4 - NCNM')
                 AND g.Date >= DATEADD(month, -27, GETDATE())
                 AND g.Date < DATEADD(month, -3, GETDATE())
-            GROUP BY
+            GROUP BY 
                 g.Metric,
                 g.Channel,
                 g.Date
         )
-        SELECT
+        SELECT 
             c.metric_name,
             c.channel_middle,
             c.period,
@@ -1379,30 +1126,30 @@ def get_kpi_metrics_detailed():
             c.unit,
             COALESCE(py.py_actual_value, 0) AS py_actual_value
         FROM CurrentData c
-        LEFT JOIN PriorYearData py
-            ON c.metric_name = py.metric_name
+        LEFT JOIN PriorYearData py 
+            ON c.metric_name = py.metric_name 
             AND LOWER(c.channel_middle) = LOWER(py.channel_middle)
             AND c.raw_date = py.mapped_date
-        ORDER BY
+        ORDER BY 
             c.raw_date DESC,
             c.metric_name,
             c.channel_middle
         """
-
+        
         print("🔍 Executing detailed query...")
         df = pd.read_sql(query, conn)
-
+        
         print(f"✅ Query successful! Retrieved {len(df)} rows")
-
+        
         # Map metric names to frontend names
         df['metric_name'] = df['metric_name'].map(METRIC_MAP).fillna(df['metric_name'])
-
+        
         # Add parent channel column
         df['channel'] = df['channel_middle'].str.lower().map(CHANNEL_PARENT_MAP).fillna(df['channel_middle'])
-
+        
         # Format channel_middle display names
         df['channel_middle'] = df['channel_middle'].str.lower().map(CHANNEL_MIDDLE_DISPLAY).fillna(df['channel_middle'])
-
+        
         # Aggregate by channel_middle (in case of duplicates)
         df = df.groupby(['metric_name', 'channel', 'channel_middle', 'period']).agg({
             'actual_value': 'sum',
@@ -1411,14 +1158,14 @@ def get_kpi_metrics_detailed():
             'currency': 'first',
             'unit': 'first'
         }).reset_index()
-
+        
         # Convert NCNM from dollars to millions
         mask = df['metric_name'] == 'NCNM'
         if mask.any():
             df.loc[mask, 'actual_value'] = df.loc[mask, 'actual_value'] / 1000000
             df.loc[mask, 'goal_value'] = df.loc[mask, 'goal_value'] / 1000000
             df.loc[mask, 'py_actual_value'] = df.loc[mask, 'py_actual_value'] / 1000000
-
+        
         # Prorate PY and goal for current month
         current_month_str = today.strftime('%b %Y')
         is_current_month = df['period'] == current_month_str
@@ -1428,32 +1175,32 @@ def get_kpi_metrics_detailed():
         else:
             df['py_prorated'] = df['py_actual_value']
             df['goal_prorated'] = df['goal_value']
-
+        
         df.loc[~is_current_month, 'py_prorated'] = df.loc[~is_current_month, 'py_actual_value']
         df.loc[~is_current_month, 'goal_prorated'] = df.loc[~is_current_month, 'goal_value']
-
+        
         if 'raw_date' in df.columns:
             df = df.drop(columns=['raw_date'])
-
+        
         # Replace NaN with None
         df = df.replace({pd.NA: None, float('nan'): None})
         import numpy as np
         df = df.replace({np.nan: None})
-
+        
         metrics = df.to_dict('records')
-
+        
         print(f"📤 Returning {len(metrics)} detailed metrics")
         print("=" * 60)
-
+        
         response_data = {
             'success': True,
             'data': metrics,
             'count': len(metrics)
         }
         _set_cached('kpi-metrics-detailed', response_data)
-
+        
         return jsonify(response_data)
-
+        
     except Exception as e:
         error_msg = str(e)
         print(f"❌ Detailed Metrics Error: {error_msg}")
@@ -1476,38 +1223,38 @@ def get_net_flows():
         print("📊 Fetching Net Flows data from Synapse...")
         print(f"📅 Server time: {datetime.now().isoformat()}")
         print("=" * 60)
-
+        
         conn = get_database_connection()
         print("✅ Database connection acquired for net-flows")
-
+        
         today = datetime.now()
         current_month_start = today.replace(day=1)
         days_in_month = (current_month_start + relativedelta(months=1) - relativedelta(days=1)).day
         days_elapsed = today.day
         prorate_factor = days_elapsed / days_in_month
-
+        
         query = """
         WITH ActualFlows AS (
-            SELECT
+            SELECT 
                 DATEFROMPARTS(YEAR(CAST(d.Date AS date)), MONTH(CAST(d.Date AS date)), 1) AS period_date,
                 COALESCE(SUM(rf.NCNM), 0) AS ncnm_actual,
                 COALESCE(SUM(rf.ECNM), 0) AS ecnm_actual,
                 COALESCE(SUM(rf.Distribution), 0) AS distributions_actual,
                 COALESCE(SUM(rf.Attrition), 0) AS attrition_actual,
                 COALESCE(SUM(
-                    ISNULL(rf.NCNM, 0) + ISNULL(rf.ECNM, 0) +
+                    ISNULL(rf.NCNM, 0) + ISNULL(rf.ECNM, 0) + 
                     ISNULL(rf.Distribution, 0) + ISNULL(rf.Attrition, 0) + ISNULL(rf.expenses, 0)
                 ), 0) AS net_flows_actual,
                 g.Reporting_Period_Key
             FROM tho.Household_Rollforward rf
             LEFT OUTER JOIN aip.DateDimension d ON rf.Reporting_Period_Key = d.DateKey
             JOIN aip.Goals_Net_Flows_2025 g ON rf.EOMONTH_Key = g.Reporting_Period_Key
-            GROUP BY
+            GROUP BY 
                 DATEFROMPARTS(YEAR(CAST(d.Date AS date)), MONTH(CAST(d.Date AS date)), 1),
                 g.Reporting_Period_Key
         ),
         PYFlows AS (
-            SELECT
+            SELECT 
                 /* Shift PY month forward 1 year so it aligns with the current-year period */
                 DATEADD(year, 1, DATEFROMPARTS(YEAR(CAST(d.Date AS date)), MONTH(CAST(d.Date AS date)), 1)) AS period_date,
                 COALESCE(SUM(rf.NCNM), 0) AS ncnm_py,
@@ -1524,11 +1271,11 @@ def get_net_flows():
                   >= DATEADD(month, -15, DATEADD(year, -1, GETDATE()))
               AND DATEFROMPARTS(YEAR(CAST(d.Date AS date)), MONTH(CAST(d.Date AS date)), 1)
                   <= EOMONTH(DATEADD(year, -1, GETDATE()))
-            GROUP BY
+            GROUP BY 
                 DATEADD(year, 1, DATEFROMPARTS(YEAR(CAST(d.Date AS date)), MONTH(CAST(d.Date AS date)), 1))
         ),
         GoalFlows AS (
-            SELECT
+            SELECT 
                 Reporting_Period_Key,
                 COALESCE(SUM(NCNM), 0) AS ncnm_goal,
                 COALESCE(SUM(ECNM), 0) AS ecnm_goal,
@@ -1538,7 +1285,7 @@ def get_net_flows():
             FROM aip.Goals_Net_Flows_2025
             GROUP BY Reporting_Period_Key
         )
-        SELECT
+        SELECT 
             a.period_date,
             FORMAT(a.period_date, 'MMM yyyy') AS period,
             COALESCE(SUM(a.ncnm_actual), 0) AS ncnm_actual,
@@ -1564,17 +1311,17 @@ def get_net_flows():
         GROUP BY a.period_date
         ORDER BY a.period_date DESC
         """
-
+        
         print("🔍 Executing Net Flows query...")
         query_start = datetime.now()
         df = pd.read_sql(query, conn)
         query_duration = (datetime.now() - query_start).total_seconds()
         print(f"✅ Net Flows query successful! Retrieved {len(df)} rows in {query_duration:.2f}s")
-
+        
         if len(df) > 0:
             print(f"📋 Columns: {df.columns.tolist()}")
             print(f"📋 Periods: {df['period'].tolist() if 'period' in df.columns else 'N/A'}")
-
+        
         if len(df) == 0:
             print("⚠️ No data returned from Net Flows query")
             return jsonify({
@@ -1582,10 +1329,10 @@ def get_net_flows():
                 'data': [],
                 'count': 0
             })
-
+        
         current_month_str = today.strftime('%b %Y')
         results = []
-
+        
         net_flow_metrics = [
             ('Net Flows', 'net_flows_actual', 'net_flows_goal', 'net_flows_py'),
             ('NCNM_NF', 'ncnm_actual', 'ncnm_goal', 'ncnm_py'),
@@ -1593,16 +1340,16 @@ def get_net_flows():
             ('Distributions', 'distributions_actual', 'distributions_goal', 'distributions_py'),
             ('Attrition', 'attrition_actual', 'attrition_goal', 'attrition_py'),
         ]
-
+        
         for _, row in df.iterrows():
             period = row['period']
             is_current = period == current_month_str
-
+            
             for metric_name, actual_col, goal_col, py_col in net_flow_metrics:
                 actual = float(row[actual_col]) / 1000000
                 goal = float(row[goal_col]) / 1000000
                 py_actual = float(row[py_col]) / 1000000
-
+                
                 results.append({
                     'metric_name': metric_name,
                     'channel': 'Total',
@@ -1615,18 +1362,18 @@ def get_net_flows():
                     'currency': 'USD',
                     'unit': 'millions'
                 })
-
+        
         print(f"📤 Returning {len(results)} Net Flows metrics")
-
+        
         response_data = {
             'success': True,
             'data': results,
             'count': len(results)
         }
         _set_cached('net-flows', response_data)
-
+        
         return jsonify(response_data)
-
+        
     except Exception as e:
         error_msg = str(e)
         import traceback
@@ -1869,13 +1616,6 @@ def track_page_view():
         if not user_email:
             user_email = data.get('userEmail')
 
-        # In prod, SSO is enforced, so a view we can't attribute to a user is
-        # unauthenticated/embedded traffic that only shows up as "anonymous" on
-        # the App Usage page. Don't record it. Dev traffic is unauthenticated by
-        # design, so keep recording it there.
-        if not user_email and _site_env() == 'prod':
-            return jsonify({'success': True, 'skipped': 'no_identity'}), 202
-
         event = {
             'timestamp': datetime.utcnow(),
             'page': data.get('page', '/'),
@@ -1925,11 +1665,7 @@ _TOOL_ROUTES = [
     ('/nfbc', 'nfbc', 'NFBC Adjustments'),
     ('/fee-calculator', 'fee_calculator', 'Fee Calculator'),
     ('/pipeline-review', 'pipeline_review', 'Pipeline Review'),
-    ('/crm', 'crm', 'CRM'),
     ('/brief', 'brief', 'Executive Brief'),
-    ('/planning', 'financial_planning', 'Financial Planning'),
-    ('/avantos', 'avantos', 'Avantos'),
-    ('/rebalancer', 'rebalancer', 'Mock Rebalancer'),
     ('/catalog', 'data_catalog', 'Data Catalog'),
     ('/app-usage', 'admin', 'App Usage'),
     ('/admin', 'admin', 'Admin'),
@@ -1938,8 +1674,6 @@ _TOOL_ROUTES = [
     ('/refresh-log', 'pipeline_logging', 'Refresh Log'),
     ('/sfp2', 'sfp2', 'Salesforce Column Updater'),
     ('/repcodes', 'repcodes', 'Rep Codes'),
-    ('/bond-analyzer', 'bond_analyzer', 'Bond Analyzer'),
-    ('/advisor-mailer', 'advisor_mailer', 'Advisor Mailer'),
     ('/embed', 'performance', 'Performance by Channel'),
     ('/home', 'home', 'Home'),
     ('/', 'home', 'Home'),
@@ -2204,11 +1938,11 @@ if __name__ == '__main__':
     print(f"   Cache TTL: {CACHE_TTL_SECONDS}s")
     print(f"   Compression: {'enabled' if Compress is not None else 'disabled (install flask-compress)'}")
     print("=" * 60)
-    print("Backend API: http://localhost:5000")
-    print("Health Check: http://localhost:5000/api/health")
-    print("All Metrics:  http://localhost:5000/api/all-metrics")
-    print("KPI Metrics:  http://localhost:5000/api/kpi-metrics")
-    print("Net Flows:    http://localhost:5000/api/net-flows")
-    print("Analytics:    http://localhost:5000/api/analytics")
+    print(f"Backend API: http://localhost:5000")
+    print(f"Health Check: http://localhost:5000/api/health")
+    print(f"All Metrics:  http://localhost:5000/api/all-metrics")
+    print(f"KPI Metrics:  http://localhost:5000/api/kpi-metrics")
+    print(f"Net Flows:    http://localhost:5000/api/net-flows")
+    print(f"Analytics:    http://localhost:5000/api/analytics")
     print("=" * 60)
     app.run(debug=True, host='0.0.0.0', port=5000)

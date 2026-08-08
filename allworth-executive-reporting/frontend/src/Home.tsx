@@ -53,7 +53,7 @@ const SECTIONS: HubSection[] = [
         id: 'performance',
         toolId: 'performance',
         kicker: 'Dashboard',
-        title: 'Growth KPIs',
+        title: 'Performance by Channel',
         tag: 'live',
         color: 'navy',
         href: '/reporting/kpi',
@@ -110,18 +110,6 @@ const SECTIONS: HubSection[] = [
         icon: svg(<><path d="M3 3v18h18" /><rect x="7" y="11" width="3" height="6" /><rect x="12" y="7" width="3" height="10" /><rect x="17" y="4" width="3" height="13" /></>),
       },
       {
-        id: 'crm',
-        toolId: 'crm',
-        kicker: 'Client relationships',
-        title: 'CRM',
-        tag: 'new',
-        color: 'sky',
-        href: '/crm',
-        host: '/crm',
-        desc: 'Wealthbox-style Client 360 — search the book, open a contact record with its activity timeline and opportunities, or switch to the advisor view to see each advisor\u2019s book of business.',
-        icon: svg(<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.9" /><path d="M16 3.1a4 4 0 0 1 0 7.8" /></>),
-      },
-      {
         id: 'file_explorer',
         toolId: 'file_explorer',
         kicker: 'Data lake',
@@ -158,18 +146,6 @@ const SECTIONS: HubSection[] = [
         icon: svg(<><path d="M3 6h18v12H3z" /><path d="m3 7 9 6 9-6" /></>),
       },
       {
-        id: 'financial_planning',
-        toolId: 'financial_planning',
-        kicker: 'Wealth planning',
-        title: 'Financial Planning',
-        tag: 'new',
-        color: 'teal',
-        href: '/planning',
-        host: '/planning',
-        desc: 'PlanEngine retirement, tax, estate, and Monte Carlo planning — build households and scenarios, project cash flows and net worth, and run goal and stress analysis.',
-        icon: svg(<><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="3.5" /><path d="M12 3v3" /><path d="M12 18v3" /><path d="M3 12h3" /><path d="M18 12h3" /></>),
-      },
-      {
         id: 'sfp2',
         toolId: 'sfp2',
         kicker: 'Developer tool',
@@ -192,30 +168,6 @@ const SECTIONS: HubSection[] = [
         host: '/repcodes',
         desc: 'Editable lookup table for advisor rep codes backed by Synapse — add, edit, and track recent changes to the rep-code mapping.',
         icon: svg(<><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18" /><path d="M8 4v16" /></>),
-      },
-      {
-        id: 'bond_analyzer',
-        toolId: 'bond_analyzer',
-        kicker: 'Fixed income',
-        title: 'Bond Analyzer',
-        tag: 'live',
-        color: 'sky',
-        href: '/bond-analyzer',
-        host: '/bond-analyzer',
-        desc: 'Fixed-income portfolio analysis — bond ladder overview, account lookup with holdings appraisal, and AllworthIQ-style sample portfolio proposals.',
-        icon: svg(<><path d="M3 3v18h18" /><path d="M7 13h2v4H7z" /><path d="M11 9h2v8h-2z" /><path d="M15 5h2v12h-2z" /></>),
-      },
-      {
-        id: 'advisor_mailer',
-        toolId: 'advisor_mailer',
-        kicker: 'Communications',
-        title: 'Advisor Mailer',
-        tag: 'live',
-        color: 'teal',
-        href: '/advisor-mailer',
-        host: '/advisor-mailer',
-        desc: 'Upload an account workbook, preview one email per advisor, then send the batch through Microsoft Graph with replies routed back to you.',
-        icon: svg(<><path d="M3 6h18v12H3z" /><path d="m3 7 9 6 9-6" /><path d="M8 18h8" /></>),
       },
     ],
   },
@@ -396,10 +348,10 @@ export default function Home() {
             <div className="hub-hero-inner">
               <div className="hub-hero-copy">
                 <div className="hub-hero-kicker"><span className="hub-dot" />Team workspace</div>
-                <h1 id="hub-hero-title">Everything your team ships, in one place.</h1>
+                <h1 id="hub-hero-title">Allworth Analytics Hub</h1>
                 <p className="hub-lede">
-                  Jump into the performance dashboard, search the knowledge base, or open any of
-                  the tools and reports the team uses day-to-day.
+                  The unified platform for performance, planning, and the reporting your team
+                  relies on to run the business.
                 </p>
               </div>
               <div className="hub-hero-actions">
@@ -458,7 +410,6 @@ export default function Home() {
         </div>
 
         <div className="hub-footer">
-          <span>Powered by <strong>Jarvis</strong></span>
           <span>{longDate}</span>
         </div>
       </div>

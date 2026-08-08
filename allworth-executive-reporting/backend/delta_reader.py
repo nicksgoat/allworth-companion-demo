@@ -14,7 +14,7 @@ The SP must have **Storage Blob Data Reader** on the `silver` container of
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, Optional
 
 import pandas as pd
 
@@ -22,7 +22,7 @@ import pandas as pd
 try:
     from deltalake import DeltaTable  # type: ignore
     DELTA_AVAILABLE = True
-    DELTA_IMPORT_ERROR: str | None = None
+    DELTA_IMPORT_ERROR: Optional[str] = None
 except Exception as _e:  # pragma: no cover - env-dependent
     DeltaTable = None  # type: ignore
     DELTA_AVAILABLE = False
@@ -85,9 +85,9 @@ def _build_storage_options() -> dict[str, str]:
 
 def read_delta_table(
     path: str,
-    columns: list[str] | None = None,
-    filters: Any | None = None,
-    limit: int | None = None,
+    columns: Optional[list[str]] = None,
+    filters: Optional[Any] = None,
+    limit: Optional[int] = None,
 ) -> pd.DataFrame:
     """Read a Delta table from ADLS Gen2 into a pandas DataFrame.
 

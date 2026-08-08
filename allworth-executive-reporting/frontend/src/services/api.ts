@@ -2,7 +2,7 @@
 // NOTE: same-origin requests to /api/ are automatically decorated with a
 // Bearer token by the global fetch() wrapper installed in main.tsx via
 // installAuthFetch().  Do not duplicate that header here.
-import type { KpiDataset, KpiEntry, PredictionsPayload } from '../types/kpi';
+import type { KpiDataset, KpiEntry } from '../types/kpi';
 
 export interface KpiMetricRaw {
   metric_name: string;
@@ -32,7 +32,6 @@ interface AllMetricsResponse {
   kpiMetrics: ApiResponse<KpiMetricRaw[]>;
   netFlows: ApiResponse<KpiMetricRaw[]>;
   detailedMetrics: ApiResponse<KpiMetricRaw[]>;
-  predictions?: PredictionsPayload;
 }
 
 /** Pre-transformed bundle returned by fetchAllMetrics */
@@ -40,7 +39,6 @@ export interface AllMetricsBundle {
   kpiMetrics: KpiDataset;
   netFlows: KpiDataset;
   detailedMetrics: KpiDataset;
-  predictions?: PredictionsPayload;
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -261,7 +259,6 @@ export const fetchAllMetrics = async (): Promise<AllMetricsBundle> => {
       kpiMetrics: result.kpiMetrics?.data ? transformApiMetrics(result.kpiMetrics.data) : [],
       netFlows: result.netFlows?.data ? transformApiMetrics(result.netFlows.data) : [],
       detailedMetrics: result.detailedMetrics?.data ? transformApiMetrics(result.detailedMetrics.data) : [],
-      predictions: result.predictions,
     };
   } catch (error) {
     console.warn('   ⚠️ Combined endpoint failed, falling back to sequential fetches:', error);

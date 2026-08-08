@@ -1,0 +1,38 @@
+name: Division
+uri: frameworks://division
+category: Data Model
+description: Organizational division or regional segment for household/account rollups.
+keywords:
+  - division
+  - segment
+  - region
+  - organizational unit
+content: |
+  Source column: `Division` on `Historical_Household_Demographic` (see `growth.py:95–96`).
+
+  Primary segmentation dimension used across growth, profitability, and risk analytics:
+
+  - `growth.py`: `segment_by: Literal["firm", "advisor", "division", "service_model"]`.
+  - `risk.py`: account-rollforward segmentation via `Historical_Household_Demographic`.
+  - `client_outcomes.py`: household classification and reporting.
+
+  ## Join Behavior
+  Queries use a two-key join (`avhhid` + `Reporting_Period`) to ensure demographic attributes match the rollforward's time period. Unassigned households are surfaced as:
+
+  ```sql
+  ISNULL(hhd.Division, 'Unknown') AS division
+  ```
+
+  ## Values
+  Not hardcoded in Python — stored in the warehouse:
+
+  ```sql
+  SELECT DISTINCT Division, COUNT(DISTINCT avhhid) AS hhs
+  FROM [tav].[Historical_Household_Demographic]
+  WHERE Reporting_Period = (SELECT MAX(Reporting_Period) FROM [tav].[Historical_Household_Demographic])
+  GROUP BY Division
+  ORDER BY hhs DESC
+  ```
+
+  ## Typical Use
+  Division answers "how is [metric] distributed geographically / across offices?". Use together with `advisor` for within-division drill-downs.

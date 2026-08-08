@@ -19,12 +19,8 @@ share everything; everyone else sees only what has been shared with them.
 
 from __future__ import annotations
 
-import csv
-import io
 import os
-import re
 import time
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
@@ -35,15 +31,13 @@ from file_explorer import adls, shares
 bp = Blueprint("file_explorer", __name__)
 
 _RESOURCES_YAML = Path(__file__).parent / "resources.yaml"
-_MAX_ROWS = int(os.getenv("FILE_EXPLORER_MAX_ROWS", "5000000"))
+_MAX_ROWS = int(os.getenv("FILE_EXPLORER_MAX_ROWS", "2000000"))
 _DISCOVERY_TTL = int(os.getenv("FILE_EXPLORER_DISCOVERY_TTL", "300"))
 
 _ALLOWED_FORMATS = ("csv", "txt")
-_MAX_UPLOAD_BYTES = int(os.getenv("FILE_EXPLORER_MAX_UPLOAD_BYTES", str(200 * 1024 * 1024)))
 
 _roots_cache: Optional[list[dict[str, Any]]] = None
-_uploads_cache: Optional[list[dict[str, Any]]] = None
-_discovery_cache: dict[str, tuple[float, list[dict[str, Any]]]] = {}
+_discovery_cache: dict[str, tuple[float, list[str]]] = {}
 
 
 # ── registry + discovery ─────────────────────────────────────────────────────
@@ -85,73 +79,13 @@ def _root_by_id(root_id: str) -> Optional[dict[str, Any]]:
     return next((r for r in _load_roots() if r["id"] == root_id), None)
 
 
-def _load_uploads() -> list[dict[str, Any]]:
-    """Upload targets from the registry (id, label, container, path, columns…)."""
-    global _uploads_cache
-    if _uploads_cache is not None:
-        return _uploads_cache
-    uploads: list[dict[str, Any]] = []
-    try:
-        import yaml  # type: ignore
-
-        data = yaml.safe_load(_RESOURCES_YAML.read_text(encoding="utf-8")) or {}
-        for entry in data.get("uploads", []):
-            uid = str(entry.get("id", "")).strip()
-            columns: list[list[str]] = []
-            for c in entry.get("columns") or []:
-                alts = (
-                    [str(x).strip() for x in c if str(x).strip()]
-                    if isinstance(c, (list, tuple))
-                    else [str(c).strip()]
-                )
-                if alts:
-                    columns.append(alts)
-            if not uid or not columns:
-                continue
-            header_rows = [
-                int(r) for r in (entry.get("header_rows") or [1]) if int(r) >= 1
-            ] or [1]
-            uploads.append(
-                {
-                    "id": uid,
-                    "label": str(entry.get("label", uid)),
-                    "container": str(entry.get("container", "bronze")),
-                    "path": str(entry.get("path", "")).strip("/"),
-                    "format": str(entry.get("format", "csv")).lower(),
-                    "header_rows": header_rows,
-                    "columns": columns,
-                }
-            )
-    except Exception:
-        uploads = []
-    _uploads_cache = uploads
-    return uploads
-
-
-def _upload_by_id(upload_id: str) -> Optional[dict[str, Any]]:
-    return next((u for u in _load_uploads() if u["id"] == upload_id), None)
-
-
-def _discover_tables(root: dict[str, Any]) -> list[dict[str, Any]]:
-    """Discovered tables under a root as ``{"name", "last_modified"}`` dicts.
-
-    The list and each table's last-modified timestamp are cached together for
-    ``_DISCOVERY_TTL`` seconds so date lookups never hit ADLS on a request path.
-    """
+def _discover_tables(root: dict[str, Any]) -> list[str]:
     key = f"{root['container']}/{root['path']}"
     now = time.time()
     cached = _discovery_cache.get(key)
     if cached and (now - cached[0]) < _DISCOVERY_TTL:
         return cached[1]
-    tables = [
-        {
-            "name": name,
-            "last_modified": adls.table_last_modified(
-                root["container"], root["path"], name
-            ),
-        }
-        for name in adls.list_delta_tables(root["container"], root["path"])
-    ]
+    tables = adls.list_delta_tables(root["container"], root["path"])
     _discovery_cache[key] = (now, tables)
     return tables
 
@@ -233,8 +167,7 @@ def list_downloads():
             tables = _discover_tables(root)
         except Exception:  # pragma: no cover - network/permission dependent
             continue
-        for meta in tables:
-            table = meta["name"]
+        for table in tables:
             rid = f"{root_id}/{table}"
             if manager or root_shared or rid in shared:
                 out.append(
@@ -244,7 +177,6 @@ def list_downloads():
                         "root_id": root_id,
                         "root_label": root["label"],
                         "formats": root["formats"],
-                        "last_modified": meta.get("last_modified"),
                     }
                 )
     return jsonify({"success": True, "resources": out, "can_manage": manager})
@@ -324,14 +256,9 @@ def list_resources():
             "tables": [],
         }
         try:
-            for meta in _discover_tables(root):
+            for table in _discover_tables(root):
                 node["tables"].append(
-                    {
-                        "id": f"{root['id']}/{meta['name']}",
-                        "label": meta["name"],
-                        "type": "table",
-                        "last_modified": meta.get("last_modified"),
-                    }
+                    {"id": f"{root['id']}/{table}", "label": table, "type": "table"}
                 )
         except Exception as e:  # pragma: no cover - network dependent
             node["error"] = str(e)
@@ -398,172 +325,6 @@ def delete_share():
     except ValueError as e:
         return jsonify({"success": False, "error": str(e)}), 400
     return jsonify({"success": True, "removed": removed})
-
-
-# ── uploads (manager only) ───────────────────────────────────────────────────
-
-
-def _decode_csv(data: bytes) -> str:
-    """Decode uploaded CSV bytes, tolerating a UTF-8 BOM then falling back to
-    latin-1 so an odd byte never crashes header validation."""
-    for encoding in ("utf-8-sig", "latin-1"):
-        try:
-            return data.decode(encoding)
-        except UnicodeDecodeError:
-            continue
-    return data.decode("utf-8", errors="replace")
-
-
-def _column_display(accepted: list[str]) -> str:
-    """Human-readable form of a column's accepted spellings for the UI."""
-    if len(accepted) <= 1:
-        return accepted[0] if accepted else ""
-    return f"{accepted[0]} (or {', '.join(accepted[1:])})"
-
-
-def _validate_header(
-    data: bytes, expected: list[list[str]], header_rows: list[int]
-) -> tuple[bool, Optional[int], Optional[str]]:
-    """Confirm the CSV header matches ``expected`` on one of ``header_rows``.
-
-    ``expected`` is an ordered list of columns, each a list of accepted spellings
-    (the first is canonical). A single-column row 1 (a title/banner) is skipped
-    so the real header on a later row (e.g. row 3) is used. Returns
-    ``(ok, header_row_1based, error)``; on failure ``error`` names the offending
-    column or the wrong column count so the user can fix the file.
-    """
-    text = _decode_csv(data)
-    rows = list(csv.reader(io.StringIO(text)))
-    if not rows:
-        return False, None, "The file is empty."
-
-    candidates: list[tuple[int, list[str]]] = []
-    for r in header_rows:
-        idx = r - 1
-        if 0 <= idx < len(rows):
-            candidates.append((r, [c.strip() for c in rows[idx]]))
-    # If row 1 is a single column (a title/banner) and there's another header
-    # row to try, skip row 1 and look further down (e.g. row 3).
-    if len(candidates) > 1:
-        candidates = [
-            (rn, cells) for rn, cells in candidates if not (rn == 1 and len(cells) <= 1)
-        ] or candidates
-    if not candidates:
-        return False, None, "The file has no header row to check."
-
-    def _matches(cells: list[str]) -> bool:
-        return len(cells) == len(expected) and all(
-            found in accepted for found, accepted in zip(cells, expected)
-        )
-
-    # Exact match on any allowed header row wins.
-    for rownum, cells in candidates:
-        if _matches(cells):
-            return True, rownum, None
-
-    # Report against the most likely header row: prefer one with the right
-    # number of columns, else the first candidate.
-    rownum, cells = next(
-        ((rn, c) for rn, c in candidates if len(c) == len(expected)), candidates[0]
-    )
-    where = f"row {rownum}"
-    if len(cells) != len(expected):
-        wanted = ", ".join(_column_display(c) for c in expected)
-        return False, None, (
-            f"Expected {len(expected)} columns but found {len(cells)} in the "
-            f"header ({where}). The columns must be, in order: {wanted}."
-        )
-    for i, (found, accepted) in enumerate(zip(cells, expected), start=1):
-        if found not in accepted:
-            return False, None, (
-                f'Column {i} in the header ({where}) should be '
-                f'"{_column_display(accepted)}" but the file has "{found}".'
-            )
-    return True, rownum, None
-
-
-def _safe_filename(name: str) -> str:
-    """A filesystem/ADLS-safe basename derived from the uploaded filename."""
-    base = os.path.basename(name or "").strip() or "upload.csv"
-    return re.sub(r"[^A-Za-z0-9._-]+", "_", base)
-
-
-@bp.get("/uploads")
-def list_uploads():
-    """Upload targets the caller may push files into (manager-gated)."""
-    manager = _can_manage(_current_email())
-    targets = (
-        [
-            {
-                "id": u["id"],
-                "label": u["label"],
-                "format": u["format"],
-                "columns": [_column_display(c) for c in u["columns"]],
-            }
-            for u in _load_uploads()
-        ]
-        if manager
-        else []
-    )
-    return jsonify({"success": True, "uploads": targets, "can_manage": manager})
-
-
-@bp.post("/upload/<target_id>")
-def upload(target_id: str):
-    """Validate an uploaded file against a target's schema, then store it."""
-    denied = _require_manager()
-    if denied:
-        return denied
-
-    target = _upload_by_id(target_id)
-    if not target:
-        return jsonify({"success": False, "error": "Unknown upload target"}), 404
-
-    file = request.files.get("file")
-    if not file or not file.filename:
-        return jsonify({"success": False, "error": "No file was provided"}), 400
-
-    if not file.filename.lower().endswith(".csv"):
-        return (
-            jsonify({"success": False, "error": "Please upload a .csv file"}),
-            400,
-        )
-
-    data = file.read()
-    if not data:
-        return jsonify({"success": False, "error": "The file is empty"}), 400
-    if len(data) > _MAX_UPLOAD_BYTES:
-        return (
-            jsonify(
-                {
-                    "success": False,
-                    "error": f"File exceeds the {_MAX_UPLOAD_BYTES // (1024 * 1024)} MB upload limit",
-                }
-            ),
-            413,
-        )
-
-    ok, _header_row, err = _validate_header(
-        data, target["columns"], target["header_rows"]
-    )
-    if not ok:
-        return jsonify({"success": False, "error": err}), 422
-
-    ts = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
-    stored_name = f"{ts}_{_safe_filename(file.filename)}"
-    try:
-        stored = adls.upload_bytes(
-            target["container"], target["path"], stored_name, data
-        )
-    except Exception as e:
-        return (
-            jsonify({"success": False, "error": f"Upload failed: {e}"}),
-            502,
-        )
-
-    return jsonify(
-        {"success": True, "stored": stored, "filename": stored_name}
-    )
 
 
 @bp.get("/health")

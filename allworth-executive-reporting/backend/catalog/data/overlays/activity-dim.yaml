@@ -1,0 +1,8 @@
+id: activity-dim
+source: wealth_mcp.domain.tables
+description: 'Attributes of Salesforce tasks and events: type, subject, owner, related
+  records.'
+business_name: Activity attributes (tasks/events)
+grain: one row per Salesforce Activity Id
+pk: Id
+domain: Activity

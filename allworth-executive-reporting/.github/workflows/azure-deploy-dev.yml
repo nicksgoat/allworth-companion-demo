@@ -216,38 +216,6 @@ jobs:
               "value": "${{ secrets.SYNAPSE_PASSWORD }}"
             },
             {
-              "name": "DW_SERVER",
-              "value": "${{ secrets.SYNAPSE_SERVER }}"
-            },
-            {
-              "name": "DW_DATABASE",
-              "value": "${{ secrets.SYNAPSE_DATABASE }}"
-            },
-            {
-              "name": "DW_USER",
-              "value": "${{ secrets.SYNAPSE_USERNAME }}"
-            },
-            {
-              "name": "DW_PW",
-              "value": "${{ secrets.SYNAPSE_PASSWORD }}"
-            },
-            {
-              "name": "DW_PORT",
-              "value": "1433"
-            },
-            {
-              "name": "SYNAPSE_PLANNING_ENABLED",
-              "value": "true"
-            },
-            {
-              "name": "SYNAPSE_PLANNING_SCHEMA",
-              "value": "planengine"
-            },
-            {
-              "name": "AUTH_FIRM_ID",
-              "value": "allworth"
-            },
-            {
               "name": "ADLS_ACCOUNT_NAME",
               "value": "${{ env.ADLS_ACCOUNT_NAME }}"
             },

@@ -1,0 +1,109 @@
+/* ---------------------------------------------------------------------------
+   Executive Brief — scoped styles.
+
+   Tailwind v4 utilities WITHOUT preflight, so no global element resets leak
+   into other portal tools. Class scanning is limited to this folder via
+   @source, so utilities are only generated for what the Brief actually uses.
+   Utility classes are class-scoped by nature (they apply only where written),
+   and they live in a cascade layer, so any unlayered portal CSS always wins
+   on a genuine name collision.
+
+   The element resets the Brief needs (normally provided by preflight) are
+   declared inside `.brief-app` in the `base` layer, which is ordered BEFORE
+   `utilities` so Tailwind spacing/margin utilities still override them.
+   --------------------------------------------------------------------------- */
+@layer theme, base, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@source "./";
+
+@theme {
+  --color-ink: #16181d;
+  --color-ink-soft: #4b5160;
+  --color-ink-faint: #8a90a0;
+  --color-paper: #f6f7f9;
+  --color-card: #ffffff;
+  --color-line: #e6e8ee;
+  --color-accent: #2f3a8f;
+  --color-accent-soft: #eceefb;
+  --color-critical: #b3261e;
+  --color-critical-soft: #fdeceb;
+  --color-high: #9a5b00;
+  --color-high-soft: #fdf3e0;
+  --color-medium: #1d5c96;
+  --color-medium-soft: #e8f1f9;
+  --color-low: #5c6370;
+  --color-low-soft: #eef0f3;
+  --color-miss: #7a3e9d;
+  --color-miss-soft: #f6effb;
+}
+
+@layer base {
+  .brief-app {
+    min-height: 100vh;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+      sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+  .brief-app h1,
+  .brief-app h2,
+  .brief-app h3,
+  .brief-app h4,
+  .brief-app p,
+  .brief-app ul,
+  .brief-app ol,
+  .brief-app li,
+  .brief-app section,
+  .brief-app article,
+  .brief-app header {
+    margin: 0;
+    padding: 0;
+  }
+  .brief-app ul,
+  .brief-app ol {
+    list-style: none;
+  }
+  .brief-app button {
+    margin: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    text-align: center; /* match UA/preflight default; text-left opts out */
+  }
+  .brief-app textarea {
+    font: inherit;
+    color: inherit;
+    margin: 0;
+  }
+}
+
+/* Hide scrollbars on horizontal pill rows while keeping them scrollable. */
+.brief-app .no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.brief-app .no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes brief-sheet-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.brief-app .animate-sheet-up {
+  animation: brief-sheet-up 0.22s ease-out;
+}

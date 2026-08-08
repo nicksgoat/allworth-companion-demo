@@ -84,23 +84,11 @@
   margin-bottom: 28px;
 }
 
-.file-explorer .fe-group-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 0 0 12px;
-}
-
 .file-explorer .fe-group-title {
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--fe-navy);
   margin: 0 0 12px;
-}
-
-.file-explorer .fe-group-header .fe-group-title {
-  margin: 0;
 }
 
 .file-explorer .fe-list {
@@ -139,30 +127,6 @@
   font-weight: 600;
   flex: 1;
   word-break: break-word;
-}
-
-.file-explorer .fe-row-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 0;
-}
-
-.file-explorer .fe-row-meta .fe-row-name {
-  flex: none;
-}
-
-.file-explorer .fe-row-modified {
-  font-size: 0.72rem;
-  color: var(--fe-muted);
-}
-
-.file-explorer .fe-tree-modified {
-  margin-left: 8px;
-  font-size: 0.72rem;
-  font-weight: 400;
-  color: var(--fe-muted);
 }
 
 .file-explorer .fe-row-actions {
@@ -245,96 +209,6 @@
 
 .file-explorer .fe-error {
   color: var(--fe-danger);
-  font-weight: 600;
-}
-
-/* ── uploads ── */
-.file-explorer .fe-uploads {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.file-explorer .fe-upload-card {
-  background: var(--fe-panel);
-  border: 1px solid var(--fe-border);
-  border-radius: 12px;
-  padding: 18px 20px;
-  box-shadow: var(--fe-shadow);
-}
-
-.file-explorer .fe-upload-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.file-explorer .fe-upload-head .fe-group-title {
-  margin: 0;
-}
-
-.file-explorer .fe-upload-type {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--fe-navy);
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 999px;
-  padding: 2px 8px;
-}
-
-.file-explorer .fe-upload-hint {
-  margin: 0 0 12px;
-  font-size: 0.85rem;
-}
-
-.file-explorer .fe-linkish {
-  appearance: none;
-  border: none;
-  background: none;
-  padding: 0;
-  color: var(--fe-navy);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.file-explorer .fe-upload-columns {
-  margin: 0 0 14px;
-  padding-left: 20px;
-  columns: 2;
-  font-size: 0.82rem;
-  color: var(--fe-muted);
-}
-
-.file-explorer .fe-upload-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.file-explorer .fe-file-btn {
-  cursor: pointer;
-}
-
-.file-explorer .fe-upload-filename {
-  flex: 1;
-  min-width: 120px;
-  font-size: 0.88rem;
-  color: var(--fe-muted);
-  word-break: break-all;
-}
-
-.file-explorer .fe-upload-error {
-  margin: 12px 0 0;
-}
-
-.file-explorer .fe-upload-ok {
-  margin: 12px 0 0;
-  color: var(--fe-navy);
   font-weight: 600;
 }
 

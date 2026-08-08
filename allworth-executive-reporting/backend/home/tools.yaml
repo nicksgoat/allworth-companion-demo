@@ -28,7 +28,7 @@ tools:
 
   # ------------------------------- Live tools ------------------------------- #
   - id: performance
-    name: Growth KPIs
+    name: Performance by Channel
     kicker: Dashboard
     description: |
       KPI matrix for NCNM, Clients, Appointments and Leads across every
@@ -127,21 +127,6 @@ tools:
     icon: |
       <path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="4" width="3" height="13"/>
 
-  - id: crm
-    name: CRM
-    kicker: Client relationships
-    description: |
-      Wealthbox-style Client 360 — search the book, open a contact record with
-      its activity timeline and opportunities, or switch to the advisor view to
-      see each advisor's book of business.
-    url: /crm
-    host: /crm
-    category: live
-    color: sky
-    status: new
-    icon: |
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>
-
   - id: file_explorer
     name: File Explorer
     kicker: Data lake
@@ -186,51 +171,6 @@ tools:
     status: new
     icon: |
       <path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/>
-
-  - id: financial_planning
-    name: Financial Planning
-    kicker: Wealth planning
-    description: |
-      PlanEngine retirement, tax, estate, and Monte Carlo planning — build
-      households and scenarios, project cash flows and net worth, and run goal
-      and stress analysis.
-    url: /planning
-    host: /planning
-    category: live
-    color: teal
-    status: new
-    icon: |
-      <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M12 3v3"/><path d="M12 18v3"/><path d="M3 12h3"/><path d="M18 12h3"/>
-
-  - id: avantos
-    name: Avantos
-    kicker: Advisor console
-    description: |
-      The advisor operating console — every planning household ranked by plan
-      health, drift against actuals, publication state, and open work items,
-      in one cockpit.
-    url: /avantos
-    host: /avantos
-    category: live
-    color: navy
-    status: new
-    icon: |
-      <path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/>
-
-  - id: rebalancer
-    name: Mock Rebalancer
-    kicker: Tax transition
-    description: |
-      Tax-aware what-if rebalancing — lot-level convex optimization toward a
-      target model with tax budgets, wash-sale rules, and substitutions.
-      Proposed trades only; nothing is submitted.
-    url: /rebalancer
-    host: /rebalancer
-    category: live
-    color: teal
-    status: new
-    icon: |
-      <path d="M12 3v18"/><path d="M5 8l7-5 7 5"/><path d="M3 14a3 3 0 0 0 6 0l-3-6z"/><path d="M15 14a3 3 0 0 0 6 0l-3-6z"/>
 
   # ------------------------- Analytics & reports --------------------------- #
   - id: pipeline_logging
@@ -317,34 +257,6 @@ tools:
     status: live
     icon: |
       <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 4v16"/>
-
-  - id: bond_analyzer
-    name: Bond Analyzer
-    kicker: Fixed income
-    description: |
-      Fixed-income portfolio analysis — bond ladder overview, account lookup
-      with holdings appraisal, and AllworthIQ-style sample portfolio proposals.
-    url: /bond-analyzer
-    host: /bond-analyzer
-    category: live
-    color: sky
-    status: new
-    icon: |
-      <path d="M3 3v18h18"/><path d="M7 13h2v4H7z"/><path d="M11 9h2v8h-2z"/><path d="M15 5h2v12h-2z"/>
-
-  - id: advisor_mailer
-    name: Advisor Mailer
-    kicker: Communications
-    description: |
-      Upload an account workbook, preview one email per advisor, then send the
-      batch through Microsoft Graph with replies routed back to you.
-    url: /advisor-mailer
-    host: /advisor-mailer
-    category: live
-    color: teal
-    status: new
-    icon: |
-      <path d="M3 6h18v12H3z"/><path d="m3 7 9 6 9-6"/><path d="M8 18h8"/>
 
   - id: field_mapping
     name: Field Mapping Explorer

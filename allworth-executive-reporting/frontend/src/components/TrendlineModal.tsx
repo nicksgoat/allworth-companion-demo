@@ -27,39 +27,6 @@ const shortPeriod = (period: string) => {
   return period;
 };
 
-// Custom dot for the Actual line. The current (partial) month renders the
-// model's projected EoM value, so its dot is a distinct amber ring with a
-// "Projected" label instead of the usual small blue dot.
-const renderActualDot = (props: {
-  cx?: number;
-  cy?: number;
-  index?: number;
-  payload?: TrendPoint;
-}) => {
-  const { cx, cy, index, payload } = props;
-  if (cx == null || cy == null) return <g key={`ad-${index}`} />;
-  if (payload?.projected) {
-    return (
-      <g key={`ad-${index}`}>
-        <circle cx={cx} cy={cy} r={10} fill="#f59e0b" fillOpacity={0.16} />
-        <circle cx={cx} cy={cy} r={5.5} fill="#ffffff" stroke="#f59e0b" strokeWidth={2.5} />
-        <circle cx={cx} cy={cy} r={2} fill="#b45309" />
-        <text
-          x={cx}
-          y={cy - 14}
-          textAnchor="middle"
-          fontSize={11}
-          fontWeight={700}
-          fill="#b45309"
-        >
-          Projected
-        </text>
-      </g>
-    );
-  }
-  return <circle key={`ad-${index}`} cx={cx} cy={cy} r={3} fill="#2563eb" />;
-};
-
 export function TrendlineModal({ target, data, onClose }: Props) {
   // Close on Escape
   useEffect(() => {
@@ -111,12 +78,9 @@ export function TrendlineModal({ target, data, onClose }: Props) {
                   stroke="var(--ts-text-secondary, #6b7280)"
                 />
                 <Tooltip
-                  formatter={(value, name, item) => {
+                  formatter={(value) => {
                     const num = typeof value === 'number' ? value : Number(value);
-                    const formatted = Number.isFinite(num) ? format(num) : String(value);
-                    const projected = (item?.payload as TrendPoint | undefined)?.projected;
-                    const label = projected && name === 'Actual' ? 'Projected (EoM)' : name;
-                    return [formatted, label];
+                    return Number.isFinite(num) ? format(num) : String(value);
                   }}
                   labelStyle={{ fontWeight: 600 }}
                   contentStyle={{ borderRadius: 8, fontSize: 13 }}
@@ -128,7 +92,7 @@ export function TrendlineModal({ target, data, onClose }: Props) {
                   name="Actual"
                   stroke="#2563eb"
                   strokeWidth={2.5}
-                  dot={renderActualDot}
+                  dot={{ r: 3 }}
                   activeDot={{ r: 5 }}
                   connectNulls
                 />

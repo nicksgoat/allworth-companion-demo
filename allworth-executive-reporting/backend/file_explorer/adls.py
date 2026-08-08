@@ -14,8 +14,6 @@ Auth precedence matches ``delta_reader`` and ``admin.store``:
 from __future__ import annotations
 
 import os
-from datetime import datetime, timezone
-from email.utils import parsedate_to_datetime
 from typing import Any, Optional
 
 ADLS_ACCOUNT_NAME = os.getenv("ADLS_ACCOUNT_NAME", "dlallworthai")
@@ -97,62 +95,3 @@ def _is_delta_table(fs, table_path: str) -> bool:
         return fs.get_directory_client(f"{table_path.strip('/')}/_delta_log").exists()
     except Exception:  # pragma: no cover - network/permission dependent
         return False
-
-
-def upload_bytes(container: str, path: str, filename: str, data: bytes) -> str:
-    """Write ``data`` to ``container/path/filename`` in ADLS Gen2 (overwrite).
-
-    Returns the stored path relative to the container. Raises on failure so the
-    caller can surface a clear error to the user.
-    """
-    fs = _service_client().get_file_system_client(container)
-    rel = f"{path.strip('/')}/{filename.strip('/')}".strip("/")
-    fs.get_file_client(rel).upload_data(data, overwrite=True)
-    return rel
-
-
-def table_last_modified(container: str, path: str, table: str) -> Optional[str]:
-    """Best-effort last-modified timestamp for a Delta table (ISO 8601, UTC).
-
-    A Delta table's true "last written" moment is the newest commit file in its
-    ``_delta_log`` folder, so we take the max ``last_modified`` across that
-    folder's files. Returns ``None`` if it can't be determined (missing log,
-    permission/network error) so listing never fails because of a date lookup.
-    """
-    base = path.strip("/")
-    prefix = f"{base}/" if base else ""
-    log_path = f"{prefix}{table.strip('/')}/_delta_log"
-    try:
-        fs = _service_client().get_file_system_client(container)
-        latest: Optional[datetime] = None
-        for item in fs.get_paths(path=log_path, recursive=False):
-            if getattr(item, "is_directory", False):
-                continue
-            dt = _to_datetime(getattr(item, "last_modified", None))
-            if dt and (latest is None or dt > latest):
-                latest = dt
-        return _to_iso(latest) if latest else None
-    except Exception:  # pragma: no cover - network/permission dependent
-        return None
-
-
-def _to_datetime(value: Any) -> Optional[datetime]:
-    """Coerce an ADLS ``last_modified`` (datetime or RFC 1123 string) to an
-    aware UTC datetime, or ``None`` if it can't be parsed."""
-    if value is None:
-        return None
-    if isinstance(value, datetime):
-        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
-    try:
-        dt = parsedate_to_datetime(str(value))
-        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
-    except Exception:
-        return None
-
-
-def _to_iso(dt: datetime) -> str:
-    return (
-        dt.astimezone(timezone.utc)
-        .isoformat(timespec="seconds")
-        .replace("+00:00", "Z")
-    )

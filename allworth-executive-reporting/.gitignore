@@ -38,8 +38,6 @@ yarn-error.log*
 .pnpm-debug.log*
 /frontend/dist
 /frontend/build
-/frontend/.vite/
-/backend/planning/.planning-state/
 
 # IDEs
 .vscode/
@@ -74,9 +72,4 @@ backend/admin/.admin-state/
 # The admin roster is NEVER committed — it lives only in ADLS (source of truth)
 # so a PR/merge can't carry a stale user list that overwrites the live one.
 backend/admin/admin_state.seed.json
-
-# File Explorer share ledger — runtime state, NEVER committed. Lives on the
-# container disk and is backed up to / restored from ADLS (source of truth) so a
-# PR/merge or redeploy can't carry a stale ledger that wipes the live shares.
-backend/file_explorer/.file-explorer-state/
 

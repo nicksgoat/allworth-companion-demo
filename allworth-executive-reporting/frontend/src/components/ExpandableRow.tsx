@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { KpiEntry, TrendTarget, ChannelProjection } from '../types/kpi';
+import type { KpiEntry, TrendTarget } from '../types/kpi';
 import { KpiTile } from './KpiTile';
 
 type ExpandableRowProps = {
@@ -9,11 +9,9 @@ type ExpandableRowProps = {
   detailedMetricsMap: Map<string, KpiEntry[]>;
   yellowThreshold?: number;
   onShowTrendline?: (target: TrendTarget, anchor: { x: number; y: number }) => void;
-  // Current-month NCNM EoM projection for this channel (applied to the NCNM tile only).
-  ncnmProjection?: ChannelProjection;
 };
 
-export function ExpandableRow({ channel, metrics, metricsMap, detailedMetricsMap, yellowThreshold = 80, onShowTrendline, ncnmProjection }: ExpandableRowProps) {
+export function ExpandableRow({ channel, metrics, metricsMap, detailedMetricsMap, yellowThreshold = 80, onShowTrendline }: ExpandableRowProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Check if there are any child entries for this channel
@@ -59,7 +57,6 @@ export function ExpandableRow({ channel, metrics, metricsMap, detailedMetricsMap
         {metrics.map((metric) => {
           const entry = metricsMap.get(`${metric}-${channel}`);
           const tileTitle = channel === 'Total' ? metric : channel;
-          const proj = metric === 'NCNM' ? ncnmProjection : undefined;
           
           return (
             <KpiTile 
@@ -69,9 +66,6 @@ export function ExpandableRow({ channel, metrics, metricsMap, detailedMetricsMap
               title={tileTitle}
               yellowThreshold={yellowThreshold}
               onShowTrendline={onShowTrendline}
-              projection={proj?.projection}
-              projectionLow={proj?.low}
-              projectionHigh={proj?.high}
             />
           );
         })}

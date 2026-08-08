@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Executive Reporting — Header Options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  /* ── Allworth brand tokens — from ALW001_01_Brand_Dashboard_DEC2024.pdf ── */
+  :root {
+    --allworth-navy: #173D67;      /* Indigo Blue / PMS 295C — wordmark */
+    --allworth-accent: #3E71B7;    /* Cerulean / PMS 2144C — Iris symbol */
+    --night-blue: #0C2E4E;         /* premium dark hero surface */
+    --chart-sky: #289FDA;
+    --chart-pumpkin: #D26D37;      /* accent / money-movement only */
+    --bg: #F3F4F4;                 /* Feather Gray */
+    --text: #000000;
+    --text-muted: #595959;         /* Dark Gray */
+    --text-subtle: #828282;        /* Medium Gray */
+    --hairline: #E6E6E6;           /* Pale Gray */
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    --sans: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.6 var(--sans);
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  }
+  .page { max-width: 1200px; margin: 0 auto; padding: 40px 52px 64px; }
+  .page-head { margin-bottom: 8px; }
+  .page-head h1 { font-family: var(--display); font-size: 24px; font-weight: 600; margin: 0 0 4px; color: var(--allworth-navy); }
+  .page-head p { color: var(--text-muted); margin: 0; font-size: 14px; }
+
+  .option-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--sans); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--allworth-navy); margin: 40px 0 12px;
+  }
+  .option-label .pip { width: 22px; height: 22px; border-radius: 6px; display: inline-flex;
+    align-items: center; justify-content: center; color: #fff; font-size: 12px;
+    background: var(--allworth-accent); }
+  .option-note { color: var(--text-subtle); font-weight: 400; text-transform: none; letter-spacing: normal; }
+
+  /* ── hero (brand: Night Blue → Indigo surface) ── */
+  .hero {
+    position: relative; overflow: hidden;
+    padding: 40px 40px 34px; border-radius: 16px;
+    background: linear-gradient(120deg, var(--night-blue) 0%, var(--allworth-navy) 100%);
+    color: #fff; box-shadow: 0 2px 8px rgba(12, 46, 78, 0.05);
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 680px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 18px;
+    font-family: var(--sans); font-size: 12px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.78); }
+  .brand-mark { width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; }
+  .brand-mark svg { width: 26px; height: 26px; }
+  .hero h1 { font-family: var(--display); font-size: 40px; font-weight: 600; letter-spacing: -0.005em; line-height: 1.1; margin: 0 0 14px; }
+  .lede { font-family: var(--sans); color: rgba(255, 255, 255, 0.8); font-size: 15px; max-width: 620px; line-height: 1.6; margin: 0; }
+  .hero-search { display: flex; align-items: center; gap: 8px; margin-top: 24px;
+    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 10px; padding: 6px 6px 6px 14px; max-width: 560px; }
+  .hero-search svg { width: 16px; height: 16px; color: rgba(255, 255, 255, 0.6); flex-shrink: 0; }
+  .hero-search input { flex: 1; border: 0; background: transparent; color: #fff; font: inherit;
+    font-family: var(--sans); font-size: 14px; padding: 8px 4px; outline: none; }
+  .hero-search input::placeholder { color: rgba(255, 255, 255, 0.5); }
+  .quick { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+  .quick-label { font-family: var(--sans); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.5); font-weight: 700; margin-right: 2px; }
+  .chip { font-family: var(--sans); font-size: 12.5px; font-weight: 400; color: rgba(255, 255, 255, 0.88);
+    padding: 6px 12px; border-radius: 999px; text-decoration: none;
+    background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.16);
+    transition: background 160ms var(--ease); }
+  .chip:hover { background: rgba(255, 255, 255, 0.16); }
+  .hero-accent { position: absolute; right: 30px; bottom: 0; top: 0; width: 260px;
+    display: flex; align-items: center; justify-content: center; opacity: 0.55;
+    pointer-events: none; z-index: 0; }
+  .hero-accent svg { width: 100%; height: auto; }
+  .btn {
+    font-family: var(--sans); font-size: 13px; padding: 10px 18px; border-radius: 10px;
+    font-weight: 700; transition: all 160ms var(--ease);
+    background: #fff; color: var(--allworth-navy);
+    border: 1px solid #fff; box-shadow: 0 2px 8px rgba(12, 46, 78, 0.18);
+    display: inline-flex; align-items: center; gap: 8px; text-decoration: none; cursor: pointer;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(12, 46, 78, 0.28); }
+  .btn svg { width: 14px; height: 14px; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="page-head">
+      <h1>Executive Reporting — Final Header</h1>
+      <p>Final pick, in the production hero design.</p>
+    </div>
+
+    <!-- FINAL -->
+    <div class="option-label"><span class="pip">&#10003;</span> Allworth Analytics Hub <span class="option-note">— approved</span></div>
+    <section class="hero">
+      <div class="hero-accent" aria-hidden="true">
+        <svg viewBox="0 0 80 80" fill="rgba(255,255,255,0.6)">
+          <path d="M48.9297 78.2278L41.4408 57.0982C41.1997 56.4041 40.5348 55.9365 39.7677 55.9365H39.7531C38.9859 55.9365 38.3211 56.4041 38.0799 57.0982L30.5911 78.2278L34.0981 78.8927L39.7531 62.9432L45.4081 78.8927L48.9151 78.2278H48.9297Z"/>
+          <path d="M21.8966 75.0644L29.7435 54.0663C30.0065 53.3795 29.8019 52.5904 29.2101 52.1009H29.2028C28.6183 51.5968 27.8073 51.531 27.1717 51.911L7.854 63.2867L10.1189 66.0485L24.7022 57.4637L18.7841 73.3182L21.8966 75.0644Z"/>
+          <path d="M3.22935 55.2642L22.737 44.2244C23.3799 43.8664 23.7306 43.1285 23.5918 42.376V42.3614C23.4603 41.6015 22.8831 41.0316 22.1525 40.9147L0.0438374 37.2178L0 40.7905L16.6874 43.5888L1.96537 51.9252L3.22935 55.2642Z"/>
+          <path d="M1.65135 28.0996L23.6942 32.1838C24.4175 32.3226 25.1555 31.9865 25.5354 31.3143C25.9226 30.6421 25.8496 29.8312 25.3674 29.2759L10.8134 12.2231L8.48267 14.9338L19.4712 27.8073L2.82765 24.7314L1.64404 28.0996H1.65135Z"/>
+          <path d="M17.9077 6.26874L32.1695 23.5626C32.6298 24.1325 33.4188 24.3517 34.1348 24.0813H34.1421C34.8655 23.8183 35.3331 23.1461 35.3185 22.4155L35.1285 0L31.6069 0.577192L31.7457 17.4984L20.9763 4.44949L17.9077 6.26874Z"/>
+          <path d="M44.3927 0L44.2027 22.4155C44.1881 23.1534 44.6557 23.8183 45.379 24.0813H45.3863C46.1096 24.3517 46.8914 24.1398 47.359 23.5626L61.6208 6.26874L58.5522 4.44949L47.7828 17.5057L47.9216 0.584498L44.4 0.00730623L44.3927 0Z"/>
+          <path d="M68.7079 12.2231L54.1539 29.2759C53.6717 29.8312 53.5986 30.6421 53.9858 31.307C54.3657 31.9792 55.111 32.3226 55.827 32.1838L77.8699 28.0996L76.6863 24.7314L60.05 27.8073L71.0312 14.9338L68.7006 12.2231H68.7079Z"/>
+          <path d="M79.4843 37.2104L57.3757 40.9147C56.6524 41.0316 56.0679 41.6015 55.9437 42.3613V42.376C55.8049 43.1285 56.1556 43.8664 56.7985 44.2244L76.3061 55.2641L77.5701 51.9252L62.8481 43.5888L79.5355 40.7905L79.4917 37.2178L79.4843 37.2104Z"/>
+          <path d="M71.6668 63.279L52.3492 51.9032C51.7208 51.5233 50.9098 51.5891 50.318 52.0859H50.3107C49.7189 52.5827 49.5143 53.3718 49.7774 54.0586L57.6243 75.0567L60.7367 73.3105L54.8187 57.456L69.4019 66.0408L71.6668 63.279Z"/>
+          <path d="M49.9015 39.5122C49.9015 45.1014 45.3717 49.6386 39.7751 49.6386C34.1785 49.6386 29.6487 45.1087 29.6487 39.5122C29.6487 33.9156 34.1785 29.3857 39.7751 29.3857C45.3717 29.3857 49.9015 33.9156 49.9015 39.5122ZM39.7751 33.1265C36.2462 33.1265 33.3895 35.9906 33.3895 39.5122C33.3895 43.0338 36.2535 45.8978 39.7751 45.8978C43.2967 45.8978 46.1608 43.0338 46.1608 39.5122C46.1608 35.9906 43.2967 33.1265 39.7751 33.1265Z"/>
+        </svg>
+      </div>
+      <div class="hero-inner">
+        <div class="brand">
+          <span class="brand-mark">
+            <svg viewBox="0 0 80 80" fill="var(--allworth-accent)" aria-hidden="true">
+              <path d="M48.9297 78.2278L41.4408 57.0982C41.1997 56.4041 40.5348 55.9365 39.7677 55.9365H39.7531C38.9859 55.9365 38.3211 56.4041 38.0799 57.0982L30.5911 78.2278L34.0981 78.8927L39.7531 62.9432L45.4081 78.8927L48.9151 78.2278H48.9297Z"/>
+              <path d="M21.8966 75.0644L29.7435 54.0663C30.0065 53.3795 29.8019 52.5904 29.2101 52.1009H29.2028C28.6183 51.5968 27.8073 51.531 27.1717 51.911L7.854 63.2867L10.1189 66.0485L24.7022 57.4637L18.7841 73.3182L21.8966 75.0644Z"/>
+              <path d="M3.22935 55.2642L22.737 44.2244C23.3799 43.8664 23.7306 43.1285 23.5918 42.376V42.3614C23.4603 41.6015 22.8831 41.0316 22.1525 40.9147L0.0438374 37.2178L0 40.7905L16.6874 43.5888L1.96537 51.9252L3.22935 55.2642Z"/>
+              <path d="M1.65135 28.0996L23.6942 32.1838C24.4175 32.3226 25.1555 31.9865 25.5354 31.3143C25.9226 30.6421 25.8496 29.8312 25.3674 29.2759L10.8134 12.2231L8.48267 14.9338L19.4712 27.8073L2.82765 24.7314L1.64404 28.0996H1.65135Z"/>
+              <path d="M17.9077 6.26874L32.1695 23.5626C32.6298 24.1325 33.4188 24.3517 34.1348 24.0813H34.1421C34.8655 23.8183 35.3331 23.1461 35.3185 22.4155L35.1285 0L31.6069 0.577192L31.7457 17.4984L20.9763 4.44949L17.9077 6.26874Z"/>
+              <path d="M44.3927 0L44.2027 22.4155C44.1881 23.1534 44.6557 23.8183 45.379 24.0813H45.3863C46.1096 24.3517 46.8914 24.1398 47.359 23.5626L61.6208 6.26874L58.5522 4.44949L47.7828 17.5057L47.9216 0.584498L44.4 0.00730623L44.3927 0Z"/>
+              <path d="M68.7079 12.2231L54.1539 29.2759C53.6717 29.8312 53.5986 30.6421 53.9858 31.307C54.3657 31.9792 55.111 32.3226 55.827 32.1838L77.8699 28.0996L76.6863 24.7314L60.05 27.8073L71.0312 14.9338L68.7006 12.2231H68.7079Z"/>
+              <path d="M79.4843 37.2104L57.3757 40.9147C56.6524 41.0316 56.0679 41.6015 55.9437 42.3613V42.376C55.8049 43.1285 56.1556 43.8664 56.7985 44.2244L76.3061 55.2641L77.5701 51.9252L62.8481 43.5888L79.5355 40.7905L79.4917 37.2178L79.4843 37.2104Z"/>
+              <path d="M71.6668 63.279L52.3492 51.9032C51.7208 51.5233 50.9098 51.5891 50.318 52.0859H50.3107C49.7189 52.5827 49.5143 53.3718 49.7774 54.0586L57.6243 75.0567L60.7367 73.3105L54.8187 57.456L69.4019 66.0408L71.6668 63.279Z"/>
+              <path d="M49.9015 39.5122C49.9015 45.1014 45.3717 49.6386 39.7751 49.6386C34.1785 49.6386 29.6487 45.1087 29.6487 39.5122C29.6487 33.9156 34.1785 29.3857 39.7751 29.3857C45.3717 29.3857 49.9015 33.9156 49.9015 39.5122ZM39.7751 33.1265C36.2462 33.1265 33.3895 35.9906 33.3895 39.5122C33.3895 43.0338 36.2535 45.8978 39.7751 45.8978C43.2967 45.8978 46.1608 43.0338 46.1608 39.5122C46.1608 35.9906 43.2967 33.1265 39.7751 33.1265Z"/>
+            </svg>
+          </span>
+          Allworth Financial
+        </div>
+        <h1>Allworth Analytics Hub</h1>
+        <p class="lede">The unified platform for performance, planning, and the reporting your team relies on to run the business.</p>
+        <form class="hero-search" onsubmit="return false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="text" placeholder="Search dashboards, reports, and tools…" aria-label="Search" />
+          <button class="btn" type="submit">Search</button>
+        </form>
+        <div class="quick">
+          <span class="quick-label">Jump to</span>
+          <a class="chip" href="#">Performance by Channel</a>
+          <a class="chip" href="#">NFBC Adjustments</a>
+          <a class="chip" href="#">Fee Calculator</a>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

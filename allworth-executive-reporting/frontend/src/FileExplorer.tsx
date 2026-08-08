@@ -10,18 +10,10 @@ import {
   type Principals,
   type ResourceTreeNode,
   type ShareEntry,
-  type UploadTarget,
 } from './services/fileExplorer';
 import './FileExplorer.css';
 
 type Tab = 'downloads' | 'uploads';
-
-function formatModified(iso?: string | null): string | null {
-  if (!iso) return null;
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-}
 
 export default function FileExplorer() {
   const [tab, setTab] = useState<Tab>('downloads');
@@ -53,14 +45,16 @@ export default function FileExplorer() {
             type="button"
             role="tab"
             aria-selected={tab === 'uploads'}
-            className={tab === 'uploads' ? 'fe-tab active' : 'fe-tab'}
-            onClick={() => setTab('uploads')}
+            className="fe-tab disabled"
+            title="Uploads are coming soon"
+            disabled
           >
             Uploads
+            <span className="fe-soon">Soon</span>
           </button>
         </div>
 
-        {tab === 'downloads' ? <Downloads /> : <Uploads />}
+        {tab === 'downloads' ? <Downloads /> : null}
       </main>
     </div>
   );
@@ -74,7 +68,6 @@ function Downloads() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
-  const [busyGroup, setBusyGroup] = useState<string | null>(null);
   const [shareTarget, setShareTarget] = useState<{ id: string; label: string } | null>(null);
 
   const load = useCallback(async () => {
@@ -96,28 +89,14 @@ function Downloads() {
   }, [load]);
 
   const grouped = useMemo(() => {
-    const map = new Map<string, { id: string; label: string; items: DownloadResource[] }>();
+    const map = new Map<string, { label: string; items: DownloadResource[] }>();
     for (const r of resources) {
-      const entry = map.get(r.root_id) ?? { id: r.root_id, label: r.root_label, items: [] };
+      const entry = map.get(r.root_id) ?? { label: r.root_label, items: [] };
       entry.items.push(r);
       map.set(r.root_id, entry);
     }
     return [...map.values()];
   }, [resources]);
-
-  const downloadAll = useCallback(async (id: string, items: DownloadResource[]) => {
-    setBusyGroup(id);
-    setError(null);
-    try {
-      for (const item of items) {
-        await fileExplorerApi.downloadFile(item.id, item.formats[0] ?? 'csv');
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Download failed');
-    } finally {
-      setBusyGroup(null);
-    }
-  }, []);
 
   if (loading) return <p className="fe-muted">Loading…</p>;
   if (error) return <p className="fe-error">{error}</p>;
@@ -135,18 +114,8 @@ function Downloads() {
         </div>
       ) : (
         grouped.map((group) => (
-          <section key={group.id} className="fe-group">
-            <div className="fe-group-header">
-              <h2 className="fe-group-title">{group.label}</h2>
-              <button
-                type="button"
-                className="fe-btn primary sm"
-                disabled={busyGroup === group.id || group.items.length === 0}
-                onClick={() => downloadAll(group.id, group.items)}
-              >
-                {busyGroup === group.id ? 'Downloading…' : 'Download all'}
-              </button>
-            </div>
+          <section key={group.label} className="fe-group">
+            <h2 className="fe-group-title">{group.label}</h2>
             <ul className="fe-list">
               {group.items.map((r) => (
                 <DownloadRow
@@ -199,7 +168,6 @@ function DownloadRow({
 }) {
   const [format, setFormat] = useState(resource.formats[0] ?? 'csv');
   const labelFor = (f: string) => (f === 'txt' ? 'Text (tab)' : f.toUpperCase());
-  const modified = formatModified(resource.last_modified);
 
   return (
     <li className="fe-row">
@@ -209,12 +177,7 @@ function DownloadRow({
           <path d="M14 3v5h5" />
         </svg>
       </span>
-      <div className="fe-row-meta">
-        <span className="fe-row-name">{resource.label}</span>
-        {modified ? (
-          <span className="fe-row-modified">Modified {modified}</span>
-        ) : null}
-      </div>
+      <span className="fe-row-name">{resource.label}</span>
       <div className="fe-row-actions">
         <label className="fe-format">
           <span className="fe-format-label">Format</span>
@@ -248,148 +211,6 @@ function DownloadRow({
         ) : null}
       </div>
     </li>
-  );
-}
-
-// ── Sharing (manager only) ───────────────────────────────────────────────────
-
-function Uploads() {
-  const [targets, setTargets] = useState<UploadTarget[]>([]);
-  const [canManage, setCanManage] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    void (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fileExplorerApi.getUploads();
-        setTargets(data.uploads);
-        setCanManage(data.can_manage);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to load upload targets');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
-
-  if (loading) return <p className="fe-muted">Loading…</p>;
-  if (error) return <p className="fe-error">{error}</p>;
-  if (!canManage) {
-    return (
-      <div className="fe-empty">
-        <p>You don’t have permission to upload files.</p>
-        <p className="fe-muted">Ask an administrator for access.</p>
-      </div>
-    );
-  }
-  if (targets.length === 0) {
-    return (
-      <div className="fe-empty">
-        <p>No upload targets are configured yet.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="fe-uploads">
-      {targets.map((t) => (
-        <UploadCard key={t.id} target={t} />
-      ))}
-    </div>
-  );
-}
-
-function UploadCard({ target }: { target: UploadTarget }) {
-  const [file, setFile] = useState<File | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState<string | null>(null);
-  const [showColumns, setShowColumns] = useState(false);
-
-  const submit = async () => {
-    if (!file) return;
-    setBusy(true);
-    setError(null);
-    setDone(null);
-    try {
-      const res = await fileExplorerApi.uploadFile(target.id, file);
-      setDone(res.filename);
-      setFile(null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Upload failed');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <section className="fe-upload-card">
-      <div className="fe-upload-head">
-        <h2 className="fe-group-title">{target.label}</h2>
-        <span className="fe-upload-type">{target.format.toUpperCase()}</span>
-      </div>
-
-      <p className="fe-muted fe-upload-hint">
-        Upload a {target.format.toUpperCase()} file. Its header must match the
-        expected columns (on the first or third row).{' '}
-        <button
-          type="button"
-          className="fe-linkish"
-          onClick={() => setShowColumns((v) => !v)}
-        >
-          {showColumns ? 'Hide columns' : 'Show expected columns'}
-        </button>
-      </p>
-      {showColumns ? (
-        <ol className="fe-upload-columns">
-          {target.columns.map((c) => (
-            <li key={c}>{c}</li>
-          ))}
-        </ol>
-      ) : null}
-
-      <div className="fe-upload-controls">
-        <label className="fe-btn ghost fe-file-btn">
-          {file ? 'Change file' : 'Choose file'}
-          <input
-            type="file"
-            accept=".csv,text/csv"
-            hidden
-            onChange={(e) => {
-              setFile(e.target.files?.[0] ?? null);
-              setError(null);
-              setDone(null);
-            }}
-          />
-        </label>
-        <span className="fe-upload-filename">
-          {file ? file.name : 'No file selected'}
-        </span>
-        <button
-          type="button"
-          className="fe-btn primary"
-          disabled={!file || busy}
-          onClick={submit}
-        >
-          {busy ? (
-            <>
-              <span className="fe-spinner" aria-hidden="true" />
-              Uploading…
-            </>
-          ) : (
-            'Upload'
-          )}
-        </button>
-      </div>
-
-      {error ? <p className="fe-error fe-upload-error">{error}</p> : null}
-      {done ? (
-        <p className="fe-upload-ok">Uploaded successfully as {done}.</p>
-      ) : null}
-    </section>
   );
 }
 
@@ -445,14 +266,7 @@ function SharingPanel() {
               <ul className="fe-tree-tables">
                 {root.tables.map((t) => (
                   <li key={t.id} className="fe-tree-row">
-                    <span className="fe-tree-file">
-                      📄 {t.label}
-                      {formatModified(t.last_modified) ? (
-                        <span className="fe-tree-modified">
-                          {formatModified(t.last_modified)}
-                        </span>
-                      ) : null}
-                    </span>
+                    <span className="fe-tree-file">📄 {t.label}</span>
                     <button
                       type="button"
                       className="fe-btn ghost sm"

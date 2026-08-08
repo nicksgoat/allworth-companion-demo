@@ -54,22 +54,12 @@ def send_email(
     html: bool = False,
     token: str | None = None,
     mailbox: str | None = None,
-    reply_to: str | list[str] | None = None,
 ) -> None:
-    """Send a new email. Delegated (token) or app-only (mailbox/MAILER_FROM).
-
-    ``reply_to`` sets the Reply-To header so replies route back to that address.
-    """
-    recipients = [item.strip() for item in _as_list(to) if item.strip()]
+    """Send a new email. Delegated (token) or app-only (mailbox/MAILER_FROM)."""
+    recipients = _as_list(to)
     if not recipients:
         raise MailError("send_email requires at least one recipient", 400)
-    if not subject.strip():
-        raise MailError("send_email requires a subject", 400)
-    _g.raw_send(
-        token, _default_mailbox(token, mailbox), subject, body, recipients,
-        [item.strip() for item in _as_list(cc) if item.strip()], html,
-        reply_to=[item.strip() for item in _as_list(reply_to) if item.strip()],
-    )
+    _g.raw_send(token, _default_mailbox(token, mailbox), subject, body, recipients, _as_list(cc), html)
 
 
 def reply_to(

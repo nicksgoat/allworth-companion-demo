@@ -1,4 +1,4 @@
-import { StrictMode, Suspense, lazy, useEffect, useState } from 'react';
+import { StrictMode, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -17,13 +17,12 @@ import Automations from './Automations';
 import FeeCalculator from './FeeCalculator';
 import PipelineReview from './PipelineReview';
 import ExecutiveReport from './ExecutiveReport';
-import Crm from './Crm';
 import FileExplorer from './FileExplorer';
 import Brief from './brief/Brief';
 import Home from './Home';
 import SideNav from './components/SideNav';
 import PageTracker from './components/PageTracker';
-import type { KpiDataset, PredictionsPayload } from './types/kpi';
+import type { KpiDataset } from './types/kpi';
 import { getChartContext } from '@thoughtspot/ts-chart-sdk';
 import type { ThoughtSpotCell, ThoughtSpotRenderContext } from './types/thoughtspot';
 import { fetchAllMetrics } from './services/api';
@@ -32,19 +31,7 @@ import {
   ensureAuthenticated,
   installAuthFetch,
 } from './services/auth';
-import { demoMetrics, demoNetFlows, demoPredictions } from './data/demoMetrics';
-
-// MUI-based tools are code-split so the (large) MUI runtime is only fetched
-// when one of these routes is opened.
-const BondAnalyzer = lazy(() => import('./BondAnalyzer'));
-const EmailBatchApp = lazy(() => import('./EmailBatchApp'));
-const PlanningApp = lazy(() => import('./PlanningApp'));
-const Avantos = lazy(() => import('./Avantos'));
-const Rebalancer = lazy(() => import('./Rebalancer'));
-
-const lazyPage = (node: ReactNode) => (
-  <Suspense fallback={<div className="lazy-page-loading" />}>{node}</Suspense>
-);
+import { demoMetrics } from './data/demoMetrics';
 
 // Local preview mode: when VITE_DEMO_MODE=true the app renders bundled demo
 // data with NO authentication and NO backend/Synapse connection.  Used for the
@@ -216,14 +203,8 @@ const isPipelinePath = (() => {
       p === '/fee-calculator' ||
       p === '/pipeline-review' ||
       p === '/executive-report' ||
-      p === '/crm' ||
       p === '/file-explorer' ||
       p === '/brief' ||
-      p === '/bond-analyzer' ||
-      p === '/advisor-mailer' ||
-      p === '/planning' ||
-      p === '/avantos' ||
-      p === '/rebalancer' ||
       p === '/admin' ||
       p === '/app-usage' ||
       p === '/automations'
@@ -255,14 +236,8 @@ if (isPipelinePath) {
             <Route path="/fee-calculator" element={<ToolGuard toolId="fee_calculator"><FeeCalculator /></ToolGuard>} />
             <Route path="/pipeline-review" element={<ToolGuard toolId="pipeline_review"><PipelineReview /></ToolGuard>} />
             <Route path="/executive-report" element={<ToolGuard toolId="executive_report"><ExecutiveReport /></ToolGuard>} />
-            <Route path="/crm" element={<ToolGuard toolId="crm"><Crm /></ToolGuard>} />
             <Route path="/file-explorer" element={<ToolGuard toolId="file_explorer"><FileExplorer /></ToolGuard>} />
             <Route path="/brief" element={<ToolGuard toolId="brief"><Brief /></ToolGuard>} />
-            <Route path="/bond-analyzer" element={<ToolGuard toolId="bond_analyzer">{lazyPage(<BondAnalyzer />)}</ToolGuard>} />
-            <Route path="/advisor-mailer" element={<ToolGuard toolId="advisor_mailer">{lazyPage(<EmailBatchApp />)}</ToolGuard>} />
-            <Route path="/planning" element={<ToolGuard toolId="financial_planning">{lazyPage(<PlanningApp />)}</ToolGuard>} />
-            <Route path="/avantos" element={<ToolGuard toolId="avantos">{lazyPage(<Avantos />)}</ToolGuard>} />
-            <Route path="/rebalancer" element={<ToolGuard toolId="rebalancer">{lazyPage(<Rebalancer />)}</ToolGuard>} />
             <Route path="/admin" element={<ToolGuard toolId="admin"><Admin /></ToolGuard>} />
             <Route path="/app-usage" element={<ToolGuard toolId="admin"><AppUsage /></ToolGuard>} />
             <Route path="/automations" element={<ToolGuard toolId="admin"><Automations /></ToolGuard>} />
@@ -276,7 +251,7 @@ if (isPipelinePath) {
   })();
 }
 
-const renderApp = (metrics: KpiDataset, netFlowsMetrics?: KpiDataset, detailedMetrics?: KpiDataset, isLoading = false, predictions?: PredictionsPayload) => {
+const renderApp = (metrics: KpiDataset, netFlowsMetrics?: KpiDataset, detailedMetrics?: KpiDataset, isLoading = false) => {
   const nf = netFlowsMetrics || [];
   const dm = detailedMetrics || [];
   root.render(
@@ -295,18 +270,13 @@ const renderApp = (metrics: KpiDataset, netFlowsMetrics?: KpiDataset, detailedMe
           <Route path="/fee-calculator" element={<ToolGuard toolId="fee_calculator"><FeeCalculator /></ToolGuard>} />
           <Route path="/pipeline-review" element={<ToolGuard toolId="pipeline_review"><PipelineReview /></ToolGuard>} />
           <Route path="/executive-report" element={<ToolGuard toolId="executive_report"><ExecutiveReport /></ToolGuard>} />
-          <Route path="/crm" element={<ToolGuard toolId="crm"><Crm /></ToolGuard>} />
           <Route path="/file-explorer" element={<ToolGuard toolId="file_explorer"><FileExplorer /></ToolGuard>} />
           <Route path="/brief" element={<ToolGuard toolId="brief"><Brief /></ToolGuard>} />
-          <Route path="/bond-analyzer" element={<ToolGuard toolId="bond_analyzer">{lazyPage(<BondAnalyzer />)}</ToolGuard>} />
-          <Route path="/advisor-mailer" element={<ToolGuard toolId="advisor_mailer">{lazyPage(<EmailBatchApp />)}</ToolGuard>} />
-          <Route path="/planning" element={<ToolGuard toolId="financial_planning">{lazyPage(<PlanningApp />)}</ToolGuard>} />
-          <Route path="/avantos" element={<ToolGuard toolId="avantos">{lazyPage(<Avantos />)}</ToolGuard>} />
           <Route path="/admin" element={<ToolGuard toolId="admin"><Admin /></ToolGuard>} />
           <Route path="/app-usage" element={<ToolGuard toolId="admin"><AppUsage /></ToolGuard>} />
           <Route path="/automations" element={<ToolGuard toolId="admin"><Automations /></ToolGuard>} />
-          <Route path="/reporting/kpi" element={<ToolGuard toolId="performance"><Reporting metrics={metrics} netFlowsMetrics={nf} detailedMetrics={dm} isLoading={isLoading} predictions={predictions} /></ToolGuard>} />
-          <Route path="*" element={<ToolGuard toolId="performance"><Reporting metrics={metrics} netFlowsMetrics={nf} detailedMetrics={dm} isLoading={isLoading} predictions={predictions} /></ToolGuard>} />
+          <Route path="/reporting/kpi" element={<ToolGuard toolId="performance"><Reporting metrics={metrics} netFlowsMetrics={nf} detailedMetrics={dm} isLoading={isLoading} /></ToolGuard>} />
+          <Route path="*" element={<ToolGuard toolId="performance"><Reporting metrics={metrics} netFlowsMetrics={nf} detailedMetrics={dm} isLoading={isLoading} /></ToolGuard>} />
         </Routes>
         <PageTracker />
         <ImpersonationBar />
@@ -471,7 +441,7 @@ const bootstrap = async () => {
   // Local preview mode — render bundled demo data with no auth and no backend.
   if (DEMO_MODE) {
     console.log('🎭 DEMO_MODE enabled — rendering bundled demo metrics (no auth, no backend)');
-    renderApp(demoMetrics, demoNetFlows, [], false, demoPredictions);
+    renderApp(demoMetrics);
     return;
   }
 
@@ -507,7 +477,7 @@ const bootstrap = async () => {
 
     if (bundle.kpiMetrics.length > 0) {
       console.log('   🎉 SUCCESS! Rendering dashboard');
-      renderApp(bundle.kpiMetrics, bundle.netFlows, bundle.detailedMetrics, false, bundle.predictions);
+      renderApp(bundle.kpiMetrics, bundle.netFlows, bundle.detailedMetrics);
       return;
     } else {
       console.warn('   ⚠️ API returned 0 KPI metrics');
@@ -533,7 +503,7 @@ const bootstrap = async () => {
           }
         ],
         getQueriesFromChartConfig: () => [],
-        renderChart: async (context: unknown) => {
+        renderChart: async (context: any) => {
           const rows = (context as ThoughtSpotRenderContext)?.data ?? [];
           console.log(`   ThoughtSpot returned ${rows.length} rows`);
           const metrics = parseMetricsFromRows(rows);

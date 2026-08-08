@@ -196,36 +196,6 @@ def _easyauth_identity(req: Any) -> str | None:
     )
 
 
-def _dev_user() -> dict[str, str | None] | None:
-    """Synthetic signed-in user for local dev (AUTH_DEV_EMAIL / AUTH_DEV_NAME).
-
-    Ignored whenever real Entra SSO is configured, so it can never impersonate
-    a user in a production deployment.
-    """
-    email = (os.getenv('AUTH_DEV_EMAIL') or '').strip()
-    if not email or is_configured():
-        return None
-    name = (os.getenv('AUTH_DEV_NAME') or '').strip() or (
-        email.split('@')[0].replace('.', ' ').title()
-    )
-    return {'email': email, 'name': name}
-
-
-def easy_auth_user(req: Any = None) -> dict[str, str | None] | None:
-    """Return {'email', 'name'} for the Easy Auth identity, or None.
-
-    Accepts any request-like object with ``.headers`` (defaults to the active
-    Flask request). Falls back to a local dev identity (``AUTH_DEV_EMAIL``)
-    when no Easy Auth header is present and real Entra SSO is not configured.
-    """
-    req = req if req is not None else request
-    identity = _easyauth_identity(req)
-    if not identity:
-        return _dev_user()
-    name = identity.split('@')[0].replace('.', ' ').title() if '@' in identity else identity
-    return {'email': identity, 'name': name}
-
-
 def _authorize(claims: dict[str, Any]) -> str | None:
     """Return None if claims pass the configured allowlists, else an error string."""
     if _ALLOWED_EMAILS:

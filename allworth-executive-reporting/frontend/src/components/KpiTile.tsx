@@ -40,14 +40,9 @@ type Props = {
   compact?: boolean;
   yellowThreshold?: number;
   onShowTrendline?: (target: TrendTarget, anchor: { x: number; y: number }) => void;
-  // Current-month EoM projection (same unit/currency as the tile). When set, a
-  // "Proj" figure renders to the right of the actual. Tile coloring is unchanged.
-  projection?: number;
-  projectionLow?: number;
-  projectionHigh?: number;
 };
 
-export function KpiTile({ entry, isTotal = false, title, compact = false, yellowThreshold = 80, onShowTrendline, projection, projectionLow, projectionHigh }: Props) {
+export function KpiTile({ entry, isTotal = false, title, compact = false, yellowThreshold = 80, onShowTrendline }: Props) {
   if (!entry) {
     return (
       <div className={`kpi-tile kpi-tile--empty ${isTotal ? 'kpi-tile--total' : ''} ${compact ? 'kpi-tile--compact' : ''}`}>
@@ -111,35 +106,14 @@ export function KpiTile({ entry, isTotal = false, title, compact = false, yellow
     return 'kpi-tile--off-track'; // Red: < threshold%
   };
 
-  // Projection status is judged against the FULL-month plan (a full-month
-  // projection vs the prorated plan would be apples-to-oranges), matching the
-  // projection panel below the matrix so both visuals tell the same story.
-  const fullPlan = entry.goal ?? 0;
-  const getProjStatusClass = () => {
-    if (projection === undefined || fullPlan === 0) return '';
-    if (isNegativeMetric) {
-      const projAbs = Math.abs(projection);
-      const planAbs = Math.abs(fullPlan);
-      if (projAbs <= planAbs) return 'kpi-tile__proj--on-track';
-      const pct = (planAbs / projAbs) * 100;
-      return pct >= yellowThreshold ? 'kpi-tile__proj--near-goal' : 'kpi-tile__proj--off-track';
-    }
-    const pct = (projection / fullPlan) * 100;
-    if (pct >= 100) return 'kpi-tile__proj--on-track';
-    if (pct >= yellowThreshold) return 'kpi-tile__proj--near-goal';
-    return 'kpi-tile__proj--off-track';
-  };
-
   return (
     <div
       className={`kpi-tile ${isTotal ? 'kpi-tile--total' : ''} ${compact ? 'kpi-tile--compact' : ''} ${getStatusClass()}`}
       onContextMenu={handleContextMenu}
     >
       {title && !compact && <div className="kpi-tile__title">{title}</div>}
-      <div className="kpi-tile__actual-row">
-        <div className="kpi-tile__actual">
-          {formatNumber(entry.actual, entry.currency, unit)}
-        </div>
+      <div className="kpi-tile__actual">
+        {formatNumber(entry.actual, entry.currency, unit)}
       </div>
       <div className="kpi-tile__comparisons">
         <span className="kpi-tile__py">
@@ -150,20 +124,6 @@ export function KpiTile({ entry, isTotal = false, title, compact = false, yellow
           <span className="kpi-tile__label">Plan</span>
           <span className="kpi-tile__value">{formatNumber(planValue, entry.currency, unit)}</span>
         </span>
-        {projection !== undefined && (
-          <span
-            className={`kpi-tile__proj ${getProjStatusClass()}`}
-            title={
-              (projectionLow !== undefined && projectionHigh !== undefined
-                ? `Projected end-of-month: ${formatNumber(projection, entry.currency, unit)} (range ${formatNumber(projectionLow, entry.currency, unit)} – ${formatNumber(projectionHigh, entry.currency, unit)})`
-                : `Projected end-of-month: ${formatNumber(projection, entry.currency, unit)}`)
-              + (fullPlan ? ` · vs full-month plan ${formatNumber(fullPlan, entry.currency, unit)}` : '')
-            }
-          >
-            <span className="kpi-tile__label">Proj</span>
-            <span className="kpi-tile__value">{formatNumber(projection, entry.currency, unit)}</span>
-          </span>
-        )}
       </div>
     </div>
   );
