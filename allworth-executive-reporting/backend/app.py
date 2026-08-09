@@ -175,6 +175,14 @@ try:
 except Exception as _exec_e:  # pragma: no cover - defensive
     print(f"⚠️  Executive Report blueprint unavailable: {type(_exec_e).__name__}: {_exec_e}")
 
+# CRM — read-only Client 360 + Advisor book views over the Synapse warehouse.
+try:
+    from crm.routes import bp as crm_bp
+    app.register_blueprint(crm_bp, url_prefix="/api/crm")
+    print("👥 CRM blueprint registered at /api/crm")
+except Exception as _crm_e:  # pragma: no cover - defensive
+    print(f"⚠️  CRM blueprint unavailable: {type(_crm_e).__name__}: {_crm_e}")
+
 # File Explorer — download (and later upload) data-lake files. Reuses the shared
 # JWT middleware; Delta tables are surfaced from ADLS Gen2 and shared per user or
 # per Admin-console group.
@@ -184,6 +192,55 @@ try:
     print("🗂️  File Explorer blueprint registered at /api/file-explorer")
 except Exception as _fe_e:  # pragma: no cover - defensive
     print(f"⚠️  File Explorer blueprint unavailable: {type(_fe_e).__name__}: {_fe_e}")
+
+# Investments — Bond Analyzer workspaces. Blueprints own their /api prefixes.
+try:
+    from investments.routers import account_analysis as _inv_account_analysis
+    from investments.routers import bond_ladder as _inv_bond_ladder
+    from investments.routers import dashboard as _inv_dashboard
+    from investments.routers import sample_portfolio as _inv_sample_portfolio
+    from investments.routers import upload as _inv_upload
+    for _inv_mod in (
+        _inv_account_analysis, _inv_bond_ladder, _inv_dashboard,
+        _inv_sample_portfolio, _inv_upload,
+    ):
+        app.register_blueprint(_inv_mod.bp)
+    print("📈 Investments blueprints registered (bond analyzer)")
+    from investments import warmup as _inv_warmup
+    _inv_warmup.start()
+except Exception as _inv_e:  # pragma: no cover - defensive
+    print(f"⚠️  Investments blueprints unavailable: {type(_inv_e).__name__}: {_inv_e}")
+
+# Advisor Mailer — workbook preview and deliberate Microsoft Graph batch send.
+try:
+    from email_batch.routes import bp as email_batch_bp
+    app.register_blueprint(email_batch_bp)
+    print("📧 Advisor Mailer blueprint registered at /api/email-batch")
+except Exception as _eb_e:  # pragma: no cover - defensive
+    print(f"⚠️  Advisor Mailer blueprint unavailable: {type(_eb_e).__name__}: {_eb_e}")
+
+# Financial Planning and its advisor cockpit.
+try:
+    from planning.routes import bp as planning_bp
+    app.register_blueprint(planning_bp, url_prefix="/api/v1")
+    print("📐 Financial Planning blueprint registered at /api/v1")
+except Exception as _plan_e:  # pragma: no cover - defensive
+    print(f"⚠️  Financial Planning blueprint unavailable: {type(_plan_e).__name__}: {_plan_e}")
+
+try:
+    from avantos.routes import bp as avantos_bp
+    app.register_blueprint(avantos_bp, url_prefix="/api/avantos")
+    print("Avantos cockpit registered at /api/avantos")
+except Exception as _av_e:  # pragma: no cover - defensive
+    print(f"Avantos blueprint unavailable: {type(_av_e).__name__}: {_av_e}")
+
+# Tax-aware, proposal-only what-if rebalancing; never submits trades.
+try:
+    from rebalancer.routes import bp as rebalancer_bp
+    app.register_blueprint(rebalancer_bp, url_prefix="/api/rebalancer")
+    print("Mock Rebalancer registered at /api/rebalancer")
+except Exception as _rb_e:  # pragma: no cover - defensive
+    print(f"Rebalancer blueprint unavailable: {type(_rb_e).__name__}: {_rb_e}")
 
 
 @app.after_request
@@ -1665,7 +1722,11 @@ _TOOL_ROUTES = [
     ('/nfbc', 'nfbc', 'NFBC Adjustments'),
     ('/fee-calculator', 'fee_calculator', 'Fee Calculator'),
     ('/pipeline-review', 'pipeline_review', 'Pipeline Review'),
+    ('/crm', 'crm', 'CRM'),
     ('/brief', 'brief', 'Executive Brief'),
+    ('/planning', 'financial_planning', 'Financial Planning'),
+    ('/avantos', 'avantos', 'Avantos'),
+    ('/rebalancer', 'rebalancer', 'Mock Rebalancer'),
     ('/catalog', 'data_catalog', 'Data Catalog'),
     ('/app-usage', 'admin', 'App Usage'),
     ('/admin', 'admin', 'Admin'),
@@ -1674,6 +1735,8 @@ _TOOL_ROUTES = [
     ('/refresh-log', 'pipeline_logging', 'Refresh Log'),
     ('/sfp2', 'sfp2', 'Salesforce Column Updater'),
     ('/repcodes', 'repcodes', 'Rep Codes'),
+    ('/bond-analyzer', 'bond_analyzer', 'Bond Analyzer'),
+    ('/advisor-mailer', 'advisor_mailer', 'Advisor Mailer'),
     ('/embed', 'performance', 'Performance by Channel'),
     ('/home', 'home', 'Home'),
     ('/', 'home', 'Home'),

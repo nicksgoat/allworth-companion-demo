@@ -3,12 +3,14 @@ import type { FormEvent, ReactNode } from 'react';
 import { InboxProvider, useInbox } from '../brief/store';
 import { demoMetrics } from '../data/demoMetrics';
 import { fetchKpiMetrics } from '../services/api';
+import { crmApi } from '../services/crm';
+import type { CrmClient } from '../services/crm';
 import type { KpiDataset, KpiEntry } from '../types/kpi';
 import './AccountToolWidgets.css';
 
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
-type WidgetKey = 'performance' | 'fee_calculator' | 'pipeline_review' | 'brief';
+type WidgetKey = 'performance' | 'crm' | 'fee_calculator' | 'pipeline_review' | 'brief' | 'avantos';
 
 interface AccountToolWidgetsProps {
   enabled: Record<WidgetKey, boolean>;
@@ -98,6 +100,45 @@ function PerformanceWidget() {
         </>
       ) : (
         <p className="account-widget-empty">{error ? 'Performance data is unavailable.' : 'Loading performance…'}</p>
+      )}
+    </WidgetShell>
+  );
+}
+
+function CrmWidget() {
+  const [query, setQuery] = useState('');
+  const [clients, setClients] = useState<CrmClient[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setLoading(true);
+      setError(false);
+      void crmApi.getClients({ q: query, limit: 5 })
+        .then((rows) => setClients(rows.slice(0, 4)))
+        .catch(() => setError(true))
+        .finally(() => setLoading(false));
+    }, query ? 180 : 0);
+    return () => window.clearTimeout(timer);
+  }, [query]);
+
+  return (
+    <WidgetShell eyebrow="Client relationships" title="CRM" href="/crm" status={loading ? 'Searching…' : `${clients.length} in view`}>
+      <label className="crm-widget-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search client or household" aria-label="Search CRM clients" />
+      </label>
+      {error ? <p className="account-widget-empty">CRM search is unavailable.</p> : (
+        <div className="crm-widget-list">
+          {clients.map((client) => (
+            <a key={client.lead_id} href={`/crm?client=${encodeURIComponent(client.lead_id)}`}>
+              <div><strong>{client.name}</strong><span>{client.advisor_name} · {client.segment || client.hh_status}</span></div>
+              <div><strong>{currency(client.aum)}</strong><span>{client.state || '—'}</span></div>
+            </a>
+          ))}
+          {!loading && !clients.length && <p className="account-widget-empty">No matching clients.</p>}
+        </div>
       )}
     </WidgetShell>
   );
@@ -304,6 +345,64 @@ function ExecutiveBriefWidget() {
   return <InboxProvider><ExecutiveBriefWidgetContent /></InboxProvider>;
 }
 
+interface CockpitHousehold {
+  household_id: string;
+  name: string;
+  health_band: 'healthy' | 'watch' | 'at_risk';
+  health_score?: number;
+  open_alerts: number;
+  open_tasks: number;
+  drift_flagged: boolean;
+}
+
+const DEMO_COCKPIT: CockpitHousehold[] = [
+  { household_id: 'hh-201', name: 'Evergreen Family', health_band: 'at_risk', health_score: 42, open_alerts: 2, open_tasks: 1, drift_flagged: true },
+  { household_id: 'hh-202', name: 'Northstar Household', health_band: 'watch', health_score: 68, open_alerts: 1, open_tasks: 2, drift_flagged: false },
+  { household_id: 'hh-203', name: 'Harbor Ridge Household', health_band: 'healthy', health_score: 91, open_alerts: 0, open_tasks: 1, drift_flagged: false },
+];
+
+function AvantosWidget() {
+  const [households, setHouseholds] = useState<CockpitHousehold[]>(DEMO_MODE ? DEMO_COCKPIT : []);
+  const [filter, setFilter] = useState<'all' | 'at_risk'>('all');
+  const [loading, setLoading] = useState(!DEMO_MODE);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    if (DEMO_MODE) return;
+    void fetch('/api/avantos/cockpit')
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Cockpit unavailable');
+        const payload = await response.json() as { households?: CockpitHousehold[] };
+        setHouseholds(payload.households ?? []);
+      })
+      .catch(() => setError(true))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const visible = households.filter((household) => filter === 'all' || household.health_band === 'at_risk').slice(0, 3);
+  const atRisk = households.filter((household) => household.health_band === 'at_risk').length;
+  return (
+    <WidgetShell eyebrow="Advisor console" title="Avantos" href="/avantos" status={`${atRisk} at risk`}>
+      <div className="account-widget-segment avantos-widget-segment" role="group" aria-label="Avantos household filter">
+        <button type="button" className={filter === 'all' ? 'active' : ''} onClick={() => setFilter('all')}>Priority book</button>
+        <button type="button" className={filter === 'at_risk' ? 'active' : ''} onClick={() => setFilter('at_risk')}>At risk</button>
+      </div>
+      {loading ? <p className="account-widget-empty">Loading household health…</p> : error ? <p className="account-widget-empty">Avantos data is unavailable.</p> : (
+        <div className="avantos-widget-list">
+          {visible.map((household) => (
+            <a key={household.household_id} href={`/planning?household=${encodeURIComponent(household.household_id)}`}>
+              <span className={`avantos-health ${household.health_band}`} />
+              <div><strong>{household.name}</strong><span>{household.open_alerts} alerts · {household.open_tasks} tasks{household.drift_flagged ? ' · Drift' : ''}</span></div>
+              <b>{household.health_score ?? '—'}</b>
+            </a>
+          ))}
+          {!visible.length && <p className="account-widget-empty">No households in this view.</p>}
+        </div>
+      )}
+    </WidgetShell>
+  );
+}
+
 export default function AccountToolWidgets({ enabled, accountLabel }: AccountToolWidgetsProps) {
   const count = Object.values(enabled).filter(Boolean).length;
   if (!count) return null;
@@ -315,9 +414,11 @@ export default function AccountToolWidgets({ enabled, accountLabel }: AccountToo
       </div>
       <div className="account-tools-grid">
         {enabled.performance && <PerformanceWidget />}
+        {enabled.crm && <CrmWidget />}
         {enabled.fee_calculator && <FeeCalculatorWidget />}
         {enabled.pipeline_review && <PipelineWidget />}
         {enabled.brief && <ExecutiveBriefWidget />}
+        {enabled.avantos && <AvantosWidget />}
       </div>
     </section>
   );

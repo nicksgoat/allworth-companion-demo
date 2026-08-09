@@ -62,3 +62,21 @@
 .brief-widget-row > button:hover { border-color: var(--aw-cerulean, #3e71b7); background: var(--aw-ice, #edf2f7); }
 .account-widget-empty { margin: 24px 0; color: var(--aw-ink-muted, #828282); font-size: 12px; text-align: center; }
 .account-widget-error { margin: 18px 0 0; color: #9b4e3a; font-size: 11px; }
+.crm-widget-search { height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid rgba(23,61,103,.2); border-radius: 6px; background: #fff; }
+.crm-widget-search:focus-within { border-color: var(--aw-cerulean, #3e71b7); box-shadow: 0 0 0 3px rgba(62,113,183,.12); }
+.crm-widget-search svg { width: 15px; height: 15px; flex: none; color: var(--aw-ink-muted, #828282); }
+.crm-widget-search input { width: 100%; min-width: 0; border: 0; outline: 0; color: var(--aw-ink, #171717); font: 400 11.5px/1 var(--aw-font-body, Lato, sans-serif); }
+.crm-widget-list, .avantos-widget-list { display: grid; margin-top: 9px; }
+.crm-widget-list > a, .avantos-widget-list > a { min-height: 48px; display: grid; align-items: center; gap: 10px; border-top: 1px solid var(--aw-line, #e6e6e6); color: inherit; text-decoration: none; }
+.crm-widget-list > a { grid-template-columns: minmax(0, 1fr) auto; }
+.crm-widget-list > a > div, .avantos-widget-list > a > div { min-width: 0; display: grid; gap: 2px; }
+.crm-widget-list > a > div:last-child { text-align: right; }
+.crm-widget-list strong, .avantos-widget-list strong { overflow: hidden; color: var(--aw-night, #0c2e4e); font-size: 11.5px; text-overflow: ellipsis; white-space: nowrap; }
+.crm-widget-list span, .avantos-widget-list span { overflow: hidden; color: var(--aw-ink-muted, #828282); font-size: 9.5px; text-overflow: ellipsis; white-space: nowrap; }
+.crm-widget-list > a:hover strong, .avantos-widget-list > a:hover strong { color: var(--aw-cerulean, #3e71b7); }
+.avantos-widget-segment { margin-bottom: 2px; }
+.avantos-widget-list > a { grid-template-columns: 8px minmax(0, 1fr) 28px; }
+.avantos-widget-list > a > b { color: var(--aw-night, #0c2e4e); font: 600 17px/1 var(--aw-font-display, Georgia, serif); text-align: right; }
+.avantos-health { width: 7px; height: 7px; border-radius: 50%; background: #6d8b7b; }
+.avantos-health.watch { background: #a99c6c; }
+.avantos-health.at_risk { background: #9b4e3a; }

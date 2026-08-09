@@ -1,0 +1,71 @@
+.av-shell {
+  min-height: 100vh;
+  background: var(--aw-feather, #f3f4f4);
+  color: var(--aw-ink, #171717);
+  font-family: var(--aw-font-body, 'Lato', sans-serif);
+}
+
+.av-header {
+  background: transparent !important;
+  color: var(--aw-ink, #171717) !important;
+  border-bottom: 1px solid var(--aw-line, #e6e6e6);
+}
+
+.av-header .MuiToolbar-root {
+  min-height: 0;
+  padding: 24px 32px 22px;
+}
+
+.av-brand {
+  margin: 0;
+  color: var(--aw-indigo, #173d67);
+  font: 600 2rem/1.1 var(--aw-font-display, 'Playfair Display', serif) !important;
+  letter-spacing: -0.02em;
+}
+
+.av-product {
+  margin-top: 6px !important;
+  color: var(--aw-ink-secondary, #595959);
+  font: 400 0.9rem/1.45 var(--aw-font-body, 'Lato', sans-serif) !important;
+}
+
+.av-status-chip {
+  background: var(--aw-ice, #edf2f7) !important;
+  border: 1px solid rgba(23, 61, 103, 0.16) !important;
+  color: var(--aw-indigo, #173d67) !important;
+  font-weight: 700;
+}
+
+.av-loading {
+  display: flex;
+  justify-content: center;
+  padding: 64px 0;
+}
+
+.av-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.av-tile__label {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--aw-ink-muted, #828282);
+}
+
+.av-tile__value {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--aw-indigo, #173d67);
+}
+
+.av-table-card {
+  border-radius: var(--aw-radius, 10px);
+}
+
+.av-row {
+  cursor: pointer;
+}

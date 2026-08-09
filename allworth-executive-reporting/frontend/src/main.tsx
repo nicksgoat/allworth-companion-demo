@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useState } from 'react';
+import { StrictMode, Suspense, lazy, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -17,6 +17,7 @@ import Automations from './Automations';
 import FeeCalculator from './FeeCalculator';
 import PipelineReview from './PipelineReview';
 import ExecutiveReport from './ExecutiveReport';
+import Crm from './Crm';
 import FileExplorer from './FileExplorer';
 import Brief from './brief/Brief';
 import Home from './Home';
@@ -32,6 +33,18 @@ import {
   installAuthFetch,
 } from './services/auth';
 import { demoMetrics } from './data/demoMetrics';
+
+// Keep the larger planning and investment workspaces out of the initial hub
+// bundle. They load only when an authorized user opens the tool.
+const BondAnalyzer = lazy(() => import('./BondAnalyzer'));
+const EmailBatchApp = lazy(() => import('./EmailBatchApp'));
+const PlanningApp = lazy(() => import('./PlanningApp'));
+const Avantos = lazy(() => import('./Avantos'));
+const Rebalancer = lazy(() => import('./Rebalancer'));
+
+const lazyPage = (node: ReactNode) => (
+  <Suspense fallback={<div className="lazy-page-loading" aria-label="Loading tool" />}>{node}</Suspense>
+);
 
 // Local preview mode: when VITE_DEMO_MODE=true the app renders bundled demo
 // data with NO authentication and NO backend/Synapse connection.  Used for the
@@ -236,8 +249,14 @@ if (isPipelinePath) {
             <Route path="/fee-calculator" element={<ToolGuard toolId="fee_calculator"><FeeCalculator /></ToolGuard>} />
             <Route path="/pipeline-review" element={<ToolGuard toolId="pipeline_review"><PipelineReview /></ToolGuard>} />
             <Route path="/executive-report" element={<ToolGuard toolId="executive_report"><ExecutiveReport /></ToolGuard>} />
+            <Route path="/crm" element={<ToolGuard toolId="crm"><Crm /></ToolGuard>} />
             <Route path="/file-explorer" element={<ToolGuard toolId="file_explorer"><FileExplorer /></ToolGuard>} />
             <Route path="/brief" element={<ToolGuard toolId="brief"><Brief /></ToolGuard>} />
+            <Route path="/bond-analyzer" element={<ToolGuard toolId="bond_analyzer">{lazyPage(<BondAnalyzer />)}</ToolGuard>} />
+            <Route path="/advisor-mailer" element={<ToolGuard toolId="advisor_mailer">{lazyPage(<EmailBatchApp />)}</ToolGuard>} />
+            <Route path="/planning" element={<ToolGuard toolId="financial_planning">{lazyPage(<PlanningApp />)}</ToolGuard>} />
+            <Route path="/avantos" element={<ToolGuard toolId="avantos">{lazyPage(<Avantos />)}</ToolGuard>} />
+            <Route path="/rebalancer" element={<ToolGuard toolId="rebalancer">{lazyPage(<Rebalancer />)}</ToolGuard>} />
             <Route path="/admin" element={<ToolGuard toolId="admin"><Admin /></ToolGuard>} />
             <Route path="/app-usage" element={<ToolGuard toolId="admin"><AppUsage /></ToolGuard>} />
             <Route path="/automations" element={<ToolGuard toolId="admin"><Automations /></ToolGuard>} />
@@ -270,8 +289,14 @@ const renderApp = (metrics: KpiDataset, netFlowsMetrics?: KpiDataset, detailedMe
           <Route path="/fee-calculator" element={<ToolGuard toolId="fee_calculator"><FeeCalculator /></ToolGuard>} />
           <Route path="/pipeline-review" element={<ToolGuard toolId="pipeline_review"><PipelineReview /></ToolGuard>} />
           <Route path="/executive-report" element={<ToolGuard toolId="executive_report"><ExecutiveReport /></ToolGuard>} />
+          <Route path="/crm" element={<ToolGuard toolId="crm"><Crm /></ToolGuard>} />
           <Route path="/file-explorer" element={<ToolGuard toolId="file_explorer"><FileExplorer /></ToolGuard>} />
           <Route path="/brief" element={<ToolGuard toolId="brief"><Brief /></ToolGuard>} />
+          <Route path="/bond-analyzer" element={<ToolGuard toolId="bond_analyzer">{lazyPage(<BondAnalyzer />)}</ToolGuard>} />
+          <Route path="/advisor-mailer" element={<ToolGuard toolId="advisor_mailer">{lazyPage(<EmailBatchApp />)}</ToolGuard>} />
+          <Route path="/planning" element={<ToolGuard toolId="financial_planning">{lazyPage(<PlanningApp />)}</ToolGuard>} />
+          <Route path="/avantos" element={<ToolGuard toolId="avantos">{lazyPage(<Avantos />)}</ToolGuard>} />
+          <Route path="/rebalancer" element={<ToolGuard toolId="rebalancer">{lazyPage(<Rebalancer />)}</ToolGuard>} />
           <Route path="/admin" element={<ToolGuard toolId="admin"><Admin /></ToolGuard>} />
           <Route path="/app-usage" element={<ToolGuard toolId="admin"><AppUsage /></ToolGuard>} />
           <Route path="/automations" element={<ToolGuard toolId="admin"><Automations /></ToolGuard>} />

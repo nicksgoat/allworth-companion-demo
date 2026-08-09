@@ -196,6 +196,27 @@ def _easyauth_identity(req: Any) -> str | None:
     )
 
 
+def _dev_user() -> dict[str, str] | None:
+    """Return the explicit local-development identity when SSO is absent."""
+    email = (os.getenv('AUTH_DEV_EMAIL') or '').strip()
+    if not email or is_configured():
+        return None
+    name = (os.getenv('AUTH_DEV_NAME') or '').strip() or (
+        email.split('@')[0].replace('.', ' ').title()
+    )
+    return {'email': email, 'name': name}
+
+
+def easy_auth_user(req: Any = None) -> dict[str, str | None] | None:
+    """Return the current Easy Auth identity in a stable email/name shape."""
+    req = req if req is not None else request
+    identity = _easyauth_identity(req)
+    if not identity:
+        return _dev_user()
+    name = identity.split('@')[0].replace('.', ' ').title() if '@' in identity else identity
+    return {'email': identity, 'name': name}
+
+
 def _authorize(claims: dict[str, Any]) -> str | None:
     """Return None if claims pass the configured allowlists, else an error string."""
     if _ALLOWED_EMAILS:

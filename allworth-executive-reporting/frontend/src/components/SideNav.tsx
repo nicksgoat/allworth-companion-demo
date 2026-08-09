@@ -51,15 +51,27 @@ const GROUPS: NavGroup[] = [
     heading: 'Daily work',
     links: [
       { href: '/reporting/kpi', label: 'Performance', matches: ['/reporting/kpi'], toolId: 'performance', icon: icon(<><path d="M3 3v18h18" /><path d="M7 15l3-4 3 3 4-6" /></>) },
+      { href: '/crm', label: 'CRM', matches: ['/crm'], toolId: 'crm', icon: icon(<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.9" /><path d="M16 3.1a4 4 0 0 1 0 7.8" /></>) },
       { href: '/pipeline-review', label: 'Pipeline Review', matches: ['/pipeline-review'], toolId: 'pipeline_review', icon: icon(<><path d="M3 3v18h18" /><path d="m7 14 4-4 3 3 5-6" /></>) },
       { href: '/executive-report', label: 'Executive Report', matches: ['/executive-report'], toolId: 'executive_report', icon: icon(<><path d="M3 3v18h18" /><rect x="7" y="11" width="3" height="6" /><rect x="12" y="7" width="3" height="10" /><rect x="17" y="4" width="3" height="13" /></>) },
       { href: '/brief', label: 'Executive Brief', matches: ['/brief'], toolId: 'brief', icon: icon(<><path d="M3 6h18v12H3z" /><path d="m3 7 9 6 9-6" /></>) },
       { href: '/fee-calculator', label: 'Fee Calculator', matches: ['/fee-calculator'], toolId: 'fee_calculator', icon: icon(<><rect x="4" y="2" width="16" height="20" rx="2" /><path d="M8 6h8" /><path d="M8 10h8" /><path d="M8 14h4" /><path d="M8 18h6" /></>) },
+      { href: '/planning', label: 'Financial Planning', matches: ['/planning'], toolId: 'financial_planning', icon: icon(<><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="3.5" /><path d="M12 3v3" /><path d="M12 18v3" /><path d="M3 12h3" /><path d="M18 12h3" /></>) },
+      { href: '/avantos', label: 'Avantos', matches: ['/avantos'], toolId: 'avantos', icon: icon(<><path d="M3 17l6-6 4 4 8-8" /><path d="M14 7h7v7" /></>) },
+    ],
+  },
+  {
+    heading: 'Portfolio tools',
+    links: [
+      { href: '/rebalancer', label: 'Mock Rebalancer', matches: ['/rebalancer'], toolId: 'rebalancer', icon: icon(<><path d="M12 3v18" /><path d="M5 8l7-5 7 5" /><path d="M3 14a3 3 0 0 0 6 0l-3-6z" /><path d="M15 14a3 3 0 0 0 6 0l-3-6z" /></>) },
+      { href: '/bond-analyzer', label: 'Bond Analyzer', matches: ['/bond-analyzer'], toolId: 'bond_analyzer', icon: icon(<><path d="M3 3v18h18" /><path d="M7 13h2v4H7z" /><path d="M11 9h2v8h-2z" /><path d="M15 5h2v12h-2z" /></>) },
+      { href: '/advisor-mailer', label: 'Advisor Mailer', matches: ['/advisor-mailer'], toolId: 'advisor_mailer', icon: icon(<><path d="M3 6h18v12H3z" /><path d="m3 7 9 6 9-6" /><path d="M8 18h8" /></>) },
     ],
   },
   {
     heading: 'Data & operations',
     links: [
+      { href: '/jarvis', label: 'Jarvis Encyclopedia', matches: ['/jarvis'], toolId: 'jarvis', icon: icon(<><path d="M5 4h12a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2z" /><path d="M9 8h6" /><path d="M9 12h6" /><path d="M9 16h4" /></>) },
       { href: '/nfbc', label: 'NFBC Adjustments', matches: ['/nfbc'], toolId: 'nfbc', icon: icon(<><path d="M4 4h16v16H4z" /><path d="M4 9h16" /><path d="M4 14h16" /><path d="M9 4v16" /></>) },
       { href: '/file-explorer', label: 'File Explorer', matches: ['/file-explorer'], toolId: 'file_explorer', icon: icon(<><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M12 11v5" /><path d="m9.5 13.5 2.5-2.5 2.5 2.5" /></>) },
       { href: '/catalog/', label: 'Data Catalog', matches: ['/catalog', '/catalog/'], toolId: 'data_catalog', icon: icon(<><ellipse cx="12" cy="5" rx="8" ry="3" /><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5" /><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" /></>) },
