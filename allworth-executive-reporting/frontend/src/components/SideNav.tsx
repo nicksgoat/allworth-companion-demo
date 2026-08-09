@@ -7,7 +7,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { canAccessTool, useEffectiveAccess } from '../services/access';
-import allworthLogoWhite from '../assets/allworth-logo-white.png';
+import allworthLogo from '../assets/allworth-logo.svg';
 import './SideNav.css';
 
 interface NavLink {
@@ -227,7 +227,7 @@ const SideNav = () => {
       <div className="side-nav-brand-row">
         <a className="side-nav-brand" href="/" aria-label="Allworth workspace">
           <img
-            src={allworthLogoWhite}
+            src={allworthLogo}
             alt="Allworth"
             onError={(event) => {
               event.currentTarget.hidden = true;
