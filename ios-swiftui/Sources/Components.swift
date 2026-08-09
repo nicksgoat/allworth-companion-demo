@@ -1,0 +1,215 @@
+import SwiftUI
+
+// MARK: - Scroll tracking
+
+// Reports how far a ScrollView has scrolled (0 at rest, growing as you scroll
+// up) — mirror of the RN `scrollY` Animated.Value that drives the header + logo
+// handoff. Uses ScrollGeometry (the reliable modern API); apply to the ScrollView.
+extension View {
+    func trackScroll(into scrollY: Binding<CGFloat>) -> some View {
+        onScrollGeometryChange(for: CGFloat.self) { geo in
+            geo.contentOffset.y + geo.contentInsets.top
+        } action: { _, newValue in
+            scrollY.wrappedValue = max(0, newValue)
+        }
+    }
+}
+
+func clamp01(_ v: CGFloat) -> CGFloat { min(1, max(0, v)) }
+
+// MARK: - Card
+
+struct CardBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: Radius.card, style: .continuous)
+                    .stroke(Color.allworthNavy.opacity(0.05), lineWidth: 1)
+            )
+            .shadow(color: Color.nightBlue.opacity(0.05), radius: 8, x: 0, y: 2)
+    }
+}
+
+extension View {
+    func card() -> some View { modifier(CardBackground()) }
+}
+
+// MARK: - Section header
+
+struct SectionHeader: View {
+    let text: String
+    init(_ text: String) { self.text = text }
+    var body: some View {
+        Text(text.uppercased())
+            .font(BrandFont.sansBold(11))
+            .tracking(0.6)
+            .foregroundStyle(Color.inkTertiary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - Navy hero gradient
+
+// The brand's premium fill: Night Blue → Indigo vertical gradient + a soft
+// cerulean glow in the upper-right. Reserved for hero surfaces (DESIGN.md).
+struct NavyGradient: View {
+    // Reassurance hero (Home): the brand marquee supergraphic + a single "breath"
+    // where the glow settles open on appear. Other heroes keep the flat gradient.
+    var supergraphic = false
+    var breathe = false
+    @State private var glow = 0.20
+
+    // Time-of-day light (Home hero only): navy stays constant; only the glow's
+    // colour + peak shift, so opening the app feels like the right hour — warm
+    // gold at dawn, bright cerulean midday, amber dusk, calm dim night.
+    private var daypart: (color: Color, peak: Double) {
+        let h = ProcessInfo.processInfo.environment["HERO_HOUR"].flatMap { Int($0) }
+            ?? Calendar.current.component(.hour, from: Date())
+        switch h {
+        case 5..<10:  return (Color(hex: 0xE6C87E), 0.34)   // dawn — warm gold
+        case 10..<17: return (.allworthAccent, 0.40)        // midday — cerulean
+        case 17..<21: return (Color(hex: 0xE39B6F), 0.30)   // dusk — warm amber
+        default:      return (.allworthAccent, 0.20)        // night — calm, dim
+        }
+    }
+
+    var body: some View {
+        let glowColor: Color = breathe ? daypart.color : .allworthAccent
+        let peak: Double = breathe ? daypart.peak : 0.36
+        return GeometryReader { geo in
+            ZStack {
+                LinearGradient(
+                    colors: [.nightBlue, .allworthNavy],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                RadialGradient(
+                    colors: [glowColor.opacity(breathe ? glow : peak), glowColor.opacity(0)],
+                    center: UnitPoint(x: 0.82, y: 0.12),
+                    startRadius: 0,
+                    endRadius: max(geo.size.width, geo.size.height) * 0.8
+                )
+                if supergraphic { IrisSupergraphic() }
+            }
+        }
+        .onAppear { if breathe { withAnimation(.easeOut(duration: 0.7)) { glow = peak } } }
+    }
+}
+
+// The brand "marquee" — interlocking circles derived from the Iris geometry, the
+// deck's reserved treatment for premium navy surfaces. Anchored top-right and
+// feathered so it whispers rather than decorates.
+struct IrisSupergraphic: View {
+    var body: some View {
+        GeometryReader { geo in
+            let r = min(geo.size.width, geo.size.height) * 0.30
+            let cx = geo.size.width * 0.9
+            let cy = geo.size.height * 0.0
+            ZStack {
+                ForEach(0..<7, id: \.self) { i in
+                    let a = Double(i) / 6 * 2 * .pi
+                    Circle()
+                        .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                        .frame(width: r * 2, height: r * 2)
+                        .position(x: cx + (i == 0 ? 0 : cos(a) * r),
+                                  y: cy + (i == 0 ? 0 : sin(a) * r))
+                }
+            }
+            .mask(LinearGradient(colors: [.white, .white.opacity(0)],
+                                 startPoint: .topTrailing, endPoint: .bottomLeading))
+        }
+        .allowsHitTesting(false)
+    }
+}
+
+// MARK: - Glass header
+
+// THE header (DESIGN.md): brand mark chip + title, one optional action, on glass.
+// - onHero:      floats white over the navy hero, cross-fades to light glass on scroll.
+// - heroReveal:  Home only — no white row; the hero's big logo is the brand at the
+//                top and the compact header simply reveals on scroll.
+// - default:     solid light glass, always visible (Chat).
+struct GlassHeader: View {
+    @Environment(AppModel.self) private var app
+    let title: String
+    var scrollY: CGFloat = 0
+    var onHero: Bool = false
+    var heroReveal: Bool = false
+    var actionIcon: String? = nil
+    var onAction: (() -> Void)? = nil
+    let safeTop: CGFloat
+
+    private let barHeight: CGFloat = 48
+    private var glassOpacity: CGFloat { onHero ? clamp01(scrollY / 130) : 1 }
+
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            // Real iOS 26 Liquid Glass (fades in over the hero; always on elsewhere).
+            Color.clear
+                .glassEffect(.regular, in: Rectangle())
+                .overlay(alignment: .bottom) { Divider().opacity(0.4) }
+                .opacity(glassOpacity)
+
+            // Dark row (ink on light) — the resolved/scrolled state.
+            row(light: false)
+                .opacity(onHero ? glassOpacity : 1)
+
+            // White row over the navy hero (skipped in heroReveal mode).
+            if onHero && !heroReveal {
+                row(light: true)
+                    .opacity(1 - glassOpacity)
+                    .allowsHitTesting(false)
+            }
+        }
+        .frame(height: safeTop + barHeight)
+        .frame(maxWidth: .infinity)
+        .ignoresSafeArea(edges: .top)
+    }
+
+    private func row(light: Bool) -> some View {
+        let ink = light ? Color.white : Color.inkPrimary
+        let mark = light ? Color.white : Color.allworthNavy
+        let chip = light ? Color.white.opacity(0.16) : Color.white.opacity(0.85)
+        return HStack(spacing: Space.s2) {
+            ZStack {
+                RoundedRectangle(cornerRadius: Radius.chip, style: .continuous)
+                    .fill(chip)
+                    .frame(width: 32, height: 32)
+                AllworthMark(color: mark, size: 18)
+            }
+            .contentShape(Rectangle())
+            .onTapGesture(count: 3) { app.showDemoControls = true }
+            Text(title)
+                .font(BrandFont.sansBold(17))
+                .foregroundStyle(ink)
+            Spacer(minLength: 0)
+            if let icon = actionIcon {
+                Button(action: { onAction?() }) {
+                    Image(systemName: icon)
+                        .font(.system(size: 20))
+                        .foregroundStyle(ink)
+                        .frame(width: 36, height: 36)
+                }
+            } else {
+                Color.clear.frame(width: 36, height: 36)
+            }
+        }
+        .padding(.horizontal, Space.s4)
+        .frame(height: barHeight)
+    }
+}
+
+// MARK: - Disclaimer
+
+struct DisclaimerFooter: View {
+    var body: some View {
+        Text("Educational information, not investment advice. Allworth Financial demo — synthetic data.")
+            .font(BrandFont.sans(11))
+            .foregroundStyle(Color.inkTertiary)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, Space.s2)
+    }
+}

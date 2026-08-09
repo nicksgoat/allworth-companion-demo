@@ -1,0 +1,54 @@
+name: AllworthSwiftUI
+options:
+  bundleIdPrefix: com.allworth.companion
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "17"   # must exceed the latest TestFlight build (RN was 14)
+    SWIFT_VERSION: "5.0"
+targets:
+  AllworthSwiftUI:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+      - Resources/Fonts
+      - Resources/Assets.xcassets
+    info:
+      path: Generated/Info.plist
+      properties:
+        CFBundleDisplayName: Allworth
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        ITSAppUsesNonExemptEncryption: false
+        UILaunchScreen:
+          UIColorName: ""
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UIAppFonts:
+          - PlayfairDisplay_700Bold.ttf
+          - PlayfairDisplay_600SemiBold.ttf
+          - PlayfairDisplay_600SemiBold_Italic.ttf
+          - Lato_400Regular.ttf
+          - Lato_400Regular_Italic.ttf
+          - Lato_700Bold.ttf
+        # Allow the local dev backend (http://localhost:3000) — the live assistant.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+          NSExceptionDomains:
+            localhost:
+              NSExceptionAllowsInsecureHTTPLoads: true
+              NSIncludesSubdomains: true
+    settings:
+      base:
+        # Ships as the next build of the existing App Store Connect app
+        # (ascAppId 6779701863), replacing the RN app on TestFlight.
+        PRODUCT_BUNDLE_IDENTIFIER: com.allworth.companion
+        GENERATE_INFOPLIST_FILE: "NO"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1"
+        DEVELOPMENT_TEAM: NAK8FFQZBA
+        CODE_SIGN_STYLE: Automatic

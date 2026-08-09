@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAnimatedValue } from "../anim";
 import { CollapsibleCard } from "../components/Collapsible";
 import { APP_HEADER_HEIGHT, AppHeader, TAB_BAR_HEIGHT } from "../components/Glass";
+import { NavyHeroBand } from "../components/GreetingHero";
 import {
   DisclaimerFooter,
   HairlineDivider,
@@ -106,14 +107,16 @@ export function ProfileScreen() {
         scrollEventThrottle={16}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
       >
-        {/* Identity */}
-        <View style={styles.identity}>
-          <View style={styles.bigAvatar}>
-            <Text style={styles.bigAvatarText}>{initials}</Text>
+        {/* Identity — the navy hero (Tier 1 of the navy header system) */}
+        <NavyHeroBand id="profileHero">
+          <View style={styles.identity}>
+            <View style={styles.bigAvatar}>
+              <Text style={styles.bigAvatarText}>{initials}</Text>
+            </View>
+            <Text style={styles.name}>{name}</Text>
+            {meta ? <Text style={styles.meta}>{meta}</Text> : null}
           </View>
-          <Text style={styles.name}>{name}</Text>
-          {meta ? <Text style={styles.meta}>{meta}</Text> : null}
-        </View>
+        </NavyHeroBand>
 
         {/* Advisor */}
         {advisor ? (
@@ -268,24 +271,24 @@ export function ProfileScreen() {
         <DocumentsSheet visible={documentsOpen} onClose={() => setDocumentsOpen(false)} />
         <GoalsSheet visible={goalsOpen} onClose={() => setGoalsOpen(false)} />
       </Animated.ScrollView>
-      <AppHeader title="Profile" scrollY={scrollY} />
+      <AppHeader title="Profile" scrollY={scrollY} onHero />
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  identity: { alignItems: "center", gap: 10, paddingTop: 4, paddingBottom: 4 },
+  identity: { alignItems: "center", gap: 10 },
   bigAvatar: {
     width: 76,
     height: 76,
     borderRadius: 38,
-    backgroundColor: colors.allworthNavy,
+    backgroundColor: "rgba(255,255,255,0.16)",
     alignItems: "center",
     justifyContent: "center",
   },
   bigAvatarText: { fontSize: 28, fontFamily: fonts.sansBold, color: "#FFFFFF", letterSpacing: 0.5 },
-  name: { fontSize: 27, fontFamily: fonts.displayMedium, color: colors.allworthNavy },
-  meta: { fontSize: 14, fontFamily: fonts.sans, color: colors.inkTertiary },
+  name: { fontSize: 27, fontFamily: fonts.displayMedium, color: "#FFFFFF" },
+  meta: { fontSize: 14, fontFamily: fonts.sans, color: "rgba(255,255,255,0.7)" },
 
   advisorCard: { ...card, flexDirection: "row", alignItems: "center", gap: 12, padding: 14 },
   advisorAvatar: {

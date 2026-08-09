@@ -1,0 +1,272 @@
+import SwiftUI
+
+// A letter-by-letter reveal — each character fades + rises (with a soft focus-in)
+// in sequence, so the greeting "arrives" like a real hello rather than painting.
+private struct LetterReveal: View {
+    let text: String
+    let font: Font
+    let color: Color
+    var startDelay: Double = 0
+    var perLetter: Double = 0.04
+    var appeared: Bool
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(Array(text.enumerated()), id: \.offset) { i, ch in
+                Text(ch == " " ? "\u{00A0}" : String(ch))
+                    .font(font)
+                    .foregroundStyle(color)
+                    .fixedSize()
+                    .opacity(appeared ? 1 : 0)
+                    .offset(y: appeared ? 0 : 8)
+                    .blur(radius: appeared ? 0 : 3)
+                    .animation(.easeOut(duration: 0.42).delay(startDelay + Double(i) * perLetter), value: appeared)
+            }
+        }
+    }
+}
+
+// Home — the front door. Big Allworth logo "hello" that hands off to the header
+// mark on scroll, then a calm cascade of: what needs attention, quick actions,
+// the advisor, and the way into Wealth. No totals here (they live in Wealth).
+struct HomeView: View {
+    @Environment(AppModel.self) private var app
+    @State private var scrollY: CGFloat = 0
+    @State private var appeared = false
+    @State private var sheetNudge: Demo.NudgeInfo?
+    @State private var goalsOpen = false
+    @State private var documentsOpen = false
+    @State private var conciergeOpen = false
+
+    var body: some View {
+        GeometryReader { proxy in
+            let safeTop = proxy.safeAreaInsets.top
+
+            ZStack(alignment: .top) {
+                Color.surfacePrimary.ignoresSafeArea()
+
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        hero(safeTop: safeTop)
+
+                        VStack(spacing: Space.s6) {
+                            // The hello lands, the chip arrives, a half-second beat —
+                            // then the rest of the page cascades in together.
+                            attention.entrance(2.4, appeared: appeared)
+                            quickActions.entrance(2.5, appeared: appeared)
+                            advisor.entrance(2.6, appeared: appeared)
+                            wealthGuide.entrance(2.7, appeared: appeared)
+                            DisclaimerFooter().entrance(2.78, appeared: appeared)
+                        }
+                        .padding(.horizontal, Space.s5)
+                        .padding(.top, Space.s6)
+                        .padding(.bottom, Space.s8)
+                    }
+                }
+                .trackScroll(into: $scrollY)
+                .ignoresSafeArea(edges: .top)
+
+                GlassHeader(title: "Home", scrollY: scrollY, onHero: true, heroReveal: true, safeTop: safeTop)
+            }
+        }
+        .onAppear {
+            appeared = true
+            // Debug-only: screenshot the quick-action wiring (simctl has no tap).
+            switch ProcessInfo.processInfo.environment["AUTO_QUICK"] {
+            case "spending": runQuickAction(.askSpending)
+            case "goals": runQuickAction(.goals)
+            case "book": runQuickAction(.book)
+            case "documents": runQuickAction(.documents)
+            default: break
+            }
+        }
+        .sheet(item: $sheetNudge) { n in
+            NudgeDetailSheet(nudge: n) { sheetNudge = nil }
+        }
+        .sheet(isPresented: $goalsOpen) { GoalsSheet { goalsOpen = false } }
+        .sheet(isPresented: $documentsOpen) { DocumentsSheet { documentsOpen = false } }
+        .sheet(isPresented: $conciergeOpen) { AdvisorConciergeSheet { conciergeOpen = false } }
+    }
+
+    private func runQuickAction(_ kind: QuickActionKind) {
+        switch kind {
+        case .askSpending: app.goToChat(sending: "How is my spending tracking against my plan?")
+        case .goals: goalsOpen = true
+        case .book: conciergeOpen = true
+        case .documents: documentsOpen = true
+        }
+    }
+
+    // MARK: hero
+
+    private func hero(safeTop: CGFloat) -> some View {
+        let t = clamp01(scrollY / 90)             // logo handoff progress
+        let logoOpacity = 1 - t
+        let logoScale = 1 - 0.18 * t              // 1 → 0.82
+        let logoLift = -10 * t
+
+        let advisorFirst = Demo.advisorName.split(separator: " ").first.map(String.init) ?? Demo.advisorName
+
+        return NavyHeroBand(safeTop: safeTop, supergraphic: true, breathe: true) {
+            AllworthWordmark(light: true)
+                .scaleEffect(logoScale, anchor: .topLeading)
+                .offset(y: logoLift)
+                .opacity(appeared ? logoOpacity : 0)
+                .offset(y: appeared ? 0 : 8)
+                .animation(.easeOut(duration: 0.56), value: appeared)
+                .padding(.bottom, Space.s1)
+
+            VStack(alignment: .leading, spacing: Space.s3) {
+                // The hello: greeting then name, each cascading in letter by letter.
+                VStack(alignment: .leading, spacing: 2) {
+                    LetterReveal(text: "\(Demo.greetingForNow()),",
+                                 font: BrandFont.sans(14), color: .white.opacity(0.72),
+                                 startDelay: 0.30, perLetter: 0.035, appeared: appeared)
+                    LetterReveal(text: Demo.clientFirstName,
+                                 font: BrandFont.displayMedium(30), color: .white,
+                                 startDelay: 0.70, perLetter: 0.06, appeared: appeared)
+                }
+
+                // Once "Good morning, Maya" has fully landed, the chip arrives.
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.shield.fill")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.allworthAccent)
+                    Text("Reviewed by \(advisorFirst) this week")
+                        .font(BrandFont.sansBold(12.5))
+                        .foregroundStyle(.white.opacity(0.9))
+                }
+                .padding(.horizontal, 11)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule().fill(.white.opacity(0.10))
+                        .overlay(Capsule().stroke(.white.opacity(0.16), lineWidth: 1))
+                )
+                .entrance(1.35, appeared: appeared)
+
+                // …then a half-second beat, and "View your wealth" joins the rest.
+                Button { app.tab = 1 } label: {
+                    HStack(spacing: 3) {
+                        Text("View your wealth")
+                            .font(BrandFont.sansBold(14))
+                            .foregroundStyle(.white.opacity(0.92))
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.92))
+                    }
+                }
+                .buttonStyle(.plain)
+                .entrance(2.35, appeared: appeared)
+            }
+        }
+    }
+
+    // MARK: sections
+
+    private var attention: some View {
+        VStack(alignment: .leading, spacing: Space.s3) {
+            SectionHeader("Needs your attention")
+            VStack(spacing: 0) {
+                ForEach(Array(Demo.homeNudges.enumerated()), id: \.element.id) { i, nudge in
+                    if i > 0 { Divider().background(Color.hairline) }
+                    AttentionRow(nudge: nudge)
+                        .contentShape(Rectangle())
+                        .onTapGesture { sheetNudge = nudge }
+                }
+            }
+            .padding(.horizontal, Space.s4)
+            .padding(.vertical, Space.s1)
+            .card()
+        }
+    }
+
+    private var quickActions: some View {
+        VStack(alignment: .leading, spacing: Space.s3) {
+            SectionHeader("Quick actions")
+            LazyVGrid(
+                columns: [GridItem(.flexible(), spacing: Space.s3), GridItem(.flexible(), spacing: Space.s3)],
+                spacing: Space.s3
+            ) {
+                ForEach(Demo.quickActions) { a in
+                    Button { runQuickAction(a.kind) } label: {
+                        HStack(spacing: Space.s2) {
+                            Image(systemName: a.icon).font(.system(size: 18)).foregroundStyle(Color.allworthNavy)
+                            Text(a.label).font(BrandFont.sansBold(14)).foregroundStyle(Color.allworthNavy).lineLimit(1)
+                            Spacer(minLength: 0)
+                        }
+                        .padding(.horizontal, Space.s3)
+                        .padding(.vertical, Space.s3)
+                        .frame(maxWidth: .infinity)
+                        .card()
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    private var advisor: some View {
+        VStack(alignment: .leading, spacing: Space.s3) {
+            SectionHeader("Your advisor")
+            HStack(spacing: Space.s3) {
+                ZStack {
+                    Circle().fill(Color.allworthNavy).frame(width: 44, height: 44)
+                    Text(Demo.advisorInitials).font(BrandFont.sansBold(15)).foregroundStyle(.white)
+                }
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(Demo.advisorName).font(BrandFont.sansBold(16)).foregroundStyle(Color.inkPrimary)
+                    Text(Demo.advisorTitle).font(BrandFont.sans(13)).foregroundStyle(Color.inkSecondary)
+                }
+                Spacer(minLength: Space.s2)
+                CircleIconButton(icon: "bubble.left.fill") { app.tab = 2 }
+                CircleIconButton(icon: "calendar") { conciergeOpen = true }
+            }
+            .padding(Space.s4)
+            .card()
+        }
+    }
+
+    private var wealthGuide: some View {
+        Button { app.tab = 1 } label: {
+            HStack(spacing: Space.s3) {
+                Image(systemName: "chart.pie").font(.system(size: 18)).foregroundStyle(Color.allworthAccent)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Your wealth").font(BrandFont.sansBold(15)).foregroundStyle(Color.inkPrimary)
+                    Text("Accounts, allocation, and what's held away")
+                        .font(BrandFont.sans(12)).foregroundStyle(Color.inkTertiary)
+                }
+                Spacer(minLength: Space.s2)
+                Image(systemName: "chevron.right").font(.system(size: 14, weight: .semibold)).foregroundStyle(Color.inkTertiary)
+            }
+            .padding(.horizontal, Space.s4)
+            .padding(.vertical, Space.s4)
+            .card()
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+struct AttentionRow: View {
+    let nudge: Demo.NudgeInfo
+    var body: some View {
+        let tint = nudge.severity == .attention ? Color.attention : Color.allworthAccent
+        HStack(spacing: Space.s3) {
+            ZStack {
+                RoundedRectangle(cornerRadius: Radius.chip, style: .continuous)
+                    .fill(tint.opacity(0.10))
+                    .frame(width: 34, height: 34)
+                Image(systemName: nudge.icon).font(.system(size: 16)).foregroundStyle(tint)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(nudge.title)
+                    .font(BrandFont.sansBold(15))
+                    .foregroundStyle(Color.inkPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(nudge.sub).font(BrandFont.sans(12)).foregroundStyle(Color.inkSecondary)
+            }
+            Spacer(minLength: Space.s2)
+            Image(systemName: "chevron.right").font(.system(size: 13, weight: .semibold)).foregroundStyle(Color.inkTertiary)
+        }
+        .padding(.vertical, Space.s3)
+    }
+}
