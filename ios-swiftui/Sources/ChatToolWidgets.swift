@@ -57,7 +57,9 @@ struct RebalanceResult: Decodable {
     let post_trade_allocation: [String: Double]?
     let total_portfolio_value: Double?
     let estimated_tax: Tax?
+    let model: Model?
     struct Tax: Decodable { let total: Double? }
+    struct Model: Decodable { let allocation: String? }
 }
 
 struct GoalFundingResult: Decodable {
@@ -234,9 +236,11 @@ private struct ProjectionCardView: View {
                 Text("\(result.simulations ?? 500) simulations\(result.assumptions?.endAge.map { " · to age \($0)" } ?? "")")
                     .font(BrandFont.sans(12.5)).foregroundStyle(Color.inkTertiary)
             }
-            .padding(14).frame(maxWidth: .infinity, alignment: .leading).card()
+            .padding(16).frame(maxWidth: .infinity, alignment: .leading).toolWidgetCard()
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Retirement projection, \(Int(rate)) percent on track")
+        .accessibilityHint("Opens the detailed retirement projection")
         .fullScreenCover(isPresented: $open) { ProjectionDetailView(result: result) { open = false } }
     }
 }
@@ -268,7 +272,7 @@ private struct ProjectionDetailView: View {
                     Text("drag to explore").font(BrandFont.sansItalic(11)).foregroundStyle(.white.opacity(0.4))
                 }
             }
-            .padding(16).background(RoundedRectangle(cornerRadius: 16).fill(.white.opacity(0.06)).overlay(RoundedRectangle(cornerRadius: 16).stroke(.white.opacity(0.1), lineWidth: 1)))
+            .padding(16).background(RoundedRectangle(cornerRadius: 10).fill(Color.allworthNavy).overlay(RoundedRectangle(cornerRadius: 10).stroke(.white.opacity(0.14), lineWidth: 1)))
             if let interp = result.interpretation {
                 Text(interp).font(BrandFont.sans(16)).foregroundStyle(.white).lineSpacing(6)
             }
@@ -283,18 +287,21 @@ private struct RebalanceCardView: View {
     let result: RebalanceResult
     @State private var open = false
     var body: some View {
-        let n = result.trades.count
+        let n = result.trades.filter { abs($0.amount) > 1 }.count
         let tax = result.estimated_tax?.total ?? 0
+        let target = result.model?.allocation ?? "60/40"
         Button { open = true } label: {
             VStack(alignment: .leading, spacing: 10) {
                 WidgetHeader(icon: "arrow.left.arrow.right", label: "Rebalance plan", expand: true)
                 Text("\(n) \(n == 1 ? "trade" : "trades")").font(BrandFont.displayMedium(26)).foregroundStyle(Color.allworthNavy).monospacedDigit()
                 AllocationShift(result: result, onDark: false, detailed: false)
-                Text("To your 60/40 target · ≈ \(usd(Int(tax))) est. tax").font(BrandFont.sans(12.5)).foregroundStyle(Color.inkTertiary)
+                Text("To your \(target) target · ≈ \(usd(Int(tax))) est. tax").font(BrandFont.sans(12.5)).foregroundStyle(Color.inkTertiary)
             }
-            .padding(14).frame(maxWidth: .infinity, alignment: .leading).card()
+            .padding(16).frame(maxWidth: .infinity, alignment: .leading).toolWidgetCard()
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("Rebalance plan, \(n) \(n == 1 ? "trade" : "trades")")
+        .accessibilityHint("Opens the detailed rebalance plan")
         .fullScreenCover(isPresented: $open) { RebalanceDetailView(result: result) { open = false } }
     }
 }
@@ -307,24 +314,25 @@ private struct RebalanceDetailView: View {
         let shown = Array(trades.prefix(8))
         let more = trades.count - shown.count
         let tax = result.estimated_tax?.total ?? 0
+        let target = result.model?.allocation ?? "60/40"
         WidgetDetailScaffold(title: "Rebalance plan", onClose: onClose) {
             VStack(alignment: .leading, spacing: 6) {
                 Text("\(trades.count)").font(BrandFont.displayMedium(56)).foregroundStyle(.white).monospacedDigit()
-                Text("tax-aware trades to move from your current mix to the Core-Satellite 60/40 target")
+                Text("tax-aware trades to move from your current mix to the Core-Satellite \(target) target")
                     .font(BrandFont.sans(16)).foregroundStyle(.white.opacity(0.78)).lineSpacing(4)
             }
             VStack(alignment: .leading, spacing: 14) {
-                Text("ALLOCATION: NOW → TARGET").font(BrandFont.sansBold(12)).tracking(0.8).foregroundStyle(.white.opacity(0.6))
+                Text("Allocation: now → target").font(BrandFont.sansBold(12)).tracking(0.2).foregroundStyle(.white.opacity(0.6))
                 AllocationShift(result: result, onDark: true, detailed: true)
             }
-            .padding(16).background(RoundedRectangle(cornerRadius: 16).fill(.white.opacity(0.06)).overlay(RoundedRectangle(cornerRadius: 16).stroke(.white.opacity(0.1), lineWidth: 1)))
+            .padding(16).background(RoundedRectangle(cornerRadius: 10).fill(Color.allworthNavy).overlay(RoundedRectangle(cornerRadius: 10).stroke(.white.opacity(0.14), lineWidth: 1)))
             VStack(alignment: .leading, spacing: 0) {
-                Text("LARGEST TRADES").font(BrandFont.sansBold(12)).tracking(0.8).foregroundStyle(.white.opacity(0.6)).padding(.bottom, 4)
+                Text("Largest trades").font(BrandFont.sansBold(12)).tracking(0.2).foregroundStyle(.white.opacity(0.6)).padding(.bottom, 4)
                 ForEach(Array(shown.enumerated()), id: \.offset) { i, t in
                     HStack(spacing: 12) {
                         Text(t.action).font(BrandFont.sansBold(11)).foregroundStyle(Color.allworthNavy)
                             .frame(width: 46).padding(.vertical, 3)
-                            .background(Capsule().fill(t.action == "SELL" ? Color.lossOnDark : Color.gainOnDark))
+                            .background(RoundedRectangle(cornerRadius: 4).fill(t.action == "SELL" ? Color.lossOnDark : Color.gainOnDark))
                         Text(t.ticker).font(BrandFont.sansBold(16)).foregroundStyle(.white).frame(maxWidth: .infinity, alignment: .leading)
                         Text(usd(Int(abs(t.amount)))).font(BrandFont.sans(15)).foregroundStyle(.white.opacity(0.85)).monospacedDigit()
                     }
@@ -415,7 +423,8 @@ private struct GoalFundingCardView: View {
         let rate = result.assumedGrowthRate ?? 0.06
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 6) {
-                Image(systemName: "flag").font(.system(size: 13)).foregroundStyle(Color.allworthAccent)
+                Rectangle().fill(Color.allworthAccent).frame(width: 2, height: 20)
+                Image(systemName: "flag").font(.system(size: 13, weight: .regular)).foregroundStyle(Color.allworthNavy)
                 Text("Your goals").font(BrandFont.sansBold(13)).foregroundStyle(Color.inkSecondary)
                 Spacer()
                 Text(result.summary).font(BrandFont.sans(12)).foregroundStyle(Color.inkTertiary)
@@ -425,7 +434,7 @@ private struct GoalFundingCardView: View {
                 goalRow(g, rate: rate)
             }
         }
-        .padding(14).frame(maxWidth: .infinity, alignment: .leading).card()
+        .padding(16).frame(maxWidth: .infinity, alignment: .leading).toolWidgetCard()
     }
 
     private func onTrack(_ g: APIGoal) -> Bool { g.onTrack ?? (g.status == "on_track") }
@@ -461,6 +470,8 @@ private struct GoalFundingCardView: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("\(g.label), \(onTrack(g) ? "on track" : "needs attention")")
+                .accessibilityHint(openId == g.id ? "Collapses goal controls" : "Expands goal controls")
                 if openId == g.id {
                     GoalDials(goal: g, rate: rate)
                         .padding(.top, 10)
@@ -483,12 +494,13 @@ private struct WidgetHeader: View {
     let icon: String; let label: String; var expand = false
     var body: some View {
         HStack(spacing: 8) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8).fill(Color.allworthAccent.opacity(0.12)).frame(width: 26, height: 26)
-                Image(systemName: icon).font(.system(size: 14)).foregroundStyle(Color.allworthAccent)
-            }
+            Rectangle().fill(Color.allworthAccent).frame(width: 2, height: 20)
+            Image(systemName: icon).font(.system(size: 14, weight: .regular)).foregroundStyle(Color.allworthNavy)
             Text(label).font(BrandFont.sansBold(13)).foregroundStyle(Color.inkSecondary).frame(maxWidth: .infinity, alignment: .leading)
-            if expand { Image(systemName: "arrow.up.left.and.arrow.down.right").font(.system(size: 13)).foregroundStyle(Color.inkTertiary) }
+            if expand {
+                Text("View details").font(BrandFont.sansBold(12)).foregroundStyle(Color.allworthAccent)
+                Image(systemName: "arrow.right").font(.system(size: 12)).foregroundStyle(Color.allworthAccent)
+            }
         }
     }
 }
@@ -514,7 +526,7 @@ private struct FactGrid: View {
                     Text(f.0).font(BrandFont.sans(12.5)).foregroundStyle(.white.opacity(0.6))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(14).background(RoundedRectangle(cornerRadius: 12).fill(.white.opacity(0.06)))
+                .padding(14).background(RoundedRectangle(cornerRadius: 8).fill(Color.allworthNavy).overlay(RoundedRectangle(cornerRadius: 8).stroke(.white.opacity(0.12), lineWidth: 1)))
             }
         }
     }
@@ -527,10 +539,14 @@ private struct WidgetDetailScaffold<Content: View>: View {
     @ViewBuilder let content: () -> Content
     var body: some View {
         ZStack {
-            Color.chartNightBlue.ignoresSafeArea()
+            NavyGradient().ignoresSafeArea()
             VStack(spacing: 0) {
                 HStack {
-                    Button(action: onClose) { Image(systemName: "xmark").font(.system(size: 22, weight: .medium)).foregroundStyle(.white) }
+                    Button(action: onClose) {
+                        Image(systemName: "xmark").font(.system(size: 20, weight: .medium)).foregroundStyle(.white)
+                            .frame(width: 44, height: 44)
+                    }
+                    .accessibilityLabel("Close \(title)")
                     Spacer()
                     Text(title).font(BrandFont.sansBold(16)).foregroundStyle(.white)
                     Spacer()
@@ -544,4 +560,21 @@ private struct WidgetDetailScaffold<Content: View>: View {
             }
         }
     }
+}
+
+private struct ToolWidgetCardSurface: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .stroke(Color.allworthNavy.opacity(0.14), lineWidth: 1)
+            )
+            .shadow(color: Color.nightBlue.opacity(0.04), radius: 8, x: 0, y: 2)
+    }
+}
+
+private extension View {
+    func toolWidgetCard() -> some View { modifier(ToolWidgetCardSurface()) }
 }

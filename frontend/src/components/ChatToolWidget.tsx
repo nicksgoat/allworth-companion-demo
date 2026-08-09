@@ -291,7 +291,7 @@ function DetailModal({
           <AllworthMark size={22} color="#FFFFFF" />
         </View>
         <ScrollView
-          contentContainerStyle={{ padding: 20, paddingBottom: insets.bottom + 28, gap: 22 }}
+          contentContainerStyle={[styles.modalContent, { paddingBottom: insets.bottom + 28 }]}
           showsVerticalScrollIndicator={false}
         >
           {children}
@@ -308,14 +308,17 @@ function ProjectionCard({ result, onOpen }: { result: any; onOpen: () => void })
   return (
     <Pressable
       onPress={onOpen}
+      accessibilityRole="button"
+      accessibilityLabel={`Retirement projection, ${rate}% on track`}
+      accessibilityHint="Opens the detailed retirement projection"
       style={({ pressed }) => [styles.widget, pressed && { opacity: 0.92 }]}
     >
       <View style={styles.wHeader}>
-        <View style={styles.wIcon}>
-          <Ionicons name="analytics-outline" size={15} color={colors.allworthAccent} />
-        </View>
+        <View style={styles.wRule} />
+        <Ionicons name="analytics-outline" size={16} color={colors.allworthNavy} />
         <Text style={styles.wLabel}>Retirement projection</Text>
-        <Ionicons name="expand-outline" size={15} color={colors.inkTertiary} />
+        <Text style={styles.wAction}>View details</Text>
+        <Ionicons name="arrow-forward" size={14} color={colors.allworthAccent} />
       </View>
       <Text style={[styles.bigStat, { color: successColor(rate, false) }]}>{rate}% on track</Text>
       <FanChart snapshots={result.pathSnapshots} height={150} onDark={false} />
@@ -490,25 +493,31 @@ function AllocationShift({
 }
 
 function RebalanceCard({ result, onOpen }: { result: any; onOpen: () => void }) {
-  const trades = result.trades ?? [];
+  const trades = (result.trades ?? []).filter((t: any) => Math.abs(t.amount) > 1);
   const tax = result.estimated_tax?.total ?? 0;
+  const targetLabel = result.model?.allocation ?? "60/40";
   return (
     <Pressable
       onPress={onOpen}
+      accessibilityRole="button"
+      accessibilityLabel={`Rebalance plan, ${trades.length} ${trades.length === 1 ? "trade" : "trades"}`}
+      accessibilityHint="Opens the detailed rebalance plan"
       style={({ pressed }) => [styles.widget, pressed && { opacity: 0.92 }]}
     >
       <View style={styles.wHeader}>
-        <View style={styles.wIcon}>
-          <Ionicons name="swap-horizontal-outline" size={15} color={colors.allworthAccent} />
-        </View>
+        <View style={styles.wRule} />
+        <Ionicons name="swap-horizontal-outline" size={16} color={colors.allworthNavy} />
         <Text style={styles.wLabel}>Rebalance plan</Text>
-        <Ionicons name="expand-outline" size={15} color={colors.inkTertiary} />
+        <Text style={styles.wAction}>View details</Text>
+        <Ionicons name="arrow-forward" size={14} color={colors.allworthAccent} />
       </View>
       <Text style={styles.bigStat}>
         {trades.length} {trades.length === 1 ? "trade" : "trades"}
       </Text>
       <AllocationShift result={result} onDark={false} />
-      <Text style={styles.wCaption}>To your 60/40 target · ≈ {usd(tax)} est. tax</Text>
+      <Text style={styles.wCaption}>
+        To your {targetLabel} target · ≈ {usd(tax)} est. tax
+      </Text>
     </Pressable>
   );
 }
@@ -528,12 +537,13 @@ function RebalanceDetail({
     .sort((a: any, b: any) => Math.abs(b.amount) - Math.abs(a.amount));
   const shown = allTrades.slice(0, 8);
   const more = allTrades.length - shown.length;
+  const targetLabel = result.model?.allocation ?? "60/40";
   return (
     <DetailModal visible={visible} onClose={onClose} title="Rebalance plan">
       <View style={{ gap: 6 }}>
         <Text style={styles.heroStat}>{allTrades.length}</Text>
         <Text style={styles.heroSub}>
-          tax-aware trades to move from your current mix to the Core-Satellite 60/40 target
+          tax-aware trades to move from your current mix to the Core-Satellite {targetLabel} target
         </Text>
       </View>
       <View style={styles.chartCard}>
@@ -595,7 +605,8 @@ function GoalFundingCard({ result }: { result: GoalFundingResult }) {
   return (
     <View style={styles.widget}>
       <View style={styles.goalHeader}>
-        <Ionicons name="flag-outline" size={14} color={colors.allworthAccent} />
+        <View style={styles.wRule} />
+        <Ionicons name="flag-outline" size={15} color={colors.allworthNavy} />
         <Text style={styles.goalTitle}>Your goals</Text>
         <Text style={styles.goalSummary}>{result.summary}</Text>
       </View>
@@ -619,7 +630,16 @@ function GoalFundingCard({ result }: { result: GoalFundingResult }) {
             </View>
           ) : (
             <>
-              <Pressable onPress={() => toggle(goal.id)} style={{ gap: 5 }}>
+              <Pressable
+                onPress={() => toggle(goal.id)}
+                accessibilityRole="button"
+                accessibilityLabel={`${goal.label}, ${goal.status === "on_track" ? "on track" : "needs attention"}`}
+                accessibilityHint={
+                  openId === goal.id ? "Collapses goal controls" : "Expands goal controls"
+                }
+                hitSlop={8}
+                style={{ gap: 5 }}
+              >
                 <View style={styles.goalRowHeader}>
                   <Text style={styles.goalRowLabel}>{goal.label}</Text>
                   <Text
@@ -702,9 +722,15 @@ export function ChatToolWidget({ widget }: { widget: ToolWidget }) {
 
 const styles = StyleSheet.create({
   // Inline widget card (in the chat stream, light surface)
-  widget: { ...card, padding: 14, gap: 10 },
+  widget: {
+    ...card,
+    padding: 16,
+    gap: 12,
+    borderRadius: 10,
+    borderColor: "rgba(23,61,103,0.14)",
+  },
   // Live goal planner
-  goalHeader: { flexDirection: "row", alignItems: "center", gap: 6 },
+  goalHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
   goalTitle: { flex: 1, fontSize: 13, fontFamily: fonts.sansBold, color: colors.inkSecondary },
   goalVerdict: { fontSize: 12, fontFamily: fonts.sansBold },
   goalSummary: { fontSize: 12, fontFamily: fonts.sans, color: colors.inkTertiary },
@@ -730,16 +756,10 @@ const styles = StyleSheet.create({
   },
   goalTrack: { height: 6, borderRadius: 3, backgroundColor: colors.inkFaint, overflow: "hidden" },
   goalFill: { height: 6, borderRadius: 3 },
-  wHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
-  wIcon: {
-    width: 26,
-    height: 26,
-    borderRadius: 8,
-    backgroundColor: "rgba(62,113,183,0.12)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  wHeader: { flexDirection: "row", alignItems: "center", gap: 8, minHeight: 24 },
+  wRule: { width: 2, height: 20, backgroundColor: colors.allworthAccent },
   wLabel: { flex: 1, fontSize: 13, fontFamily: fonts.sansBold, color: colors.inkSecondary },
+  wAction: { fontSize: 12, fontFamily: fonts.sansBold, color: colors.allworthAccent },
   bigStat: {
     fontSize: 26,
     fontFamily: fonts.displayMedium,
@@ -769,6 +789,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingBottom: 6,
+    width: "100%",
+    maxWidth: 980,
+    alignSelf: "center",
+  },
+  modalContent: {
+    width: "100%",
+    maxWidth: 980,
+    alignSelf: "center",
+    padding: 24,
+    gap: 24,
   },
   modalTitle: { fontSize: 16, fontFamily: fonts.sansBold, color: "#FFFFFF" },
   heroStat: {
@@ -785,18 +815,17 @@ const styles = StyleSheet.create({
   },
 
   chartCard: {
-    backgroundColor: "rgba(255,255,255,0.06)",
-    borderRadius: 16,
+    backgroundColor: colors.allworthNavy,
+    borderRadius: 10,
     padding: 16,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.1)",
+    borderColor: "rgba(255,255,255,0.14)",
   },
   cardTitle: {
     fontSize: 12,
     fontFamily: fonts.sansBold,
     color: "rgba(255,255,255,0.6)",
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
+    letterSpacing: 0.2,
   },
   legendRow: { flexDirection: "row", gap: 16, marginTop: 12 },
   legend: { flexDirection: "row", alignItems: "center", gap: 6 },
@@ -840,10 +869,12 @@ const styles = StyleSheet.create({
   factCell: {
     flexGrow: 1,
     flexBasis: "44%",
-    backgroundColor: "rgba(255,255,255,0.06)",
-    borderRadius: 12,
+    backgroundColor: colors.allworthNavy,
+    borderRadius: 8,
     padding: 14,
     gap: 2,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.12)",
   },
   factVal: {
     fontSize: 19,
@@ -859,7 +890,7 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: "rgba(255,255,255,0.12)",
   },
-  tradeTag: { width: 46, paddingVertical: 3, borderRadius: 6, alignItems: "center" },
+  tradeTag: { width: 46, paddingVertical: 3, borderRadius: 4, alignItems: "center" },
   tradeTagText: { fontSize: 11, fontFamily: fonts.sansBold, color: colors.allworthNavy },
   tradeTicker: { flex: 1, fontSize: 16, fontFamily: fonts.sansBold, color: "#FFFFFF" },
   tradeAmount: {
