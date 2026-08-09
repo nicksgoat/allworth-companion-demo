@@ -1,7 +1,7 @@
 .tamarac-page {
   min-height: 100vh;
   background: var(--aw-night, #0c2e4e);
-  color: #f8fafc;
+  color: #F3F4F4;
   font-family: var(--aw-font-body, 'Lato', sans-serif);
   padding: 2rem;
   box-sizing: border-box;
@@ -26,7 +26,7 @@
 
 .tamarac-subtitle {
   margin: 0.25rem 0 0;
-  color: #94a3b8;
+  color: #828282;
   font-size: 0.9rem;
 }
 
@@ -80,7 +80,7 @@
 
 .tamarac-legend-fetched {
   margin-left: auto;
-  color: #94a3b8;
+  color: #828282;
   font-size: 0.8rem;
 }
 
@@ -106,8 +106,8 @@
   align-items: stretch;
   gap: 0.25rem 0.5rem;
   padding: 1rem;
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: #171717;
+  border: 1px solid #595959;
   border-radius: 8px;
   overflow-x: auto;
 }
@@ -124,7 +124,7 @@
   padding: 0.85rem 0.9rem;
   border-radius: 8px;
   border: 2px solid transparent;
-  color: #0f172a;
+  color: #171717;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
   transition: transform 0.12s;
 }
@@ -146,18 +146,18 @@
 }
 
 .tamarac-arrow {
-  color: #64748b;
+  color: #595959;
   font-size: 1.25rem;
   padding: 0 0.25rem;
 }
 
 /* Status colors */
 .status-not_started {
-  background: #64748b;
-  color: #e2e8f0 !important;
-  border-color: #475569;
+  background: #595959;
+  color: #E6E6E6 !important;
+  border-color: #595959;
 }
-.tamarac-dot.status-not_started { background: #64748b; }
+.tamarac-dot.status-not_started { background: #595959; }
 
 .status-running {
   background: #facc15;
@@ -168,18 +168,18 @@
 .tamarac-dot.status-running { background: #facc15; }
 
 .status-success {
-  background: #22c55e;
+  background: #436434;
   color: #052e16 !important;
-  border-color: #16a34a;
+  border-color: #436434;
 }
-.tamarac-dot.status-success { background: #22c55e; }
+.tamarac-dot.status-success { background: #436434; }
 
 .status-failure {
-  background: #ef4444;
+  background: #D26D37;
   color: #fef2f2 !important;
-  border-color: #b91c1c;
+  border-color: #D26D37;
 }
-.tamarac-dot.status-failure { background: #ef4444; }
+.tamarac-dot.status-failure { background: #D26D37; }
 
 @keyframes tamarac-pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.6); }
@@ -189,15 +189,15 @@
 /* ---------- Gantt-style timeline ---------- */
 
 .tamarac-gantt-wrap {
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: #171717;
+  border: 1px solid #595959;
   border-radius: 8px;
   padding: 1rem;
   overflow-x: auto;
 }
 
 .tamarac-empty {
-  color: #94a3b8;
+  color: #828282;
   font-size: 0.95rem;
   padding: 1.5rem 0.5rem;
   text-align: center;
@@ -215,7 +215,7 @@
   left: 0;
   right: 0;
   height: 22px;
-  border-bottom: 1px dashed #334155;
+  border-bottom: 1px dashed #595959;
 }
 
 .tamarac-axis-tick {
@@ -231,7 +231,7 @@
   top: 0;
   left: 4px;
   font-size: 0.72rem;
-  color: #94a3b8;
+  color: #828282;
   white-space: nowrap;
 }
 
@@ -280,7 +280,7 @@
   top: 22px;
   bottom: 0;
   width: 2px;
-  background: #f8fafc;
+  background: #F3F4F4;
   box-shadow: 0 0 6px rgba(248, 250, 252, 0.6);
   pointer-events: none;
 }
@@ -290,7 +290,7 @@
   top: -18px;
   left: 4px;
   font-size: 0.68rem;
-  color: #f8fafc;
+  color: #F3F4F4;
   background: rgba(15, 23, 42, 0.8);
   padding: 1px 5px;
   border-radius: 3px;
@@ -300,12 +300,12 @@
 .tamarac-pending {
   margin-top: 1.25rem;
   padding-top: 1rem;
-  border-top: 1px solid #334155;
+  border-top: 1px solid #595959;
 }
 
 .tamarac-pending-title {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: #828282;
   margin-bottom: 0.5rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;

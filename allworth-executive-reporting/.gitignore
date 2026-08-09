@@ -59,6 +59,8 @@ coverage/
 *.cover
 .coverage
 htmlcov/
+frontend/test-results/
+frontend/playwright-report/
 
 # Temporary files
 *.tmp
@@ -72,4 +74,3 @@ backend/admin/.admin-state/
 # The admin roster is NEVER committed — it lives only in ADLS (source of truth)
 # so a PR/merge can't carry a stale user list that overwrites the live one.
 backend/admin/admin_state.seed.json
-

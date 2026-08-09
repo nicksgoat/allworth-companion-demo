@@ -3,7 +3,7 @@
 // users download data-lake Delta tables as CSV or tab-delimited text. Managers
 // (Admin all-access) can inline-share a directory or table with users or groups.
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import SideNav from './components/SideNav';
+import { ToolPage } from './components/ToolPage';
 import {
   fileExplorerApi,
   type DownloadResource,
@@ -19,17 +19,13 @@ export default function FileExplorer() {
   const [tab, setTab] = useState<Tab>('downloads');
 
   return (
-    <div className="file-explorer has-sidenav">
-      <SideNav />
-      <main className="fe-main">
-        <header className="fe-header">
-          <div>
-            <h1>File Explorer</h1>
-            <p className="fe-subtitle">
-              Upload files to and download files from the data lake.
-            </p>
-          </div>
-        </header>
+    <ToolPage
+      eyebrow="Data operations"
+      title="File Explorer"
+      description="Download approved warehouse resources and manage sharing for data-lake directories."
+      width="wide"
+      className="file-explorer"
+    >
 
         <div className="fe-tabs" role="tablist" aria-label="File Explorer sections">
           <button
@@ -55,8 +51,7 @@ export default function FileExplorer() {
         </div>
 
         {tab === 'downloads' ? <Downloads /> : null}
-      </main>
-    </div>
+    </ToolPage>
   );
 }
 

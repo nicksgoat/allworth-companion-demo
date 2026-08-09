@@ -3,7 +3,7 @@
 /* Hero banner: Night Blue → Allworth Navy gradient (brand premium surface) */
 .aw-hero {
   /* deslop-ignore-next-line 06 — official Allworth Night-to-Indigo premium surface */
-  background: linear-gradient(160deg, #0C2E4E 0%, #173D67 100%);
+  background: var(--aw-night, #0c2e4e);
   position: relative;
   overflow: hidden;
   padding: 40px 32px 36px;

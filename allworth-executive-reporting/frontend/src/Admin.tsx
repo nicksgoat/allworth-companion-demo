@@ -7,14 +7,17 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import './Tamarac2.css';
 import './Admin.css';
-import SideNav from './components/SideNav';
+import { ToolPage } from './components/ToolPage';
 import {
   adminApi,
   type Tool,
   type AdminUser,
   type AdminGroup,
-  type BackupInfo,
+  type Assignment,
 } from './services/admin';
+import { AssignmentsPanel } from './components/admin/AssignmentsPanel';
+import { BackupRestoreModal, BulkUploadModal } from './components/admin/AdminModals';
+import { ToolsPanel } from './components/admin/ToolsPanel';
 
 // "View as user" session overlay — consumed by the global ImpersonationBar in
 // main.tsx. Non-destructive: it never mutates persisted access grants.
@@ -24,12 +27,15 @@ function applyImpersonation(
   email: string,
   tools: string[],
   shareTools: string[] = [],
-  shareAll = false
+  shareAll = false,
+  assignment?: Assignment,
+  advisorId?: string | null,
 ) {
   try {
     sessionStorage.setItem(
       IMPERSONATION_KEY,
-      JSON.stringify({ email, tools, shareTools, shareAll })
+      JSON.stringify({ email, tools, shareTools, shareAll, assignment,
+        advisor: advisorId ? { advisor_id: advisorId, resolution: 'override' } : null })
     );
   } catch {
     /* ignore */
@@ -43,7 +49,7 @@ interface Toast {
   msg: string;
 }
 
-type Tab = 'users' | 'groups' | 'tools';
+type Tab = 'users' | 'groups' | 'assignments' | 'tools';
 
 // Per-tool access level. "share" implies "view" plus the right to re-share the
 // tool with other users straight from the tool page.
@@ -83,120 +89,12 @@ function formatCreated(iso?: string): string {
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-// Turn a snapshot file name (admin_state_YYYYMMDD.json) into a readable date.
-function formatBackupName(name: string): string {
-  const m = name.match(/(\d{4})(\d{2})(\d{2})/);
-  if (!m) return name;
-  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
-  if (Number.isNaN(d.getTime())) return name;
-  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-interface BackupRestoreModalProps {
-  onClose: () => void;
-  onRestored: (summary: { users: number; groups: number }) => void;
-}
-
-function BackupRestoreModal({ onClose, onRestored }: BackupRestoreModalProps) {
-  const [backups, setBackups] = useState<BackupInfo[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState<string | null>(null);
-  const [confirmName, setConfirmName] = useState<string | null>(null);
-
-  useEffect(() => {
-    adminApi
-      .listBackups()
-      .then(setBackups)
-      .catch((e) => {
-        setError(e instanceof Error ? e.message : String(e));
-        setBackups([]);
-      });
-  }, []);
-
-  const restore = async (name: string) => {
-    setBusy(name);
-    setError(null);
-    try {
-      const summary = await adminApi.restoreBackup(name);
-      onRestored(summary);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-      setBusy(null);
-      setConfirmName(null);
-    }
-  };
-
-  return (
-    <div className="admin-modal-overlay" onClick={onClose}>
-      <div
-        className="admin-modal"
-        role="dialog"
-        aria-modal="true"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="admin-modal-title">Restore the user list</h2>
-        <p className="admin-modal-text">
-          Pick a saved snapshot to restore the roster (users, groups and tool
-          grants). This replaces the current list and becomes the shared roster.
-        </p>
-        {error && <div className="admin-error">{error}</div>}
-        {backups === null ? (
-          <div className="admin-loading">Loading backups…</div>
-        ) : backups.length === 0 ? (
-          <div className="admin-empty">No saved backups were found.</div>
-        ) : (
-          <div className="admin-backup-list">
-            {backups.map((b) => (
-              <div className="admin-backup-row" key={b.name}>
-                <div className="admin-backup-meta">
-                  <span className="admin-backup-name">{formatBackupName(b.name)}</span>
-                  <span className="admin-backup-sub">{b.name}</span>
-                </div>
-                {confirmName === b.name ? (
-                  <div className="admin-backup-confirm">
-                    <button
-                      className="admin-danger admin-danger-solid"
-                      disabled={busy === b.name}
-                      onClick={() => restore(b.name)}
-                    >
-                      {busy === b.name ? 'Restoring…' : 'Confirm restore'}
-                    </button>
-                    <button
-                      className="admin-secondary"
-                      disabled={busy === b.name}
-                      onClick={() => setConfirmName(null)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    className="admin-secondary"
-                    disabled={!!busy}
-                    onClick={() => setConfirmName(b.name)}
-                  >
-                    Restore
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-        <div className="admin-modal-actions">
-          <button className="admin-secondary" onClick={onClose}>
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function Admin() {
   const [tab, setTab] = useState<Tab>('users');
   const [tools, setTools] = useState<Tool[]>([]);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [groups, setGroups] = useState<AdminGroup[]>([]);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -211,14 +109,16 @@ export default function Admin() {
     setLoading(true);
     setError(null);
     try {
-      const [t, u, g] = await Promise.all([
+      const [t, u, g, a] = await Promise.all([
         adminApi.getTools(),
         adminApi.getUsers(),
         adminApi.getGroups(),
+        adminApi.getAssignments(),
       ]);
       setTools(t);
       setUsers(u);
       setGroups(g);
+      setAssignments(a);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -296,8 +196,19 @@ export default function Admin() {
     const shareAll = memberGroups.some((g) => g.all_tools);
     const shareSet = new Set(user.direct_share_tools);
     for (const g of memberGroups) for (const t of g.share_tools) shareSet.add(t);
-    applyImpersonation(user.email, user.effective_tools, [...shareSet], shareAll);
+    const assignment = assignments.find((item) => item.id === user.assignment_id)
+      ?? assignments.find((item) => item.id === 'general');
+    applyImpersonation(user.email, user.effective_tools, [...shareSet], shareAll,
+      assignment, user.advisor_id_override);
     toast('ok', `Now viewing as ${user.email}. Use the Revert view button to return.`);
+  };
+
+  const setUserAssignment = async (user: AdminUser, assignmentId: string | null, advisorIdOverride?: string | null) => {
+    try {
+      const updated = await adminApi.setUserAssignment(user.email, assignmentId, advisorIdOverride);
+      setUsers((current) => current.map((item) => item.email === user.email ? updated : item));
+      toast('ok', `Updated ${user.email}'s workspace`);
+    } catch (e) { toast('err', e instanceof Error ? e.message : String(e)); }
   };
 
   // ── group actions ──────────────────────────────────────────────────────────
@@ -479,24 +390,21 @@ export default function Admin() {
   };
 
   return (
-    <div className="t2-page has-sidenav">
-      <SideNav />
-      <div className="t2-shell admin-console">
-        <header className="admin-hero">
-          <div className="admin-hero-left">
-            <div className="admin-kicker-row">
-              <span className="admin-kicker">Access control</span>
-            </div>
-            <div className="admin-title">
-              <h1>Admin</h1>
-            </div>
-            <p className="admin-tagline">
-              Grant tool access by email, build groups, and let group access cascade to
-              every member.
-            </p>
-          </div>
-          <div className="admin-hero-right">
+    <ToolPage
+      eyebrow="Access control"
+      title="Admin"
+      description="Grant tool access by email, build groups, and let group access cascade to every member."
+      width="full"
+      className="t2-page admin-console"
+      actions={
             <div className="admin-tabs">
+              <button
+                type="button"
+                className={tab === 'assignments' ? 'admin-tab active' : 'admin-tab'}
+                onClick={() => setTab('assignments')}
+              >
+                Assignments <span className="admin-tab-count">{assignments.length}</span>
+              </button>
               <button
                 type="button"
                 className={tab === 'users' ? 'admin-tab active' : 'admin-tab'}
@@ -519,8 +427,8 @@ export default function Admin() {
                 Tools <span className="admin-tab-count">{tools.length}</span>
               </button>
             </div>
-          </div>
-        </header>
+      }
+    >
 
         {error && <div className="admin-error">{error}</div>}
 
@@ -619,6 +527,8 @@ export default function Admin() {
                             onSetLevel={setUserToolLevel}
                             onRemove={(email) => setConfirmDeleteUser(email)}
                             onViewAs={viewAsUser}
+                            assignments={assignments}
+                            onSetAssignment={setUserAssignment}
                           />
                         ))}
                       </div>
@@ -670,6 +580,14 @@ export default function Admin() {
               </div>
             )}
           </section>
+        ) : tab === 'assignments' ? (
+          <AssignmentsPanel
+            assignments={assignments}
+            tools={tools.filter((tool) => tool.status !== 'soon')}
+            users={users}
+            onChanged={load}
+            onToast={toast}
+          />
         ) : (
           <ToolsPanel
             tools={tools}
@@ -679,8 +597,6 @@ export default function Admin() {
             onShareGroup={shareToolWithGroup}
           />
         )}
-      </div>
-
       <div className="admin-toasts">
         {toasts.map((t) => (
           <div key={t.id} className={`admin-toast ${t.kind}`}>
@@ -757,7 +673,7 @@ export default function Admin() {
           }}
         />
       )}
-    </div>
+    </ToolPage>
   );
 }
 
@@ -768,10 +684,15 @@ interface UserCardProps {
   onSetLevel: (user: AdminUser, toolId: string, level: ToolLevel) => void;
   onRemove: (email: string) => void;
   onViewAs: (user: AdminUser) => void;
+  assignments: Assignment[];
+  onSetAssignment: (user: AdminUser, assignmentId: string | null, advisorIdOverride?: string | null) => void;
 }
 
-function UserCard({ user, tools, toolName, onSetLevel, onRemove, onViewAs }: UserCardProps) {
+function UserCard({ user, tools, toolName, onSetLevel, onRemove, onViewAs, assignments, onSetAssignment }: UserCardProps) {
   const [open, setOpen] = useState(false);
+  const [advisorOverride, setAdvisorOverride] = useState(user.advisor_id_override ?? '');
+  const assignment = assignments.find((item) => item.id === user.assignment_id)
+    ?? assignments.find((item) => item.id === 'general');
 
   return (
     <div className={'admin-card' + (open ? ' open' : '')}>
@@ -811,6 +732,17 @@ function UserCard({ user, tools, toolName, onSetLevel, onRemove, onViewAs }: Use
 
       {open && (
         <div className="admin-card-body">
+          <div className="admin-user-assignment">
+            <label><span>Primary assignment</span>
+              <select value={assignment?.id ?? 'general'} onChange={(event) => onSetAssignment(user, event.target.value, advisorOverride)}>
+                {assignments.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+              </select>
+            </label>
+            {assignment?.type === 'advisor' && <label><span>Advisor ID override <small>Optional</small></span>
+              <div className="admin-assignment-override"><input value={advisorOverride} onChange={(event) => setAdvisorOverride(event.target.value)} placeholder="Matched by email" />
+                <button className="admin-secondary" onClick={() => onSetAssignment(user, assignment.id, advisorOverride)}>Save</button></div>
+            </label>}
+          </div>
           {user.groups.length > 0 && (
             <div className="admin-meta">
               Member of:{' '}
@@ -1106,452 +1038,6 @@ function MemberSearchAdd({ group, users, onAdd }: MemberSearchAddProps) {
               Add new user: <strong>{q}</strong>
             </button>
           )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-interface BulkUploadModalProps {
-  groups: AdminGroup[];
-  onClose: () => void;
-  onUpload: (emails: string[], groupIds: string[]) => void;
-}
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function BulkUploadModal({ groups, onClose, onUpload }: BulkUploadModalProps) {
-  const [text, setText] = useState('');
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-
-  // Split on commas, semicolons, or any whitespace (newlines included).
-  const tokens = useMemo(
-    () =>
-      text
-        .split(/[\s,;]+/)
-        .map((t) => t.trim().toLowerCase())
-        .filter(Boolean),
-    [text]
-  );
-  const valid = useMemo(() => [...new Set(tokens.filter((t) => EMAIL_RE.test(t)))], [tokens]);
-  const invalid = useMemo(() => [...new Set(tokens.filter((t) => !EMAIL_RE.test(t)))], [tokens]);
-
-  const toggleGroup = (gid: string) =>
-    setSelected((s) => {
-      const next = new Set(s);
-      if (next.has(gid)) next.delete(gid);
-      else next.add(gid);
-      return next;
-    });
-
-  const submit = () => {
-    if (valid.length === 0) return;
-    onUpload(valid, [...selected]);
-  };
-
-  return (
-    <div className="admin-modal-overlay" onClick={onClose}>
-      <div
-        className="admin-modal"
-        role="dialog"
-        aria-modal="true"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="admin-modal-title">Bulk upload users</h2>
-        <p className="admin-modal-text">
-          Paste a list of email addresses (separated by new lines, commas, or spaces). New
-          addresses are created; existing ones are reused.
-        </p>
-
-        <textarea
-          className="admin-bulk-textarea"
-          placeholder={'jane@allworth.com\nsam@allworth.com\n…'}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={8}
-        />
-
-        <div className="admin-bulk-summary">
-          <span className="admin-chip">{valid.length} valid</span>
-          {invalid.length > 0 && (
-            <span className="admin-chip admin-chip-warn">{invalid.length} invalid</span>
-          )}
-        </div>
-
-        <div className="admin-section-label">Add to groups (optional)</div>
-        {groups.length === 0 ? (
-          <div className="admin-muted">No groups yet.</div>
-        ) : (
-          <div className="admin-bulk-groups">
-            {groups.map((g) => (
-              <label key={g.id} className={'admin-tool' + (selected.has(g.id) ? ' on' : '')}>
-                <input
-                  type="checkbox"
-                  checked={selected.has(g.id)}
-                  onChange={() => toggleGroup(g.id)}
-                />
-                <span>{g.name}</span>
-                {g.all_tools && <span className="admin-alltools-badge">All tools</span>}
-              </label>
-            ))}
-          </div>
-        )}
-
-        <div className="admin-modal-actions">
-          <button className="admin-secondary" onClick={onClose}>
-            Cancel
-          </button>
-          <button className="admin-primary" onClick={submit} disabled={valid.length === 0}>
-            Upload {valid.length > 0 ? `${valid.length} user(s)` : 'users'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Tools tab ─────────────────────────────────────────────────────────────────
-// A tool-first view of access: tools are grouped into their category (the
-// hierarchy), each category drills into its individual tools, and each tool can
-// be shared with a user or group via search. Sharing reuses the same set-tools
-// endpoints as the Users/Groups tabs, so grants stay consistent across all three.
-
-const CATEGORY_META: { key: string; label: string; blurb: string }[] = [
-  { key: 'live', label: 'Live tools', blurb: 'Shipped and in production today.' },
-  { key: 'analytics', label: 'Analytics & reports', blurb: 'Reporting, visual analytics and exports.' },
-  { key: 'utilities', label: 'Utilities', blurb: 'Internal apps and lookup tools.' },
-];
-
-const STATUS_LABEL: Record<string, string> = { live: 'Live', new: 'New', soon: 'Soon' };
-
-interface ToolsPanelProps {
-  tools: Tool[];
-  users: AdminUser[];
-  groups: AdminGroup[];
-  onShareUser: (toolId: string, email: string, grant: boolean) => void;
-  onShareGroup: (toolId: string, group: AdminGroup, grant: boolean) => void;
-}
-
-function ToolsPanel({ tools, users, groups, onShareUser, onShareGroup }: ToolsPanelProps) {
-  // Group tools by category, honouring the fixed category order and appending
-  // any unknown categories at the end so nothing is ever hidden.
-  const categories = useMemo(() => {
-    const byCat = new Map<string, Tool[]>();
-    for (const t of tools) {
-      if (!byCat.has(t.category)) byCat.set(t.category, []);
-      byCat.get(t.category)!.push(t);
-    }
-    const ordered: { key: string; label: string; blurb: string; items: Tool[] }[] = [];
-    for (const meta of CATEGORY_META) {
-      const items = byCat.get(meta.key);
-      if (items?.length) ordered.push({ ...meta, items });
-    }
-    for (const [key, items] of byCat) {
-      if (!CATEGORY_META.some((m) => m.key === key)) {
-        ordered.push({ key, label: key, blurb: '', items });
-      }
-    }
-    return ordered;
-  }, [tools]);
-
-  if (tools.length === 0) {
-    return (
-      <section className="admin-panel">
-        <div className="admin-empty">No tools registered.</div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="admin-panel">
-      <p className="admin-tools-intro">
-        Browse tools by section, drill into a tool, then share it with a user or
-        group. Group shares cascade to every member.
-      </p>
-      <div className="admin-list">
-        {categories.map((cat) => (
-          <ToolCategoryCard
-            key={cat.key}
-            label={cat.label}
-            blurb={cat.blurb}
-            items={cat.items}
-            users={users}
-            groups={groups}
-            onShareUser={onShareUser}
-            onShareGroup={onShareGroup}
-          />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-interface ToolCategoryCardProps {
-  label: string;
-  blurb: string;
-  items: Tool[];
-  users: AdminUser[];
-  groups: AdminGroup[];
-  onShareUser: (toolId: string, email: string, grant: boolean) => void;
-  onShareGroup: (toolId: string, group: AdminGroup, grant: boolean) => void;
-}
-
-function ToolCategoryCard({
-  label,
-  blurb,
-  items,
-  users,
-  groups,
-  onShareUser,
-  onShareGroup,
-}: ToolCategoryCardProps) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className={'admin-card' + (open ? ' open' : '')}>
-      <div className="admin-card-head">
-        <button type="button" className="admin-card-toggle" onClick={() => setOpen((o) => !o)}>
-          <span className="admin-chevron" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6" /></svg>
-          </span>
-          <span className="admin-card-titlewrap">
-            <span className="admin-card-title">{label}</span>
-            <span className="admin-card-count">
-              {items.length} {items.length === 1 ? 'tool' : 'tools'}
-            </span>
-          </span>
-        </button>
-      </div>
-
-      {open && (
-        <div className="admin-card-body">
-          {blurb && <div className="admin-card-sub">{blurb}</div>}
-          <div className="admin-list admin-tool-sublist">
-            {items.map((t) => (
-              <ToolShareRow
-                key={t.id}
-                tool={t}
-                users={users}
-                groups={groups}
-                onShareUser={onShareUser}
-                onShareGroup={onShareGroup}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-interface ToolShareRowProps {
-  tool: Tool;
-  users: AdminUser[];
-  groups: AdminGroup[];
-  onShareUser: (toolId: string, email: string, grant: boolean) => void;
-  onShareGroup: (toolId: string, group: AdminGroup, grant: boolean) => void;
-}
-
-function ToolShareRow({ tool, users, groups, onShareUser, onShareGroup }: ToolShareRowProps) {
-  const [open, setOpen] = useState(false);
-
-  const grantingGroups = useMemo(
-    () => groups.filter((g) => g.all_tools || g.tools.includes(tool.id)),
-    [groups, tool.id]
-  );
-  const directUsers = useMemo(
-    () => users.filter((u) => u.direct_tools.includes(tool.id)),
-    [users, tool.id]
-  );
-  const shareCount = grantingGroups.length + directUsers.length;
-
-  return (
-    <div className={'admin-card admin-tool-card' + (open ? ' open' : '')}>
-      <div className="admin-card-head">
-        <button type="button" className="admin-card-toggle" onClick={() => setOpen((o) => !o)}>
-          <span className="admin-chevron" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6" /></svg>
-          </span>
-          <span className="admin-card-titlewrap">
-            <span className="admin-card-title">
-              {tool.name}
-              {STATUS_LABEL[tool.status] && (
-                <span className={'admin-status-badge admin-status-' + tool.status}>
-                  {STATUS_LABEL[tool.status]}
-                </span>
-              )}
-            </span>
-            <span className="admin-card-count">
-              {shareCount === 0
-                ? 'Not shared'
-                : `Shared with ${shareCount} ${shareCount === 1 ? 'recipient' : 'recipients'}`}
-            </span>
-          </span>
-        </button>
-      </div>
-
-      {open && (
-        <div className="admin-card-body">
-          <div className="admin-section-label">Share with a user or group</div>
-          <ToolShareControl
-            tool={tool}
-            users={users}
-            groups={groups}
-            onShareUser={onShareUser}
-            onShareGroup={onShareGroup}
-          />
-
-          <div className="admin-section-label">
-            Groups <span className="admin-tab-count">{grantingGroups.length}</span>
-          </div>
-          {grantingGroups.length === 0 ? (
-            <div className="admin-muted admin-members-empty">No groups have this tool.</div>
-          ) : (
-            <div className="admin-members">
-              {grantingGroups.map((g) => (
-                <span className="admin-member" key={g.id}>
-                  {g.name}
-                  {g.all_tools ? (
-                    <span className="admin-alltools-badge">All tools</span>
-                  ) : (
-                    <button
-                      type="button"
-                      className="admin-member-x"
-                      onClick={() => onShareGroup(tool.id, g, false)}
-                      title={`Remove ${tool.name} from ${g.name}`}
-                    >
-                      ×
-                    </button>
-                  )}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="admin-section-label">
-            Users (direct) <span className="admin-tab-count">{directUsers.length}</span>
-          </div>
-          {directUsers.length === 0 ? (
-            <div className="admin-muted admin-members-empty">
-              No users have this tool granted directly.
-            </div>
-          ) : (
-            <div className="admin-members">
-              {directUsers.map((u) => (
-                <span className="admin-member" key={u.email}>
-                  {u.email}
-                  <button
-                    type="button"
-                    className="admin-member-x"
-                    onClick={() => onShareUser(tool.id, u.email, false)}
-                    title={`Remove ${tool.name} from ${u.email}`}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-interface ToolShareControlProps {
-  tool: Tool;
-  users: AdminUser[];
-  groups: AdminGroup[];
-  onShareUser: (toolId: string, email: string, grant: boolean) => void;
-  onShareGroup: (toolId: string, group: AdminGroup, grant: boolean) => void;
-}
-
-function ToolShareControl({
-  tool,
-  users,
-  groups,
-  onShareUser,
-  onShareGroup,
-}: ToolShareControlProps) {
-  const [query, setQuery] = useState('');
-  const [focused, setFocused] = useState(false);
-  const q = query.trim().toLowerCase();
-
-  const groupMatches = useMemo(
-    () =>
-      groups
-        .filter(
-          (g) => !g.all_tools && !g.tools.includes(tool.id) && g.name.toLowerCase().includes(q)
-        )
-        .slice(0, 5),
-    [groups, tool.id, q]
-  );
-  const userMatches = useMemo(
-    () =>
-      users.filter((u) => !u.direct_tools.includes(tool.id) && u.email.includes(q)).slice(0, 6),
-    [users, tool.id, q]
-  );
-
-  const showMenu = focused && (groupMatches.length > 0 || userMatches.length > 0);
-
-  const pickGroup = (g: AdminGroup) => {
-    onShareGroup(tool.id, g, true);
-    setQuery('');
-    setFocused(false);
-  };
-  const pickUser = (email: string) => {
-    onShareUser(tool.id, email, true);
-    setQuery('');
-    setFocused(false);
-  };
-
-  const onKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== 'Enter') return;
-    if (groupMatches.length > 0) pickGroup(groupMatches[0]);
-    else if (userMatches.length > 0) pickUser(userMatches[0].email);
-  };
-
-  return (
-    <div className="admin-search">
-      <input
-        type="text"
-        placeholder="Search users or groups to share with…"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setTimeout(() => setFocused(false), 120)}
-        onKeyDown={onKeyDown}
-      />
-      {showMenu && (
-        <div className="admin-search-menu">
-          {groupMatches.length > 0 && (
-            <div className="admin-search-group">Groups</div>
-          )}
-          {groupMatches.map((g) => (
-            <button
-              type="button"
-              key={g.id}
-              className="admin-search-item"
-              onMouseDown={() => pickGroup(g)}
-            >
-              <span>{g.name}</span>
-              <span className="admin-search-kind">group</span>
-            </button>
-          ))}
-          {userMatches.length > 0 && (
-            <div className="admin-search-group">Users</div>
-          )}
-          {userMatches.map((u) => (
-            <button
-              type="button"
-              key={u.email}
-              className="admin-search-item"
-              onMouseDown={() => pickUser(u.email)}
-            >
-              <span>{u.email}</span>
-              <span className="admin-search-kind">user</span>
-            </button>
-          ))}
         </div>
       )}
     </div>

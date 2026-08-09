@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import PipelineNav from './components/PipelineNav';
-import SideNav from './components/SideNav';
+import { ToolPage } from './components/ToolPage';
 import {
   addSfp2Column,
   cancelSfp2PendingDrop,
@@ -316,16 +316,14 @@ const Sfp2 = () => {
   }, [selectedTable, selectedSObject, dropTarget, loadDiff, loadChanges]);
 
   return (
-    <div className="sfp2-page has-sidenav">
-      <SideNav />
-      <div className="sfp2-shell">
-        <header className="sfp2-hero">
-          <div>
-            <div className="sfp2-kicker">Pipeline Monitor · SFP2 Schema</div>
-            <h1 className="sfp2-title">Salesforce ⇄ Bronze Delta schema</h1>
-          </div>
-          <PipelineNav />
-        </header>
+    <ToolPage
+      eyebrow="Pipeline monitor · SFP2 schema"
+      title="Salesforce ⇄ Bronze Delta schema"
+      description="Compare source and bronze fields, then safely queue schema changes for the overnight ingestion run."
+      actions={<PipelineNav />}
+      width="full"
+      className="sfp2-page"
+    >
 
         {error && <div className="sfp2-banner error">{error}</div>}
 
@@ -681,7 +679,6 @@ const Sfp2 = () => {
             />
           </div>
         </div>
-      </div>
 
       {dropTarget && (
         <div
@@ -755,7 +752,7 @@ const Sfp2 = () => {
           </div>
         </div>
       )}
-    </div>
+    </ToolPage>
   );
 };
 

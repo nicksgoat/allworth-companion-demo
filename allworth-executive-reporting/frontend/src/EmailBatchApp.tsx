@@ -6,7 +6,6 @@ import {
   Checkbox,
   Chip,
   CircularProgress,
-  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -27,8 +26,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import AuthControl from './components/AuthControl';
 import EmailBatchReview from './components/EmailBatchReview';
 import RichTextEditor from './components/RichTextEditor';
-import SideNav from './components/SideNav';
 import ShareTool from './components/ShareTool';
+import { ToolPage, ToolPanel } from './components/ToolPage';
 import { ThemeProvider } from '@mui/material/styles';
 import { colors, muiTheme } from './theme';
 import { previewEmailBatch, sendEmailBatch, getMailerStatus } from './services/emailBatchApi';
@@ -199,21 +198,18 @@ export default function EmailBatchApp() {
 
   return (
     <ThemeProvider theme={muiTheme}>
-    <div className="has-sidenav">
-    <SideNav />
-    <Box sx={{ minHeight: '100vh', backgroundColor: colors.surfacePrimary }}>
-      {/* ── Allworth hero header ─────────────────────────────────── */}
-      <div className="aw-hero">
-        <div className="aw-hero__topline">
+      <ToolPage
+        eyebrow="Communications"
+        title="Advisor Mailer"
+        description="Build, verify, and send account notices to advisors from a controlled workbook batch."
+        width="wide"
+        actions={
+          <>
           <ShareTool toolId="advisor_mailer" toolName="Advisor Mailer" />
           <AuthControl />
-        </div>
-        <div>
-          <p className="aw-hero__eyebrow">Allworth Financial</p>
-          <h1 className="aw-hero__title">Advisor Mailer</h1>
-          <p className="aw-hero__subtitle">Preview and send account notices to advisors</p>
-        </div>
-      </div>
+          </>
+        }
+      >
 
       {/* ── Sign-in gate (mirrors Executive Brief) ───────────────────────── */}
       {status !== null && !status.ready && (
@@ -226,7 +222,7 @@ export default function EmailBatchApp() {
             variant="contained"
             size="large"
             onClick={() => { window.location.href = '/.auth/login/aad?post_login_redirect_uri=/advisor-mailer'; }}
-            sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 8, px: 4 }}
+            sx={{ textTransform: 'none', fontWeight: 700, borderRadius: 6, px: 4 }}
           >
             Sign in with Microsoft
           </Button>
@@ -236,7 +232,6 @@ export default function EmailBatchApp() {
       {/* ── Main content (only when ready) ──────────────────────────────── */}
       {(status === null || status.ready) && (
       <>
-      <Container maxWidth="lg" sx={{ py: 3, px: { xs: 1, sm: 2, md: 3 } }}>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
             {error}
@@ -244,22 +239,10 @@ export default function EmailBatchApp() {
         )}
 
         {/* Step 1 — upload */}
-        <Box
-          sx={{
-            backgroundColor: colors.surfaceCard,
-            borderRadius: 4,
-            border: '1px solid rgba(23,61,103,0.05)',
-            boxShadow: '0 2px 8px rgba(12,46,78,0.05)',
-            p: 3,
-            mb: 2,
-          }}
+        <ToolPanel
+          title="1 — Upload the accounts workbook"
+          description="Use an Excel workbook with an advisor column such as Primary Advisor."
         >
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
-            1. Upload the accounts workbook
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Drop in an Excel (.xlsx) file. It must include an advisor column (e.g. “Primary Advisor”).
-          </Typography>
           <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
             Message
           </Typography>
@@ -333,22 +316,14 @@ export default function EmailBatchApp() {
               {loading ? 'Building preview…' : 'Preview emails'}
             </Button>
           </Box>
-        </Box>
+        </ToolPanel>
 
         {/* Step 2 — preview + send */}
         {preview && (
-          <Box
-            sx={{
-              backgroundColor: colors.surfaceCard,
-              borderRadius: 4,
-              border: '1px solid rgba(23,61,103,0.05)',
-              boxShadow: '0 2px 8px rgba(12,46,78,0.05)',
-              p: 3,
-            }}
+          <ToolPanel
+            title="2 — Verify, then send"
+            description="Confirm recipients, account groups, reply routing, and the rendered message before delivery."
           >
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
-              2. Verify, then send
-            </Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 1.5 }}>
               <Chip size="small" label={`Subject: ${subject || preview.subject}`} />
               <Chip size="small" label={`Advisor column: ${preview.advisor_column}`} />
@@ -511,9 +486,8 @@ export default function EmailBatchApp() {
             </Box>
             </>
             )}
-          </Box>
+          </ToolPanel>
         )}
-      </Container>
 
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>Send advisor emails?</DialogTitle>
@@ -535,8 +509,7 @@ export default function EmailBatchApp() {
       </Dialog>
       </>
       )}
-    </Box>
-    </div>
+      </ToolPage>
     </ThemeProvider>
   );
 }

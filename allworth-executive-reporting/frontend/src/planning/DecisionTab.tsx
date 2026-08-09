@@ -4,7 +4,8 @@ import {
   Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography,
 } from '@mui/material';
 import PresentToAllOutlinedIcon from '@mui/icons-material/PresentToAllOutlined';
-import { Area, AreaChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
+import { ChartContainer, ChartLegend, ChartTooltip } from '../components/ui/chart';
 import { planningApi, type CompareScenario, type RothAnalysis, type Scenario, type SolveResult, type StressResult } from '../services/planningApi';
 import { Kpi, chartColors, money } from './shared';
 
@@ -121,14 +122,14 @@ export default function DecisionTab({ scenario, scenarios, householdId, chart, r
       </CardContent></Card>
       <Card><CardContent>
         <Typography variant="h6">Scenario impact</Typography>
-        <ResponsiveContainer width="100%" height={300}>
+        <ChartContainer width="100%" height={300}>
           <AreaChart data={chart}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="age" /><YAxis tickFormatter={v => money(v, true)} />
-            <Tooltip formatter={v => money(v)} />
+            <ChartTooltip formatter={v => money(v)} />
             <Area type="monotone" dataKey="netWorth" name="Net worth" stroke={chartColors.nightBlue} fill={chartColors.nightBlue} fillOpacity={0.12} strokeWidth={3} />
           </AreaChart>
-        </ResponsiveContainer>
+        </ChartContainer>
       </CardContent></Card>
     </Box>
 
@@ -148,14 +149,14 @@ export default function DecisionTab({ scenario, scenarios, householdId, chart, r
           <Kpi label="Impact vs base plan" value={money(stress.delta_ending_net_worth)} tone={Number(stress.delta_ending_net_worth) < 0 ? 'loss' : 'gain'} />
           <Kpi label="First shortfall" value={stress.projection.first_shortfall_year ? String(stress.projection.first_shortfall_year) : 'None'} tone={stress.projection.first_shortfall_year ? 'loss' : 'gain'} />
         </Box>
-        <ResponsiveContainer width="100%" height={240}>
+        <ChartContainer width="100%" height={240}>
           <LineChart data={stressChart}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="year" /><YAxis tickFormatter={v => money(v, true)} />
-            <Tooltip formatter={v => money(v)} />
+            <ChartTooltip formatter={v => money(v)} />
             <Line dataKey="stressed" name="Stressed net worth" stroke={chartColors.pumpkin} strokeWidth={3} dot={false} />
           </LineChart>
-        </ResponsiveContainer>
+        </ChartContainer>
       </Box>}
     </CardContent></Card>
 
@@ -214,15 +215,15 @@ export default function DecisionTab({ scenario, scenarios, householdId, chart, r
         <Button variant="contained" onClick={runCompare} disabled={compareIds.length < 2 || comparing}>{comparing ? 'Comparing…' : 'Compare'}</Button>
       </Stack>
       {comparison.length > 0 && <>
-        <ResponsiveContainer width="100%" height={300}>
+        <ChartContainer width="100%" height={300}>
           <LineChart data={compareChart}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="year" /><YAxis tickFormatter={v => money(v, true)} />
-            <Tooltip formatter={v => money(v)} /><Legend />
+            <ChartTooltip formatter={v => money(v)} /><ChartLegend />
             {comparison.map((item, index) =>
               <Line key={item.scenario_id} dataKey={item.name} stroke={COMPARE_COLORS[index % COMPARE_COLORS.length]} strokeWidth={3} dot={false} />)}
           </LineChart>
-        </ResponsiveContainer>
+        </ChartContainer>
         <Table size="small" sx={{ mt: 2 }}>
           <TableHead><TableRow><TableCell>Scenario</TableCell><TableCell align="right">Ending assets</TableCell><TableCell align="right">Lifetime taxes</TableCell><TableCell align="right">First shortfall</TableCell></TableRow></TableHead>
           <TableBody>{comparison.map(item =>

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, Box, Card, CardContent, Typography } from '@mui/material';
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
+import { ChartContainer, ChartLegend, ChartTooltip } from '../components/ui/chart';
 import { planningApi } from '../services/planningApi';
 import { Kpi, chartColors, money } from './shared';
 
@@ -42,15 +43,15 @@ export default function EstateTab({ scenario, estate, onError }: Props) {
     {taxChart.length > 0 && <Card sx={{ mt: 2.5 }}><CardContent>
       <Typography variant="h6">Estate tax exposure over time</Typography>
       <Typography color="text.secondary" sx={{ mb: 2 }}>Projected gross estate and federal estate tax if death occurs in each plan year.</Typography>
-      <ResponsiveContainer width="100%" height={320}>
+      <ChartContainer width="100%" height={320}>
         <LineChart data={taxChart}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="year" /><YAxis tickFormatter={v => money(v, true)} />
-          <Tooltip formatter={v => money(v)} /><Legend />
+          <ChartTooltip formatter={v => money(v)} /><ChartLegend />
           <Line dataKey="Gross estate" stroke={chartColors.nightBlue} strokeWidth={3} dot={false} />
           <Line dataKey="Federal estate tax" stroke={chartColors.pumpkin} strokeWidth={3} dot={false} />
         </LineChart>
-      </ResponsiveContainer>
+      </ChartContainer>
     </CardContent></Card>}
   </Box>;
 }

@@ -10,7 +10,7 @@ import {
   type TransformationLogRow,
 } from './services/refreshLog';
 import PipelineNav from './components/PipelineNav';
-import SideNav from './components/SideNav';
+import { ToolPage, ToolPanel } from './components/ToolPage';
 import {
   TZ_OPTIONS,
   formatClockInTz,
@@ -317,21 +317,20 @@ const Tamarac2 = () => {
   }, [states]);
 
   return (
-    <div className="t2-page has-sidenav">
-      <SideNav />
-      <div className="t2-shell">
-        <header className="t2-hero">
-          <div className="t2-kicker-row">
-            <div className="t2-kicker">Pipeline · Today</div>
-            <PipelineNav />
-          </div>
-          <h1 className="t2-title">Tamarac Transformations</h1>
-          <p className="t2-lede">
+    <ToolPage
+      eyebrow="Pipeline · Today"
+      title="Tamarac Transformations"
+      description={
+        <>
             Live view of this morning&rsquo;s notebook runs, threaded by
             overlap. First to finish sits leftmost; not&#8209;yet&#8209;run
             notebooks appear below.
-          </p>
-
+        </>
+      }
+      actions={<PipelineNav />}
+      width="full"
+      className="t2-page"
+      context={
           <div className="t2-meta-row">
             <div className="t2-legend">
               <span className="t2-legend-item">
@@ -379,16 +378,17 @@ const Tamarac2 = () => {
                 }}
                 disabled={loading}
               >
-                {loading ? 'Refreshing…' : 'Refresh'}
+              {loading ? 'Refreshing…' : 'Refresh'}
               </button>
             </div>
           </div>
+      }
+    >
           {fetchedAt && (
             <div className="t2-fetched">
               Updated {formatClock(new Date(fetchedAt).getTime(), tz)} · {tzOption.short}
             </div>
           )}
-        </header>
 
         {error && (
           <div className="t2-error-banner">
@@ -396,16 +396,10 @@ const Tamarac2 = () => {
           </div>
         )}
 
-        <section className="t2-card">
+        <ToolPanel title="Timeline" description={spanMin > 0
+          ? `${spanMin.toFixed(0)} min span · ${gantt.laneCount} parallel ${gantt.laneCount === 1 ? 'thread' : 'threads'}`
+          : undefined} flush>
           <div className="t2-card-header">
-            <h2>Timeline</h2>
-            <span className="t2-card-meta">
-              {spanMin > 0
-                ? `${spanMin.toFixed(0)} min span · ${gantt.laneCount} parallel ${
-                    gantt.laneCount === 1 ? 'thread' : 'threads'
-                  }`
-                : ''}
-            </span>
           </div>
 
           <div className="t2-gantt-wrap">
@@ -508,15 +502,11 @@ const Tamarac2 = () => {
               </div>
             )}
           </div>
-        </section>
+        </ToolPanel>
 
         {pending.length > 0 && (
-          <section className="t2-card t2-card-secondary">
+          <ToolPanel title="Pending" description={`${pending.length} not started today`} className="t2-card-secondary">
             <div className="t2-card-header">
-              <h2>Pending</h2>
-              <span className="t2-card-meta">
-                {pending.length} not started today
-              </span>
             </div>
             <div className="t2-pending-list">
               {pending.map((s) => (
@@ -525,10 +515,9 @@ const Tamarac2 = () => {
                 </span>
               ))}
             </div>
-          </section>
+          </ToolPanel>
         )}
-      </div>
-    </div>
+    </ToolPage>
   );
 };
 

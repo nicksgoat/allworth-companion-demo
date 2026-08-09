@@ -21,13 +21,13 @@
   /* Back-compat aliases repointed to brand colors */
   --pr-navy: var(--pr-indigo);
   --pr-green: var(--pr-evergreen);
-  --pr-red: #C8102E;
+  --pr-red: var(--pr-pumpkin);
 
   --pr-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --pr-sans: 'Lato', 'Segoe UI', system-ui, -apple-system, sans-serif;
 
   font-family: var(--pr-sans);
-  color: #1a1a1a;
+  color: #171717;
   max-width: none;
   margin: 0 auto;
   padding: 1.5rem 2rem 4rem;
@@ -62,7 +62,7 @@
   align-items: center;
   gap: 1.25rem;
   flex-wrap: wrap;
-  background: linear-gradient(135deg, var(--pr-night) 0%, var(--pr-indigo) 100%);
+  background: var(--pr-night);
   border-radius: 14px;
   padding: 1.4rem 1.75rem;
   margin-bottom: 1.5rem;
@@ -79,10 +79,7 @@
   height: 260px;
   transform: translateY(-50%);
   border-radius: 50%;
-  background:
-    radial-gradient(circle, transparent 34%, rgba(255,255,255,0.06) 35%, rgba(255,255,255,0.06) 37%, transparent 38%),
-    radial-gradient(circle, transparent 54%, rgba(255,255,255,0.06) 55%, rgba(255,255,255,0.06) 57%, transparent 58%),
-    radial-gradient(circle, transparent 74%, rgba(255,255,255,0.06) 75%, rgba(255,255,255,0.06) 77%, transparent 78%);
+  background: none;
   pointer-events: none;
 }
 .pr-header-brand { display: flex; align-items: center; gap: 1.1rem; position: relative; z-index: 1; }
@@ -103,7 +100,7 @@
   padding: 0.42rem 0.7rem; border: 1px solid rgba(255,255,255,0.3); border-radius: 7px;
   font-size: 0.88rem; background: rgba(255,255,255,0.12); color: #fff; font-family: var(--pr-sans);
 }
-.pr-week-select select option { color: #1a1a1a; }
+.pr-week-select select option { color: #171717; }
 .pr-btn {
   background: #fff; color: var(--pr-indigo); border: none; border-radius: 7px;
   padding: 0.55rem 1.15rem; font-size: 0.82rem; font-weight: 700; cursor: pointer;
@@ -118,9 +115,9 @@
 }
 
 /* KPIs */
-.pr-kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+.pr-kpis { margin-bottom: 1.5rem; }
 .pr-kpi {
-  background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
+  background: #fff; border: 1px solid #E6E6E6; border-radius: 10px;
   padding: 1rem 1.2rem; display: flex; flex-direction: column; gap: 0.35rem;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
@@ -135,7 +132,7 @@
 /* Charts */
 .pr-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
 .pr-chart {
-  background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1rem 1rem 0.5rem;
+  background: #fff; border: 1px solid #E6E6E6; border-radius: 10px; padding: 1rem 1rem 0.5rem;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 .pr-chart h3 { margin: 0 0 0.5rem; font-size: 0.9rem; color: var(--pr-navy); }
@@ -148,7 +145,7 @@
 
 /* Filters */
 .pr-filters {
-  background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1rem;
+  background: #fff; border: 1px solid #E6E6E6; border-radius: 10px; padding: 1rem;
   position: sticky; top: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   max-height: calc(100vh - 2rem); overflow-y: auto;
 }
@@ -168,25 +165,25 @@
 .pr-filter-group h4 { margin: 0 0 0.4rem; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: #999; }
 
 /* List */
-.pr-list { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.pr-list-head { padding: 0.75rem 1rem; border-bottom: 1px solid #eee; font-size: 0.82rem; color: #666; background: #fafbfc; }
+.pr-list { background: #fff; border: 1px solid #E6E6E6; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.pr-list-head { padding: 0.75rem 1rem; border-bottom: 1px solid #eee; font-size: 0.82rem; color: #666; background: #F3F4F4; }
 .pr-loading, .pr-empty { padding: 2.5rem; text-align: center; color: #999; }
 
 .pr-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 .pr-table th {
   text-align: left; padding: 0.6rem 0.75rem; background: #f4f6f9; color: #555;
-  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; border-bottom: 1px solid #e5e7eb;
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; border-bottom: 1px solid #E6E6E6;
   position: sticky; top: 0;
 }
 .pr-table td { padding: 0.55rem 0.75rem; border-bottom: 1px solid #f2f2f2; }
 .pr-table tbody tr:not(.pr-detail-row) { cursor: pointer; }
-.pr-table tbody tr:not(.pr-detail-row):hover { background: #f8fafc; }
+.pr-table tbody tr:not(.pr-detail-row):hover { background: #F3F4F4; }
 .pr-num { text-align: right; }
 .pr-col-check { width: 34px; text-align: center; }
 .pr-sortable { cursor: pointer; user-select: none; }
 .pr-sortable:hover { color: var(--pr-navy); }
 
-.pr-name { font-weight: 600; color: #1a1a1a; }
+.pr-name { font-weight: 600; color: #171717; }
 .pr-stage { display: inline-block; }
 .pr-days { display: inline-block; margin-left: 0.4rem; font-size: 0.72rem; color: #999; }
 .pr-score {
@@ -200,7 +197,7 @@
 .pr-worked td { opacity: 0.5; text-decoration: line-through; }
 .pr-worked .pr-score { background: #999; }
 
-.pr-detail-row td { background: #f8fafc; }
+.pr-detail-row td { background: #F3F4F4; }
 .pr-detail { display: flex; flex-wrap: wrap; gap: 1.5rem; padding: 0.4rem 0.5rem; font-size: 0.82rem; color: #555; }
 
 /* KPI sub-line + WoW deltas */
@@ -209,18 +206,19 @@
 .pr-kpi-delta.up { color: var(--pr-green); }
 .pr-kpi-delta.down { color: var(--pr-red); }
 .pr-kpi-delta.flat { color: #999; }
+.pr-metric-detail { display: grid; gap: 3px; }
 .pr-kpi-worked { border-left: 3px solid var(--pr-navy); }
 
 /* Scoring key */
-.pr-scoring { margin: 0 0 1.5rem; background: #fff; border: 1px solid #e5e9f0; border-radius: var(--aw-radius, 10px); padding: 1.1rem 1.35rem 1.25rem; }
+.pr-scoring { margin: 0 0 1.5rem; background: #fff; border: 1px solid #E6E6E6; border-radius: var(--aw-radius, 10px); padding: 1.1rem 1.35rem 1.25rem; }
 .pr-scoring-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
 .pr-scoring-head h3 { margin: 0; color: var(--pr-navy); font-size: 1.02rem; }
 .pr-scoring-note { font-size: 0.75rem; color: #8a94a6; }
 .pr-scoring-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
 .pr-score-col { background: #fff; border: 1px solid #e9edf4; border-radius: 10px; padding: 0.75rem 0.9rem; }
-.pr-score-col h4 { margin: 0 0 0.55rem; font-size: 0.72rem; color: var(--pr-navy); text-transform: uppercase; letter-spacing: 0.06em; padding-bottom: 0.4rem; border-bottom: 2px solid #eef1f6; }
+.pr-score-col h4 { margin: 0 0 0.55rem; font-size: 0.72rem; color: var(--pr-navy); text-transform: uppercase; letter-spacing: 0.06em; padding-bottom: 0.4rem; border-bottom: 2px solid #E6E6E6; }
 .pr-score-col ul { margin: 0; padding: 0; list-style: none; }
-.pr-score-col li { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.28rem 0; font-size: 0.82rem; color: #374253; }
+.pr-score-col li { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.28rem 0; font-size: 0.82rem; color: #595959; }
 .pr-score-col li + li { border-top: 1px solid #f4f6fa; }
 .pr-score-label { flex: 1; }
 .pr-pts { flex: 0 0 auto; min-width: 40px; text-align: center; font-weight: 700; font-size: 0.76rem; padding: 0.12rem 0.5rem; border-radius: 999px; }
@@ -235,10 +233,10 @@
 /* Charts */
 .pr-chart h3 { display: flex; align-items: baseline; gap: 0.4rem; }
 .pr-chart-unit { font-size: 0.75rem; font-weight: 400; color: #99a3b3; }
-.pr-chart-empty { display: flex; align-items: center; justify-content: center; height: 230px; color: #98a2b3; font-size: 0.85rem; text-align: center; padding: 0 1.5rem; border: 1px dashed #e0e5ee; border-radius: 8px; background: #fafbfd; }
+.pr-chart-empty { display: flex; align-items: center; justify-content: center; height: 230px; color: #828282; font-size: 0.85rem; text-align: center; padding: 0 1.5rem; border: 1px dashed #e0e5ee; border-radius: 8px; background: #F3F4F4; }
 
 /* Channel groups */
-.pr-group { margin-bottom: 1.25rem; border: 1px solid #e5e9f0; border-radius: 10px; overflow: hidden; }
+.pr-group { margin-bottom: 1.25rem; border: 1px solid #E6E6E6; border-radius: 10px; overflow: hidden; }
 .pr-group-head { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.9rem; color: #fff; }
 .pr-group-name { font-weight: 700; font-size: 0.92rem; }
 .pr-group-stat { font-size: 0.8rem; opacity: 0.9; }
@@ -264,18 +262,18 @@ a.pr-name:hover { text-decoration: underline; }
 
 /* Closed section */
 .pr-closed { margin-top: 2rem; }
-.pr-closed h2, .pr-risks h2 { color: var(--pr-navy); font-size: 1.2rem; border-bottom: 2px solid #e5e9f0; padding-bottom: 0.4rem; }
+.pr-closed h2, .pr-risks h2 { color: var(--pr-navy); font-size: 1.2rem; border-bottom: 2px solid #E6E6E6; padding-bottom: 0.4rem; }
 
 /* At-risk flags */
 .pr-risks { margin-top: 2rem; }
 .pr-risk-card { margin-bottom: 1.1rem; }
-.pr-risk-head-overdue { background: linear-gradient(90deg, #C8102E 0%, #e0384f 100%); }
-.pr-risk-head-nonext { background: linear-gradient(90deg, #A9701A 0%, #c68a2c 100%); }
-.pr-risk-head-dropped { background: linear-gradient(90deg, #5b6472 0%, #79828f 100%); }
+.pr-risk-head-overdue { background: var(--aw-pumpkin, #d26d37); }
+.pr-risk-head-nonext { background: var(--aw-gold, #a99c6c); }
+.pr-risk-head-dropped { background: var(--aw-ink-secondary, #595959); }
 .pr-badge-overdue { background: #fdecea; color: var(--pr-red); font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.72rem; }
 
 /* Week-over-week progress */
-.pr-progress { margin: 0 0 1.5rem; background: #fff; border: 1px solid #e5e9f0; border-radius: 12px; padding: 1.1rem 1.35rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.pr-progress { margin: 0 0 1.5rem; background: #fff; border: 1px solid #E6E6E6; border-radius: 12px; padding: 1.1rem 1.35rem 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 .pr-progress-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .pr-progress-head h2 { margin: 0; color: var(--pr-navy); font-size: 1.2rem; }
 .pr-progress-sub { margin: 0.3rem 0 0; font-size: 0.85rem; color: #666; }
@@ -289,14 +287,14 @@ a.pr-name:hover { text-decoration: underline; }
 .pr-ptile-won { background: #f2f7f0; border-top-color: var(--pr-green); }
 .pr-ptile-advanced { background: #eef8fe; border-top-color: #289FDA; }
 .pr-ptile-reengaged { background: #faf6ea; border-top-color: #A99C6C; }
-.pr-ptile-stable { background: #f7f8fa; border-top-color: #9aa4b2; }
+.pr-ptile-stable { background: #F3F4F4; border-top-color: #9aa4b2; }
 .pr-ptile-dropped { background: #fdf1ea; border-top-color: var(--pr-red); }
 @media (max-width: 900px) { .pr-progress-tiles { grid-template-columns: repeat(2, 1fr); } }
 
-.pr-progress-table { border: 1px solid #eef1f6; border-radius: 8px; overflow: hidden; }
-.pr-score-change { font-variant-numeric: tabular-nums; font-size: 0.8rem; color: #374253; white-space: nowrap; }
-.pr-progress-note { color: #1a1a1a; }
-.pr-progress-foot { margin: 0.75rem 0 0; font-size: 0.78rem; color: #98a2b3; font-style: italic; }
+.pr-progress-table { border: 1px solid #E6E6E6; border-radius: 8px; overflow: hidden; }
+.pr-score-change { font-variant-numeric: tabular-nums; font-size: 0.8rem; color: #595959; white-space: nowrap; }
+.pr-progress-note { color: #171717; }
+.pr-progress-foot { margin: 0.75rem 0 0; font-size: 0.78rem; color: #828282; font-style: italic; }
 
 .pr-pstatus { display: inline-block; padding: 0.12rem 0.55rem; border-radius: 999px; font-size: 0.68rem; font-weight: 700; }
 .pr-pstatus-won { background: #e8ede7; color: #1c7a45; }
@@ -306,8 +304,8 @@ a.pr-name:hover { text-decoration: underline; }
 .pr-pstatus-dropped { background: #fde8db; color: var(--pr-red); }
 
 /* ── Brand refinements (Allworth Financial) ───────────────────────────── */
-/* Premium KPI accent card uses the dark brand gradient */
-.pr-kpi-accent { background: linear-gradient(135deg, var(--pr-night) 0%, var(--pr-indigo) 100%); }
+/* Legacy class retained for historical snapshots; KPI surfaces are unified. */
+.pr-kpi-accent { background: var(--aw-surface, #fff); }
 .pr-kpi-value, .pr-ptile-count, .pr-num, .pr-score-change { font-variant-numeric: tabular-nums; }
 
 /* Playfair Display on the major section headings (brand headline face) */

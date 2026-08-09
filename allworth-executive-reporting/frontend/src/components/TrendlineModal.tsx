@@ -1,16 +1,15 @@
 import { useEffect } from 'react';
 import {
   CartesianGrid,
-  Legend,
   Line,
   LineChart,
-  ResponsiveContainer,
-  Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
+import { ChartContainer, ChartLegend, ChartTooltip } from './ui/chart';
 import type { TrendPoint, TrendTarget } from '../types/kpi';
 import { formatNumber } from './KpiTile';
+import { chartTheme } from '../theme';
 
 type Props = {
   target: TrendTarget;
@@ -62,35 +61,35 @@ export function TrendlineModal({ target, data, onClose }: Props) {
           {data.length === 0 ? (
             <p className="trend-modal__empty">No history available for this metric.</p>
           ) : (
-            <ResponsiveContainer width="100%" height={340}>
+            <ChartContainer width="100%" height={340}>
               <LineChart data={data} margin={{ top: 12, right: 24, bottom: 8, left: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--ts-border, #e5e7eb)" vertical={false} />
+                <CartesianGrid stroke={chartTheme.grid} vertical={false} />
                 <XAxis
                   dataKey="period"
                   tickFormatter={shortPeriod}
                   tick={{ fontSize: 12 }}
-                  stroke="var(--ts-text-secondary, #6b7280)"
+                  stroke={chartTheme.axis}
                 />
                 <YAxis
                   tickFormatter={(v: number) => format(v)}
                   tick={{ fontSize: 12 }}
                   width={72}
-                  stroke="var(--ts-text-secondary, #6b7280)"
+                  stroke={chartTheme.axis}
                 />
-                <Tooltip
+                <ChartTooltip
                   formatter={(value) => {
                     const num = typeof value === 'number' ? value : Number(value);
                     return Number.isFinite(num) ? format(num) : String(value);
                   }}
                   labelStyle={{ fontWeight: 600 }}
-                  contentStyle={{ borderRadius: 8, fontSize: 13 }}
+                  contentStyle={chartTheme.tooltip}
                 />
-                <Legend />
+                <ChartLegend />
                 <Line
                   type="monotone"
                   dataKey="actual"
                   name="Actual"
-                  stroke="#2563eb"
+                  stroke={chartTheme.actual}
                   strokeWidth={2.5}
                   dot={{ r: 3 }}
                   activeDot={{ r: 5 }}
@@ -100,7 +99,7 @@ export function TrendlineModal({ target, data, onClose }: Props) {
                   type="monotone"
                   dataKey="plan"
                   name="Goal"
-                  stroke="#9ca3af"
+                  stroke={chartTheme.neutral}
                   strokeWidth={2}
                   strokeDasharray="5 4"
                   dot={false}
@@ -110,13 +109,13 @@ export function TrendlineModal({ target, data, onClose }: Props) {
                   type="monotone"
                   dataKey="py"
                   name="Prior Year"
-                  stroke="#10b981"
+                  stroke={chartTheme.positive}
                   strokeWidth={2}
                   dot={{ r: 2.5 }}
                   connectNulls
                 />
               </LineChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           )}
         </div>
       </div>

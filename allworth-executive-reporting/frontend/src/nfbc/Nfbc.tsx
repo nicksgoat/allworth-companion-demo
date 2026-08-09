@@ -11,7 +11,7 @@ import { QueueSummary } from './components/QueueSummary';
 import { QueueSkeleton } from './components/QueueSkeleton';
 import { PastAdjustments } from './components/PastAdjustments';
 import { RowDetail } from './components/RowDetail';
-import SideNav from '../components/SideNav';
+import { ToolPage } from '../components/ToolPage';
 
 type AdjRow = AuditResponse['db_adjustments'][number];
 const pastKey = (avhhid: unknown, period: unknown, amount: unknown) =>
@@ -190,29 +190,13 @@ export default function Nfbc() {
   }, [toast]);
 
   return (
-    <div className="t2-page has-sidenav">
-      <SideNav />
-      <div className="t2-bg" aria-hidden="true">
-        <div className="t2-orb t2-orb-1" />
-        <div className="t2-orb t2-orb-2" />
-        <div className="t2-orb t2-orb-3" />
-        <div className="t2-orb t2-orb-4" />
-        <div className="t2-orb t2-orb-5" />
-      </div>
-
-      <div className="t2-shell">
-        <header className="nfbc-hero">
-          <div className="nfbc-hero-left">
-            <div className="nfbc-kicker-row">
-              <span className="nfbc-kicker">Agentic ops</span>
-            </div>
-            <div className="nfbc-title"><h1>NFBC Adjustments</h1></div>
-            <p className="nfbc-tagline">
-              Review Claude-proposed flow adjustments, edit inline, and confirm to
-              write Synapse, run rollforward, and reply to Jira in one click.
-            </p>
-          </div>
-          <div className="nfbc-hero-right">
+    <ToolPage
+      eyebrow="Operations"
+      title="NFBC Adjustments"
+      description="Review proposed flow adjustments, edit inline, then write Synapse, run rollforward, and reply to Jira."
+      width="full"
+      className="t2-page"
+      actions={<>
             {builtAt && (
               <span className="nfbc-built">
                 queue built {new Date(builtAt * 1000).toLocaleTimeString()}
@@ -222,10 +206,10 @@ export default function Nfbc() {
             <button className="nfbc-ghost" onClick={() => load(true)} disabled={loading}>
               {building ? 'Building…' : loading ? 'Loading…' : '↻ Rebuild queue'}
             </button>
-          </div>
-        </header>
+      </>}
+    >
 
-        <main className="nfbc-main">
+        <div className="nfbc-main">
           {error && <div className="nfbc-error">⚠ {error}</div>}
 
           {diag && !diag.configured && (
@@ -339,13 +323,11 @@ export default function Nfbc() {
               </div>
             </div>
           )}
-        </main>
+        </div>
 
         <footer className="nfbc-footer">
           Powered by <strong>Jarvis</strong>
         </footer>
-      </div>
-
       {audit && (
         <div className="nfbc-audit-overlay" onClick={() => setAudit(null)}>
           <div className="nfbc-audit" onClick={(e) => e.stopPropagation()}>
@@ -392,6 +374,6 @@ export default function Nfbc() {
           <div key={t.id} className={`nfbc-toast ${t.kind}`}>{t.msg}</div>
         ))}
       </div>
-    </div>
+    </ToolPage>
   );
 }

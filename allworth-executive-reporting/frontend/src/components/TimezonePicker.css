@@ -4,10 +4,10 @@
    the dark pipeline theme, and consumers override the vars to re-theme. */
 
 .tz-select {
-  --tz-bg: #0f172a;
-  --tz-fg: #f8fafc;
-  --tz-border: #334155;
-  --tz-border-hover: #475569;
+  --tz-bg: #171717;
+  --tz-fg: #F3F4F4;
+  --tz-border: #595959;
+  --tz-border-hover: #595959;
   --tz-focus: #6366f1;
   --tz-focus-ring: rgba(99, 102, 241, 0.25);
 

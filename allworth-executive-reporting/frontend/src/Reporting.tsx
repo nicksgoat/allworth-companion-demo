@@ -5,7 +5,7 @@ import type { KpiDataset, TrendPoint, TrendTarget } from './types/kpi';
 import { KpiTile } from './components/KpiTile';
 import { ExpandableRow } from './components/ExpandableRow';
 import { TrendlineModal } from './components/TrendlineModal';
-import SideNav from './components/SideNav';
+import { ToolPage } from './components/ToolPage';
 import {
   buildBucketDescriptors,
   aggregateEntries,
@@ -190,21 +190,13 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], i
   }, [trendTarget, metrics, netFlowsMetrics, detailedMetrics]);
 
   return (
-    <div className="t2-page has-sidenav">
-      <SideNav />
-      <div className="t2-shell perf-console">
-        <header className="perf-hero">
-          <div className="perf-hero-left">
-            <div className="perf-kicker-row">
-              <span className="perf-kicker">Dashboard</span>
-            </div>
-            <div className="perf-title"><h1>Performance by Channel</h1></div>
-            <p className="perf-tagline">
-              KPI matrix for NCNM, Clients, Appointments and Leads across every
-              acquisition channel — with plan, prior-year and prorated current-month values.
-            </p>
-          </div>
-        <div className="header-controls perf-hero-right">
+    <ToolPage
+      eyebrow="Growth analytics"
+      title="Performance by Channel"
+      description="Compare NCNM, clients, appointments, and leads across acquisition channels against plan and prior year."
+      width="full"
+      className="t2-page perf-console"
+      actions={<div className="header-controls perf-hero-right">
           <div className="threshold-control" role="group" aria-label="Watch threshold percentage">
             <span className="threshold-label">Watch at</span>
             <button
@@ -263,10 +255,10 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], i
               ))}
             </div>
           )}
-        </div>
-      </header>
+        </div>}
+    >
 
-      <main>
+      <div>
         {isLoading ? (
           <section className="reporting-loading" aria-busy="true" aria-live="polite">
             <div className="reporting-loading__spinner" aria-hidden="true" />
@@ -319,7 +311,7 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], i
         {isCurrentMonth && (
           <p className="prorated-note">* PY and Plan values are prorated to reflect the current day of the month.</p>
         )}
-      </main>
+      </div>
 
       {contextMenu && (
         <div
@@ -346,8 +338,7 @@ function Reporting({ metrics = [], netFlowsMetrics = [], detailedMetrics = [], i
       {trendTarget && (
         <TrendlineModal target={trendTarget} data={trendData} onClose={() => setTrendTarget(null)} />
       )}
-      </div>
-    </div>
+    </ToolPage>
   );
 }
 

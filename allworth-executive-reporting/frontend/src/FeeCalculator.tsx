@@ -1,8 +1,11 @@
 // src/FeeCalculator.tsx
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { ChartContainer, ChartTooltip } from './components/ui/chart';
 import './FeeCalculator.css';
-import SideNav from './components/SideNav';
+import { useWorkspace } from './components/WorkspaceContext';
+import { ToolPage } from './components/ToolPage';
+import { chartTheme } from './theme';
 
 interface TierBreakdown {
   from: number;
@@ -144,6 +147,7 @@ const formatTierRange = (from: number, to: number | null) => {
 };
 
 const FeeCalculator = () => {
+  const { household } = useWorkspace();
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
   const [, setSearchResults] = useState<HouseholdSearchResult[]>([]);
@@ -164,6 +168,14 @@ const FeeCalculator = () => {
   const [manualAum, setManualAum] = useState('');
   const [selectedSchedule, setSelectedSchedule] = useState('gm_schedule_new');
   const [feeResult, setFeeResult] = useState<FeeResult | null>(null);
+
+  useEffect(() => {
+    if (!household) return;
+    setSearchQuery(household.name);
+    setManualAum(String(Math.round(household.aum)));
+    const numericAvhhid = Number(household.avhhid);
+    if (Number.isFinite(numericAvhhid)) setSelectedAvhhid(numericAvhhid);
+  }, [household]);
   const [allResults, setAllResults] = useState<Record<string, FeeResult> | null>(null);
   const [compareMode, setCompareMode] = useState(false);
   const [calcLoading, setCalcLoading] = useState(false);
@@ -448,7 +460,7 @@ const FeeCalculator = () => {
           setUploadError(`Upload failed (HTTP ${res.status}).`);
         }
       }
-    } catch (err) {
+    } catch {
       setUploadError('Upload failed — network or server error. Please retry.');
     } finally {
       setUploadLoading(false);
@@ -788,7 +800,6 @@ const FeeCalculator = () => {
 
       let proposedAnnual = 0;
       let withIncrease = 0;
-      let filledClients = 0;
       for (const hh of tierHhs) {
         const rowKey = `${hh.avhhid}-${hh.billing_def || ''}`;
         const userSched = userScheduleOverrides[rowKey] || '';
@@ -797,7 +808,6 @@ const FeeCalculator = () => {
         if (!userSched || userSched === 'no_change') {
           pa = hh.current_annual_fee; // Unfilled or No Change → current fee
         } else {
-          filledClients++;
           const proposed = (hh as any)[pKey] || hh.proposed;
           pa = proposed[userSched]?.annual_fee ?? hh.current_annual_fee;
         }
@@ -1071,13 +1081,13 @@ const FeeCalculator = () => {
   };
 
   return (
-    <div className="fee-calc-page has-sidenav">
-      <SideNav />
-      <div className="fee-calc-container">
-      <header className="fee-calc-header">
-        <h1>Fee Calculator</h1>
-        <p className="fee-calc-subtitle">Tiered fee computation for new client pricing</p>
-      </header>
+    <ToolPage
+      eyebrow="Client pricing"
+      title="Fee Calculator"
+      description="Calculate tiered pricing, compare schedules, and review household repricing scenarios."
+      width="full"
+      className="fee-calc-page"
+    >
 
       {/* Fee Schedule Reference Tile */}
       <section className="fee-calc-section fee-schedule-ref">
@@ -1457,9 +1467,9 @@ const FeeCalculator = () => {
                   onMouseUp={handleLassoMouseUp}
                   onMouseLeave={handleLassoMouseUp}
                 >
-                <ResponsiveContainer width="100%" height={360}>
+                <ChartContainer width="100%" height={360}>
                   <ScatterChart margin={{ top: 10, right: 30, bottom: 30, left: 60 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                    <CartesianGrid stroke={chartTheme.grid} />
                     <XAxis
                       type="number"
                       dataKey="aum"
@@ -1476,7 +1486,7 @@ const FeeCalculator = () => {
                       tickFormatter={(v: number) => `${v.toFixed(1)}%`}
                       label={{ value: 'Fee Rate (%)', angle: -90, position: 'insideLeft', offset: -10 }}
                     />
-                    <Tooltip
+                    <ChartTooltip
                       content={({ payload }) => {
                         if (!payload || !payload.length) return null;
                         const d = payload[0].payload;
@@ -1496,7 +1506,7 @@ const FeeCalculator = () => {
                     <Scatter
                       name="On Track"
                       data={scatterGroups.onTrack}
-                      fill="#27ae60"
+                      fill={chartTheme.positive}
                       opacity={0.7}
                       onClick={handleScatterClick}
                       cursor="pointer"
@@ -1505,7 +1515,7 @@ const FeeCalculator = () => {
                     <Scatter
                       name="Below Target"
                       data={scatterGroups.below}
-                      fill="#f39c12"
+                      fill={chartTheme.neutral}
                       opacity={0.7}
                       onClick={handleScatterClick}
                       cursor="pointer"
@@ -1514,21 +1524,21 @@ const FeeCalculator = () => {
                     <Scatter
                       name="Above Target"
                       data={scatterGroups.above}
-                      fill="#e74c3c"
+                      fill={chartTheme.warning}
                       opacity={0.7}
                       onClick={handleScatterClick}
                       cursor="pointer"
                       isAnimationActive={false}
                     />
                   </ScatterChart>
-                </ResponsiveContainer>
+                </ChartContainer>
                 {/* Lasso SVG overlay */}
                 {lassoActive && lassoPath.length > 1 && (
                   <svg className="lasso-overlay">
                     <polyline
                       points={lassoPath.map((p) => `${p.x},${p.y}`).join(' ')}
-                      fill="rgba(52, 152, 219, 0.1)"
-                      stroke="#3498db"
+                      fill="rgba(62, 113, 183, 0.10)"
+                      stroke={chartTheme.comparison}
                       strokeWidth={2}
                       strokeDasharray="5,3"
                     />
@@ -1936,10 +1946,9 @@ const FeeCalculator = () => {
         )}
         </div>
       </section>
-    </div>
     {/* Floating back-to-top button */}
     <button className="back-to-top-btn" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} title="Back to top">↑</button>
-    </div>
+    </ToolPage>
   );
 };
 

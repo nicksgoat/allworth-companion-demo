@@ -385,7 +385,7 @@ def import_household(session: Session, household_id: str) -> Facts:
         warnings.append("No household contacts were returned; placeholder client requires review")
         unverified_mc_inputs.update({"current_age", "retirement_age"})
     household_fact = session.execute(text(
-        "SELECT TOP 1 [AVHHID],[Expected_Retirement_Date__c],[AUM] "
+        "SELECT TOP 1 [AVHHID],[Expected_Retirement_Date__c],[AUM],[advisorid],[LeadId] "
         "FROM [tho].[Current_Household_Fact] WHERE [HHID]=:id"),
         {"id": household_id}).mappings().first()
     avhhid = household_fact.get("AVHHID") if household_fact else None
@@ -529,6 +529,8 @@ def import_household(session: Session, household_id: str) -> Facts:
                   expenses=expenses, assumptions=Assumptions(),
                   metadata={"source": "datawarehouse", "source_id": household_id,
                             "household_avhhid": str(avhhid) if avhhid else None,
+                            "advisor_id": str(household_fact.get("advisorid") or "") if household_fact else None,
+                            "crm_lead_id": str(household_fact.get("LeadId") or "") if household_fact else None,
                             "provenance": provenance, "data_quality_warnings": warnings,
                             "unverified_monte_carlo_inputs": sorted(unverified_mc_inputs),
                             "requires_advisor_review": bool(warnings)})

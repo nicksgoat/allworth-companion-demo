@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Alert, Button, Card, CardContent, Box, LinearProgress, Typography } from '@mui/material';
-import { Area, CartesianGrid, ComposedChart, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Area, CartesianGrid, ComposedChart, Line, LineChart, XAxis, YAxis } from 'recharts';
+import { ChartContainer, ChartTooltip } from '../components/ui/chart';
 import type { MonteCarloInputs, MonteCarloResult } from '../services/planningApi';
 import { Kpi, chartColors, money, pct } from './shared';
 
@@ -51,30 +52,30 @@ export default function MonteCarloTab({ mcInputs, mcResult, mcRunning, onRun }: 
       <Card><CardContent>
         <Typography variant="h6">Net worth outcome bands</Typography>
         <Typography color="text.secondary" sx={{ mb: 2 }}>5th–95th percentile fan with interquartile band and median path</Typography>
-        <ResponsiveContainer width="100%" height={380}>
+        <ChartContainer width="100%" height={380}>
           <ComposedChart data={bands}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="year" />
             <YAxis tickFormatter={v => money(v, true)} />
-            <Tooltip formatter={(value: unknown) => Array.isArray(value) ? `${money(value[0])} – ${money(value[1])}` : money(value)} />
+            <ChartTooltip formatter={(value: unknown) => Array.isArray(value) ? `${money(value[0])} – ${money(value[1])}` : money(value)} />
             <Area dataKey="outer" name="5th–95th" stroke="none" fill={chartColors.sky} fillOpacity={0.16} />
             <Area dataKey="inner" name="25th–75th" stroke="none" fill={chartColors.sky} fillOpacity={0.28} />
             <Line dataKey="median" name="Median" stroke={chartColors.nightBlue} strokeWidth={3} dot={false} />
           </ComposedChart>
-        </ResponsiveContainer>
+        </ChartContainer>
       </CardContent></Card>
       <Card sx={{ mt: 2.5 }}><CardContent>
         <Typography variant="h6">Success by age</Typography>
         <Typography color="text.secondary" sx={{ mb: 2 }}>Share of trials still funded at each client age</Typography>
-        <ResponsiveContainer width="100%" height={260}>
+        <ChartContainer width="100%" height={260}>
           <LineChart data={successByAge}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="age" />
             <YAxis domain={[0, 100]} tickFormatter={v => `${v}%`} />
-            <Tooltip formatter={(value: unknown) => `${Number(value).toFixed(1)}%`} />
+            <ChartTooltip formatter={(value: unknown) => `${Number(value).toFixed(1)}%`} />
             <Line dataKey="probability" name="Funded" stroke={chartColors.evergreen} strokeWidth={3} dot={false} />
           </LineChart>
-        </ResponsiveContainer>
+        </ChartContainer>
       </CardContent></Card>
     </>}
   </Box>;

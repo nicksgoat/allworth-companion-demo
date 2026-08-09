@@ -1,10 +1,10 @@
 import { lazy, Suspense, useState } from 'react';
-import { Container, Tab, Tabs, Alert, Box, LinearProgress } from '@mui/material';
+import { Tab, Tabs, Alert, Box, LinearProgress } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import AuthControl from './components/AuthControl';
 import { TabPanel } from './components/TabPanel';
-import SideNav from './components/SideNav';
 import ShareTool from './components/ShareTool';
+import { ToolPage, ToolPanel } from './components/ToolPage';
 import { colors, muiTheme } from './theme';
 import './BondAnalyzer.css';
 
@@ -18,39 +18,25 @@ export default function BondAnalyzer() {
 
   return (
     <ThemeProvider theme={muiTheme}>
-    <div className="has-sidenav">
-    <SideNav />
-    <Box sx={{ minHeight: '100vh', backgroundColor: colors.surfacePrimary }}>
-      {/* ── Allworth hero header ─────────────────────────────────────────── */}
-      <div className="aw-hero">
-        <div className="aw-hero__topline">
+      <ToolPage
+        eyebrow="Portfolio tools"
+        title="Bond Analyzer"
+        description="Build fixed-income ladders, inspect account exposure, and produce client-ready analysis."
+        width="full"
+        actions={
+          <>
           <ShareTool toolId="bond_analyzer" toolName="Bond Analyzer" />
           <AuthControl />
-        </div>
-        <div>
-          <p className="aw-hero__eyebrow">Allworth Financial</p>
-          <h1 className="aw-hero__title">Bond Analyzer</h1>
-          <p className="aw-hero__subtitle">Fixed-income portfolio analysis and reporting</p>
-        </div>
-      </div>
-
-      {/* ── Main content ─────────────────────────────────────────────────── */}
-      <Container maxWidth="xl" sx={{ py: 3, px: { xs: 1, sm: 2, md: 3 } }}>
+          </>
+        }
+      >
         {error && (
           <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
             {error}
           </Alert>
         )}
 
-        <Box
-          sx={{
-            backgroundColor: colors.surfaceCard,
-            borderRadius: 1,
-            border: `1px solid ${colors.hairline}`,
-            boxShadow: 'none',
-            overflow: 'hidden',
-          }}
-        >
+        <ToolPanel flush>
           <Tabs
             value={tab}
             onChange={(_, v) => setTab(v)}
@@ -80,10 +66,8 @@ export default function BondAnalyzer() {
               </TabPanel>
             </Suspense>
           </Box>
-        </Box>
-      </Container>
-    </Box>
-    </div>
+        </ToolPanel>
+      </ToolPage>
     </ThemeProvider>
   );
 }

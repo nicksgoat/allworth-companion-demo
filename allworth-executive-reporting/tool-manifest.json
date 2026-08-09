@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "assignment_presets": {
+    "advisor": ["avantos", "crm", "financial_planning", "pipeline_review", "fee_calculator"],
+    "executive": ["executive_report", "performance", "brief"],
+    "operations": ["nfbc", "pipeline_logging", "file_explorer", "repcodes"],
+    "platform_admin": ["admin", "pipeline_logging", "sfp2", "data_catalog"],
+    "general": []
+  },
+  "sections": {
+    "live": { "label": "Live tools", "nav_label": "Daily work", "description": "Shipped and available for the team to use today." },
+    "analytics": { "label": "Analytics and reports", "nav_label": "Data and operations", "description": "Operational reporting, observability, and data-quality workflows." },
+    "utilities": { "label": "Utilities", "nav_label": "Data and operations", "description": "Reference-data and platform maintenance tools." }
+  },
+  "tools": [
+    {
+      "id": "performance", "name": "Performance by Channel", "kicker": "Dashboard", "description": "Review growth against plan across every acquisition channel.", "url": "/reporting/kpi", "analytics_urls": ["/reporting/kpi", "/reporting", "/embed"], "category": "live", "color": "navy", "status": "live", "icon": "performance",
+      "navigation": [{ "href": "/reporting/kpi", "label": "Performance", "matches": ["/reporting/kpi"], "group": "Daily work" }],
+      "widget": { "kind": "core" }
+    },
+    {
+      "id": "jarvis", "name": "Jarvis Encyclopedia", "kicker": "Institutional knowledge", "description": "Find trusted definitions, operating context, and ownership.", "url": "/jarvis", "category": "live", "color": "navy", "status": "live", "icon": "knowledge",
+      "navigation": [{ "href": "/jarvis", "label": "Jarvis Encyclopedia", "matches": ["/jarvis"], "group": "Data and operations" }],
+      "widget": { "action": "search", "eyebrow": "Guidance" }
+    },
+    {
+      "id": "nfbc", "name": "NFBC Adjustments", "kicker": "Agentic operations", "description": "Review, edit, and confirm proposed household flow adjustments.", "url": "/nfbc", "category": "live", "color": "orange", "status": "new", "icon": "table",
+      "navigation": [{ "href": "/nfbc", "label": "NFBC Adjustments", "matches": ["/nfbc"], "group": "Data and operations" }],
+      "widget": { "endpoint": "/api/nfbc/queue", "count_path": ["rows"], "count_label": "queue items", "eyebrow": "Operations" }
+    },
+    {
+      "id": "admin", "name": "Access Management", "kicker": "Platform control", "description": "Manage people, assignments, groups, and workspace permissions.", "url": "/admin", "analytics_urls": ["/admin", "/app-usage", "/automations"], "category": "live", "color": "slate", "status": "new", "icon": "admin",
+      "navigation": [
+        { "href": "/admin", "label": "Access Management", "matches": ["/admin"], "group": "Administration" },
+        { "href": "/app-usage", "label": "App Usage", "matches": ["/app-usage"], "group": "Administration" },
+        { "href": "/automations", "label": "Automations", "matches": ["/automations"], "group": "Administration" }
+      ],
+      "widget": { "endpoint": "/api/admin/users", "count_path": ["users"], "count_label": "people", "eyebrow": "Platform" }
+    },
+    {
+      "id": "fee_calculator", "name": "Fee Calculator", "kicker": "Pricing", "description": "Compare fee schedules and calculate client pricing.", "url": "/fee-calculator", "category": "live", "color": "teal", "status": "live", "icon": "calculator",
+      "navigation": [{ "href": "/fee-calculator", "label": "Fee Calculator", "advisor_label": "Pricing", "matches": ["/fee-calculator"], "group": "Daily work" }],
+      "widget": { "kind": "core" }
+    },
+    {
+      "id": "pipeline_review", "name": "Pipeline Review", "kicker": "Prospect focus list", "description": "Focus the team on prospects that need attention now.", "url": "/pipeline-review", "category": "live", "color": "teal", "status": "live", "icon": "pipeline",
+      "navigation": [{ "href": "/pipeline-review", "label": "Pipeline Review", "advisor_label": "Pipeline", "matches": ["/pipeline-review"], "group": "Daily work" }],
+      "widget": { "kind": "core" }
+    },
+    {
+      "id": "executive_report", "name": "Executive Report", "kicker": "Leadership", "description": "See company flows, forecasts, and the executive summary.", "url": "/executive-report", "category": "live", "color": "navy", "status": "new", "icon": "report",
+      "navigation": [{ "href": "/executive-report", "label": "Executive Report", "matches": ["/executive-report"], "group": "Daily work" }],
+      "widget": { "endpoint": "/executive-report/api/health", "eyebrow": "Leadership" }
+    },
+    {
+      "id": "crm", "name": "CRM", "kicker": "Client relationships", "description": "Find clients, activity, opportunities, and advisor relationships.", "url": "/crm", "category": "live", "color": "sky", "status": "new", "icon": "relationships",
+      "navigation": [{ "href": "/crm", "label": "CRM", "advisor_label": "Relationships", "matches": ["/crm"], "group": "Daily work" }],
+      "widget": { "kind": "core" }
+    },
+    {
+      "id": "file_explorer", "name": "File Explorer", "kicker": "Data access", "description": "Find, download, and share approved data-lake resources.", "url": "/file-explorer", "category": "live", "color": "sky", "status": "new", "icon": "folder",
+      "navigation": [{ "href": "/file-explorer", "label": "File Explorer", "matches": ["/file-explorer"], "group": "Data and operations" }],
+      "widget": { "endpoint": "/api/file-explorer/resources", "count_path": ["resources"], "count_label": "resources", "eyebrow": "Data access" }
+    },
+    {
+      "id": "data_catalog", "name": "Data Catalog", "kicker": "Definitions", "description": "Understand warehouse fields, tables, and relationships.", "url": "/catalog/", "category": "live", "color": "navy", "status": "new", "icon": "database",
+      "navigation": [{ "href": "/catalog/", "label": "Data Catalog", "matches": ["/catalog", "/catalog/"], "group": "Data and operations" }],
+      "widget": { "action": "search", "eyebrow": "Definitions" }
+    },
+    {
+      "id": "brief", "name": "Executive Brief", "kicker": "Executive inbox", "description": "Triage the executive inbox and prepare decision-ready replies.", "url": "/brief", "category": "live", "color": "navy", "status": "new", "icon": "mail",
+      "navigation": [{ "href": "/brief", "label": "Executive Brief", "matches": ["/brief"], "group": "Daily work" }],
+      "widget": { "kind": "core" }
+    },
+    {
+      "id": "financial_planning", "name": "Financial Planning", "kicker": "Advice", "description": "Build and compare retirement, tax, and estate scenarios.", "url": "/planning", "category": "live", "color": "teal", "status": "new", "icon": "planning",
+      "navigation": [{ "href": "/planning", "label": "Financial Planning", "advisor_label": "Financial plans", "matches": ["/planning"], "group": "Daily work" }],
+      "widget": { "endpoint": "/api/v1/households", "count_path": ["households"], "count_label": "households", "eyebrow": "Advice" }
+    },
+    {
+      "id": "avantos", "name": "Avantos", "kicker": "Advisor workbench", "description": "Prioritize households by plan health, drift, and open work.", "url": "/avantos", "category": "live", "color": "navy", "status": "new", "icon": "trend",
+      "navigation": [{ "href": "/avantos", "label": "Avantos", "advisor_label": "Full book", "matches": ["/avantos"], "group": "Daily work" }],
+      "widget": { "kind": "core" }
+    },
+    {
+      "id": "rebalancer", "name": "Mock Rebalancer", "kicker": "Tax transition", "description": "Model tax-aware portfolio transitions before execution.", "url": "/rebalancer", "category": "live", "color": "teal", "status": "new", "icon": "balance",
+      "navigation": [{ "href": "/rebalancer", "label": "Mock Rebalancer", "matches": ["/rebalancer"], "group": "Portfolio tools" }],
+      "widget": { "eyebrow": "Investments" }
+    },
+    {
+      "id": "pipeline_logging", "name": "Pipeline Logging", "kicker": "Platform health", "description": "Inspect ingestion, transformation, and refresh health.", "url": "/refresh_log", "analytics_urls": ["/refresh_log", "/refresh-log", "/tamarac"], "category": "analytics", "color": "sky", "status": "live", "icon": "refresh",
+      "navigation": [
+        { "href": "/tamarac", "label": "Source Runs", "matches": ["/tamarac"], "group": "Data and operations" },
+        { "href": "/refresh_log", "label": "Refresh Log", "matches": ["/refresh_log", "/refresh-log"], "group": "Data and operations" }
+      ],
+      "widget": { "endpoint": "/api/health", "eyebrow": "Platform health" }
+    },
+    {
+      "id": "sfp2", "name": "Schema Changes", "kicker": "Data operations", "description": "Review pending field changes and downstream impact.", "url": "/sfp2", "category": "utilities", "color": "slate", "status": "live", "icon": "schema",
+      "navigation": [{ "href": "/sfp2", "label": "Schema Changes", "matches": ["/sfp2"], "group": "Data and operations" }],
+      "widget": { "endpoint": "/api/sfp2/schema-changes", "count_path": ["changes"], "count_label": "changes", "eyebrow": "Data operations" }
+    },
+    {
+      "id": "repcodes", "name": "Rep Codes", "kicker": "Reference data", "description": "Maintain advisor representative-code mappings.", "url": "/repcodes", "category": "utilities", "color": "slate", "status": "live", "icon": "reference",
+      "navigation": [{ "href": "/repcodes", "label": "Rep Codes", "matches": ["/repcodes"], "group": "Data and operations" }],
+      "widget": { "endpoint": "/api/repcodes/", "count_path": ["data"], "count_label": "codes", "eyebrow": "Reference data" }
+    },
+    {
+      "id": "bond_analyzer", "name": "Bond Analyzer", "kicker": "Fixed income", "description": "Analyze fixed-income holdings, ladders, calls, and cash flows.", "url": "/bond-analyzer", "category": "live", "color": "teal", "status": "new", "icon": "bonds",
+      "navigation": [{ "href": "/bond-analyzer", "label": "Bond Analyzer", "matches": ["/bond-analyzer"], "group": "Portfolio tools" }],
+      "widget": { "eyebrow": "Investments" }
+    },
+    {
+      "id": "advisor_mailer", "name": "Advisor Mailer", "kicker": "Communications", "description": "Prepare and review governed advisor communications.", "url": "/advisor-mailer", "category": "live", "color": "navy", "status": "new", "icon": "mail",
+      "navigation": [{ "href": "/advisor-mailer", "label": "Advisor Mailer", "matches": ["/advisor-mailer"], "group": "Portfolio tools" }],
+      "widget": { "endpoint": "/mailer/api/health", "eyebrow": "Communication" }
+    },
+    { "id": "heatmaps", "name": "Heatmaps", "kicker": "Visual analytics", "description": "Density views for advisor activity and client engagement.", "url": null, "category": "analytics", "color": "sky", "status": "soon", "icon": "grid", "navigation": [] },
+    { "id": "html_reports", "name": "HTML Reports", "kicker": "Ad hoc", "description": "Governed viewer for static reconciliation and analysis exports.", "url": null, "category": "analytics", "color": "slate", "status": "soon", "icon": "document", "navigation": [] },
+    { "id": "reconciliations", "name": "Reconciliations", "kicker": "Data quality", "description": "Exception-focused data reconciliation workflows.", "url": null, "category": "analytics", "color": "orange", "status": "soon", "icon": "compare", "navigation": [] },
+    { "id": "field_mapping", "name": "Field Mapping Explorer", "kicker": "Developer tool", "description": "Inspect source-to-target field mappings and ownership.", "url": null, "category": "utilities", "color": "slate", "status": "soon", "icon": "schema", "navigation": [] },
+    { "id": "custodian", "name": "Custodian Dashboard", "kicker": "Operations", "description": "Monitor custodian connectivity and account exceptions.", "url": null, "category": "utilities", "color": "slate", "status": "soon", "icon": "database", "navigation": [] }
+  ]
+}

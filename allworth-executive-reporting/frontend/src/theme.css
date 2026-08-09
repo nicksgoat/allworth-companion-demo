@@ -22,12 +22,13 @@
   --aw-ink: #171717;
   --aw-ink-secondary: #595959;
   --aw-ink-muted: #828282;
+  --aw-light-gray: #bebebe;
   --aw-line: #e6e6e6;
   --aw-surface: #ffffff;
   --aw-focus: rgba(62, 113, 183, 0.22);
   --aw-radius-sm: 6px;
-  --aw-radius: 10px;
-  --aw-radius-lg: 14px;
+  --aw-radius: 6px;
+  --aw-radius-lg: 6px;
   --aw-shadow: 0 12px 32px rgba(12, 46, 78, 0.08);
   --aw-shadow-sm: 0 2px 8px rgba(12, 46, 78, 0.06);
   --aw-font-display: 'Playfair Display', Georgia, serif;
@@ -48,7 +49,7 @@
   --ts-text-muted: var(--aw-ink-muted);
   --ts-success: var(--aw-evergreen);
   --ts-warning: var(--aw-gold);
-  --ts-danger: #a63d35;
+  --ts-danger: var(--aw-pumpkin);
   --ts-shadow-sm: var(--aw-shadow-sm);
   --ts-shadow-md: var(--aw-shadow);
   --ts-radius: var(--aw-radius);

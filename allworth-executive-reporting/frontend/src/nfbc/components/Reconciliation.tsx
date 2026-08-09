@@ -11,6 +11,9 @@
 // in its period (e.g. a broken-feed phantom outflow) vs. when it's backed by
 // a real flow that genuinely moved the account.
 
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, ReferenceLine, XAxis, YAxis } from 'recharts';
+import { ChartContainer, ChartTooltip } from '../../components/ui/chart';
+import { chartTheme } from '../../theme';
 import type { NfbcRow, FlowPeriod } from '../types';
 
 const money = (n: number | null | undefined) =>
@@ -117,12 +120,15 @@ export function Reconciliation({ row }: { row: NfbcRow }) {
     .filter((a) => (a.reportingperiod || '').slice(0, 7) === (row.period || '').slice(0, 7))
     .reduce((s, a) => s + (a.flow_adjustment ?? 0), 0);
 
-  const scale = Math.max(...series.map((s) => Math.abs(s.eop ?? 0)), 1);
-  const barW = (v: number | null | undefined) => (v == null ? 0 : Math.min(100, (Math.abs(v) / scale) * 100));
-
   const verdict = target ? assess(target, adj, existingInPeriod) : null;
   const adjustedNet = target ? target.net + adj : null;
   const avChange = target && target.bop != null && target.eop != null ? target.eop - target.bop : null;
+  const bridge = target ? [
+    { label: 'Beginning account value', value: target.bop ?? 0, fill: chartTheme.actual },
+    { label: 'Net flows (blanket)', value: target.net, fill: target.net >= 0 ? chartTheme.positive : chartTheme.warning },
+    { label: 'Market change', value: target.market ?? 0, fill: (target.market ?? 0) >= 0 ? chartTheme.positive : chartTheme.warning },
+    { label: 'Ending account value', value: target.eop ?? 0, fill: chartTheme.actual },
+  ] : [];
 
   return (
     <section className="nfbc-pane nfbc-recon">
@@ -153,12 +159,19 @@ export function Reconciliation({ row }: { row: NfbcRow }) {
               <span className="nfbc-recon-note"> · {row.period} not yet in the rollforward — reconciled against latest available {target.period}</span>
             )}
           </div>
-          <div className="nfbc-recon-bridge">
-            <BridgeStep label="Beginning account value" value={money(target.bop)} tone="anchor" w={barW(target.bop)} />
-            <BridgeStep label="Net flows (blanket)" value={signed(target.net)} tone={target.net >= 0 ? 'pos' : 'neg'} w={barW(target.net)} />
-            <BridgeStep label="Market change" value={signed(target.market)} tone={(target.market ?? 0) >= 0 ? 'pos' : 'neg'} w={barW(target.market)} />
-            <BridgeStep label="Ending account value" value={money(target.eop)} tone="anchor" w={barW(target.eop)} />
-          </div>
+          <ChartContainer className="nfbc-recon-bridge-chart" height={210}>
+            <BarChart data={bridge} layout="vertical" margin={{ top: 8, right: 88, bottom: 4, left: 8 }}>
+              <CartesianGrid horizontal={false} />
+              <XAxis type="number" tickFormatter={(value) => money(Number(value))} tickLine={false} axisLine={false} />
+              <YAxis type="category" dataKey="label" width={148} tickLine={false} axisLine={false} />
+              <ReferenceLine x={0} stroke={chartTheme.axis} />
+              <ChartTooltip formatter={(value) => [signed(Number(value)), 'Value']} />
+              <Bar dataKey="value" name="Value" radius={[0, 4, 4, 0]} minPointSize={2} isAnimationActive={false}>
+                {bridge.map((step) => <Cell key={step.label} fill={step.fill} />)}
+                <LabelList dataKey="value" position="right" formatter={(value) => signed(Number(value))} fill={chartTheme.axis} fontSize={11} />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
 
           {/* Comp overlay — adjusted net flows vs. what actually moved the account */}
           <div className="nfbc-recon-overlay">
@@ -200,17 +213,5 @@ export function Reconciliation({ row }: { row: NfbcRow }) {
         </>
       )}
     </section>
-  );
-}
-
-function BridgeStep({ label, value, tone, w }: { label: string; value: string; tone: 'anchor' | 'pos' | 'neg'; w: number }) {
-  return (
-    <div className="nfbc-recon-step">
-      <span className="nfbc-recon-step-label">{label}</span>
-      <span className="nfbc-recon-track">
-        <span className={`nfbc-recon-fill tone-${tone}`} style={{ width: `${w}%` }} />
-      </span>
-      <span className="nfbc-recon-step-val">{value}</span>
-    </div>
   );
 }

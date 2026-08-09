@@ -4,27 +4,10 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './theme.css';
 import './index.css';
-import Reporting from './Reporting';
-import EmbedApp from './EmbedApp';
-import RefreshLog from './RefreshLog';
-import Tamarac2 from './Tamarac2';
-import Sfp2 from './Sfp2';
-import Repcodes from './Repcodes';
-import Nfbc from './nfbc/Nfbc';
-import Admin from './Admin';
-import AppUsage from './AppUsage';
-import Automations from './Automations';
-import FeeCalculator from './FeeCalculator';
-import PipelineReview from './PipelineReview';
-import ExecutiveReport from './ExecutiveReport';
-import Crm from './Crm';
-import FileExplorer from './FileExplorer';
-import Brief from './brief/Brief';
 import Home from './Home';
 import SideNav from './components/SideNav';
 import PageTracker from './components/PageTracker';
 import type { KpiDataset } from './types/kpi';
-import { getChartContext } from '@thoughtspot/ts-chart-sdk';
 import type { ThoughtSpotCell, ThoughtSpotRenderContext } from './types/thoughtspot';
 import { fetchAllMetrics } from './services/api';
 import { adminApi } from './services/admin';
@@ -33,9 +16,26 @@ import {
   installAuthFetch,
 } from './services/auth';
 import { demoMetrics } from './data/demoMetrics';
+import { WorkspaceProvider } from './components/WorkspaceContext';
 
-// Keep the larger planning and investment workspaces out of the initial hub
-// bundle. They load only when an authorized user opens the tool.
+// Tool pages load only after their route is opened. This keeps page-specific
+// charting, editor, and data-grid dependencies out of the initial workspace.
+const RefreshLog = lazy(() => import('./RefreshLog'));
+const Reporting = lazy(() => import('./Reporting'));
+const EmbedApp = lazy(() => import('./EmbedApp'));
+const Tamarac2 = lazy(() => import('./Tamarac2'));
+const Sfp2 = lazy(() => import('./Sfp2'));
+const Repcodes = lazy(() => import('./Repcodes'));
+const Nfbc = lazy(() => import('./nfbc/Nfbc'));
+const Admin = lazy(() => import('./Admin'));
+const AppUsage = lazy(() => import('./AppUsage'));
+const Automations = lazy(() => import('./Automations'));
+const FeeCalculator = lazy(() => import('./FeeCalculator'));
+const PipelineReview = lazy(() => import('./PipelineReview'));
+const ExecutiveReport = lazy(() => import('./ExecutiveReport'));
+const Crm = lazy(() => import('./Crm'));
+const FileExplorer = lazy(() => import('./FileExplorer'));
+const Brief = lazy(() => import('./brief/Brief'));
 const BondAnalyzer = lazy(() => import('./BondAnalyzer'));
 const EmailBatchApp = lazy(() => import('./EmailBatchApp'));
 const PlanningApp = lazy(() => import('./PlanningApp'));
@@ -118,12 +118,13 @@ function ImpersonationBar() {
 // Tool/page access gate. While "viewing as" another user (impersonation), a
 // route whose tool id is NOT in that user's effective access renders the
 // no-access notice. Otherwise the real signed-in user's effective access
-// (fetched once from /api/admin/me) is enforced. Fails OPEN on lookup error so
-// a backend hiccup can't lock everyone out.
+// (fetched once from /api/admin/me) is enforced. Lookup failures fail closed
+// with a retry state so an outage cannot become an implicit grant.
 // ---------------------------------------------------------------------------
 interface MeAccess {
   effective: Set<string>;
   all: boolean;
+  unavailable?: boolean;
 }
 let meCache: MeAccess | null = null;
 let mePromise: Promise<void> | null = null;
@@ -135,8 +136,9 @@ function loadMe(): Promise<void> {
         meCache = { effective: new Set(m.effective_tools), all: m.all_access };
       })
       .catch(() => {
-        // Fail open: if access can't be resolved, don't lock the user out.
-        meCache = { effective: new Set(), all: true };
+        // Fail closed: an access-service outage must not become an implicit
+        // all-tools grant. The user gets a retryable availability state.
+        meCache = { effective: new Set(), all: false, unavailable: true };
       });
   }
   return mePromise;
@@ -158,6 +160,19 @@ function NoAccess() {
           </a>{' '}
           to request access.
         </p>
+      </div>
+    </div>
+  );
+}
+
+function AccessUnavailable() {
+  return (
+    <div className="no-access has-sidenav">
+      <SideNav />
+      <div className="no-access-card">
+        <h1>Access check unavailable</h1>
+        <p>We could not verify your workspace permissions. Refresh to try again.</p>
+        <button type="button" onClick={() => window.location.reload()}>Refresh</button>
       </div>
     </div>
   );
@@ -189,8 +204,58 @@ function ToolGuard({ toolId, children }: { toolId: string; children: ReactNode }
   }
   // Real signed-in user. Wait for the access lookup, then enforce.
   if (me === null) return null;
+  if (me.unavailable) return <AccessUnavailable />;
   if (me.all || me.effective.has(toolId)) return <>{children}</>;
   return <NoAccess />;
+}
+
+interface AppRoutesProps {
+  metrics: KpiDataset;
+  netFlowsMetrics?: KpiDataset;
+  detailedMetrics?: KpiDataset;
+  isLoading?: boolean;
+  fallback: 'home' | 'reporting';
+}
+
+function AppRoutes({ metrics, netFlowsMetrics = [], detailedMetrics = [], isLoading = false, fallback }: AppRoutesProps) {
+  const tool = (toolId: string, node: ReactNode) => (
+    <ToolGuard toolId={toolId}>{lazyPage(node)}</ToolGuard>
+  );
+  const reporting = (
+    <ToolGuard toolId="performance">
+      {lazyPage(<Reporting metrics={metrics} netFlowsMetrics={netFlowsMetrics} detailedMetrics={detailedMetrics} isLoading={isLoading} />)}
+    </ToolGuard>
+  );
+
+  return (
+    <Routes>
+      <Route path="/embed" element={lazyPage(<EmbedApp metrics={metrics} netFlowsMetrics={netFlowsMetrics} detailedMetrics={detailedMetrics} />)} />
+      <Route path="/" element={<Home />} />
+      <Route path="/home" element={<Home />} />
+      <Route path="/refresh_log" element={tool('pipeline_logging', <RefreshLog />)} />
+      <Route path="/refresh-log" element={tool('pipeline_logging', <RefreshLog />)} />
+      <Route path="/tamarac" element={tool('pipeline_logging', <Tamarac2 />)} />
+      <Route path="/sfp2" element={tool('sfp2', <Sfp2 />)} />
+      <Route path="/repcodes" element={tool('repcodes', <Repcodes />)} />
+      <Route path="/nfbc" element={tool('nfbc', <Nfbc />)} />
+      <Route path="/fee-calculator" element={tool('fee_calculator', <FeeCalculator />)} />
+      <Route path="/pipeline-review" element={tool('pipeline_review', <PipelineReview />)} />
+      <Route path="/executive-report" element={tool('executive_report', <ExecutiveReport />)} />
+      <Route path="/crm" element={tool('crm', <Crm />)} />
+      <Route path="/file-explorer" element={tool('file_explorer', <FileExplorer />)} />
+      <Route path="/brief" element={tool('brief', <Brief />)} />
+      <Route path="/bond-analyzer" element={tool('bond_analyzer', <BondAnalyzer />)} />
+      <Route path="/advisor-mailer" element={tool('advisor_mailer', <EmailBatchApp />)} />
+      <Route path="/planning" element={tool('financial_planning', <PlanningApp />)} />
+      <Route path="/avantos" element={tool('avantos', <Avantos />)} />
+      <Route path="/rebalancer" element={tool('rebalancer', <Rebalancer />)} />
+      <Route path="/admin" element={tool('admin', <Admin />)} />
+      <Route path="/app-usage" element={tool('admin', <AppUsage />)} />
+      <Route path="/automations" element={tool('admin', <Automations />)} />
+      <Route path="/reporting/kpi" element={reporting} />
+      <Route path="*" element={fallback === 'home' ? <Home /> : reporting} />
+    </Routes>
+  );
 }
 
 // -------------------------------------------------------------------------
@@ -237,33 +302,11 @@ if (isPipelinePath) {
     root.render(
       <StrictMode>
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/refresh_log" element={<ToolGuard toolId="pipeline_logging"><RefreshLog /></ToolGuard>} />
-            <Route path="/refresh-log" element={<ToolGuard toolId="pipeline_logging"><RefreshLog /></ToolGuard>} />
-            <Route path="/tamarac" element={<ToolGuard toolId="pipeline_logging"><Tamarac2 /></ToolGuard>} />
-            <Route path="/sfp2" element={<ToolGuard toolId="sfp2"><Sfp2 /></ToolGuard>} />
-            <Route path="/repcodes" element={<ToolGuard toolId="repcodes"><Repcodes /></ToolGuard>} />
-            <Route path="/nfbc" element={<ToolGuard toolId="nfbc"><Nfbc /></ToolGuard>} />
-            <Route path="/fee-calculator" element={<ToolGuard toolId="fee_calculator"><FeeCalculator /></ToolGuard>} />
-            <Route path="/pipeline-review" element={<ToolGuard toolId="pipeline_review"><PipelineReview /></ToolGuard>} />
-            <Route path="/executive-report" element={<ToolGuard toolId="executive_report"><ExecutiveReport /></ToolGuard>} />
-            <Route path="/crm" element={<ToolGuard toolId="crm"><Crm /></ToolGuard>} />
-            <Route path="/file-explorer" element={<ToolGuard toolId="file_explorer"><FileExplorer /></ToolGuard>} />
-            <Route path="/brief" element={<ToolGuard toolId="brief"><Brief /></ToolGuard>} />
-            <Route path="/bond-analyzer" element={<ToolGuard toolId="bond_analyzer">{lazyPage(<BondAnalyzer />)}</ToolGuard>} />
-            <Route path="/advisor-mailer" element={<ToolGuard toolId="advisor_mailer">{lazyPage(<EmailBatchApp />)}</ToolGuard>} />
-            <Route path="/planning" element={<ToolGuard toolId="financial_planning">{lazyPage(<PlanningApp />)}</ToolGuard>} />
-            <Route path="/avantos" element={<ToolGuard toolId="avantos">{lazyPage(<Avantos />)}</ToolGuard>} />
-            <Route path="/rebalancer" element={<ToolGuard toolId="rebalancer">{lazyPage(<Rebalancer />)}</ToolGuard>} />
-            <Route path="/admin" element={<ToolGuard toolId="admin"><Admin /></ToolGuard>} />
-            <Route path="/app-usage" element={<ToolGuard toolId="admin"><AppUsage /></ToolGuard>} />
-            <Route path="/automations" element={<ToolGuard toolId="admin"><Automations /></ToolGuard>} />
-            <Route path="*" element={<Home />} />
-          </Routes>
-          <PageTracker />
-          <ImpersonationBar />
+          <WorkspaceProvider>
+            <AppRoutes metrics={[]} fallback="home" />
+            <PageTracker />
+            <ImpersonationBar />
+          </WorkspaceProvider>
         </BrowserRouter>
       </StrictMode>
     );
@@ -276,35 +319,11 @@ const renderApp = (metrics: KpiDataset, netFlowsMetrics?: KpiDataset, detailedMe
   root.render(
     <StrictMode>
       <BrowserRouter>
-        <Routes>
-          <Route path="/embed" element={<EmbedApp metrics={metrics} netFlowsMetrics={nf} detailedMetrics={dm} />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/refresh_log" element={<ToolGuard toolId="pipeline_logging"><RefreshLog /></ToolGuard>} />
-          <Route path="/refresh-log" element={<ToolGuard toolId="pipeline_logging"><RefreshLog /></ToolGuard>} />
-          <Route path="/tamarac" element={<ToolGuard toolId="pipeline_logging"><Tamarac2 /></ToolGuard>} />
-          <Route path="/sfp2" element={<ToolGuard toolId="sfp2"><Sfp2 /></ToolGuard>} />
-          <Route path="/repcodes" element={<ToolGuard toolId="repcodes"><Repcodes /></ToolGuard>} />
-          <Route path="/nfbc" element={<ToolGuard toolId="nfbc"><Nfbc /></ToolGuard>} />
-          <Route path="/fee-calculator" element={<ToolGuard toolId="fee_calculator"><FeeCalculator /></ToolGuard>} />
-          <Route path="/pipeline-review" element={<ToolGuard toolId="pipeline_review"><PipelineReview /></ToolGuard>} />
-          <Route path="/executive-report" element={<ToolGuard toolId="executive_report"><ExecutiveReport /></ToolGuard>} />
-          <Route path="/crm" element={<ToolGuard toolId="crm"><Crm /></ToolGuard>} />
-          <Route path="/file-explorer" element={<ToolGuard toolId="file_explorer"><FileExplorer /></ToolGuard>} />
-          <Route path="/brief" element={<ToolGuard toolId="brief"><Brief /></ToolGuard>} />
-          <Route path="/bond-analyzer" element={<ToolGuard toolId="bond_analyzer">{lazyPage(<BondAnalyzer />)}</ToolGuard>} />
-          <Route path="/advisor-mailer" element={<ToolGuard toolId="advisor_mailer">{lazyPage(<EmailBatchApp />)}</ToolGuard>} />
-          <Route path="/planning" element={<ToolGuard toolId="financial_planning">{lazyPage(<PlanningApp />)}</ToolGuard>} />
-          <Route path="/avantos" element={<ToolGuard toolId="avantos">{lazyPage(<Avantos />)}</ToolGuard>} />
-          <Route path="/rebalancer" element={<ToolGuard toolId="rebalancer">{lazyPage(<Rebalancer />)}</ToolGuard>} />
-          <Route path="/admin" element={<ToolGuard toolId="admin"><Admin /></ToolGuard>} />
-          <Route path="/app-usage" element={<ToolGuard toolId="admin"><AppUsage /></ToolGuard>} />
-          <Route path="/automations" element={<ToolGuard toolId="admin"><Automations /></ToolGuard>} />
-          <Route path="/reporting/kpi" element={<ToolGuard toolId="performance"><Reporting metrics={metrics} netFlowsMetrics={nf} detailedMetrics={dm} isLoading={isLoading} /></ToolGuard>} />
-          <Route path="*" element={<ToolGuard toolId="performance"><Reporting metrics={metrics} netFlowsMetrics={nf} detailedMetrics={dm} isLoading={isLoading} /></ToolGuard>} />
-        </Routes>
-        <PageTracker />
-        <ImpersonationBar />
+        <WorkspaceProvider>
+          <AppRoutes metrics={metrics} netFlowsMetrics={nf} detailedMetrics={dm} isLoading={isLoading} fallback="reporting" />
+          <PageTracker />
+          <ImpersonationBar />
+        </WorkspaceProvider>
       </BrowserRouter>
     </StrictMode>
   );
@@ -511,6 +530,7 @@ const bootstrap = async () => {
     console.log('2️⃣ Strategy 2: Attempting ThoughtSpot SDK...');
     try {
       console.log('   Initializing ThoughtSpot context...');
+      const { getChartContext } = await import('@thoughtspot/ts-chart-sdk');
       await getChartContext({
         getDefaultChartConfig: () => [
           {
@@ -519,7 +539,7 @@ const bootstrap = async () => {
           }
         ],
         getQueriesFromChartConfig: () => [],
-        renderChart: async (context: any) => {
+        renderChart: async (context: unknown) => {
           const rows = (context as ThoughtSpotRenderContext)?.data ?? [];
           console.log(`   ThoughtSpot returned ${rows.length} rows`);
           const metrics = parseMetricsFromRows(rows);

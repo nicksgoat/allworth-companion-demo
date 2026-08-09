@@ -13,7 +13,7 @@ import {
   type TransformationLogRow,
 } from './services/refreshLog';
 import PipelineNav from './components/PipelineNav';
-import SideNav from './components/SideNav';
+import { ToolPage, ToolPanel } from './components/ToolPage';
 import {
   TZ_OPTIONS,
   sameDayInTz,
@@ -217,24 +217,21 @@ const RefreshLog = () => {
   };
 
   return (
-    <div className="t2-page has-sidenav">
-      <SideNav />
-      <div className="t2-shell">
-        <header className="t2-hero">
-          <div className="t2-kicker-row">
-            <div className="t2-kicker">Pipeline · Full Log</div>
-            <PipelineNav />
-          </div>
-          <h1 className="t2-title">Transformation Log</h1>
-          <p className="t2-lede">
+    <ToolPage
+      eyebrow="Pipeline · Full log"
+      title="Transformation Log"
+      description={<>
             Every recorded run of the Tamarac notebook pipeline, sourced
             from{' '}
             <code className="refresh-log-code">
               {data?.source ?? 'loading…'}
             </code>
             . Click a column header to sort, or filter inline below.
-          </p>
-
+          </>}
+      actions={<PipelineNav />}
+      width="full"
+      className="t2-page"
+      context={
           <div className="t2-meta-row">
             <div className="refresh-log-meta">
               {data && (
@@ -297,7 +294,8 @@ const RefreshLog = () => {
               </button>
             </div>
           </div>
-        </header>
+      }
+    >
 
         {error && (
           <div className="t2-error-banner">
@@ -305,7 +303,7 @@ const RefreshLog = () => {
           </div>
         )}
 
-        <section className="t2-card refresh-log-table-card">
+        <ToolPanel className="t2-card refresh-log-table-card" flush>
           <div className="refresh-log-table-wrap">
             {columns.length === 0 && !loading && !error && (
               <div className="refresh-log-empty">No rows returned.</div>
@@ -406,9 +404,8 @@ const RefreshLog = () => {
               </table>
             )}
           </div>
-        </section>
-      </div>
-    </div>
+        </ToolPanel>
+    </ToolPage>
   );
 };
 

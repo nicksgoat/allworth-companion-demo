@@ -423,7 +423,7 @@ export default function CalledBondsView() {
                           <Chip
                             size="small"
                             label="Bond purchased"
-                            sx={{ backgroundColor: '#F4D35E', color: '#4B3B00', fontWeight: 700 }}
+                            sx={{ backgroundColor: colors.linen, color: colors.chartNightBlue, fontWeight: 700 }}
                           />
                         ) : null}
                       </TableCell>

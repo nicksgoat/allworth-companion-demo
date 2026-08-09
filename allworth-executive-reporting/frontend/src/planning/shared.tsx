@@ -11,10 +11,11 @@ export function Kpi({ label, value, tone }: { label: string; value: string; tone
 
 /* Brand chart palette (theme.ts chartPalette) */
 export const chartColors = {
-  nightBlue: '#0C2E4E',
-  sky: '#289FDA',
-  evergreen: '#436434',
-  gold: '#A99C6C',
-  pumpkin: '#D26D37',
-  lightGray: '#BEBEBE',
+  nightBlue: colors.chartNightBlue,
+  sky: colors.chartSky,
+  evergreen: colors.chartEvergreen,
+  gold: colors.chartGold,
+  pumpkin: colors.chartPumpkin,
+  lightGray: colors.chartLightGray,
 };
+import { colors } from '../theme';

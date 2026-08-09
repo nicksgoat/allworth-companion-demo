@@ -5,68 +5,53 @@ user-facing feature is a "tool" reachable at its own route (e.g. `/nfbc`,
 `/fee-calculator`, `/admin`). The **Admin** console (`/admin`) manages who can
 open which tool; access is enforced per-user when `ADMIN_ENFORCEMENT` is on.
 
-## The tool registry & where the navigation lives
+## The canonical tool manifest
 
-`backend/home/tools.yaml` is the canonical **access** registry. Every entry there:
+`tool-manifest.json` is the canonical product and access registry. Every entry there:
 
 - appears in the **Admin access console** (`/admin`) as a grantable tool
   (the admin API reads it via `admin/store.available_tools()`), and
 - can be gated per-user (the tool `id` is the access key).
 
-The **navigation is React and shared across every page**:
+The React navigation and home both derive from that manifest:
 
-- The left rail is `frontend/src/components/SideNav.tsx` (the `GROUPS` / `REPORTS`
-  arrays). It is mounted by the Home hub and every tool page, and it hides links
+- The left rail is `frontend/src/components/SideNav.tsx`. It is mounted by the
+  Home hub and every tool page, and it hides links
   the current (or impersonated) user can't reach.
-- The **Home hub** is `frontend/src/Home.tsx` (a React route at `/` and `/home`,
-  no longer a Flask template). It renders the launcher cards from its `SECTIONS`
-  catalog and also mounts `<SideNav />`.
+- The **Home hub** is `frontend/src/Home.tsx` (a React route at `/` and `/home`).
+  It renders manifest-defined launchers and widgets and mounts `<SideNav />`.
 - Access is resolved once by `frontend/src/services/access.ts`
   (`useEffectiveAccess`), which applies the "view as" impersonation overlay so
   the rail, hub cards, and `ToolGuard` all hide the same things.
 
-Keep the `id` identical across `tools.yaml`, `SideNav.tsx`, and `Home.tsx` — it
-is the access key checked by `ToolGuard`, `/api/admin/me`, and the nav filter.
-
-**The Home hub cards must always mirror the SideNav rail.** Every launcher card
-in `Home.tsx` `SECTIONS` should live in the section that matches its `SideNav`
-`GROUPS` group (Live tools → Live tools, Admin → Admin, etc.), and the two must
-be reorganized together. When you move, add, or remove a tool in one, make the
-same change in the other so the hub and the rail never disagree on where a tool
-belongs. (Reporting drill-in reports and "soon" placeholder cards are the only
-entries that don't have a 1:1 rail link.)
+The manifest `id` is the access key checked by `ToolGuard`, `/api/admin/me`, and
+the nav filter. Do not add parallel tool catalogs to `SideNav.tsx`, `Home.tsx`,
+or Admin demo data.
 
 ## Required checklist when you add a NEW user-facing tool/page
 
 Do ALL of these so the tool is launchable AND access-controlled. Use one
 stable `id` (lowercase slug, e.g. `fee_calculator`) everywhere.
 
-1. **Register it in `backend/home/tools.yaml`** — add a `tools:` entry with
-   `id`, `name`, `kicker`, `description`, `url`, `host`, `category`
-   (`live` | `analytics` | `utilities`), `color`, `status`, and an `icon`.
-   This is what surfaces it in the Admin access console.
+1. **Register it in `tool-manifest.json`** — add its identity, presentation,
+   navigation, and functional widget metadata. This surfaces it consistently
+   in the Admin access console, navigation, and assignment configuration.
 2. **Frontend route + gate** in `frontend/src/main.tsx` — add the `<Route>` in
    BOTH the `isPipelinePath` block and `renderApp`, wrapped in the guard:
    `<Route path="/my-tool" element={<ToolGuard toolId="my_tool"><MyTool /></ToolGuard>} />`.
    Also add the path to the `isPipelinePath` list if it needs SSO before render.
-3. **Navigation + hub card (ASK FIRST — see next section)** — add the tool to
-   the shared rail in `frontend/src/components/SideNav.tsx` (a `NavLink` in the
-   right `GROUPS` section, carrying its `toolId`) and, if it belongs on the
-   landing page, add a card to the `SECTIONS` catalog in `frontend/src/Home.tsx`.
-   Both are gated by the tool `id` so they hide for users without access.
+3. **Navigation + home (ASK FIRST — see next section)** — set the manifest's
+   navigation group and assignment/widget configuration. `SideNav` and `Home`
+   consume those fields and apply access filtering.
 4. **Backend blueprint** (if it has an API) — register it in `backend/app.py`
    following the existing defensive `try/except` pattern.
-5. **App Usage logging** — add the tool's route to `_TOOL_ROUTES` (consumed by
-   `_page_to_tool`) in `backend/app.py`, mapping its path prefix to the same
-   tool `id` and a display name. Page views are auto-tracked on every route by
-   `frontend/src/components/PageTracker.tsx`, but **paths with no `_TOOL_ROUTES`
-   entry group under "Other"** in the App Usage dashboard — this step attributes
-   them to the tool. Also add the tool to `DEMO_TOOLS` in
-   `frontend/src/services/analytics.ts` so it appears in the offline App Usage
-   demo. (Entries are matched most-specific-first, so list nested paths like
-   `/reporting/kpi` before their parents.)
-6. **Demo list** — add the tool to `DEMO_TOOLS` in
-   `frontend/src/services/admin.ts` so it also shows in the offline demo admin.
+5. **App Usage logging** — the primary manifest `url` is tracked automatically.
+   Add `analytics_urls` only when the same tool owns aliases or child routes.
+   Page views are auto-tracked by `frontend/src/components/PageTracker.tsx`.
+   Keep the offline usage fixture in `frontend/src/services/analytics.ts`
+   representative when adding a materially different tool category.
+6. **Demo list** — no separate edit is required; demo Admin derives tools from
+   the canonical manifest.
 7. **Keep "view as" mirroring true access** — the impersonation overlay must
    reflect exactly what the impersonated user can do. If the tool adds a new
    *dimension* of access (beyond plain view — e.g. the share right), thread it
@@ -75,7 +60,7 @@ stable `id` (lowercase slug, e.g. `fee_calculator`) everywhere.
    `EffectiveAccess` returned by `useEffectiveAccess`. See the *view-as mirrors
    true access* rule below.
 
-The `id` in steps 1–3/5/6 must match exactly — it is the access key checked by
+The `id` in steps 1–3 must match exactly — it is the access key checked by
 `ToolGuard`, the `/api/admin/me` enforcement, and the hub filter.
 
 ## Ask the tool's creator about navigation
@@ -109,8 +94,8 @@ with existing entries (icon style, group placement, and `toolId` gating).
 - The all-access **Admin** group and the bootstrap owner emails
   (`ADMIN_BOOTSTRAP_EMAILS`, plus the built-in owner) are guaranteed by
   `admin/store.ensure_bootstrap()` so an admin can never be locked out.
-- `all_tools` groups auto-grant every current AND future tool, so tools added
-  to `tools.yaml` are immediately available to those members.
+- `all_tools` groups auto-grant every current AND future assignable tool, so
+  live/new tools added to the manifest are immediately available to members.
 - **Auto-provisioning:** the first authenticated hit on `/api/admin/me` calls
   `store.ensure_user()`, so a brand-new user is added to the roster and joins
   the derived **All Users** group automatically (no tools until granted).
@@ -172,4 +157,3 @@ with existing entries (icon style, group placement, and `toolId` gating).
 4. **`dev` → `main` is the user's call.** When the user decides a feature is
    complete, they open their own PR from `dev` to `main` in the GitHub UI — do
    not open or merge `dev`→`main` PRs automatically.
-

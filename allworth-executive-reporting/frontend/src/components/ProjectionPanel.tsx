@@ -1,5 +1,8 @@
 import { useMemo } from 'react';
+import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts';
+import { ChartContainer, ChartLegend, ChartTooltip } from './ui/chart';
 import { formatNumber } from './KpiTile';
+import { chartPalette, chartTheme } from '../theme';
 
 // One channel's current-month pacing plus its model-bucket composition.
 export type ChannelPacing = {
@@ -93,61 +96,26 @@ export function ProjectionPanel({ rows, yellowThreshold = 80, asOfLabel }: Props
         </div>
       </div>
 
-      <div className="proj-pace__rows">
-        {priced.map((r) => {
-          const att = r.goal > 0 ? r.projection / r.goal : 0;
-          const status = statusOf(att);
-          const gap = r.projection - r.goal;
-          const projPct = Math.max(0, Math.min(att, 1)) * 100;
-          const bookedPct = r.goal > 0 ? Math.max(0, Math.min(r.actual / r.goal, 1)) * 100 : 0;
-          const bookedPctOfProj = r.projection > 0 ? Math.round((r.actual / r.projection) * 100) : 0;
-          const isTotal = r.channel === 'Total';
-
-          const health =
-            status === 'on'
-              ? `On track — ${bookedPctOfProj}% of the projection already booked`
-              : status === 'watch'
-                ? `Watch — pacing to ${Math.round(att * 100)}% of plan, ${fmt(Math.abs(gap), r)} light`
-                : `Behind — projecting ${fmt(Math.abs(gap), r)} under plan`;
-
-          return (
-            <div
-              key={r.channel}
-              className={`proj-pace__row proj-pace__row--${status}${isTotal ? ' proj-pace__row--total' : ''}`}
-            >
-              <div className="proj-pace__label">
-                <span className="proj-pace__channel">{r.channel}</span>
-                <span className={`proj-pace__status proj-pace__status--${status}`}>{STATUS_LABEL[status]}</span>
-                <span className="proj-pace__health">{health}</span>
-              </div>
-
-              <div
-                className="proj-pace__track"
-                title={`Booked ${fmt(r.actual, r)} · projected ${fmt(r.projection, r)} · plan ${fmt(r.goal, r)}`}
-              >
-                <div className="proj-pace__fill" style={{ width: `${projPct}%` }} />
-                <div className="proj-pace__booked" style={{ width: `${bookedPct}%` }}>
-                  <span className="proj-pace__booked-val">{fmt(r.actual, r)}</span>
-                </div>
-                <span
-                  className="proj-pace__fill-val"
-                  style={{ left: `${Math.min(projPct, 100)}%` }}
-                >
-                  {fmt(r.projection, r)} proj
-                </span>
-                <div className="proj-pace__goal" />
-              </div>
-
-              <div className="proj-pace__figs">
-                <span className="proj-pace__att">{Math.round(att * 100)}%</span>
-                <span className={`proj-pace__gap proj-pace__gap--${gap >= 0 ? 'pos' : 'neg'}`}>
-                  {gap >= 0 ? '+' : '−'}{fmt(Math.abs(gap), r)} vs plan
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <ChartContainer className="proj-pace__chart" height={Math.max(280, priced.length * 58)}>
+        <BarChart data={priced} layout="vertical" margin={{ top: 8, right: 24, bottom: 8, left: 8 }}>
+          <CartesianGrid horizontal={false} />
+          <XAxis type="number" domain={[0, 'dataMax']} tickFormatter={(value) => fmt(Number(value), priced[0])} tickLine={false} axisLine={false} />
+          <YAxis type="category" dataKey="channel" width={116} tickLine={false} axisLine={false} />
+          <ChartTooltip
+            labelFormatter={(label) => {
+              const row = priced.find((item) => item.channel === label);
+              if (!row) return String(label);
+              const attainment = row.goal > 0 ? row.projection / row.goal : 0;
+              return `${String(label)} · ${STATUS_LABEL[statusOf(attainment)]} · ${Math.round(attainment * 100)}%`;
+            }}
+            formatter={(value, name) => [fmt(Number(value), priced[0]), String(name)]}
+          />
+          <ChartLegend />
+          <Bar dataKey="actual" name="Actual booked" fill={chartTheme.actual} radius={[0, 3, 3, 0]} isAnimationActive={false} />
+          <Bar dataKey="projection" name="Projected EoM" fill={chartTheme.comparison} radius={[0, 3, 3, 0]} isAnimationActive={false} />
+          <Bar dataKey="goal" name="Plan" fill={chartTheme.prior} radius={[0, 3, 3, 0]} isAnimationActive={false} />
+        </BarChart>
+      </ChartContainer>
 
       {diagnosis && (
         <div className="proj-pace__diagnosis">
@@ -180,45 +148,30 @@ export function ProjectionPanel({ rows, yellowThreshold = 80, asOfLabel }: Props
             </div>
           </div>
 
-          <div
-            className="proj-pace__diag-bar"
-            title="How the month-end projection is built from the model buckets, with actual-to-date and plan markers."
-          >
-            {(() => {
-              const scale = Math.max(diagnosis.projection, diagnosis.plan, diagnosis.actual) || 1;
-              const w = (v: number) => `${Math.max(0, (v / scale) * 100)}%`;
-              const pos = (v: number) => `${Math.max(0, Math.min((v / scale) * 100, 100))}%`;
-              return (
-                <>
-                  <div className="proj-pace__diag-track">
-                    <div className="proj-pace__diag-seg proj-pace__diag-seg--tail" style={{ width: w(diagnosis.a) }} />
-                    <div className="proj-pace__diag-seg proj-pace__diag-seg--closed" style={{ width: w(diagnosis.b) }} />
-                    {diagnosis.recruiting > 0 && (
-                      <div className="proj-pace__diag-seg proj-pace__diag-seg--recruiting" style={{ width: w(diagnosis.recruiting) }} />
-                    )}
-                    <div className="proj-pace__diag-seg proj-pace__diag-seg--pipeline" style={{ width: w(diagnosis.c) }} />
-                  </div>
-                  <div className="proj-pace__diag-marker proj-pace__diag-marker--plan" style={{ left: pos(diagnosis.plan) }}>
-                    <span className="proj-pace__diag-marker-tag">Plan {fmt(diagnosis.plan, diagnosis.total)}</span>
-                  </div>
-                  <div className="proj-pace__diag-marker proj-pace__diag-marker--actual" style={{ left: pos(diagnosis.actual) }}>
-                    <span className="proj-pace__diag-marker-tag">Actual {fmt(diagnosis.actual, diagnosis.total)}</span>
-                  </div>
-                </>
-              );
-            })()}
-          </div>
-
-          <div className="proj-pace__diag-legend">
-            <span><i className="proj-pace__swatch proj-pace__swatch--tail" />Tail Funding {fmt(diagnosis.a, diagnosis.total)}</span>
-            <span><i className="proj-pace__swatch proj-pace__swatch--closed" />Already Closed {fmt(diagnosis.b, diagnosis.total)}</span>
-            {diagnosis.recruiting > 0 && (
-              <span><i className="proj-pace__swatch proj-pace__swatch--recruiting" />Recruiting {fmt(diagnosis.recruiting, diagnosis.total)}</span>
-            )}
-            <span><i className="proj-pace__swatch proj-pace__swatch--pipeline" />Active Pipeline {fmt(diagnosis.c, diagnosis.total)}</span>
-            <span className="proj-pace__legend-mark proj-pace__legend-mark--actual"><i className="proj-pace__swatch proj-pace__swatch--actual-mark" />Actual marker</span>
-            <span className="proj-pace__legend-mark proj-pace__legend-mark--plan"><i className="proj-pace__swatch proj-pace__swatch--plan-mark" />Plan marker</span>
-          </div>
+          <ChartContainer className="proj-pace__diagnosis-chart" height={120}>
+            <BarChart
+              data={[{
+                label: 'Projected EoM',
+                tail: diagnosis.a,
+                closed: diagnosis.b,
+                recruiting: diagnosis.recruiting,
+                pipeline: diagnosis.c,
+              }]}
+              layout="vertical"
+              margin={{ top: 22, right: 20, bottom: 8, left: 8 }}
+            >
+              <XAxis type="number" domain={[0, 'dataMax']} tickFormatter={(value) => fmt(Number(value), diagnosis.total)} tickLine={false} axisLine={false} />
+              <YAxis type="category" dataKey="label" width={108} tickLine={false} axisLine={false} />
+              <ChartTooltip formatter={(value, name) => [fmt(Number(value), diagnosis.total), String(name)]} />
+              <ChartLegend />
+              <ReferenceLine x={diagnosis.plan} stroke={chartTheme.warning} strokeDasharray="4 3" label={{ value: 'Plan', fill: chartTheme.warning, fontSize: 11 }} />
+              <ReferenceLine x={diagnosis.actual} stroke={chartTheme.actual} strokeDasharray="2 2" label={{ value: 'Actual', fill: chartTheme.actual, fontSize: 11 }} />
+              <Bar dataKey="tail" name="Tail Funding" stackId="projection" fill={chartPalette[0]} isAnimationActive={false} />
+              <Bar dataKey="closed" name="Already Closed" stackId="projection" fill={chartPalette[1]} isAnimationActive={false} />
+              {diagnosis.recruiting > 0 && <Bar dataKey="recruiting" name="Recruiting" stackId="projection" fill={chartPalette[2]} isAnimationActive={false} />}
+              <Bar dataKey="pipeline" name="Active Pipeline" stackId="projection" fill={chartPalette[3]} radius={[0, 4, 4, 0]} isAnimationActive={false} />
+            </BarChart>
+          </ChartContainer>
 
           <p className="proj-pace__diag-text">
             {diagnosis.gap >= 0 ? (

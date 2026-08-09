@@ -1,0 +1,16 @@
+.workspace-live-tools { margin-top: 34px; font-family: Lato, sans-serif; }
+.workspace-live-tools-heading { margin-bottom: 14px; }
+.workspace-live-tools-heading span, .workspace-live-widget header span { color: #3e71b7; font-size: 10px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.workspace-live-tools-heading h2 { margin: 3px 0 0; color: #173d67; font: 600 26px "Playfair Display", serif; }
+.workspace-live-tools-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); border-top: 1px solid rgba(23,61,103,.16); border-left: 1px solid rgba(23,61,103,.16); }
+.workspace-live-widget { min-height: 220px; display: flex; flex-direction: column; padding: 20px; border-right: 1px solid rgba(23,61,103,.16); border-bottom: 1px solid rgba(23,61,103,.16); background: #fff; }
+.workspace-live-widget header { display: flex; justify-content: space-between; gap: 16px; }
+.workspace-live-widget h3 { margin: 3px 0 0; color: #173d67; font: 600 20px "Playfair Display", serif; }
+.workspace-live-widget header b { color: #436434; font-size: 10px; text-transform: uppercase; }
+.workspace-live-widget > p { color: #595959; font-size: 13px; line-height: 1.55; }
+.workspace-live-widget-error { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 2px 0 12px; color: #7a3525; font-size: 12px; }
+.workspace-live-widget-error button { border: 0; border-bottom: 1px solid currentColor; padding: 2px 0; background: transparent; color: #173d67; font: 800 11px Lato, sans-serif; cursor: pointer; }
+.workspace-live-widget form { display: flex; gap: 7px; margin: 4px 0 14px; }
+.workspace-live-widget input { min-width: 0; flex: 1; padding: 8px 9px; border: 1px solid #bebebe; font: 13px Lato, sans-serif; }
+.workspace-live-widget form a { padding: 9px 12px; background: #173d67; color: #fff; font-size: 12px; font-weight: 800; text-decoration: none; }
+.workspace-live-widget-open { display: flex; justify-content: space-between; margin-top: auto; padding-top: 14px; border-top: 1px solid #e6e6e6; color: #173d67; font-size: 12px; font-weight: 900; text-decoration: none; }

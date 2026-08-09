@@ -6,7 +6,8 @@ import PrintIcon from '@mui/icons-material/Print';
 import { fetchAppraisalHoldings, fetchTransactions } from '../services/bondApi';
 import type { AppraisalHolding, TransactionRow } from '../services/bondApi';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, ScatterChart, Scatter, ZAxis, XAxis, YAxis, ReferenceLine,
-  CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+  CartesianGrid } from 'recharts';
+import { ChartContainer, ChartLegend, ChartTooltip } from './ui/chart';
 import { colors, chartPalette, sectionHeaderStyle } from '../theme';
 import type { PortfolioSummary, Dashboard, AISummary, Bond } from '../services/bondApi';
 import { TabPanel } from './TabPanel';
@@ -262,7 +263,7 @@ function BondHoldingsTable({
       <TableContainer>
         <Table size="small">
           <TableHead>
-            <TableRow sx={{ '& th': { backgroundColor: '#f5f7fa', py: 1 } }}>
+            <TableRow sx={{ '& th': { backgroundColor: colors.ice, py: 1 } }}>
               {showAccount && header('Account', 'account_number')}
               {header('Type', 'bond_type')}
               {header('Symbol', 'symbol')}
@@ -282,7 +283,7 @@ function BondHoldingsTable({
             {groups
               ? groups.map(([label, groupBonds]) => (
                   <React.Fragment key={label}>
-                    <TableRow sx={{ '& td': { backgroundColor: '#f8f9fa', fontWeight: 800, py: 0.9 } }}>
+                    <TableRow sx={{ '& td': { backgroundColor: colors.surfacePrimary, fontWeight: 800, py: 0.9 } }}>
                       <TableCell colSpan={colSpan}>{label} · {groupBonds.length} holding{groupBonds.length !== 1 ? 's' : ''}</TableCell>
                     </TableRow>
                     {groupBonds.map((bond, idx) => bodyRow(bond, idx))}
@@ -316,7 +317,7 @@ function AccountCashTable({ rows }: { rows: AppraisalHolding[] }) {
         <SectionHeader>Cash By Account</SectionHeader>
         <Table size="small">
           <TableHead>
-            <TableRow sx={{ '& th': { backgroundColor: '#f5f7fa', py: 0.8 } }}>
+            <TableRow sx={{ '& th': { backgroundColor: colors.ice, py: 0.8 } }}>
               <TableCell>Account</TableCell>
               <TableCell>Name</TableCell>
               <TableCell align="right">Cash Value</TableCell>
@@ -366,7 +367,7 @@ function CompareBondTable({
     <TableContainer sx={{ maxHeight: 560 }}>
       <Table size="small" stickyHeader>
         <TableHead>
-          <TableRow sx={{ '& th': { backgroundColor: '#f5f7fa', py: 0.9, fontSize: '0.72rem' } }}>
+          <TableRow sx={{ '& th': { backgroundColor: colors.ice, py: 0.9, fontSize: '0.72rem' } }}>
             <TableCell>Symbol</TableCell>
             <TableCell>Description</TableCell>
             <TableCell align="right">Value</TableCell>
@@ -419,7 +420,7 @@ function CompareAllHoldingsTable({
     <TableContainer sx={{ maxHeight: 560 }}>
       <Table size="small" stickyHeader>
         <TableHead>
-          <TableRow sx={{ '& th': { backgroundColor: '#f5f7fa', py: 0.9, fontSize: '0.72rem' } }}>
+          <TableRow sx={{ '& th': { backgroundColor: colors.ice, py: 0.9, fontSize: '0.72rem' } }}>
             <TableCell>Symbol</TableCell>
             <TableCell>Description</TableCell>
             <TableCell>Class</TableCell>
@@ -452,7 +453,7 @@ function CompareAllHoldingsTable({
                   {inBondView ? (
                     <Chip label={row.asset_class || 'Bond'} size="small" sx={{ height: 20, fontSize: '0.68rem' }} />
                   ) : (
-                    <Chip label="Only in All" size="small" sx={{ height: 20, fontSize: '0.68rem', backgroundColor: '#FFF0C2', color: colors.inkSecondary }} />
+                    <Chip label="Only in All" size="small" sx={{ height: 20, fontSize: '0.68rem', backgroundColor: colors.linen, color: colors.inkSecondary }} />
                   )}
                 </TableCell>
                 <TableCell align="right" sx={{ fontWeight: 700 }}>{formatCurrencyFull(row.market_value)}</TableCell>
@@ -567,7 +568,7 @@ function TimelineTooltip({
   return (
     <div
       style={{
-        background: '#ffffff',
+        background: colors.surfaceCard,
         border: `1px solid ${colors.hairline}`,
         borderRadius: 6,
         boxShadow: '0 8px 24px rgba(12,46,78,0.14)',
@@ -871,7 +872,7 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
           <Card>
             <CardContent>
               <SectionHeader>Fixed Income Allocation</SectionHeader>
-              <ResponsiveContainer width="100%" height={280}>
+              <ChartContainer width="100%" height={280}>
                 <PieChart>
                   <Pie
                     data={sectorData}
@@ -886,9 +887,9 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
                       <Cell key={i} fill={chartPalette[i % chartPalette.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(v) => formatCurrency(Number(v))} />
+                  <ChartTooltip formatter={(v) => formatCurrency(Number(v))} />
                 </PieChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </CardContent>
           </Card>
 
@@ -901,7 +902,7 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
                 ));
                 const chartHeight = Math.max(180, stateData.length * 32);
                 return (
-                  <ResponsiveContainer width="100%" height={chartHeight}>
+                  <ChartContainer width="100%" height={chartHeight}>
                     <BarChart data={stateData} layout="vertical" margin={{ left: 4, right: 24, top: 4, bottom: 4 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke={colors.hairline} />
                       <XAxis type="number" tick={{ fontSize: 11, fill: colors.inkTertiary }}
@@ -909,10 +910,10 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
                       <YAxis dataKey="name" type="category"
                         tick={{ fontSize: 11, fill: colors.inkSecondary }}
                         width={labelWidth} />
-                      <Tooltip formatter={(v) => formatCurrency(Number(v))} />
+                      <ChartTooltip formatter={(v) => formatCurrency(Number(v))} />
                       <Bar dataKey="value" fill={colors.allworthAccent} radius={[0, 4, 4, 0]} />
                     </BarChart>
-                  </ResponsiveContainer>
+                  </ChartContainer>
                 );
               })()}
             </CardContent>
@@ -921,12 +922,12 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
           <Card sx={{ gridColumn: { md: '1 / -1' } }}>
             <CardContent>
               <SectionHeader>Credit Distribution</SectionHeader>
-              <ResponsiveContainer width="100%" height={260}>
+              <ChartContainer width="100%" height={260}>
                 <BarChart data={creditData}>
                   <CartesianGrid strokeDasharray="3 3" stroke={colors.hairline} />
                   <XAxis dataKey="name" tick={{ fontSize: 11, fill: colors.inkSecondary }} />
                   <YAxis tick={{ fontSize: 11, fill: colors.inkTertiary }} />
-                  <Tooltip formatter={(v) => formatCurrency(Number(v))} />
+                  <ChartTooltip formatter={(v) => formatCurrency(Number(v))} />
                   <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                     {creditData.map((entry, i) => {
                       const isIG = ['AAA','AA','A','BBB','Aaa','Aa','Baa'].some(r => entry.name.startsWith(r));
@@ -934,7 +935,7 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
                     })}
                   </Bar>
                 </BarChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </CardContent>
           </Card>
         </Box>
@@ -947,15 +948,15 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
             <CardContent>
               <SectionHeader>Maturity Ladder</SectionHeader>
               <Box sx={{ height: { xs: 260, md: 300 } }}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer width="100%" height="100%">
                   <BarChart data={maturityData}>
                     <CartesianGrid strokeDasharray="3 3" stroke={colors.hairline} />
                     <XAxis dataKey="name" tick={{ fontSize: 11, fill: colors.inkSecondary }} />
                     <YAxis tick={{ fontSize: 11, fill: colors.inkTertiary }} tickFormatter={(v) => `$${(v/1000).toFixed(0)}K`} />
-                    <Tooltip formatter={(v) => formatCurrency(Number(v))} />
+                    <ChartTooltip formatter={(v) => formatCurrency(Number(v))} />
                     <Bar dataKey="value" fill={colors.allworthNavy} radius={[4, 4, 0, 0]} />
                   </BarChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </Box>
             </CardContent>
           </Card>
@@ -965,7 +966,7 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
               <SectionHeader>Bond Maturity Timeline</SectionHeader>
               {maturityTimelineData.length > 0 ? (
                 <Box sx={{ height: { xs: 280, md: 320 } }}>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ChartContainer width="100%" height="100%">
                     <ScatterChart margin={{ left: 4, right: 18, top: 12, bottom: 12 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke={colors.hairline} />
                       <XAxis
@@ -993,7 +994,7 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
                         />
                       ))}
                       <ZAxis type="number" dataKey="size" range={[28, 160]} />
-                      <Tooltip
+                      <ChartTooltip
                         cursor={{ stroke: colors.allworthNavy, strokeDasharray: '3 3' }}
                         content={<TimelineTooltip dateKey="maturity_date" dateLabel="Maturity" />}
                       />
@@ -1009,7 +1010,7 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
                         ))}
                       </Scatter>
                     </ScatterChart>
-                  </ResponsiveContainer>
+                  </ChartContainer>
                 </Box>
               ) : (
                 <Typography variant="body2" sx={{ color: colors.inkSecondary, py: 4, textAlign: 'center' }}>
@@ -1023,15 +1024,15 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
             <CardContent>
               <SectionHeader>Call Ladder</SectionHeader>
               <Box sx={{ height: { xs: 260, md: 300 } }}>
-                <ResponsiveContainer width="100%" height="100%">
+                <ChartContainer width="100%" height="100%">
                   <BarChart data={callData}>
                     <CartesianGrid strokeDasharray="3 3" stroke={colors.hairline} />
                     <XAxis dataKey="name" tick={{ fontSize: 11, fill: colors.inkSecondary }} />
                     <YAxis tick={{ fontSize: 11, fill: colors.inkTertiary }} tickFormatter={(v) => `$${(v/1000).toFixed(0)}K`} />
-                    <Tooltip formatter={(v) => formatCurrency(Number(v))} />
+                    <ChartTooltip formatter={(v) => formatCurrency(Number(v))} />
                     <Bar dataKey="value" fill={colors.chartGold} radius={[4, 4, 0, 0]} />
                   </BarChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               </Box>
             </CardContent>
           </Card>
@@ -1041,7 +1042,7 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
               <SectionHeader>Bond Call Timeline</SectionHeader>
               {callTimelineData.length > 0 ? (
                 <Box sx={{ height: { xs: 280, md: 320 } }}>
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ChartContainer width="100%" height="100%">
                     <ScatterChart margin={{ left: 4, right: 18, top: 12, bottom: 12 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke={colors.hairline} />
                       <XAxis
@@ -1069,7 +1070,7 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
                         />
                       ))}
                       <ZAxis type="number" dataKey="size" range={[28, 160]} />
-                      <Tooltip
+                      <ChartTooltip
                         cursor={{ stroke: colors.allworthAccent, strokeDasharray: '3 3' }}
                         content={<TimelineTooltip dateKey="call_date" dateLabel="Call Date" />}
                       />
@@ -1085,7 +1086,7 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
                         ))}
                       </Scatter>
                     </ScatterChart>
-                  </ResponsiveContainer>
+                  </ChartContainer>
                 </Box>
               ) : (
                 <Typography variant="body2" sx={{ color: colors.inkSecondary, py: 4, textAlign: 'center' }}>
@@ -1102,17 +1103,17 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
         <Card>
           <CardContent>
             <SectionHeader>10-Year Cash Flow Projection</SectionHeader>
-            <ResponsiveContainer width="100%" height={400}>
+            <ChartContainer width="100%" height={400}>
               <LineChart data={cashFlowData}>
                 <CartesianGrid strokeDasharray="3 3" stroke={colors.hairline} />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: colors.inkSecondary }} />
                 <YAxis tick={{ fontSize: 11, fill: colors.inkTertiary }} tickFormatter={(v) => `$${(v/1000).toFixed(0)}K`} />
-                <Tooltip formatter={(v) => formatCurrency(Number(v))} />
-                <Legend />
+                <ChartTooltip formatter={(v) => formatCurrency(Number(v))} />
+                <ChartLegend />
                 <Line type="monotone" dataKey="principal" stroke={colors.allworthNavy} strokeWidth={2} dot={false} name="Principal" />
                 <Line type="monotone" dataKey="income" stroke={colors.chartSky} strokeWidth={2} dot={false} name="Income" />
               </LineChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           </CardContent>
         </Card>
       </TabPanel>
@@ -1172,7 +1173,7 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
             <TableContainer>
               <Table size="small">
                 <TableHead>
-                  <TableRow sx={{ '& th': { backgroundColor: '#f5f7fa', py: 1 } }}>
+                  <TableRow sx={{ '& th': { backgroundColor: colors.ice, py: 1 } }}>
                     {appraisalColumns.map(({ label, key, align }) => (
                       <TableCell key={key} align={align} sx={{ whiteSpace: 'nowrap', fontSize: '0.72rem', fontWeight: 600, color: colors.inkSecondary, userSelect: 'none' }}>
                         <TableSortLabel
@@ -1190,12 +1191,12 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
                 <TableBody>
                   {groupedAppraisalRows.map((group) => (
                     <React.Fragment key={group.category}>
-                      <TableRow sx={{ '& td': { backgroundColor: '#f8f9fa', borderTop: `1px solid ${colors.hairline}`, fontWeight: 800, py: 1 } }}>
+                      <TableRow sx={{ '& td': { backgroundColor: colors.surfacePrimary, borderTop: `1px solid ${colors.hairline}`, fontWeight: 800, py: 1 } }}>
                         <TableCell colSpan={13}>{group.category}</TableCell>
                       </TableRow>
                       {group.subgroups.map((subgroup) => (
                         <React.Fragment key={`${group.category}-${subgroup.subcategory}`}>
-                          <TableRow sx={{ '& td': { backgroundColor: '#ffffff', fontWeight: 800, py: 0.9 } }}>
+                          <TableRow sx={{ '& td': { backgroundColor: colors.surfaceCard, fontWeight: 800, py: 0.9 } }}>
                             <TableCell />
                             <TableCell colSpan={12}>{subgroup.subcategory}</TableCell>
                           </TableRow>
@@ -1235,7 +1236,7 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
                               ) : null}
                             </React.Fragment>
                           ))}
-                          <TableRow sx={{ '& td': { backgroundColor: '#f1f2f2', fontWeight: 800, py: 0.8 } }}>
+                          <TableRow sx={{ '& td': { backgroundColor: colors.surfacePrimary, fontWeight: 800, py: 0.8 } }}>
                             <TableCell />
                             <TableCell>{subgroup.subcategory} Total</TableCell>
                             <TableCell />
@@ -1252,7 +1253,7 @@ export default function PortfolioDashboard({ portfolio, dashboard, summary }: Pr
                           </TableRow>
                         </React.Fragment>
                       ))}
-                      <TableRow sx={{ '& td': { backgroundColor: '#ffffff', fontWeight: 800, py: 0.9 } }}>
+                      <TableRow sx={{ '& td': { backgroundColor: colors.surfaceCard, fontWeight: 800, py: 0.9 } }}>
                         <TableCell />
                         <TableCell>{group.category} Total</TableCell>
                         <TableCell />
@@ -1534,7 +1535,7 @@ function TransactionsTab({
           <TableContainer sx={{ maxHeight: 620 }}>
             <Table size="small" stickyHeader>
               <TableHead>
-                <TableRow sx={{ '& th': { backgroundColor: '#f5f7fa', py: 1 } }}>
+                <TableRow sx={{ '& th': { backgroundColor: colors.ice, py: 1 } }}>
                   {th('Account #', 'account_number')}
                   {th('Trade Date', 'trade_date')}
                   {th('Type', 'transaction_type')}

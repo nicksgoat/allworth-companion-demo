@@ -27,7 +27,7 @@ import {
   type RepcodeWritePayload,
 } from './services/repcodes';
 import './Repcodes.css';
-import SideNav from './components/SideNav';
+import { ToolPage } from './components/ToolPage';
 import ShareTool from './components/ShareTool';
 
 interface ColumnDef {
@@ -700,16 +700,14 @@ const Repcodes = () => {
   };
 
   return (
-    <div className="repcodes-page has-sidenav">
-      <SideNav />
-      <div className="repcodes-shell">
-        <header className="repcodes-hero">
-          <div>
-            <div className="repcodes-kicker">Synapse · tho.repcodes</div>
-            <h1 className="repcodes-title">Allworth Rep Codes</h1>
-          </div>
-          <ShareTool toolId="repcodes" toolName="Rep Codes" />
-        </header>
+    <ToolPage
+      eyebrow="Synapse · tho.repcodes"
+      title="Allworth Rep Codes"
+      description="Review, edit, upload, and audit representative-code mappings in the warehouse."
+      actions={<ShareTool toolId="repcodes" toolName="Rep Codes" />}
+      width="full"
+      className="repcodes-page"
+    >
 
         {error && <div className="repcodes-banner error">{error}</div>}
         {info && <div className="repcodes-banner success">{info}</div>}
@@ -1055,8 +1053,6 @@ const Repcodes = () => {
             </tbody>
           </table>
         </div>
-      </div>
-
       {historyRowId !== null && (
         <div className="repcodes-drawer-overlay" onClick={closeHistory}>
           <aside
@@ -1135,7 +1131,7 @@ const Repcodes = () => {
           </aside>
         </div>
       )}
-    </div>
+    </ToolPage>
   );
 };
 

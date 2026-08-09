@@ -1,11 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Alert, AppBar, Box, Card, CardContent, Chip, CircularProgress, Container,
-  LinearProgress, Stack, Table, TableBody, TableCell, TableHead, TableRow,
-  TextField, Toolbar, Typography,
+  Alert, Box, Chip, CircularProgress,
+  Stack, Table, TableBody, TableCell, TableHead, TableRow,
+  TextField, Typography,
 } from '@mui/material';
-import SideNav from './components/SideNav';
+import { Bar, BarChart, XAxis, YAxis } from 'recharts';
+import { ChartContainer, ChartTooltip } from './components/ui/chart';
+import { ToolMetric, ToolMetricGrid, ToolPage, ToolPanel } from './components/ToolPage';
+import { chartTheme } from './theme';
 import './Avantos.css';
+import { useWorkspace } from './components/WorkspaceContext';
+import { householdHref, type HouseholdContext } from './services/workspace';
 
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
@@ -17,6 +22,7 @@ type CockpitRow = {
   drift_flagged: boolean; last_actuals_sync: string | null;
   publication_status: string; published_at: string | null;
   data_quality_warnings: number;
+  source_id?: string | null; avhhid?: string | null; advisor_id?: string | null; crm_lead_id?: string | null;
 };
 
 type Cockpit = {
@@ -53,14 +59,41 @@ const BAND: Record<CockpitRow['health_band'], { label: string; color: 'success' 
   at_risk: { label: 'At risk', color: 'error' },
 };
 
-function Tile({ label, value, tone }: { label: string; value: string; tone?: string }) {
-  return <Card className="av-tile"><CardContent>
-    <Typography className="av-tile__label">{label}</Typography>
-    <Typography className="av-tile__value" color={tone}>{value}</Typography>
-  </CardContent></Card>;
+function contextForRow(row: CockpitRow): HouseholdContext {
+  return {
+    planning_household_id: row.household_id,
+    crm_lead_id: row.crm_lead_id ?? null,
+    salesforce_household_id: row.source_id ?? null,
+    avhhid: row.avhhid ?? null,
+    name: row.name,
+    advisor_id: row.advisor_id ?? null,
+    advisor_name: null,
+    aum: Number(row.total_assets),
+    plan_status: row.publication_status === 'published' ? 'published' : 'draft',
+    last_actuals_sync: row.last_actuals_sync,
+    freshness: row.last_actuals_sync ? 'available' : 'unknown',
+    data_quality_warnings: row.data_quality_warnings,
+    data_quality_state: row.data_quality_warnings ? 'warning' : 'healthy',
+  };
+}
+
+function HealthScoreChart({ score, band }: { score: number; band: CockpitRow['health_band'] }) {
+  const fill = band === 'healthy' ? chartTheme.positive : band === 'watch' ? chartTheme.neutral : chartTheme.warning;
+  return (
+    <ChartContainer width={72} height={16} aria-label={`Planning health score ${score} out of 100`}>
+      <BarChart data={[{ label: 'Health', score, remaining: Math.max(0, 100 - score) }]} layout="vertical" margin={{ top: 3, right: 0, bottom: 3, left: 0 }}>
+        <XAxis type="number" domain={[0, 100]} hide />
+        <YAxis type="category" dataKey="label" hide />
+        <ChartTooltip formatter={(value, name) => [`${Number(value).toFixed(0)}`, String(name)]} />
+        <Bar dataKey="score" name="Health score" stackId="health" fill={fill} radius={[3, 0, 0, 3]} isAnimationActive={false} />
+        <Bar dataKey="remaining" name="Remaining" stackId="health" fill={chartTheme.grid} radius={[0, 3, 3, 0]} isAnimationActive={false} />
+      </BarChart>
+    </ChartContainer>
+  );
 }
 
 export default function Avantos() {
+  const { me } = useWorkspace();
   const [cockpit, setCockpit] = useState<Cockpit | null>(null);
   const [crm, setCrm] = useState<{ open_opportunities: number; open_pipeline_paum: number } | null>(null);
   const [error, setError] = useState('');
@@ -72,7 +105,9 @@ export default function Avantos() {
       setCrm({ open_opportunities: 14, open_pipeline_paum: 68400000 });
       return;
     }
-    fetch('/api/avantos/cockpit', { headers: { 'Content-Type': 'application/json' } })
+    const advisorQuery = me?.assignment.type === 'advisor' && me.advisor?.advisor_id
+      ? `?advisor_id=${encodeURIComponent(me.advisor.advisor_id)}` : '';
+    fetch(`/api/avantos/cockpit${advisorQuery}`, { headers: { 'Content-Type': 'application/json' } })
       .then(async response => {
         if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
         setCockpit(await response.json());
@@ -87,7 +122,7 @@ export default function Avantos() {
         if (body?.success && body.data) setCrm(body.data);
       })
       .catch(() => undefined);
-  }, []);
+  }, [me?.assignment.type, me?.advisor?.advisor_id]);
 
   const rows = useMemo(() => {
     const needle = filter.trim().toLowerCase();
@@ -95,43 +130,35 @@ export default function Avantos() {
       !needle || row.name.toLowerCase().includes(needle));
   }, [cockpit, filter]);
 
-  return <div className="has-sidenav">
-    <SideNav />
-    <Box className="av-shell">
-    <AppBar position="static" elevation={0} className="av-header"><Toolbar>
-      <Box sx={{ flex: 1 }}>
-        <Typography component="h1" className="av-brand">Avantos</Typography>
-        <Typography className="av-product">Advisor operating console</Typography>
-      </Box>
-    </Toolbar></AppBar>
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+  return <ToolPage
+    eyebrow="Advisor console"
+    title="Avantos"
+    description="Prioritize households by planning health, drift, open work, and pipeline context."
+    width="full"
+  >
       {error && <Alert severity="error" onClose={() => setError('')} sx={{ mb: 2 }}>{error}</Alert>}
       {!cockpit && !error && <Box className="av-loading"><CircularProgress /></Box>}
       {cockpit && <>
-        <Box className="av-tiles">
-          <Tile label="Households" value={String(cockpit.summary.households)} />
-          <Tile label="Book assets" value={money(cockpit.summary.total_assets)} />
-          <Tile label="At risk" value={String(cockpit.summary.at_risk)}
-            tone={cockpit.summary.at_risk ? 'error.main' : 'success.main'} />
-          <Tile label="Drift flagged" value={String(cockpit.summary.drift_flagged)}
-            tone={cockpit.summary.drift_flagged ? 'warning.main' : 'success.main'} />
-          <Tile label="Unpublished plans" value={String(cockpit.summary.unpublished)} />
-          <Tile label="Open work items"
+        <ToolMetricGrid>
+          <ToolMetric label="Households" value={String(cockpit.summary.households)} />
+          <ToolMetric label="Book assets" value={money(cockpit.summary.total_assets)} />
+          <ToolMetric label="At risk" value={String(cockpit.summary.at_risk)}
+            tone={cockpit.summary.at_risk ? 'critical' : 'positive'} />
+          <ToolMetric label="Drift flagged" value={String(cockpit.summary.drift_flagged)}
+            tone={cockpit.summary.drift_flagged ? 'warning' : 'positive'} />
+          <ToolMetric label="Unpublished plans" value={String(cockpit.summary.unpublished)} />
+          <ToolMetric label="Open work items"
             value={String(cockpit.summary.open_alerts + cockpit.summary.open_tasks)} />
-          {crm && <Tile label="CRM open opportunities" value={String(crm.open_opportunities)} />}
-          {crm && <Tile label="CRM pipeline PAUM" value={money(crm.open_pipeline_paum)} />}
-        </Box>
-        <Card className="av-table-card"><CardContent>
-          <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Box>
-              <Typography variant="h6">Households by need</Typography>
-              <Typography color="text.secondary" variant="body2">
-                At-risk plans first, then drift, then open work. Click through to Financial Planning to act.
-              </Typography>
-            </Box>
-            <TextField size="small" label="Filter households" value={filter}
-              onChange={e => setFilter(e.target.value)} />
-          </Stack>
+          {crm && <ToolMetric label="CRM open opportunities" value={String(crm.open_opportunities)} />}
+          {crm && <ToolMetric label="CRM pipeline PAUM" value={money(crm.open_pipeline_paum)} />}
+        </ToolMetricGrid>
+        <ToolPanel
+          title="Households by need"
+          description="At-risk plans first, then drift, then open work. Click through to Financial Planning to act."
+          actions={<TextField size="small" label="Filter households" value={filter}
+            onChange={e => setFilter(e.target.value)} />}
+          flush
+        >
           <Table size="small">
             <TableHead><TableRow>
               <TableCell>Household</TableCell>
@@ -146,20 +173,16 @@ export default function Avantos() {
             </TableRow></TableHead>
             <TableBody>{rows.map(row => (
               <TableRow key={row.household_id} hover className="av-row"
-                onClick={() => { window.location.href = '/planning'; }}>
+                onClick={() => { window.location.href = householdHref('/planning', contextForRow(row)); }}>
                 <TableCell>
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>{row.name}</Typography>
-                  <Typography variant="caption" color="text.secondary">{row.source}</Typography>
+                  <Typography variant="caption" color="text.secondary">Connected household</Typography>
                 </TableCell>
                 <TableCell>
                   <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
                     <Chip size="small" color={BAND[row.health_band].color}
                       label={`${row.health_score}`} />
-                    <Box sx={{ width: 64 }}>
-                      <LinearProgress variant="determinate" value={row.health_score}
-                        color={BAND[row.health_band].color}
-                        sx={{ height: 5, borderRadius: 3 }} />
-                    </Box>
+                    <HealthScoreChart score={row.health_score} band={row.health_band} />
                   </Stack>
                 </TableCell>
                 <TableCell align="right">{money(row.total_assets)}</TableCell>
@@ -181,10 +204,10 @@ export default function Avantos() {
                       <Chip size="small" variant="outlined" label={`${row.data_quality_warnings} DQ`} />}
                     {row.last_actuals_sync &&
                       <Chip size="small" variant="outlined" label="synced" />}
-                    {row.source === 'datawarehouse' &&
-                      <Chip size="small" variant="outlined" label="CRM" clickable
+                    {row.crm_lead_id &&
+                      <Chip size="small" variant="outlined" label="Relationship" clickable
                         onClick={event => { event.stopPropagation();
-                          window.location.href = `/crm?q=${encodeURIComponent(row.name)}`; }} />}
+                          window.location.href = householdHref('/crm', contextForRow(row)); }} />}
                   </Stack>
                 </TableCell>
               </TableRow>))}
@@ -193,9 +216,7 @@ export default function Avantos() {
           {rows.length === 0 && <Alert severity="info" sx={{ mt: 2 }}>
             No planning households yet. Import a household in Financial Planning and it will appear here.
           </Alert>}
-        </CardContent></Card>
+        </ToolPanel>
       </>}
-    </Container>
-    </Box>
-  </div>;
+  </ToolPage>;
 }

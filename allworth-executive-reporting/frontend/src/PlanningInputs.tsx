@@ -182,7 +182,7 @@ export default function PlanningInputs({ facts, source, mcInputs, mcResult, mcRu
     </Frame>}
 
     {activeStep === 2 && <Frame title="Assets & debts" description="Enter investable accounts and liabilities. Warehouse values can be reviewed here without changing the source system.">
-      {assetsLocked && <Alert severity="info" sx={{ mb: 2 }}>Assets are sourced from Synapse and are read-only in the planning tool. Update the source system and re-import to change account values, ownership, type, or holdings.</Alert>}
+      {assetsLocked && <Alert severity="info" sx={{ mb: 2 }}>Connected assets are read-only in the planning tool. Update the relationship source and reconnect to change account values, ownership, type, or holdings.</Alert>}
       <Typography variant="h6" sx={{ mb: 1 }}>Accounts and assets</Typography><Stack sx={{ gap: 2 }}>{draft.accounts.map((account, index) => <Card variant="outlined" key={String(account.id || index)}><CardContent><Box sx={grid}>
         <TextField label="Account name" value={String(account.name || '')} disabled={assetsLocked} onChange={event => updateRow('accounts', index, 'name', event.target.value)} />
         <FormControl disabled={assetsLocked}><InputLabel>Type</InputLabel><Select label="Type" value={String(account.kind || 'taxable')} onChange={event => updateRow('accounts', index, 'kind', event.target.value)}>{['taxable', 'qualified', 'roth', 'cash', '529', 'real_estate', 'private_equity', 'hedge_fund'].map(value => <MenuItem key={value} value={value}>{value.replace('_', ' ')}</MenuItem>)}</Select></FormControl>

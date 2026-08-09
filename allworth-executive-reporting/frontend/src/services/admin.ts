@@ -7,7 +7,9 @@
 // model as the server (group grants cascade to members). This lets the page be
 // fully explored offline.
 
-import { resolveUserEmail } from './auth';
+import { assignableTools } from '../config/toolManifest';
+import { requestJson } from './http';
+import { loadDemo, norm, saveDemo, slugify, type DemoGroup, type DemoState } from './adminDemoStore';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
@@ -26,6 +28,20 @@ export interface AdminUser {
   inherited_tools: Record<string, string[]>; // tool_id -> [group names]
   effective_tools: string[];
   groups: { id: string; name: string }[];
+  assignment_id?: string | null;
+  advisor_id_override?: string | null;
+  created_at?: string;
+  created_by?: string;
+}
+
+export type AssignmentType = 'advisor' | 'executive' | 'operations' | 'platform_admin' | 'general';
+
+export interface Assignment {
+  id: string;
+  name: string;
+  type: AssignmentType;
+  home_tool_ids: string[];
+  built_in?: boolean;
   created_at?: string;
   created_by?: string;
 }
@@ -51,6 +67,9 @@ export interface Me {
   all_access: boolean;
   known: boolean;
   enforced?: boolean;
+  assignment?: Assignment;
+  home_tool_ids?: string[];
+  advisor_id_override?: string | null;
 }
 
 /** A user who currently has access to a tool, as seen by a sharer. */
@@ -75,263 +94,87 @@ export interface BackupInfo {
   last_modified?: string | null;
 }
 
-// ── auth headers ─────────────────────────────────────────────────────────────
-
-let _userEmail: string | null | undefined;
-async function userHeaders(): Promise<Record<string, string>> {
-  if (_userEmail === undefined) {
-    try {
-      _userEmail = await resolveUserEmail();
-    } catch {
-      _userEmail = null;
-    }
-  }
-  return _userEmail ? { 'X-User-Email': _userEmail } : {};
-}
-
-async function parseJson<T>(res: Response): Promise<T> {
-  let body: unknown;
-  try {
-    body = await res.json();
-  } catch {
-    throw new Error(`HTTP ${res.status} ${res.statusText}`);
-  }
-  if (!res.ok) {
-    const err = (body as { error?: string })?.error;
-    throw new Error(err || `HTTP ${res.status} ${res.statusText}`);
-  }
-  return body as T;
-}
-
 // ── real API ─────────────────────────────────────────────────────────────────
+
+const api = <T>(path: string, init?: RequestInit) => requestJson<T>(`${API_BASE_URL}${path}`, init);
+const write = <T>(path: string, method: 'POST' | 'PUT' | 'DELETE', body?: unknown) => api<T>(path, {
+  method,
+  headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+  body: body === undefined ? undefined : JSON.stringify(body),
+});
 
 const realApi = {
   async getTools(): Promise<Tool[]> {
-    const res = await fetch(`${API_BASE_URL}/admin/tools`);
-    return (await parseJson<{ tools: Tool[] }>(res)).tools;
+    return (await api<{ tools: Tool[] }>('/admin/tools')).tools;
   },
   async getMe(): Promise<Me> {
-    const res = await fetch(`${API_BASE_URL}/admin/me`, { headers: { ...(await userHeaders()) } });
-    return await parseJson<Me>(res);
+    return api<Me>('/admin/me');
   },
   async getUsers(): Promise<AdminUser[]> {
-    const res = await fetch(`${API_BASE_URL}/admin/users`);
-    return (await parseJson<{ users: AdminUser[] }>(res)).users;
+    return (await api<{ users: AdminUser[] }>('/admin/users')).users;
   },
   async addUser(email: string): Promise<AdminUser> {
-    const res = await fetch(`${API_BASE_URL}/admin/users`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(await userHeaders()) },
-      body: JSON.stringify({ email }),
-    });
-    return (await parseJson<{ user: AdminUser }>(res)).user;
+    return (await write<{ user: AdminUser }>('/admin/users', 'POST', { email })).user;
   },
   async removeUser(email: string): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/admin/users/${encodeURIComponent(email)}`, {
-      method: 'DELETE',
-      headers: { ...(await userHeaders()) },
-    });
-    await parseJson<{ ok: boolean }>(res);
+    await write(`/admin/users/${encodeURIComponent(email)}`, 'DELETE');
   },
   async setUserTools(email: string, tools: string[], shareTools: string[] = []): Promise<AdminUser> {
-    const res = await fetch(`${API_BASE_URL}/admin/users/${encodeURIComponent(email)}/tools`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', ...(await userHeaders()) },
-      body: JSON.stringify({ tools, share_tools: shareTools }),
-    });
-    return (await parseJson<{ user: AdminUser }>(res)).user;
+    return (await write<{ user: AdminUser }>(`/admin/users/${encodeURIComponent(email)}/tools`, 'PUT', { tools, share_tools: shareTools })).user;
+  },
+  async setUserAssignment(email: string, assignmentId: string | null, advisorIdOverride?: string | null): Promise<AdminUser> {
+    return (await write<{ user: AdminUser }>(`/admin/users/${encodeURIComponent(email)}/assignment`, 'PUT', { assignment_id: assignmentId, advisor_id_override: advisorIdOverride ?? null })).user;
+  },
+  async getAssignments(): Promise<Assignment[]> {
+    return (await api<{ assignments: Assignment[] }>('/admin/assignments')).assignments;
+  },
+  async addAssignment(name: string, type: AssignmentType, homeToolIds: string[]): Promise<Assignment> {
+    return (await write<{ assignment: Assignment }>('/admin/assignments', 'POST', { name, type, home_tool_ids: homeToolIds })).assignment;
+  },
+  async updateAssignment(id: string, name: string, type: AssignmentType, homeToolIds: string[]): Promise<Assignment> {
+    return (await write<{ assignment: Assignment }>(`/admin/assignments/${encodeURIComponent(id)}`, 'PUT', { name, type, home_tool_ids: homeToolIds })).assignment;
+  },
+  async removeAssignment(id: string): Promise<void> {
+    await write(`/admin/assignments/${encodeURIComponent(id)}`, 'DELETE');
   },
   async getGroups(): Promise<AdminGroup[]> {
-    const res = await fetch(`${API_BASE_URL}/admin/groups`);
-    return (await parseJson<{ groups: AdminGroup[] }>(res)).groups;
+    return (await api<{ groups: AdminGroup[] }>('/admin/groups')).groups;
   },
   async addGroup(name: string, description: string): Promise<AdminGroup> {
-    const res = await fetch(`${API_BASE_URL}/admin/groups`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(await userHeaders()) },
-      body: JSON.stringify({ name, description }),
-    });
-    return (await parseJson<{ group: AdminGroup }>(res)).group;
+    return (await write<{ group: AdminGroup }>('/admin/groups', 'POST', { name, description })).group;
   },
   async removeGroup(gid: string): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/admin/groups/${encodeURIComponent(gid)}`, {
-      method: 'DELETE',
-      headers: { ...(await userHeaders()) },
-    });
-    await parseJson<{ ok: boolean }>(res);
+    await write(`/admin/groups/${encodeURIComponent(gid)}`, 'DELETE');
   },
   async setGroupTools(gid: string, tools: string[], shareTools: string[] = []): Promise<AdminGroup> {
-    const res = await fetch(`${API_BASE_URL}/admin/groups/${encodeURIComponent(gid)}/tools`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', ...(await userHeaders()) },
-      body: JSON.stringify({ tools, share_tools: shareTools }),
-    });
-    return (await parseJson<{ group: AdminGroup }>(res)).group;
+    return (await write<{ group: AdminGroup }>(`/admin/groups/${encodeURIComponent(gid)}/tools`, 'PUT', { tools, share_tools: shareTools })).group;
   },
   async setGroupAllTools(gid: string, allTools: boolean): Promise<AdminGroup> {
-    const res = await fetch(`${API_BASE_URL}/admin/groups/${encodeURIComponent(gid)}/all-tools`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', ...(await userHeaders()) },
-      body: JSON.stringify({ all_tools: allTools }),
-    });
-    return (await parseJson<{ group: AdminGroup }>(res)).group;
+    return (await write<{ group: AdminGroup }>(`/admin/groups/${encodeURIComponent(gid)}/all-tools`, 'PUT', { all_tools: allTools })).group;
   },
   async setGroupMembers(gid: string, members: string[]): Promise<AdminGroup> {
-    const res = await fetch(`${API_BASE_URL}/admin/groups/${encodeURIComponent(gid)}/members`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', ...(await userHeaders()) },
-      body: JSON.stringify({ members }),
-    });
-    return (await parseJson<{ group: AdminGroup }>(res)).group;
+    return (await write<{ group: AdminGroup }>(`/admin/groups/${encodeURIComponent(gid)}/members`, 'PUT', { members })).group;
   },
   async getShareRecipients(tool: string): Promise<ShareInfo> {
-    const res = await fetch(
-      `${API_BASE_URL}/admin/share/${encodeURIComponent(tool)}/recipients`,
-      { headers: { ...(await userHeaders()) } }
-    );
-    return await parseJson<ShareInfo>(res);
+    return api<ShareInfo>(`/admin/share/${encodeURIComponent(tool)}/recipients`);
   },
   async shareTool(tool: string, email: string): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/admin/share`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(await userHeaders()) },
-      body: JSON.stringify({ tool, email }),
-    });
-    await parseJson<{ ok: boolean }>(res);
+    await write('/admin/share', 'POST', { tool, email });
   },
   async revokeShare(tool: string, email: string): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/admin/share/revoke`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(await userHeaders()) },
-      body: JSON.stringify({ tool, email }),
-    });
-    await parseJson<{ ok: boolean }>(res);
+    await write('/admin/share/revoke', 'POST', { tool, email });
   },
   async listBackups(): Promise<BackupInfo[]> {
-    const res = await fetch(`${API_BASE_URL}/admin/backups`, { headers: { ...(await userHeaders()) } });
-    return (await parseJson<{ backups: BackupInfo[] }>(res)).backups;
+    return (await api<{ backups: BackupInfo[] }>('/admin/backups')).backups;
   },
   async restoreBackup(name: string): Promise<{ users: number; groups: number }> {
-    const res = await fetch(`${API_BASE_URL}/admin/backups/restore`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(await userHeaders()) },
-      body: JSON.stringify({ name }),
-    });
-    return await parseJson<{ users: number; groups: number }>(res);
+    return write<{ users: number; groups: number }>('/admin/backups/restore', 'POST', { name });
   },
 };
 
 // ── demo store (localStorage) ────────────────────────────────────────────────
 
-const DEMO_TOOLS: Tool[] = [
-  { id: 'performance', name: 'Performance by Channel', category: 'live', status: 'live' },
-  { id: 'jarvis', name: 'Jarvis Encyclopedia', category: 'live', status: 'live' },
-  { id: 'nfbc', name: 'NFBC Adjustments', category: 'live', status: 'new' },
-  { id: 'fee_calculator', name: 'Fee Calculator', category: 'live', status: 'live' },
-  { id: 'executive_report', name: 'Executive Report', category: 'live', status: 'new' },
-  { id: 'crm', name: 'CRM', category: 'live', status: 'new' },
-  { id: 'file_explorer', name: 'File Explorer', category: 'live', status: 'new' },
-  { id: 'financial_planning', name: 'Financial Planning', category: 'live', status: 'new' },
-  { id: 'avantos', name: 'Avantos', category: 'live', status: 'new' },
-  { id: 'rebalancer', name: 'Mock Rebalancer', category: 'live', status: 'new' },
-  { id: 'admin', name: 'Admin', category: 'live', status: 'new' },
-  { id: 'pipeline_logging', name: 'Pipeline Logging', category: 'analytics', status: 'live' },
-  { id: 'data_catalog', name: 'Data Catalog', category: 'analytics', status: 'new' },
-  { id: 'sfp2', name: 'Salesforce Column Updater', category: 'utilities', status: 'live' },
-  { id: 'repcodes', name: 'Rep Codes', category: 'utilities', status: 'live' },
-  { id: 'bond_analyzer', name: 'Bond Analyzer', category: 'live', status: 'new' },
-  { id: 'advisor_mailer', name: 'Advisor Mailer', category: 'live', status: 'new' },
-  { id: 'heatmaps', name: 'Heatmaps', category: 'analytics', status: 'soon' },
-  { id: 'reconciliations', name: 'Reconciliations', category: 'analytics', status: 'soon' },
-];
-
-interface DemoState {
-  users: Record<string, { email: string; tools: string[]; share_tools?: string[]; created_at: string }>;
-  groups: Record<string, DemoGroup>;
-  shares?: { tool: string; email: string; by: string; at: string }[];
-}
-interface DemoGroup {
-  id: string;
-  name: string;
-  description: string;
-  tools: string[];
-  share_tools?: string[];
-  all_tools: boolean;
-  all_members?: boolean;
-  members: string[];
-  created_at: string;
-}
-
-const DEMO_KEY = 'allworth-admin-demo';
-
-function loadDemo(): DemoState {
-  try {
-    const raw = localStorage.getItem(DEMO_KEY);
-    if (raw) return JSON.parse(raw) as DemoState;
-  } catch {
-    /* ignore */
-  }
-  const seed: DemoState = {
-    users: {
-      'jane.advisor@allworth.com': {
-        email: 'jane.advisor@allworth.com',
-        tools: ['performance', 'repcodes'],
-        share_tools: ['repcodes'],
-        created_at: new Date().toISOString(),
-      },
-      'sam.analyst@allworth.com': {
-        email: 'sam.analyst@allworth.com',
-        tools: [],
-        created_at: new Date().toISOString(),
-      },
-    },
-    shares: [],
-    groups: {
-      analysts: {
-        id: 'analysts',
-        name: 'Analysts',
-        description: 'Data & reporting analysts',
-        tools: ['performance', 'pipeline_logging'],
-        all_tools: false,
-        members: ['sam.analyst@allworth.com'],
-        created_at: new Date().toISOString(),
-      },
-      admin: {
-        id: 'admin',
-        name: 'Admin',
-        description: 'Full access to every tool, including new ones',
-        tools: [],
-        all_tools: true,
-        members: [],
-        created_at: new Date().toISOString(),
-      },
-      'all-users': {
-        id: 'all-users',
-        name: 'All Users',
-        description: 'Every user. Grant tools here to share them with everyone.',
-        tools: [],
-        all_tools: false,
-        all_members: true,
-        members: [],
-        created_at: new Date().toISOString(),
-      },
-    },
-  };
-  saveDemo(seed);
-  return seed;
-}
-
-function saveDemo(state: DemoState): void {
-  try {
-    localStorage.setItem(DEMO_KEY, JSON.stringify(state));
-  } catch {
-    /* ignore */
-  }
-}
-
-const norm = (e: string) => (e || '').trim().toLowerCase();
-const slugify = (v: string) =>
-  v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'group';
+const DEMO_TOOLS: Tool[] = assignableTools.map(({ id, name, category, status }) => ({ id, name, category, status }));
 
 function groupsFor(email: string, state: DemoState): DemoGroup[] {
   return Object.values(state.groups).filter(
@@ -358,6 +201,8 @@ function userView(email: string, state: DemoState): AdminUser {
     inherited_tools: inherited,
     effective_tools: effective,
     groups: groups.map((g) => ({ id: g.id, name: g.name })),
+    assignment_id: u?.assignment_id ?? null,
+    advisor_id_override: u?.advisor_id_override ?? null,
     created_at: u?.created_at,
   };
 }
@@ -394,6 +239,8 @@ const demoApi = {
       can_share_all: true,
       all_access: true,
       known: true,
+      assignment: { id: 'general', name: 'General workspace', type: 'general', home_tool_ids: [], built_in: true },
+      home_tool_ids: [],
     };
   },
   async getUsers() {
@@ -428,6 +275,47 @@ const demoApi = {
     s.users[e].share_tools = [...new Set(shareTools.filter((t) => cleaned.includes(t)))].sort();
     saveDemo(s);
     return userView(e, s);
+  },
+  async setUserAssignment(email: string, assignmentId: string | null, advisorIdOverride?: string | null) {
+    const s = loadDemo();
+    const e = norm(email);
+    if (!s.users[e]) throw new Error(`Unknown user ${e}`);
+    if (assignmentId && assignmentId !== 'general' && !s.assignments?.[assignmentId]) throw new Error(`Unknown assignment ${assignmentId}`);
+    s.users[e].assignment_id = assignmentId;
+    s.users[e].advisor_id_override = advisorIdOverride ?? null;
+    saveDemo(s);
+    return userView(e, s);
+  },
+  async getAssignments(): Promise<Assignment[]> {
+    const s = loadDemo();
+    return [
+      { id: 'general', name: 'General workspace', type: 'general', home_tool_ids: [], built_in: true },
+      ...Object.values(s.assignments ?? {}),
+    ];
+  },
+  async addAssignment(name: string, type: AssignmentType, homeToolIds: string[]): Promise<Assignment> {
+    const s = loadDemo();
+    const id = slugify(name);
+    s.assignments ??= {};
+    if (s.assignments[id]) throw new Error(`An assignment named '${name}' already exists`);
+    const assignment = { id, name, type, home_tool_ids: homeToolIds };
+    s.assignments[id] = assignment;
+    saveDemo(s);
+    return assignment;
+  },
+  async updateAssignment(id: string, name: string, type: AssignmentType, homeToolIds: string[]): Promise<Assignment> {
+    const s = loadDemo();
+    if (!s.assignments?.[id]) throw new Error(`Unknown assignment ${id}`);
+    const assignment = { ...s.assignments[id], name, type, home_tool_ids: homeToolIds };
+    s.assignments[id] = assignment;
+    saveDemo(s);
+    return assignment;
+  },
+  async removeAssignment(id: string): Promise<void> {
+    const s = loadDemo();
+    if (Object.values(s.users).some((user) => user.assignment_id === id)) throw new Error('Reassign its users before deleting this assignment');
+    if (s.assignments) delete s.assignments[id];
+    saveDemo(s);
   },
   async getGroups() {
     const s = loadDemo();

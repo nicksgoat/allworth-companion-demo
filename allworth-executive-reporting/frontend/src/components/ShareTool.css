@@ -13,9 +13,9 @@
   gap: 6px;
   padding: 9px 15px;
   border-radius: 8px;
-  border: 1px solid #d3dcec;
+  border: 1px solid #E6E6E6;
   background: #fff;
-  color: #00205c;
+  color: #173D67;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -41,8 +41,8 @@
   border-radius: 12px;
   border: 1px solid #e2e8f2;
   background: #fff;
-  box-shadow: 0 18px 44px rgba(0, 32, 92, 0.18);
-  color: #1c2434;
+  box-shadow: 0 18px 44px rgba(23, 61, 103, 0.18);
+  color: #171717;
 }
 
 .sharetool-head {
@@ -53,7 +53,7 @@
 }
 .sharetool-head strong {
   font-size: 0.95rem;
-  color: #00205c;
+  color: #173D67;
 }
 .sharetool-sub {
   font-size: 0.75rem;
@@ -69,27 +69,27 @@
   min-width: 0;
   padding: 8px 10px;
   border-radius: 8px;
-  border: 1px solid #d3dcec;
+  border: 1px solid #E6E6E6;
   background: #fff;
-  color: #1c2434;
+  color: #171717;
   font-size: 0.85rem;
 }
 .sharetool-add input:focus {
   outline: none;
-  border-color: #00205c;
+  border-color: #173D67;
 }
 .sharetool-grant {
   padding: 8px 14px;
   border-radius: 8px;
   border: 1px solid transparent;
-  background: #00205c;
+  background: #173D67;
   color: #fff;
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
 }
 .sharetool-grant:hover:not(:disabled) {
-  background: #003a8c;
+  background: #0C2E4E;
 }
 .sharetool-grant:disabled {
   opacity: 0.45;
@@ -109,7 +109,7 @@
   padding: 8px 10px;
   background: #fff;
   border: none;
-  color: #1c2434;
+  color: #171717;
   font-size: 0.82rem;
   cursor: pointer;
 }
@@ -117,7 +117,7 @@
   background: #eef3fb;
 }
 .sharetool-suggest-item.new {
-  color: #00205c;
+  color: #173D67;
   font-weight: 600;
 }
 

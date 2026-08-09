@@ -1,0 +1,49 @@
+.aw-chart {
+  min-width: 0;
+  color: var(--aw-ink-secondary, #595959);
+  font-family: var(--aw-font-body, 'Lato', sans-serif);
+}
+
+.aw-chart .recharts-surface {
+  overflow: visible;
+}
+
+.aw-chart .recharts-cartesian-grid-horizontal line,
+.aw-chart .recharts-cartesian-grid-vertical line {
+  stroke: var(--aw-line, #e6e6e6);
+}
+
+.aw-chart .recharts-cartesian-axis-line,
+.aw-chart .recharts-cartesian-axis-tick-line {
+  stroke: var(--aw-line, #e6e6e6);
+}
+
+.aw-chart .recharts-cartesian-axis-tick-value,
+.aw-chart .recharts-polar-angle-axis-tick-value,
+.aw-chart .recharts-polar-radius-axis-tick-value,
+.aw-chart .recharts-label {
+  fill: var(--aw-ink-muted, #828282);
+  font-family: var(--aw-font-body, 'Lato', sans-serif);
+  font-size: 10px;
+}
+
+.aw-chart .recharts-legend-item {
+  margin-right: 14px !important;
+}
+
+.aw-chart .recharts-legend-item-text {
+  color: var(--aw-ink-secondary, #595959) !important;
+}
+
+.aw-chart .recharts-rectangle,
+.aw-chart .recharts-sector,
+.aw-chart .recharts-layer {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aw-chart * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

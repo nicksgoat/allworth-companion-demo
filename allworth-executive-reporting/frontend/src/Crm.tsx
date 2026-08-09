@@ -10,15 +10,17 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Area,
   Bar,
+  BarChart,
   CartesianGrid,
   Cell,
   ComposedChart,
+  LabelList,
   Line,
-  ResponsiveContainer,
-  Tooltip,
+  ReferenceLine,
   XAxis,
   YAxis,
 } from 'recharts';
+import { ChartContainer, ChartTooltip } from './components/ui/chart';
 import {
   crmApi,
   type ClientQuery,
@@ -32,14 +34,15 @@ import {
   type CrmFilters,
   type CrmFlowPoint,
   type CrmOpportunity,
-  type CrmPlanLink,
   type CrmPortfolio,
   type CrmTask,
 } from './services/crm';
+import { householdHref, workspaceApi, type HouseholdContext } from './services/workspace';
 import { resolveUserEmail } from './services/auth';
-import SideNav from './components/SideNav';
 import ShareTool from './components/ShareTool';
 import CrmFlyout, { type FlyoutField } from './components/CrmFlyout';
+import { ToolChart, ToolEmptyState, ToolMetric, ToolMetricGrid, ToolPage } from './components/ToolPage';
+import { chartPalette, chartTheme } from './theme';
 import './Crm.css';
 
 // ── formatting helpers ───────────────────────────────────────────────────────
@@ -93,23 +96,32 @@ const Avatar = ({ name, size = 'md' }: { name: string; size?: 'md' | 'lg' }) => 
 
 // ── asset allocation panel (stacked bar + legend) ───────────────────────
 
-const ALLOC_COLORS = ['#00205c', '#4a7bb8', '#c75b12', '#157a4c', '#8a94a8', '#6b4fa0', '#b3894a', '#3d8f8f', '#c4c9d4'];
+const ALLOC_COLORS = chartPalette;
 
 function AllocationPanel({ allocation, title, asOf }: { allocation: CrmAllocationSlice[]; title: string; asOf?: string | null }) {
   if (allocation.length === 0) return null;
+  const allocationRow = Object.fromEntries(allocation.map((slice) => [slice.label, slice.pct]));
   return (
     <div className="crm-book-panel">
       <div className="crm-section-label">{title}{asOf ? ` · as of ${asOf}` : ''}</div>
-      <div className="crm-alloc-bar">
-        {allocation.map((s, i) => (
-          <div
-            key={s.label}
-            className="crm-alloc-seg"
-            style={{ width: `${Math.max(1.5, s.pct)}%`, background: ALLOC_COLORS[i % ALLOC_COLORS.length] }}
-            title={`${s.label} · ${s.pct}%`}
-          />
-        ))}
-      </div>
+      <ChartContainer className="crm-allocation-chart" height={28}>
+        <BarChart data={[allocationRow]} layout="vertical" margin={{ top: 2, right: 0, bottom: 2, left: 0 }}>
+          <XAxis type="number" domain={[0, 100]} hide />
+          <YAxis type="category" hide />
+          <ChartTooltip formatter={(value, name) => [`${Number(value).toFixed(1)}%`, String(name)]} />
+          {allocation.map((slice, i) => (
+            <Bar
+              key={slice.label}
+              dataKey={slice.label}
+              name={slice.label}
+              stackId="allocation"
+              fill={ALLOC_COLORS[i % ALLOC_COLORS.length]}
+              radius={i === 0 ? [5, 0, 0, 5] : i === allocation.length - 1 ? [0, 5, 5, 0] : 0}
+              isAnimationActive={false}
+            />
+          ))}
+        </BarChart>
+      </ChartContainer>
       <div className="crm-alloc-legend">
         {allocation.map((s, i) => (
           <div key={s.label} className="crm-alloc-row">
@@ -137,28 +149,28 @@ function PerformanceChart({ performance }: { performance: { period: string; mtd_
   if (data.length === 0) return null;
   const trailing = data[data.length - 1].cum_pct;
   return (
-    <div className="crm-chart-card">
-      <div className="crm-section-label">
-        Performance · monthly return & cumulative ({trailing >= 0 ? '+' : ''}{trailing}% trailing)
-      </div>
-      <ResponsiveContainer width="100%" height={210}>
+    <ToolChart
+      title="Performance"
+      description={`Monthly return and cumulative · ${trailing >= 0 ? '+' : ''}${trailing}% trailing`}
+    >
+      <ChartContainer width="100%" height={210}>
         <ComposedChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 8 }}>
-          <CartesianGrid stroke="rgba(0,32,92,0.07)" vertical={false} />
-          <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#8a94a8' }} tickLine={false} axisLine={false} />
-          <YAxis tickFormatter={(v: number) => `${v}%`} tick={{ fontSize: 11, fill: '#8a94a8' }} tickLine={false} axisLine={false} width={48} />
-          <Tooltip
+          <CartesianGrid stroke={chartTheme.grid} vertical={false} />
+          <XAxis dataKey="label" tick={{ fontSize: 11, fill: chartTheme.axis }} tickLine={false} axisLine={false} />
+          <YAxis tickFormatter={(v: number) => `${v}%`} tick={{ fontSize: 11, fill: chartTheme.axis }} tickLine={false} axisLine={false} width={48} />
+          <ChartTooltip
             formatter={(value, key) => [`${Number(value ?? 0).toFixed(2)}%`, key === 'mtd_pct' ? 'Monthly' : 'Cumulative']}
-            contentStyle={{ borderRadius: 10, border: '1px solid rgba(0,32,92,0.12)', fontSize: 12 }}
+            contentStyle={chartTheme.tooltip}
           />
-          <Bar dataKey="mtd_pct" radius={[3, 3, 0, 0]} maxBarSize={16}>
+          <Bar dataKey="mtd_pct" radius={[3, 3, 0, 0]} maxBarSize={16} isAnimationActive={false}>
             {data.map((p) => (
-              <Cell key={p.period} fill={p.mtd_pct >= 0 ? '#157a4c' : '#b3261e'} />
+              <Cell key={p.period} fill={p.mtd_pct >= 0 ? chartTheme.positive : chartTheme.warning} />
             ))}
           </Bar>
-          <Line type="monotone" dataKey="cum_pct" stroke="#00205c" strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey="cum_pct" stroke={chartTheme.actual} strokeWidth={2} dot={false} isAnimationActive={false} />
         </ComposedChart>
-      </ResponsiveContainer>
-    </div>
+      </ChartContainer>
+    </ToolChart>
   );
 }
 
@@ -175,28 +187,78 @@ function FlowsChart({ flows, title }: { flows: CrmFlowPoint[]; title: string }) 
     () => flows.map((f) => ({ ...f, label: monthLabel(f.period) })),
     [flows],
   );
-  if (data.length === 0) return <div className="crm-empty">No rollforward history.</div>;
+  if (data.length === 0) return <ToolEmptyState title="No rollforward history" />;
+
+  const aumValues = data.map((point) => point.total_value);
+  const aumStep = 5_000_000;
+  const aumFloor = Math.floor(Math.min(...aumValues) / aumStep) * aumStep;
+  const calculatedCeiling = Math.ceil(Math.max(...aumValues) / aumStep) * aumStep;
+  const aumCeiling = calculatedCeiling > aumFloor ? calculatedCeiling : aumFloor + aumStep;
+  const aumMidpoint = aumFloor + (aumCeiling - aumFloor) / 2;
+  const largestFlow = Math.max(...data.map((point) => Math.abs(point.ncnm)), 0);
+  const flowExtent = Math.max(100_000, Math.ceil(largestFlow / 100_000) * 100_000);
+  const latestAum = data[data.length - 1].total_value;
+
   return (
-    <div className="crm-chart-card">
-      <div className="crm-section-label">{title}</div>
-      <ResponsiveContainer width="100%" height={230}>
-        <ComposedChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 8 }}>
-          <CartesianGrid stroke="rgba(0,32,92,0.07)" vertical={false} />
-          <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#8a94a8' }} tickLine={false} axisLine={false} />
-          <YAxis yAxisId="aum" tickFormatter={(v: number) => compactUsd(v)} tick={{ fontSize: 11, fill: '#8a94a8' }} tickLine={false} axisLine={false} width={62} />
-          <YAxis yAxisId="flow" orientation="right" tickFormatter={(v: number) => compactUsd(v)} tick={{ fontSize: 11, fill: '#8a94a8' }} tickLine={false} axisLine={false} width={62} />
-          <Tooltip
-            formatter={(value, key) => [
-              compactUsd(Number(value ?? 0)),
-              key === 'total_value' ? 'AUM' : 'Net flows',
-            ]}
-            contentStyle={{ borderRadius: 10, border: '1px solid rgba(0,32,92,0.12)', fontSize: 12 }}
-          />
-          <Area yAxisId="aum" type="monotone" dataKey="total_value" stroke="#00205c" strokeWidth={2} fill="rgba(0,32,92,0.08)" />
-          <Bar yAxisId="flow" dataKey="ncnm" fill="#c75b12" radius={[3, 3, 0, 0]} maxBarSize={16} />
-        </ComposedChart>
-      </ResponsiveContainer>
-    </div>
+    <ToolChart title={title} description="Separate scales, aligned by month">
+      <div className="crm-flow-stack">
+        <section className="crm-flow-series">
+          <header className="crm-flow-series__header">
+            <span>Book AUM</span>
+            <strong>{compactUsd(latestAum)}</strong>
+          </header>
+          <ChartContainer width="100%" height={98}>
+            <ComposedChart data={data} margin={{ top: 4, right: 12, bottom: 0, left: 8 }}>
+              <CartesianGrid stroke={chartTheme.grid} vertical={false} />
+              <XAxis dataKey="label" tick={false} tickLine={false} axisLine={false} height={6} />
+              <YAxis
+                domain={[aumFloor, aumCeiling]}
+                ticks={[aumFloor, aumMidpoint, aumCeiling]}
+                tickFormatter={(value: number) => compactUsd(value)}
+                tick={{ fontSize: 10, fill: chartTheme.axis }}
+                tickLine={false}
+                axisLine={false}
+                width={62}
+              />
+              <ChartTooltip formatter={(value) => [compactUsd(Number(value ?? 0)), 'AUM']} contentStyle={chartTheme.tooltip} />
+              <Area type="monotone" dataKey="total_value" stroke={chartTheme.actual} strokeWidth={2} fill={chartTheme.actual} fillOpacity={0.07} isAnimationActive={false} />
+            </ComposedChart>
+          </ChartContainer>
+        </section>
+
+        <section className="crm-flow-series crm-flow-series--flows">
+          <header className="crm-flow-series__header">
+            <span>Monthly net flows</span>
+            <span className="crm-flow-key" aria-label="Positive flows are green; negative flows are orange">
+              <i className="positive" /> Positive
+              <i className="negative" /> Negative
+            </span>
+          </header>
+          <ChartContainer width="100%" height={122}>
+            <ComposedChart data={data} margin={{ top: 4, right: 12, bottom: 0, left: 8 }}>
+              <CartesianGrid stroke={chartTheme.grid} vertical={false} />
+              <XAxis dataKey="label" tick={{ fontSize: 10, fill: chartTheme.axis }} tickLine={false} axisLine={false} />
+              <YAxis
+                domain={[-flowExtent, flowExtent]}
+                ticks={[-flowExtent, 0, flowExtent]}
+                tickFormatter={(value: number) => compactUsd(value)}
+                tick={{ fontSize: 10, fill: chartTheme.axis }}
+                tickLine={false}
+                axisLine={false}
+                width={62}
+              />
+              <ChartTooltip formatter={(value) => [compactUsd(Number(value ?? 0)), 'Net flows']} contentStyle={chartTheme.tooltip} />
+              <ReferenceLine y={0} stroke={chartTheme.axis} strokeWidth={1.4} />
+              <Bar dataKey="ncnm" radius={[3, 3, 0, 0]} maxBarSize={18} isAnimationActive={false}>
+                {data.map((point) => (
+                  <Cell key={point.period} fill={point.ncnm >= 0 ? chartTheme.positive : chartTheme.warning} />
+                ))}
+              </Bar>
+            </ComposedChart>
+          </ChartContainer>
+        </section>
+      </div>
+    </ToolChart>
   );
 }
 
@@ -211,7 +273,7 @@ function ClientRecord({ leadId, onOpenAdvisor }: { leadId: string; onOpenAdvisor
   const [accounts, setAccounts] = useState<CrmAccount[]>([]);
   const [flows, setFlows] = useState<CrmFlowPoint[]>([]);
   const [portfolio, setPortfolio] = useState<CrmPortfolio | null>(null);
-  const [plan, setPlan] = useState<CrmPlanLink | null>(null);
+  const [connectedContext, setConnectedContext] = useState<HouseholdContext | null>(null);
   const [tab, setTab] = useState<RecordTab>('activity');
   const [error, setError] = useState<string | null>(null);
   const [flyoutOpp, setFlyoutOpp] = useState<CrmOpportunity | null>(null);
@@ -220,7 +282,7 @@ function ClientRecord({ leadId, onOpenAdvisor }: { leadId: string; onOpenAdvisor
     const ctrl = new AbortController();
     setError(null);
     setClient(null);
-    setPlan(null);
+    setConnectedContext(null);
     setPortfolio(null);
     Promise.all([
       crmApi.getClient(leadId, ctrl.signal),
@@ -235,10 +297,10 @@ function ClientRecord({ leadId, onOpenAdvisor }: { leadId: string; onOpenAdvisor
         setOpps(o);
         setAccounts(ac);
         setFlows(fl);
-        // Cross-app: look up this household's financial plan by name.
-        crmApi.findPlan(c.name, ctrl.signal)
-          .then((p) => { if (!ctrl.signal.aborted) setPlan(p); })
-          .catch(() => { if (!ctrl.signal.aborted) setPlan(null); });
+        // Resolve the connected planning household by exact CRM identity.
+        workspaceApi.resolveHousehold({ leadId })
+          .then((context) => { if (!ctrl.signal.aborted) setConnectedContext(context); })
+          .catch(() => { if (!ctrl.signal.aborted) setConnectedContext(null); });
         // Portfolio analytics load after the record so the page paints fast.
         crmApi.getClientPortfolio(leadId, ctrl.signal)
           .then((p) => { if (!ctrl.signal.aborted) setPortfolio(p); })
@@ -289,19 +351,19 @@ function ClientRecord({ leadId, onOpenAdvisor }: { leadId: string; onOpenAdvisor
             )}
           </div>
           <div className="crm-record-links">
-            {plan ? (
-              <a className="crm-applink" href="/planning">
+            {connectedContext?.planning_household_id ? (
+              <a className="crm-applink" href={householdHref('/planning', connectedContext)}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="3.5" /></svg>
-                Financial plan: {plan.name}
+                Financial plan: {connectedContext.name}
               </a>
             ) : (
-              <a className="crm-applink crm-applink-muted" href="/planning">
+              <a className="crm-applink crm-applink-muted" href={connectedContext ? householdHref('/planning', connectedContext) : `/planning?client=${encodeURIComponent(leadId)}`}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="9" /><path d="M12 8v8" /><path d="M8 12h8" /></svg>
                 No plan yet — create in Planning
               </a>
             )}
             {opps.length > 0 && (
-              <a className="crm-applink" href="/pipeline-review">
+              <a className="crm-applink" href={connectedContext ? householdHref('/pipeline-review', connectedContext) : `/pipeline-review?client=${encodeURIComponent(leadId)}`}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 3v18h18" /><path d="m7 14 4-4 3 3 5-6" /></svg>
                 In pipeline ({opps.length})
               </a>
@@ -309,7 +371,7 @@ function ClientRecord({ leadId, onOpenAdvisor }: { leadId: string; onOpenAdvisor
             {client.sf_url && (
               <a className="crm-applink" href={client.sf_url} target="_blank" rel="noreferrer">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M7 17 17 7" /><path d="M8 7h9v9" /></svg>
-                Salesforce
+                Source record
               </a>
             )}
           </div>
@@ -359,48 +421,20 @@ function ClientRecord({ leadId, onOpenAdvisor }: { leadId: string; onOpenAdvisor
 
       {tab === 'portfolio' && (
         <div className="crm-portfolio">
-          <div className="crm-ministats">
-            <div className="crm-ministat">
-              <div className="crm-ministat-value">{compactUsd(latest?.total_value || client.aum)}</div>
-              <div className="crm-ministat-label">Total value</div>
-            </div>
-            <div className="crm-ministat">
-              <div className="crm-ministat-value">{compactUsd(totalCash)}</div>
-              <div className="crm-ministat-label">Cash</div>
-            </div>
-            <div className="crm-ministat">
-              <div className={`crm-ministat-value ${trailingNcnm >= 0 ? 'pos' : 'neg'}`}>{compactUsd(trailingNcnm)}</div>
-              <div className="crm-ministat-label">Net flows · 12 mo</div>
-            </div>
-            <div className="crm-ministat">
-              <div className={`crm-ministat-value${rmdDue.length ? ' neg' : ''}`}>
-                {rmdDue.length ? compactUsd(rmdDue.reduce((s, a) => s + a.rmd_total, 0)) : '—'}
-              </div>
-              <div className="crm-ministat-label">RMD outstanding</div>
-            </div>
+          <ToolMetricGrid className="crm-ministats">
+            <ToolMetric label="Total value" value={compactUsd(latest?.total_value || client.aum)} />
+            <ToolMetric label="Cash" value={compactUsd(totalCash)} />
+            <ToolMetric label="Net flows · 12 mo" value={compactUsd(trailingNcnm)} tone={trailingNcnm >= 0 ? 'positive' : 'critical'} />
+            <ToolMetric label="RMD outstanding" value={rmdDue.length ? compactUsd(rmdDue.reduce((s, a) => s + a.rmd_total, 0)) : '—'} tone={rmdDue.length ? 'critical' : 'neutral'} />
             {portfolio && (
               <>
-                <div className="crm-ministat">
-                  <div className={`crm-ministat-value${portfolio.ytd_pct != null ? (portfolio.ytd_pct >= 0 ? ' pos' : ' neg') : ''}`}>
-                    {portfolio.ytd_pct != null ? `${portfolio.ytd_pct >= 0 ? '+' : ''}${portfolio.ytd_pct.toFixed(2)}%` : '—'}
-                  </div>
-                  <div className="crm-ministat-label">YTD return (TWR)</div>
-                </div>
-                <div className="crm-ministat">
-                  <div className="crm-ministat-value">{portfolio.beta ? portfolio.beta.toFixed(2) : '—'}</div>
-                  <div className="crm-ministat-label">Beta</div>
-                </div>
-                <div className="crm-ministat">
-                  <div className="crm-ministat-value">{portfolio.duration ? portfolio.duration.toFixed(1) : '—'}</div>
-                  <div className="crm-ministat-label">Duration</div>
-                </div>
-                <div className="crm-ministat">
-                  <div className="crm-ministat-value">{portfolio.yield_pct ? `${portfolio.yield_pct.toFixed(2)}%` : '—'}</div>
-                  <div className="crm-ministat-label">Weighted yield</div>
-                </div>
+                <ToolMetric label="YTD return (TWR)" value={portfolio.ytd_pct != null ? `${portfolio.ytd_pct >= 0 ? '+' : ''}${portfolio.ytd_pct.toFixed(2)}%` : '—'} tone={portfolio.ytd_pct != null ? (portfolio.ytd_pct >= 0 ? 'positive' : 'critical') : 'neutral'} />
+                <ToolMetric label="Beta" value={portfolio.beta ? portfolio.beta.toFixed(2) : '—'} />
+                <ToolMetric label="Duration" value={portfolio.duration ? portfolio.duration.toFixed(1) : '—'} />
+                <ToolMetric label="Weighted yield" value={portfolio.yield_pct ? `${portfolio.yield_pct.toFixed(2)}%` : '—'} />
               </>
             )}
-          </div>
+          </ToolMetricGrid>
 
           {portfolio && (
             <div className="crm-portfolio-grid">
@@ -409,7 +443,7 @@ function ClientRecord({ leadId, onOpenAdvisor }: { leadId: string; onOpenAdvisor
             </div>
           )}
 
-          <FlowsChart flows={flows} title="AUM & net flows (Tamarac rollforward)" />
+          <FlowsChart flows={flows} title="AUM & net flows" />
 
           {portfolio && portfolio.holdings.length > 0 && (
             <>
@@ -437,7 +471,7 @@ function ClientRecord({ leadId, onOpenAdvisor }: { leadId: string; onOpenAdvisor
             </>
           )}
 
-          <div className="crm-section-label">Accounts (Tamarac)</div>
+          <div className="crm-section-label">Accounts</div>
           {accounts.length === 0 ? (
             <div className="crm-empty">No managed accounts linked to this household.</div>
           ) : (
@@ -711,36 +745,16 @@ function BookDashboard({ userId, onOpenClient }: { userId: string; onOpenClient:
     <div className="crm-record">
       {book && (
         <>
-          <div className="crm-ministats">
-            <div className="crm-ministat">
-              <div className="crm-ministat-value">{compactUsd(advisor.total_aum)}</div>
-              <div className="crm-ministat-label">Book AUM · {advisor.client_count} clients</div>
-            </div>
-            <div className="crm-ministat">
-              <div className={`crm-ministat-value ${trailingNcnm >= 0 ? 'pos' : 'neg'}`}>{compactUsd(trailingNcnm)}</div>
-              <div className="crm-ministat-label">Net flows · 12 mo</div>
-            </div>
-            <div className="crm-ministat">
-              <div className="crm-ministat-value">{compactUsd(pipelinePaum)}</div>
-              <div className="crm-ministat-label">Pipeline PAUM · {book.pipeline.length} opps</div>
-            </div>
-            <div className="crm-ministat">
-              <div className={`crm-ministat-value${book.rmds.count ? ' neg' : ''}`}>
-                {book.rmds.count ? compactUsd(book.rmds.total) : '—'}
-              </div>
-              <div className="crm-ministat-label">RMDs outstanding · {book.rmds.count}</div>
-            </div>
-            <div className="crm-ministat">
-              <div className={`crm-ministat-value${book.needs_attention.length ? ' neg' : ''}`}>{book.needs_attention.length}</div>
-              <div className="crm-ministat-label">Need attention (90d)</div>
-            </div>
-            <div className="crm-ministat">
-              <div className="crm-ministat-value">{book.open_tasks}</div>
-              <div className="crm-ministat-label">Open tasks</div>
-            </div>
-          </div>
+          <ToolMetricGrid className="crm-ministats crm-book-metrics">
+            <ToolMetric label="Book AUM" value={compactUsd(advisor.total_aum)} detail={`${advisor.client_count} clients`} />
+            <ToolMetric label="Net flows · 12 mo" value={compactUsd(trailingNcnm)} tone={trailingNcnm >= 0 ? 'positive' : 'critical'} />
+            <ToolMetric label="Pipeline PAUM" value={compactUsd(pipelinePaum)} detail={`${book.pipeline.length} opportunities`} />
+            <ToolMetric label="RMDs outstanding" value={book.rmds.count ? compactUsd(book.rmds.total) : '—'} detail={`${book.rmds.count} accounts`} tone={book.rmds.count ? 'critical' : 'neutral'} />
+            <ToolMetric label="Need attention (90d)" value={book.needs_attention.length} tone={book.needs_attention.length ? 'critical' : 'neutral'} />
+            <ToolMetric label="Open tasks" value={book.open_tasks} />
+          </ToolMetricGrid>
 
-          <FlowsChart flows={book.flows} title="Book AUM & net flows (Tamarac rollforward)" />
+          <FlowsChart flows={book.flows} title="Book AUM & net flows" />
 
           <div className="crm-book-grid">
             <AllocationPanel allocation={book.allocation} title="Book asset allocation" />
@@ -771,22 +785,23 @@ function BookDashboard({ userId, onOpenClient }: { userId: string; onOpenClient:
               {book.segments.length === 0 ? (
                 <div className="crm-empty">No segment data.</div>
               ) : (
-                <div className="crm-segment-list">
-                  {book.segments.map((s) => {
-                    const maxAum = Math.max(...book.segments.map((x) => x.aum), 1);
-                    return (
-                      <div key={s.segment} className="crm-segment-row">
-                        <div className="crm-segment-head">
-                          <span className="crm-cell-name">{s.segment}</span>
-                          <span className="crm-cell-sub">{s.clients} clients · {compactUsd(s.aum)}</span>
-                        </div>
-                        <div className="crm-segment-bar">
-                          <div className="crm-segment-fill" style={{ width: `${Math.max(4, (s.aum / maxAum) * 100)}%` }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                <ChartContainer className="crm-segment-chart" height={Math.max(180, book.segments.length * 42)}>
+                  <BarChart data={book.segments} layout="vertical" margin={{ top: 4, right: 54, bottom: 4, left: 8 }}>
+                    <CartesianGrid horizontal={false} />
+                    <XAxis type="number" domain={[0, 'dataMax']} tickFormatter={compactUsd} tickLine={false} axisLine={false} />
+                    <YAxis type="category" dataKey="segment" width={116} tickLine={false} axisLine={false} />
+                    <ChartTooltip
+                      labelFormatter={(label) => {
+                        const segment = book.segments.find((row) => row.segment === label);
+                        return `${String(label)}${segment ? ` · ${segment.clients} clients` : ''}`;
+                      }}
+                      formatter={(value) => [compactUsd(Number(value)), 'AUM']}
+                    />
+                    <Bar dataKey="aum" name="AUM" fill={chartTheme.comparison} radius={[0, 4, 4, 0]} minPointSize={2} isAnimationActive={false}>
+                      <LabelList dataKey="aum" position="right" formatter={(value) => compactUsd(Number(value))} fill={chartTheme.axis} fontSize={11} />
+                    </Bar>
+                  </BarChart>
+                </ChartContainer>
               )}
             </div>
 
@@ -1072,38 +1087,27 @@ const Crm = () => {
   const activeSection: Section = view.section === 'client' ? 'clients' : view.section;
 
   return (
-    <div className="crm-page has-sidenav">
-      <SideNav />
-      <div className="crm-shell">
-        <header className="crm-hero">
-          {ctx && !picking ? (
-            <div className="crm-hero-advisor">
-              <Avatar name={ctx.name} size="lg" />
-              <div>
-                <div className="crm-kicker">Advisor workspace</div>
-                <h1 className="crm-title">{ctx.name}</h1>
-                <div className="crm-hero-sub">
-                  {[ctx.title, ctx.region, `${ctx.client_count.toLocaleString()} clients`, compactUsd(ctx.total_aum)]
-                    .filter(Boolean).join(' · ')}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div>
-              <div className="crm-kicker">Advisor workspace</div>
-              <h1 className="crm-title">CRM</h1>
-              <div className="crm-hero-sub">Choose a book of business to open.</div>
-            </div>
-          )}
-          <div className="crm-hero-actions">
+    <ToolPage
+      eyebrow="Advisor workspace"
+      title={ctx && !picking ? ctx.name : 'CRM'}
+      description={ctx && !picking
+        ? [ctx.title, ctx.region, `${ctx.client_count.toLocaleString()} clients`, compactUsd(ctx.total_aum)]
+          .filter(Boolean).join(' · ')
+        : 'Choose a book of business to open.'}
+      width="full"
+      className="crm-page"
+      actions={
+        <>
             {ctx && !picking && (
               <button type="button" className="crm-btn crm-btn-ghost" onClick={() => setPicking(true)}>
                 Switch book
               </button>
             )}
             <ShareTool toolId="crm" toolName="CRM" />
-          </div>
-        </header>
+        </>
+      }
+      context={ctx && !picking ? <><Avatar name={ctx.name} /><span>Viewing {ctx.name}&apos;s relationship book</span></> : undefined}
+    >
 
         {loadError && <div className="crm-error">{loadError}</div>}
 
@@ -1133,17 +1137,16 @@ const Crm = () => {
               </button>
             )}
 
-            <main className="crm-main">
+            <div className="crm-main">
               {view.section === 'dashboard' && <BookDashboard userId={ctx.advisor_id} onOpenClient={openClient} />}
               {view.section === 'clients' && <ClientsView onOpen={openClient} advisor={ctx.advisor_id} initialQuery={initial.clientQuery} />}
               {view.section === 'client' && <ClientRecord leadId={view.leadId} onOpenAdvisor={switchToAdvisorById} />}
               {view.section === 'pipeline' && <PipelineView onOpenClient={openClient} advisorName={ctx.name} />}
               {view.section === 'tasks' && <TasksView onOpenClient={openClient} owner={ctx.advisor_id} />}
-            </main>
+            </div>
           </>
         )}
-      </div>
-    </div>
+    </ToolPage>
   );
 };
 

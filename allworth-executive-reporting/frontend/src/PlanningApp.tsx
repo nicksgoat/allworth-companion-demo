@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  Alert, Box, Button, Card, CardContent, Chip, CircularProgress, Container,
+  Alert, Box, Button, Card, CardContent, Chip, CircularProgress,
   Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl,
   InputLabel, MenuItem, Select, Stack, Tab, Tabs, TextField, Typography,
 } from '@mui/material';
@@ -8,7 +8,8 @@ import { ThemeProvider } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import CloudSyncOutlinedIcon from '@mui/icons-material/CloudSyncOutlined';
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { ChartContainer, ChartLegend, ChartTooltip } from './components/ui/chart';
 import { planningApi, type Household, type MonteCarloInputs, type MonteCarloResult, type Projection, type Scenario } from './services/planningApi';
 import PlanningInputs, { type PlanningFactsDraft } from './PlanningInputs';
 import DecisionTab from './planning/DecisionTab';
@@ -22,12 +23,13 @@ import ToolsTab from './planning/ToolsTab';
 import VaultTab from './planning/VaultTab';
 import WorkspaceTab from './planning/WorkspaceTab';
 import SyncActualsDialog from './components/SyncActualsDialog';
-import { Kpi as Metric, money } from './planning/shared';
+import { money } from './planning/shared';
 import AuthControl from './components/AuthControl';
-import SideNav from './components/SideNav';
 import ShareTool from './components/ShareTool';
-import { colors, muiTheme } from './theme';
+import { ToolChart, ToolMetric, ToolMetricGrid, ToolPage, ToolPanel, ToolStatus } from './components/ToolPage';
+import { chartTheme, colors, muiTheme } from './theme';
 import './PlanningApp.css';
+import { useSearchParams } from 'react-router-dom';
 
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 const DEMO_HOUSEHOLD: Household = { id: 'demo-household', name: 'Evergreen Family', people: 2, accounts: 4, source: 'datawarehouse' };
@@ -51,11 +53,12 @@ const DEMO_MC_INPUTS: MonteCarloInputs = {
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   return <Box className="plan-empty"><AccountBalanceWalletOutlinedIcon sx={{ fontSize: 54 }} />
     <Typography variant="h4">Start a financial plan</Typography>
-    <Typography color="text.secondary">Import a household from the DataWarehouse or create a planning draft.</Typography>
+    <Typography color="text.secondary">Connect an existing household or create a planning draft.</Typography>
     <Button variant="contained" startIcon={<AddIcon />} onClick={onCreate}>Create household</Button></Box>;
 }
 
 export default function PlanningApp() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [households, setHouseholds] = useState<Household[]>(DEMO_MODE ? [DEMO_HOUSEHOLD] : []);
   const [selected, setSelected] = useState(DEMO_MODE ? DEMO_HOUSEHOLD.id : '');
   const [summary, setSummary] = useState<Record<string, unknown> | null>(DEMO_MODE ? { name: DEMO_HOUSEHOLD.name, source: DEMO_HOUSEHOLD.source, net_worth: '8600000' } : null);
@@ -97,9 +100,18 @@ export default function PlanningApp() {
     }
     const data = await planningApi.households();
     setHouseholds(data.households);
-    setSelected(current => data.households.some(household => household.id === current)
-      ? current : data.households[0]?.id || '');
-  }, []);
+    const requested = searchParams.get('household');
+    setSelected(current => requested && data.households.some(household => household.id === requested)
+      ? requested : data.households.some(household => household.id === current)
+        ? current : data.households[0]?.id || '');
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!selected || searchParams.get('household') === selected) return;
+    const next = new URLSearchParams(searchParams);
+    next.set('household', selected);
+    setSearchParams(next, { replace: true });
+  }, [selected, searchParams, setSearchParams]);
 
   useEffect(() => { refreshHouseholds().catch(e => setError(e.message)).finally(() => setLoading(false)); }, [refreshHouseholds]);
   useEffect(() => {
@@ -179,7 +191,7 @@ export default function PlanningApp() {
           setMcInputs(null);
           setMcResult(null);
           await refreshHouseholds();
-          setNotice('Household planning data was permanently deleted. Salesforce and Synapse source records were not changed.');
+          setNotice('Household planning data was permanently deleted. Connected source records were not changed.');
           return;
         }
         if (job.status === 'failed') throw new Error(job.error || 'Household deletion failed');
@@ -259,34 +271,26 @@ export default function PlanningApp() {
   }
 
   return <ThemeProvider theme={muiTheme}>
-    <div className="has-sidenav">
-    <SideNav />
-    <Box className="plan-shell">
-      {/* ── Allworth hero header ─────────────────────────────────────── */}
-      <div className="plan-hero">
-        <div className="plan-hero__topline">
+    <ToolPage
+      eyebrow="Wealth planning"
+      title="Financial Planning"
+      description="Retirement, tax, estate, and Monte Carlo planning grounded in connected household facts."
+      width="full"
+      actions={
+        <>
           <ShareTool toolId="financial_planning" toolName="Financial Planning" />
-          <div className="plan-hero__actions">
-            <Chip icon={<CloudSyncOutlinedIcon sx={{ color: '#fff' }} />} label="Warehouse-backed" className="plan-source-chip" />
-            <AuthControl />
-          </div>
-        </div>
-        <div>
-          <p className="plan-hero__eyebrow">Allworth Financial</p>
-          <h1 className="plan-hero__title">Financial Planning</h1>
-          <p className="plan-hero__subtitle">Retirement, tax, estate, and Monte Carlo planning on warehouse-backed facts</p>
-        </div>
-      </div>
-
-      {/* ── Main content ─────────────────────────────────────────────── */}
-      <Container maxWidth="xl" sx={{ py: 3, px: { xs: 1, sm: 2, md: 3 } }}>
+          <ToolStatus tone="info">Connected data</ToolStatus>
+          <AuthControl />
+        </>
+      }
+    >
         {error && <Alert severity="error" onClose={() => setError('')} sx={{ mb: 2 }}>{error}</Alert>}
         {notice && <Alert severity="success" onClose={() => setNotice('')} sx={{ mb: 2 }}>{notice}</Alert>}
         {loading && <Box className="plan-loading"><CircularProgress /></Box>}
         {!loading && !selected && <EmptyState onCreate={() => setCreateOpen(true)} />}
         {!loading && selected && <>
           <div className="plan-toolbar">
-            <Box><Typography variant="h4">{String(summary?.name || '')}</Typography><Typography color="text.secondary">Living plan · warehouse-backed facts with advisor assumptions</Typography></Box>
+            <Box><Typography variant="h4">{String(summary?.name || '')}</Typography><Typography color="text.secondary">Living plan · connected facts with advisor assumptions</Typography></Box>
             <Stack direction="row" sx={{ gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
               <FormControl size="small" sx={{ minWidth: 210 }}><InputLabel>Household</InputLabel><Select value={selected} label="Household" onChange={e => setSelected(e.target.value)}>
                 {households.map(h => <MenuItem key={h.id} value={h.id}>{h.name}</MenuItem>)}</Select></FormControl>
@@ -295,30 +299,30 @@ export default function PlanningApp() {
               <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateOpen(true)}>New plan</Button>
             </Stack>
           </div>
-          <Box sx={{ backgroundColor: colors.surfaceCard, borderRadius: 1, border: `1px solid ${colors.hairline}`, boxShadow: 'none', overflow: 'hidden' }}>
+          <ToolPanel flush>
           <Tabs value={tab} onChange={(_, v) => setTab(v)} variant="scrollable" scrollButtons="auto" sx={{ borderBottom: `1px solid ${colors.hairline}`, px: 2, backgroundColor: colors.surfaceCard }}><Tab label="Overview" /><Tab label="Workspace" /><Tab label="Planning Inputs" /><Tab label="Cash Flow" /><Tab label="Decision Center" /><Tab label="Monte Carlo" /><Tab label="Lifecycle" /><Tab label="Goals" /><Tab label="Estate" /><Tab label="Tools" /><Tab label="Vault" /><Tab label="Client View" /><Tab label="Assumptions" /><Tab label="Reports" /></Tabs>
           <Box sx={{ px: 3, pb: 3 }}>
-          {tab === 0 && <Box className="plan-panel"><Box className="plan-metrics">
-            <Metric label="Current net worth" value={money(summary?.net_worth)} />
-            <Metric label="Projected ending assets" value={money(projection?.ending_net_worth)} />
-            <Metric label="Lifetime taxes" value={money(projection?.lifetime_taxes)} />
-            <Metric label="First shortfall" value={projection?.first_shortfall_year ? String(projection.first_shortfall_year) : 'None'} tone={projection?.first_shortfall_year ? 'loss' : 'gain'} />
-            <Metric label="Monte Carlo success" value={mcResult ? `${(mcResult.probability_of_success * 100).toFixed(0)}%` : mcInputs?.ready ? 'Ready' : 'Inputs needed'} tone={mcInputs?.ready ? 'gain' : 'loss'} />
-          </Box>
+          {tab === 0 && <Box className="plan-panel"><ToolMetricGrid>
+            <ToolMetric label="Current net worth" value={money(summary?.net_worth)} />
+            <ToolMetric label="Projected ending assets" value={money(projection?.ending_net_worth)} />
+            <ToolMetric label="Lifetime taxes" value={money(projection?.lifetime_taxes)} />
+            <ToolMetric label="First shortfall" value={projection?.first_shortfall_year ? String(projection.first_shortfall_year) : 'None'} tone={projection?.first_shortfall_year ? 'critical' : 'positive'} />
+            <ToolMetric label="Monte Carlo success" value={mcResult ? `${(mcResult.probability_of_success * 100).toFixed(0)}%` : mcInputs?.ready ? 'Ready' : 'Inputs needed'} tone={mcInputs?.ready ? 'positive' : 'warning'} />
+          </ToolMetricGrid>
           {String(summary?.source || '') === 'datawarehouse' &&
             <Button variant="outlined" startIcon={<CloudSyncOutlinedIcon />} sx={{ mb: 2 }} onClick={() => setSyncOpen(true)}>Plan vs actual</Button>}
-          <Card><CardContent><Typography variant="h6">Projected net worth</Typography><Typography color="text.secondary" sx={{ mb: 2 }}>Deterministic annual ledger</Typography>
-            <ResponsiveContainer width="100%" height={360}><AreaChart data={chart}><defs><linearGradient id="wealth" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#0C2E4E" stopOpacity={0.42}/><stop offset="95%" stopColor="#0C2E4E" stopOpacity={0.02}/></linearGradient></defs><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="year"/><YAxis tickFormatter={v => money(v, true)}/><Tooltip formatter={v => money(v)}/><Area type="monotone" dataKey="netWorth" stroke="#0C2E4E" fill="url(#wealth)" strokeWidth={3}/></AreaChart></ResponsiveContainer>
-          </CardContent></Card></Box>}
+          <ToolChart title="Projected net worth" description="Deterministic annual ledger">
+            <ChartContainer width="100%" height={360}><AreaChart data={chart}><CartesianGrid stroke={chartTheme.grid} vertical={false}/><XAxis dataKey="year" stroke={chartTheme.axis}/><YAxis tickFormatter={v => money(v, true)} stroke={chartTheme.axis}/><ChartTooltip formatter={v => money(v)} contentStyle={chartTheme.tooltip}/><Area type="monotone" dataKey="netWorth" stroke={chartTheme.actual} fill={chartTheme.actual} fillOpacity={0.08} strokeWidth={2}/></AreaChart></ChartContainer>
+          </ToolChart></Box>}
           {tab === 1 && <WorkspaceTab householdId={selected} householdName={String(summary?.name || '')} onError={setError} />}
           {tab === 2 && <Box className="plan-panel plan-data"><PlanningInputs facts={facts} source={String(summary?.source || 'planning')} mcInputs={mcInputs} mcResult={mcResult} mcRunning={mcRunning} saving={savingInputs} onSave={savePlanningInputs} onRunMonteCarlo={runMonteCarlo} onDelete={openDeleteHousehold} /></Box>}
-          {tab === 3 && <Box className="plan-panel"><Card><CardContent><Typography variant="h6">Cash flow and taxes</Typography><ResponsiveContainer width="100%" height={430}><BarChart data={chart}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="year"/><YAxis tickFormatter={v => money(v, true)}/><Tooltip formatter={v => money(v)}/><Legend/><Bar dataKey="inflows" fill="#436434" stackId="in"/><Bar dataKey="outflows" fill="#A99C6C" stackId="out"/><Bar dataKey="taxes" fill="#D26D37" stackId="out"/></BarChart></ResponsiveContainer></CardContent></Card></Box>}
+          {tab === 3 && <Box className="plan-panel"><ToolChart title="Cash flow and taxes"><ChartContainer width="100%" height={430}><BarChart data={chart}><CartesianGrid stroke={chartTheme.grid} vertical={false}/><XAxis dataKey="year" stroke={chartTheme.axis}/><YAxis tickFormatter={v => money(v, true)} stroke={chartTheme.axis}/><ChartTooltip formatter={v => money(v)} contentStyle={chartTheme.tooltip}/><ChartLegend/><Bar dataKey="inflows" fill={chartTheme.positive} stackId="in"/><Bar dataKey="outflows" fill={chartTheme.neutral} stackId="out"/><Bar dataKey="taxes" fill={chartTheme.warning} stackId="out"/></BarChart></ChartContainer></ToolChart></Box>}
           {tab === 4 && <DecisionTab scenario={scenario} scenarios={scenarios} householdId={selected} chart={chart}
             retirementAge={retirementAge} annualSpending={annualSpending} applying={applying}
             onRetirementAge={setRetirementAge} onAnnualSpending={setAnnualSpending} onApply={() => void applyDecisionLevers()} onError={setError} />}
           {tab === 5 && <MonteCarloTab mcInputs={mcInputs} mcResult={mcResult} mcRunning={mcRunning} onRun={() => void runMonteCarlo()} />}
           {tab === 6 && <LifecycleTab scenario={scenario} onError={setError} />}
-          {tab === 7 && <Box className="plan-panel"><Card><CardContent><Typography variant="h6">Goal Planner</Typography><Typography color="text.secondary" sx={{ mb: 2 }}>Goals are evaluated against the same tax-aware annual ledger, not a separate calculator.</Typography>{goals.length ? <Box className="plan-report-grid">{goals.map(goal => <Card key={goal.id} variant="outlined"><CardContent><Typography variant="subtitle1">{goal.name}</Typography><Chip size="small" color={goal.status === 'funded' ? 'success' : 'warning'} label={`${Number(goal.funded_pct).toFixed(0)}% funded`} /><Typography sx={{ mt: 1 }}>{money(goal.available)} available in {goal.target_year}</Typography><Typography color="text.secondary">Target {money(goal.target_amount)} · shortfall {money(goal.shortfall)}</Typography></CardContent></Card>)}</Box> : <Alert severity="info">No goals are present in the current warehouse facts. Add retirement, education, legacy, or major-purchase goals in Planning Inputs.</Alert>}</CardContent></Card></Box>}
+          {tab === 7 && <Box className="plan-panel"><Card><CardContent><Typography variant="h6">Goal Planner</Typography><Typography color="text.secondary" sx={{ mb: 2 }}>Goals are evaluated against the same tax-aware annual ledger, not a separate calculator.</Typography>{goals.length ? <Box className="plan-report-grid">{goals.map(goal => <Card key={goal.id} variant="outlined"><CardContent><Typography variant="subtitle1">{goal.name}</Typography><Chip size="small" color={goal.status === 'funded' ? 'success' : 'warning'} label={`${Number(goal.funded_pct).toFixed(0)}% funded`} /><Typography sx={{ mt: 1 }}>{money(goal.available)} available in {goal.target_year}</Typography><Typography color="text.secondary">Target {money(goal.target_amount)} · shortfall {money(goal.shortfall)}</Typography></CardContent></Card>)}</Box> : <Alert severity="info">No goals are present in the connected household facts. Add retirement, education, legacy, or major-purchase goals in Planning Inputs.</Alert>}</CardContent></Card></Box>}
           {tab === 8 && <EstateTab scenario={scenario} estate={estate} onError={setError} />}
           {tab === 9 && <ToolsTab onError={setError} />}
           {tab === 10 && <VaultTab householdId={selected} onError={setError} />}
@@ -326,11 +330,10 @@ export default function PlanningApp() {
           {tab === 12 && <AssumptionsTab onError={setError} />}
           {tab === 13 && <ReportsTab householdId={selected} scenario={scenario} reports={reports} onError={setError} />}
           </Box>
-          </Box>
+          </ToolPanel>
         </>}
-      </Container>
-      <Dialog open={createOpen} onClose={() => { if (!importing) setCreateOpen(false); }} fullWidth maxWidth="sm"><DialogTitle>Start a planning household</DialogTitle><DialogContent><Stack sx={{ gap: 2, mt: 1 }}><Typography variant="subtitle2">Import from DataWarehouse</Typography>{importError && <Alert severity="error" onClose={() => setImportError('')}>{importError}</Alert>}{importing && <Alert severity="info" icon={<CircularProgress size={20} />}>Importing household data from Synapse. Contacts, accounts, holdings, and planning inputs can take 20–30 seconds.</Alert>}<TextField autoFocus label="Salesforce ID or exact household name" value={warehouseId} onChange={e => setWarehouseId(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') void importWarehouseHousehold(); }} disabled={importing} helperText="Example: Mahler, Kevin and Melanie. Exact warehouse names and 15/18-character Salesforce IDs are supported."/><Button variant="contained" onClick={importWarehouseHousehold} disabled={!warehouseId.trim() || importing}>{importing ? 'Importing from Synapse…' : 'Import household'}</Button><Divider>or create a draft</Divider><TextField label="Household name" value={newName} onChange={e => setNewName(e.target.value)} disabled={importing} /><TextField label="Primary client date of birth" type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} disabled={importing} slotProps={{ inputLabel: { shrink: true } }} /></Stack></DialogContent><DialogActions><Button onClick={() => setCreateOpen(false)} disabled={importing}>Cancel</Button><Button variant="outlined" onClick={createHousehold} disabled={!newName.trim() || importing}>Create draft</Button></DialogActions></Dialog>
-      <Dialog open={deleteOpen} onClose={() => { if (!deleting) setDeleteOpen(false); }} fullWidth maxWidth="sm"><DialogTitle>Delete household?</DialogTitle><DialogContent><Stack sx={{ gap: 2, mt: 1 }}><Alert severity="warning">This permanently deletes the planning copy of <strong>{String(summary?.name || '')}</strong>, including scenarios, facts versions, portal records, vault files, and cached projections. Source records in Salesforce and Synapse are not changed.</Alert><TextField label="Reason for deletion" value={deleteReason} onChange={e => setDeleteReason(e.target.value)} required helperText="Recorded in the audit log (minimum 3 characters)." slotProps={{ htmlInput: { maxLength: 500 } }} /><TextField label='Type "DELETE" to confirm' value={deleteConfirmation} onChange={e => setDeleteConfirmation(e.target.value)} required autoComplete="off" /></Stack></DialogContent><DialogActions><Button onClick={() => setDeleteOpen(false)} disabled={deleting}>Cancel</Button><Button color="error" variant="contained" onClick={deleteHousehold} disabled={deleting || deleteConfirmation !== 'DELETE' || deleteReason.trim().length < 3}>{deleting ? 'Deleting…' : 'Permanently delete'}</Button></DialogActions></Dialog>
+      <Dialog open={createOpen} onClose={() => { if (!importing) setCreateOpen(false); }} fullWidth maxWidth="sm"><DialogTitle>Start a planning household</DialogTitle><DialogContent><Stack sx={{ gap: 2, mt: 1 }}><Typography variant="subtitle2">Connect an existing household</Typography>{importError && <Alert severity="error" onClose={() => setImportError('')}>{importError}</Alert>}{importing && <Alert severity="info" icon={<CircularProgress size={20} />}>Connecting relationship, account, holding, and planning data. This can take 20–30 seconds.</Alert>}<TextField autoFocus label="Household ID or exact household name" value={warehouseId} onChange={e => setWarehouseId(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') void importWarehouseHousehold(); }} disabled={importing} helperText="Use the exact relationship name or household ID."/><Button variant="contained" onClick={importWarehouseHousehold} disabled={!warehouseId.trim() || importing}>{importing ? 'Connecting household…' : 'Connect household'}</Button><Divider>or create a draft</Divider><TextField label="Household name" value={newName} onChange={e => setNewName(e.target.value)} disabled={importing} /><TextField label="Primary client date of birth" type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} disabled={importing} slotProps={{ inputLabel: { shrink: true } }} /></Stack></DialogContent><DialogActions><Button onClick={() => setCreateOpen(false)} disabled={importing}>Cancel</Button><Button variant="outlined" onClick={createHousehold} disabled={!newName.trim() || importing}>Create draft</Button></DialogActions></Dialog>
+      <Dialog open={deleteOpen} onClose={() => { if (!deleting) setDeleteOpen(false); }} fullWidth maxWidth="sm"><DialogTitle>Delete household?</DialogTitle><DialogContent><Stack sx={{ gap: 2, mt: 1 }}><Alert severity="warning">This permanently deletes the planning copy of <strong>{String(summary?.name || '')}</strong>, including scenarios, facts versions, portal records, vault files, and cached projections. Connected source records are not changed.</Alert><TextField label="Reason for deletion" value={deleteReason} onChange={e => setDeleteReason(e.target.value)} required helperText="Recorded in the audit log (minimum 3 characters)." slotProps={{ htmlInput: { maxLength: 500 } }} /><TextField label='Type "DELETE" to confirm' value={deleteConfirmation} onChange={e => setDeleteConfirmation(e.target.value)} required autoComplete="off" /></Stack></DialogContent><DialogActions><Button onClick={() => setDeleteOpen(false)} disabled={deleting}>Cancel</Button><Button color="error" variant="contained" onClick={deleteHousehold} disabled={deleting || deleteConfirmation !== 'DELETE' || deleteReason.trim().length < 3}>{deleting ? 'Deleting…' : 'Permanently delete'}</Button></DialogActions></Dialog>
       <SyncActualsDialog open={syncOpen} householdId={selected} onClose={() => setSyncOpen(false)}
         onApplied={() => {
           Promise.all([planningApi.summary(selected), planningApi.facts(selected)])
@@ -339,7 +342,6 @@ export default function PlanningApp() {
           if (scenario) planningApi.project(scenario).then(setProjection).catch(() => undefined);
         }}
         onError={setError} />
-    </Box>
-    </div>
+    </ToolPage>
   </ThemeProvider>;
 }

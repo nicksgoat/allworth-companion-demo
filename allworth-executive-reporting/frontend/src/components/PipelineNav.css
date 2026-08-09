@@ -11,8 +11,8 @@
   align-items: center;
   gap: 2px;
   padding: 3px;
-  background: rgba(0, 32, 92, 0.06);
-  border: 1px solid rgba(0, 32, 92, 0.1);
+  background: rgba(23, 61, 103, 0.06);
+  border: 1px solid rgba(23, 61, 103, 0.1);
   border-radius: 999px;
 }
 
@@ -29,7 +29,7 @@
 .pipeline-nav-link {
   padding: 4px 12px;
   border-radius: 999px;
-  color: #4a5468;
+  color: #595959;
   text-decoration: none;
   font-size: 12px;
   font-weight: 600;
@@ -38,12 +38,12 @@
 }
 
 .pipeline-nav-link:hover {
-  background: rgba(0, 32, 92, 0.08);
-  color: #00205C;
+  background: rgba(23, 61, 103, 0.08);
+  color: var(--aw-indigo, #173d67);
 }
 
 .pipeline-nav-link.active {
-  background: linear-gradient(135deg, #00205C, #1a3c5e);
+  background: var(--aw-indigo, #173d67);
   color: #ffffff;
-  box-shadow: 0 2px 8px -2px rgba(0, 32, 92, 0.4);
+  box-shadow: 0 2px 8px -2px rgba(23, 61, 103, 0.4);
 }

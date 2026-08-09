@@ -5,7 +5,7 @@ mirroring the atomic-write + lock pattern used by ``nfbc/queue_store.py``.
 
 Access model
 ------------
-Every tool is identified by its slug (the ``id`` field in ``home/tools.yaml``).
+Every tool is identified by its slug in the root ``tool-manifest.json``.
 A user's *effective* access is the union of:
     * the tools granted to the user directly, and
     * the tools granted to every group the user is currently a member of.
@@ -28,6 +28,9 @@ from pathlib import Path
 from threading import Lock
 from typing import Any
 
+from admin.assignment_repository import AssignmentRepository, sqlite_database_url
+from tool_manifest import manifest_tools
+
 logger = logging.getLogger(__name__)
 
 _DIR = Path(__file__).parent / ".admin-state"
@@ -36,7 +39,15 @@ _STATE = _DIR / "admin_state.json"
 # local state AND no ADLS backup could be restored. Keep it current by copying
 # a known-good export here (see seed_local_if_empty).
 _SEED = Path(__file__).parent / "admin_state.seed.json"
-_TOOLS_YAML = Path(__file__).parent.parent / "home" / "tools.yaml"
+def _assignment_database_url() -> str:
+    configured_url = os.getenv("ADMIN_ASSIGNMENTS_DATABASE_URL")
+    if configured_url:
+        return configured_url
+    configured_path = os.getenv("ADMIN_ASSIGNMENTS_DB")
+    return sqlite_database_url(Path(configured_path) if configured_path else _DIR / "assignments.sqlite3")
+
+
+_ASSIGNMENTS = AssignmentRepository(_assignment_database_url)
 _lock = Lock()
 
 # Bootstrap admins are always members of the all-access "Admin" group so the
@@ -53,6 +64,15 @@ _BOOTSTRAP_EMAILS = {
     if e.strip()
 }
 _BOOTSTRAP_EMAILS.add("mark.fanning@allworthfinancial.com")
+
+ASSIGNMENT_TYPES = {"advisor", "executive", "operations", "platform_admin", "general"}
+DEFAULT_ASSIGNMENT = {
+    "id": "general",
+    "name": "General workspace",
+    "type": "general",
+    "home_tool_ids": [],
+    "built_in": True,
+}
 
 
 def now_iso() -> str:
@@ -85,73 +105,71 @@ def norm_email(email: str) -> str:
 # ── available tools (from the hub registry) ──────────────────────────────────
 
 
-def available_tools() -> list[dict[str, str]]:
-    """Return the registerable tools from ``home/tools.yaml``.
+def _manifest_tools() -> tuple[dict[str, str], ...]:
+    """Load and validate the canonical tool manifest.
 
-    Falls back to a minimal built-in list if PyYAML or the file is unavailable,
-    so the console still works in a stripped-down environment.
+    Tool registration is security-sensitive: an incomplete fallback list can
+    silently change grants. Fail loudly when the manifest is absent or invalid
+    instead of maintaining a second source of truth in Python.
     """
-    try:
-        import yaml  # type: ignore
+    tools: list[dict[str, str]] = []
+    for entry in manifest_tools():
+        tool_id = str(entry.get("id", "")).strip()
+        status = str(entry.get("status", "")).strip()
+        tools.append({
+            "id": tool_id,
+            "name": str(entry.get("name") or tool_id),
+            "category": str(entry.get("category") or "utilities"),
+            "status": status,
+        })
+    return tuple(tools)
 
-        data = yaml.safe_load(_TOOLS_YAML.read_text(encoding="utf-8")) or {}
-        tools = []
-        for entry in data.get("tools", []):
-            tid = str(entry.get("id", "")).strip()
-            if not tid:
-                continue
-            tools.append(
-                {
-                    "id": tid,
-                    "name": str(entry.get("name", tid)),
-                    "category": str(entry.get("category", "utilities")),
-                    "status": str(entry.get("status", "soon")),
-                }
-            )
-        if tools:
-            return tools
-    except Exception:
-        pass
 
-    return [
-        {"id": "performance", "name": "Performance by Channel", "category": "live", "status": "live"},
-        {"id": "jarvis", "name": "Jarvis Encyclopedia", "category": "live", "status": "live"},
-        {"id": "nfbc", "name": "NFBC Adjustments", "category": "live", "status": "new"},
-        {"id": "tamarac", "name": "Tamarac Pipeline", "category": "analytics", "status": "live"},
-        {"id": "refresh_log", "name": "Refresh Log", "category": "analytics", "status": "live"},
-    ]
+def available_tools() -> list[dict[str, str]]:
+    """Return tool metadata from the canonical root manifest."""
+    return [dict(tool) for tool in _manifest_tools()]
 
 
 def _valid_tool_ids() -> set[str]:
-    return {t["id"] for t in available_tools()}
+    return {tool["id"] for tool in available_tools() if tool["status"] in {"live", "new"}}
 
 
 # ── state I/O ────────────────────────────────────────────────────────────────
 
 
 def _empty_state() -> dict[str, Any]:
-    return {"users": {}, "groups": {}, "shares": []}
+    return {"users": {}, "groups": {}, "assignments": {}, "shares": []}
 
 
 def _read_state() -> dict[str, Any]:
     if not _STATE.exists():
-        return _empty_state()
+        data = _empty_state()
+        data["assignments"] = _ASSIGNMENTS.as_dict()
+        return data
     try:
         data = json.loads(_STATE.read_text(encoding="utf-8"))
         data.setdefault("users", {})
         data.setdefault("groups", {})
+        legacy_assignments = data.setdefault("assignments", {})
+        _ASSIGNMENTS.migrate_legacy(legacy_assignments)
+        data["assignments"] = _ASSIGNMENTS.as_dict()
         data.setdefault("shares", [])
         return data
-    except Exception:
-        return _empty_state()
+    except (OSError, json.JSONDecodeError) as exc:
+        logger.error("Admin state is unreadable: %s", exc)
+        data = _empty_state()
+        data["assignments"] = _ASSIGNMENTS.as_dict()
+        return data
 
 
 def _write_state(state: dict[str, Any]) -> None:
     _DIR.mkdir(parents=True, exist_ok=True)
+    snapshot = dict(state)
+    snapshot["assignments"] = _ASSIGNMENTS.as_dict()
     fd, tmp = tempfile.mkstemp(dir=str(_DIR), suffix=".tmp")
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as fh:
-            json.dump(state, fh, indent=2, ensure_ascii=False)
+            json.dump(snapshot, fh, indent=2, ensure_ascii=False)
         os.replace(tmp, _STATE)
     finally:
         if os.path.exists(tmp):
@@ -203,8 +221,22 @@ def _user_view(user: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
         "inherited_tools": inherited,   # tool_id -> [group names granting it]
         "effective_tools": effective,
         "groups": [{"id": g["id"], "name": g["name"]} for g in groups],
+        "assignment_id": user.get("assignment_id"),
+        "advisor_id_override": user.get("advisor_id_override"),
         "created_at": user.get("created_at"),
         "created_by": user.get("created_by"),
+    }
+
+
+def _assignment_view(assignment: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "id": assignment["id"],
+        "name": assignment["name"],
+        "type": assignment.get("type", "general"),
+        "home_tool_ids": sorted(set(assignment.get("home_tool_ids", []))),
+        "built_in": bool(assignment.get("built_in", False)),
+        "created_at": assignment.get("created_at"),
+        "created_by": assignment.get("created_by"),
     }
 
 
@@ -251,6 +283,14 @@ def list_groups() -> list[dict[str, Any]]:
         )
 
 
+def list_assignments() -> list[dict[str, Any]]:
+    with _lock:
+        state = _read_state()
+        rows = [_assignment_view(DEFAULT_ASSIGNMENT)]
+        rows.extend(_assignment_view(a) for a in state["assignments"].values())
+        return sorted(rows, key=lambda row: (row["built_in"] is False, row["name"].lower()))
+
+
 def add_user(email: str, actor: str) -> dict[str, Any]:
     email = norm_email(email)
     if not email or "@" not in email:
@@ -263,6 +303,8 @@ def add_user(email: str, actor: str) -> dict[str, Any]:
             "email": email,
             "tools": [],
             "share_tools": [],
+            "assignment_id": None,
+            "advisor_id_override": None,
             "created_at": now_iso(),
             "created_by": actor,
         }
@@ -288,6 +330,8 @@ def ensure_user(email: str, actor: str = "self-provision") -> bool:
             "email": email,
             "tools": [],
             "share_tools": [],
+            "assignment_id": None,
+            "advisor_id_override": None,
             "created_at": now_iso(),
             "created_by": actor,
         }
@@ -321,6 +365,102 @@ def set_user_tools(email: str, tools: list[str], share_tools: list[str] | None =
         state["users"][email]["share_tools"] = cleaned_share
         _write_state(state)
         return _user_view(state["users"][email], state)
+
+
+def set_user_assignment(email: str, assignment_id: str | None,
+                        advisor_id_override: str | None = None) -> dict[str, Any]:
+    email = norm_email(email)
+    assignment_id = (assignment_id or "").strip() or None
+    advisor_id_override = (advisor_id_override or "").strip() or None
+    with _lock:
+        state = _read_state()
+        if email not in state["users"]:
+            raise ValueError(f"Unknown user {email}")
+        if assignment_id not in {None, "general"} and assignment_id not in state["assignments"]:
+            raise ValueError(f"Unknown assignment {assignment_id}")
+        state["users"][email]["assignment_id"] = assignment_id
+        state["users"][email]["advisor_id_override"] = advisor_id_override
+        _write_state(state)
+        return _user_view(state["users"][email], state)
+
+
+def add_assignment(name: str, assignment_type: str, home_tool_ids: list[str], actor: str) -> dict[str, Any]:
+    name = (name or "").strip()
+    assignment_type = (assignment_type or "").strip().lower()
+    if not name:
+        raise ValueError("An assignment name is required")
+    if assignment_type not in ASSIGNMENT_TYPES:
+        raise ValueError("Unknown assignment type")
+    aid = _slugify(name)
+    if aid == "general":
+        raise ValueError("General workspace is built in")
+    valid = _valid_tool_ids()
+    tools = sorted({tool for tool in home_tool_ids if tool in valid})
+    with _lock:
+        state = _read_state()
+        if aid in state["assignments"]:
+            raise ValueError(f"An assignment named '{name}' already exists")
+        assignment = {
+            "id": aid, "name": name, "type": assignment_type,
+            "home_tool_ids": tools, "created_at": now_iso(), "created_by": actor,
+        }
+        _ASSIGNMENTS.create(assignment)
+        state["assignments"][aid] = assignment
+        _write_state(state)
+        return _assignment_view(assignment)
+
+
+def update_assignment(aid: str, name: str, assignment_type: str,
+                      home_tool_ids: list[str]) -> dict[str, Any]:
+    if aid == "general":
+        raise ValueError("General workspace is built in")
+    name = (name or "").strip()
+    assignment_type = (assignment_type or "").strip().lower()
+    if not name:
+        raise ValueError("An assignment name is required")
+    if assignment_type not in ASSIGNMENT_TYPES:
+        raise ValueError("Unknown assignment type")
+    valid = _valid_tool_ids()
+    tools = sorted({tool for tool in home_tool_ids if tool in valid})
+    with _lock:
+        state = _read_state()
+        if aid not in state["assignments"]:
+            raise ValueError(f"Unknown assignment {aid}")
+        assignment = _ASSIGNMENTS.update(aid, name=name, assignment_type=assignment_type,
+                                         home_tool_ids=tools)
+        state["assignments"][aid] = assignment
+        _write_state(state)
+        return _assignment_view(assignment)
+
+
+def remove_assignment(aid: str) -> None:
+    if aid == "general":
+        raise ValueError("General workspace is built in")
+    with _lock:
+        state = _read_state()
+        if aid not in state["assignments"]:
+            raise ValueError(f"Unknown assignment {aid}")
+        assigned = [email for email, user in state["users"].items()
+                    if user.get("assignment_id") == aid]
+        if assigned:
+            raise ValueError("Reassign its users before deleting this assignment")
+        _ASSIGNMENTS.delete(aid)
+        state["assignments"].pop(aid, None)
+        _write_state(state)
+
+
+def assignment_for(email: str) -> dict[str, Any]:
+    email = norm_email(email)
+    with _lock:
+        state = _read_state()
+        user = state["users"].get(email, {})
+        aid = user.get("assignment_id")
+        assignment = state["assignments"].get(aid) if aid else None
+        if aid == "general" or assignment is None:
+            assignment = DEFAULT_ASSIGNMENT
+        result = _assignment_view(assignment)
+        result["advisor_id_override"] = user.get("advisor_id_override")
+        return result
 
 
 def add_group(name: str, description: str, actor: str) -> dict[str, Any]:
@@ -500,6 +640,13 @@ def effective_for(email: str) -> dict[str, Any]:
         if all_access:
             effective |= set(all_tool_ids)
             shareable |= set(all_tool_ids)
+        aid = user.get("assignment_id")
+        assignment = state["assignments"].get(aid) if aid else None
+        if aid == "general" or assignment is None:
+            assignment = DEFAULT_ASSIGNMENT
+        assignment_view = _assignment_view(assignment)
+        permitted_home_tools = [tool for tool in assignment_view["home_tool_ids"]
+                                if all_access or tool in effective]
         return {
             "email": email,
             "effective_tools": sorted(effective),
@@ -507,6 +654,9 @@ def effective_for(email: str) -> dict[str, Any]:
             "can_share_all": bool(all_access),
             "all_access": bool(all_access),
             "known": email in state["users"],
+            "assignment": assignment_view,
+            "home_tool_ids": permitted_home_tools,
+            "advisor_id_override": user.get("advisor_id_override"),
         }
 
 
@@ -785,13 +935,14 @@ def restore_from_lake_if_empty() -> str:
         )
         return "failed"
     try:
-        json.loads(data)  # validate before trusting it
+        parsed = json.loads(data)  # validate before trusting it
     except Exception:
         logger.warning(
             "admin backup: remote roster is unreadable/corrupt — will NOT overwrite it"
         )
         return "failed"
     _DIR.mkdir(parents=True, exist_ok=True)
+    _ASSIGNMENTS.replace_all(parsed.get("assignments", {}).values())
     _STATE.write_bytes(data if isinstance(data, bytes) else data.encode("utf-8"))
     logger.info("admin backup: restored roster from adls://%s", path)
     return "restored"
@@ -812,7 +963,10 @@ def seed_local_if_empty() -> bool:
             raise ValueError("seed is not a JSON object")
         parsed.setdefault("users", {})
         parsed.setdefault("groups", {})
+        parsed.setdefault("assignments", {})
+        parsed.setdefault("shares", [])
         _DIR.mkdir(parents=True, exist_ok=True)
+        _ASSIGNMENTS.replace_all(parsed["assignments"].values())
         _write_state(parsed)
         logger.info(
             "admin: seeded roster from committed baseline (%d users) %s",
@@ -963,6 +1117,7 @@ def restore_backup(name: str) -> dict[str, Any]:
         raise ValueError("Backup is unreadable or corrupt")
     with _lock:
         _DIR.mkdir(parents=True, exist_ok=True)
+        _ASSIGNMENTS.replace_all(parsed.get("assignments", {}).values())
         _STATE.write_bytes(data if isinstance(data, bytes) else data.encode("utf-8"))
     ensure_bootstrap()  # keep the all-access Admin group intact
     if not readonly_mode():
@@ -973,6 +1128,7 @@ def restore_backup(name: str) -> dict[str, Any]:
             "restored": name,
             "users": len(state.get("users", {})),
             "groups": len(state.get("groups", {})),
+            "assignments": len(state.get("assignments", {})),
         }
 
 
@@ -996,12 +1152,13 @@ def refresh_from_lake() -> str:
         logger.warning("admin readonly: refresh failed (%s)", type(e).__name__)
         return "failed"
     try:
-        json.loads(data)  # validate before trusting it
+        parsed = json.loads(data)  # validate before trusting it
     except Exception:
         logger.warning("admin readonly: remote roster is unreadable/corrupt")
         return "failed"
     with _lock:
         _DIR.mkdir(parents=True, exist_ok=True)
+        _ASSIGNMENTS.replace_all(parsed.get("assignments", {}).values())
         _STATE.write_bytes(data if isinstance(data, bytes) else data.encode("utf-8"))
     return "restored"
 

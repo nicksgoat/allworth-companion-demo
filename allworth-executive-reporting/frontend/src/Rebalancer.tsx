@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Alert, AppBar, Box, Button, Card, CardContent, Chip, CircularProgress,
-  Container, Divider, FormControlLabel, MenuItem, Stack, Switch, Table,
-  TableBody, TableCell, TableHead, TableRow, TextField, Toolbar, Typography,
+  Alert, Button, Chip, CircularProgress,
+  FormControlLabel, MenuItem, Stack, Switch, Table,
+  TableBody, TableCell, TableHead, TableRow, TextField, Typography,
 } from '@mui/material';
-import SideNav from './components/SideNav';
+import { ToolMetric, ToolMetricGrid, ToolPage, ToolPanel, ToolStatus } from './components/ToolPage';
 import './Avantos.css';
 
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
@@ -45,13 +45,6 @@ const money = (value: unknown, compact = false) => new Intl.NumberFormat('en-US'
 
 const num = (value: unknown, digits = 2) =>
   Number(value || 0).toLocaleString('en-US', { maximumFractionDigits: digits });
-
-function Tile({ label, value, tone }: { label: string; value: string; tone?: string }) {
-  return <Card className="av-tile"><CardContent>
-    <Typography className="av-tile__label">{label}</Typography>
-    <Typography className="av-tile__value" color={tone}>{value}</Typography>
-  </CardContent></Card>;
-}
 
 async function getJson<T>(url: string): Promise<T> {
   const response = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
@@ -164,24 +157,16 @@ export default function Rebalancer() {
       .sort((a, b) => (b.sold + b.bought) - (a.sold + a.bought));
   }, [results]);
 
-  return <div className="has-sidenav">
-    <SideNav />
-    <Box className="av-shell">
-      <AppBar position="static" elevation={0} className="av-header"><Toolbar>
-        <Box sx={{ flex: 1 }}>
-          <Typography component="h1" className="av-brand">Mock Rebalancer</Typography>
-          <Typography className="av-product">
-            Tax-transition what-if — proposed trades only, nothing is submitted
-          </Typography>
-        </Box>
-        <Chip label="Mock only — no trades submitted" className="av-status-chip" size="small" />
-      </Toolbar></AppBar>
-
-      <Container maxWidth="lg" sx={{ py: 3 }}>
+  return <ToolPage
+    eyebrow="Portfolio tools"
+    title="Mock Rebalancer"
+    description="Model a tax-aware transition and review proposed trades without submitting orders."
+    actions={<ToolStatus tone="warning">Mock only — no trades submitted</ToolStatus>}
+    width="wide"
+  >
         {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
 
-        <Card sx={{ mb: 3 }}><CardContent>
-          <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>1 — Account</Typography>
+        <ToolPanel title="1 — Account" description="Resolve the account and confirm its current strategy before modeling changes.">
           <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
             <TextField label="Account number" size="small" value={accountNumber}
               onChange={e => setAccountNumber(e.target.value)}
@@ -200,10 +185,9 @@ export default function Rebalancer() {
                 <Chip size="small" color="error" label="Below $2,000 minimum" />}
             </Stack>}
           </Stack>
-        </CardContent></Card>
+        </ToolPanel>
 
-        <Card sx={{ mb: 3 }}><CardContent>
-          <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>2 — Target &amp; constraints</Typography>
+        <ToolPanel title="2 — Target & constraints" description="Select the destination model and define tax and wash-sale guardrails.">
           <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ alignItems: 'center' }}>
             <TextField select label="Target model" size="small" sx={{ minWidth: 260 }}
               value={model} onChange={e => { setModel(e.target.value); setAllocation(''); }}>
@@ -227,30 +211,28 @@ export default function Rebalancer() {
               {running ? <CircularProgress size={20} /> : 'Run mock rebalance'}
             </Button>
           </Stack>
-        </CardContent></Card>
+        </ToolPanel>
 
         {running && <Alert severity="info" sx={{ mb: 2 }}>
           Solving — lot-level convex optimization can take up to a minute for large accounts…
         </Alert>}
 
         {results && <>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 3 }}>
-            <Tile label="Estimated tax" value={money(results.total_tax)}
-              tone={results.total_tax > 0 ? 'warning.main' : 'success.main'} />
-            <Tile label="Realized gains (ST)" value={money(results.realized_gains_short)} />
-            <Tile label="Realized gains (LT)" value={money(results.realized_gains_long)} />
-            <Tile label="Total realized" value={money(results.total_realized_gains)} />
-            <Tile label="Tracking error" value={`${num(results.tracking_error * 100, 2)}%`} />
-          </Stack>
+          <ToolMetricGrid>
+            <ToolMetric label="Estimated tax" value={money(results.total_tax)}
+              tone={results.total_tax > 0 ? 'warning' : 'positive'} />
+            <ToolMetric label="Realized gains (ST)" value={money(results.realized_gains_short)} />
+            <ToolMetric label="Realized gains (LT)" value={money(results.realized_gains_long)} />
+            <ToolMetric label="Total realized" value={money(results.total_realized_gains)} />
+            <ToolMetric label="Tracking error" value={`${num(results.tracking_error * 100, 2)}%`} />
+          </ToolMetricGrid>
 
-          <Card><CardContent>
-            <Stack direction="row" spacing={1} sx={{ mb: 1, alignItems: 'center' }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Proposed trades</Typography>
-              <Chip size="small" label={`${trades.length} lots traded`} />
-              <Box sx={{ flex: 1 }} />
-              <Chip size="small" color="warning" variant="outlined" label="Not submitted" />
-            </Stack>
-            <Divider sx={{ mb: 1 }} />
+          <ToolPanel
+            title="Proposed trades"
+            description="Review the modeled lot changes before handing the plan to a trading workflow."
+            actions={<Stack direction="row" spacing={1}><Chip size="small" label={`${trades.length} lots traded`} /><ToolStatus tone="warning">Not submitted</ToolStatus></Stack>}
+            flush
+          >
             {trades.length === 0
               ? <Typography variant="body2" sx={{ opacity: 0.7 }}>No trades required — portfolio already within constraints.</Typography>
               : <Table size="small">
@@ -271,9 +253,7 @@ export default function Rebalancer() {
                     </TableRow>)}
                   </TableBody>
                 </Table>}
-          </CardContent></Card>
+          </ToolPanel>
         </>}
-      </Container>
-    </Box>
-  </div>;
+  </ToolPage>;
 }

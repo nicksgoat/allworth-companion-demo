@@ -45,7 +45,7 @@ export interface DiffOnlyDeltaRow {
   referenced_in?: string[];
 }
 
-export interface DiffOnlySfRow extends SfField {}
+export type DiffOnlySfRow = SfField;
 
 export interface DiffResponse {
   success: boolean;
@@ -239,4 +239,3 @@ export const cancelSfp2PendingDrop = async (table: string, column: string) => {
   });
   return handleStructured<MutationResponse>(res);
 };
-

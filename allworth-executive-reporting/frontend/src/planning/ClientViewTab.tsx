@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Alert, Box, Card, CardContent, Chip, CircularProgress, LinearProgress, List,
+  Alert, Box, Card, CardContent, Chip, CircularProgress, List,
   ListItem, ListItemText, Typography,
 } from '@mui/material';
+import { Bar, BarChart, XAxis, YAxis } from 'recharts';
+import { ChartContainer, ChartTooltip } from '../components/ui/chart';
 import { planningApi, type PortalRecord, type VaultFile } from '../services/planningApi';
+import { chartTheme } from '../theme';
 import { Kpi, money } from './shared';
 
 interface Props {
@@ -11,6 +14,21 @@ interface Props {
   summary: Record<string, unknown> | null;
   goals: Array<Record<string, string>>;
   onError: (message: string) => void;
+}
+
+function GoalFundingChart({ value, name }: { value: number; name: string }) {
+  const funded = Math.max(0, Math.min(100, value));
+  return (
+    <ChartContainer width="100%" height={18} aria-label={`${name} is ${funded.toFixed(0)} percent funded`}>
+      <BarChart data={[{ goal: name, funded, remaining: 100 - funded }]} layout="vertical" margin={{ top: 3, right: 0, bottom: 3, left: 0 }}>
+        <XAxis type="number" domain={[0, 100]} hide />
+        <YAxis type="category" dataKey="goal" hide />
+        <ChartTooltip formatter={(chartValue, series) => [`${Number(chartValue).toFixed(1)}%`, String(series)]} />
+        <Bar dataKey="funded" name="Funded" stackId="funding" fill={chartTheme.positive} radius={[4, 0, 0, 4]} isAnimationActive={false} />
+        <Bar dataKey="remaining" name="Remaining" stackId="funding" fill={chartTheme.grid} radius={[0, 4, 4, 0]} isAnimationActive={false} />
+      </BarChart>
+    </ChartContainer>
+  );
 }
 
 /** Advisor-side preview of exactly what the client portal exposes. */
@@ -58,7 +76,7 @@ export default function ClientViewTab({ householdId, summary, goals, onError }: 
               <Chip size="small" color={goal.status === 'funded' ? 'success' : 'warning'}
                 label={`${Number(goal.funded_pct).toFixed(0)}% funded`} />
             </Box>
-            <LinearProgress variant="determinate" value={Math.min(100, Number(goal.funded_pct))} sx={{ height: 8, borderRadius: 4 }} />
+            <GoalFundingChart value={Number(goal.funded_pct)} name={goal.name} />
             <Typography variant="caption" color="text.secondary">
               {money(goal.available)} of {money(goal.target_amount)} by {goal.target_year}
             </Typography>

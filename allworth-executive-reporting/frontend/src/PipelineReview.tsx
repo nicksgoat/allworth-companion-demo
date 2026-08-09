@@ -1,12 +1,14 @@
 // src/PipelineReview.tsx
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts';
+import { ChartContainer, ChartTooltip } from './components/ui/chart';
 import { resolveUserEmail } from './services/auth';
-import SideNav from './components/SideNav';
+import { ToolChart, ToolEmptyState, ToolMetric, ToolMetricGrid, ToolPage } from './components/ToolPage';
+import { chartTheme } from './theme';
 import './PipelineReview.css';
-import allworthLogo from './assets/allworth-logo-white.png';
+import { useWorkspace } from './components/WorkspaceContext';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -286,6 +288,7 @@ const saveWorked = (email: string | null, week: string, worked: Set<string>): vo
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function PipelineReview() {
+  const { household } = useWorkspace();
   const [weeks, setWeeks] = useState<WeekOption[]>([]);
   const [activeWeek, setActiveWeek] = useState<string>('');
   const [prospects, setProspects] = useState<Prospect[]>([]);
@@ -306,6 +309,8 @@ export default function PipelineReview() {
   const [minScore, setMinScore] = useState<number>(0);
   const [minPaum, setMinPaum] = useState<number>(0);
   const [search, setSearch] = useState<string>('');
+
+  useEffect(() => { if (household?.name) setSearch(household.name); }, [household?.name]);
   const [sortKey, setSortKey] = useState<SortKey>('score');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
@@ -629,19 +634,13 @@ export default function PipelineReview() {
   }, [visible, movement]);
 
   return (
-    <div className="pr-root has-sidenav">
-      <SideNav />
-      <header className="pr-header">
-        <div className="pr-header-brand">
-          <img className="pr-logo" src={allworthLogo} alt="Allworth Financial" />
-          <div className="pr-header-titles">
-            <h1>Weekly Pipeline Review</h1>
-            <p className="pr-sub">
-              High-value prospect focus list · {summary?.report_date ?? activeWeek}
-            </p>
-          </div>
-        </div>
-        <div className="pr-header-actions">
+    <ToolPage
+      eyebrow="Growth operations"
+      title="Weekly Pipeline Review"
+      description={`High-value prospect focus list · ${summary?.report_date ?? activeWeek}`}
+      width="full"
+      className="pr-root"
+      actions={<>
           <label className="pr-week-select">
             Week
             <select value={activeWeek} onChange={(e) => setActiveWeek(e.target.value)}>
@@ -653,8 +652,8 @@ export default function PipelineReview() {
           <button className="pr-btn" onClick={exportExcel} disabled={!visible.length}>
             Export XLSX
           </button>
-        </div>
-      </header>
+      </>}
+    >
 
       {error && <div className="pr-error">{error}</div>}
 
@@ -705,88 +704,59 @@ export default function PipelineReview() {
         <div className="pr-content">
 
       {/* KPI cards — weighted pipeline, verbal/onboarding, closing next 30 */}
-      <section className="pr-kpis">
-        <div className="pr-kpi pr-kpi-accent">
-          <span className="pr-kpi-label">Weighted Pipeline</span>
-          <span className="pr-kpi-value">{fmtMoney(kpi.weighted)}</span>
-          <span className="pr-kpi-sub">probability-adjusted PAUM</span>
-          <Delta cur={kpi.weighted} prior={priorSummary?.weighted_pipeline} fmt={fmtMoney} />
-        </div>
-        <div className="pr-kpi">
-          <span className="pr-kpi-label">Verbal + Onboarding</span>
-          <span className="pr-kpi-value">{fmtMoney(kpi.voPaum)}</span>
-          <span className="pr-kpi-sub">{kpi.voCount} prospects near close</span>
-          <Delta cur={kpi.voPaum} prior={priorSummary?.verbal_onboarding_paum} fmt={fmtMoney} />
-        </div>
-        <div className="pr-kpi">
-          <span className="pr-kpi-label">Closing in Next 30</span>
-          <span className="pr-kpi-value">{kpi.close30Count}</span>
-          <span className="pr-kpi-sub">{fmtMoney(kpi.close30Paum)} expected</span>
-          <Delta cur={kpi.close30Count} prior={priorSummary?.closing_next_30_count} fmt={(n) => String(n)} />
-        </div>
-        <div className="pr-kpi">
-          <span className="pr-kpi-label">Total Prospects</span>
-          <span className="pr-kpi-value">{kpi.totalCount}</span>
-          <span className="pr-kpi-sub">{fmtMoney(kpi.totalPaum)} PAUM</span>
-        </div>
-        <div className="pr-kpi">
-          <span className="pr-kpi-label">Closed This Week</span>
-          <span className="pr-kpi-value">{closedView.length}</span>
-          <span className="pr-kpi-sub">{fmtMoney(closedPaum)} won</span>
-        </div>
-        <div className="pr-kpi pr-kpi-worked">
-          <span className="pr-kpi-label">Worked (you)</span>
-          <span className="pr-kpi-value">{filteredTotals.workedCount}/{filteredTotals.count}</span>
-          <span className="pr-kpi-sub">checked off this week</span>
-        </div>
-      </section>
+      <ToolMetricGrid className="pr-kpis">
+        <ToolMetric
+          label="Weighted pipeline"
+          value={fmtMoney(kpi.weighted)}
+          detail={<span className="pr-metric-detail">Probability-adjusted PAUM<Delta cur={kpi.weighted} prior={priorSummary?.weighted_pipeline} fmt={fmtMoney} /></span>}
+        />
+        <ToolMetric
+          label="Verbal + onboarding"
+          value={fmtMoney(kpi.voPaum)}
+          detail={<span className="pr-metric-detail">{kpi.voCount} prospects near close<Delta cur={kpi.voPaum} prior={priorSummary?.verbal_onboarding_paum} fmt={fmtMoney} /></span>}
+        />
+        <ToolMetric
+          label="Closing in next 30"
+          value={kpi.close30Count}
+          detail={<span className="pr-metric-detail">{fmtMoney(kpi.close30Paum)} expected<Delta cur={kpi.close30Count} prior={priorSummary?.closing_next_30_count} fmt={(n) => String(n)} /></span>}
+        />
+        <ToolMetric label="Total prospects" value={kpi.totalCount} detail={`${fmtMoney(kpi.totalPaum)} PAUM`} />
+        <ToolMetric label="Closed this week" value={closedView.length} detail={`${fmtMoney(closedPaum)} won`} tone="positive" />
+        <ToolMetric label="Worked (you)" value={`${filteredTotals.workedCount}/${filteredTotals.count}`} detail="Checked off this week" />
+      </ToolMetricGrid>
 
       {/* Trend bar charts */}
       <section className="pr-charts">
-        <div className="pr-chart">
-          <h3>Pipeline Size <span className="pr-chart-unit">(PAUM $M)</span></h3>
+        <ToolChart title="Pipeline size" description="PAUM, $M">
           {trendData.length ? (
-            <ResponsiveContainer width="100%" height={230}>
+            <ChartContainer width="100%" height={230}>
               <BarChart data={trendData} margin={{ top: 8, right: 16, bottom: 0, left: -4 }} barCategoryGap="30%">
-                <defs>
-                  <linearGradient id="prPaumGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3E71B7" />
-                    <stop offset="100%" stopColor="#173D67" />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#eef1f6" vertical={false} />
-                <XAxis dataKey="snapshot_week" tick={{ fontSize: 11, fill: '#666' }} axisLine={{ stroke: '#ddd' }} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#666' }} axisLine={false} tickLine={false} width={44} />
-                <Tooltip cursor={{ fill: 'rgba(31,56,100,0.06)' }} formatter={(v) => [`$${Number(v).toFixed(1)}M`, 'PAUM']} />
-                <Bar dataKey="paumM" name="PAUM ($M)" fill="url(#prPaumGrad)" radius={[4, 4, 0, 0]} maxBarSize={64} />
+                <CartesianGrid stroke={chartTheme.grid} vertical={false} />
+                <XAxis dataKey="snapshot_week" tick={{ fontSize: 11, fill: chartTheme.axis }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: chartTheme.axis }} axisLine={false} tickLine={false} width={44} />
+                <ChartTooltip cursor={{ fill: 'rgba(23,61,103,0.04)' }} contentStyle={chartTheme.tooltip} formatter={(v) => [`$${Number(v).toFixed(1)}M`, 'PAUM']} />
+                <Bar dataKey="paumM" name="PAUM ($M)" fill={chartTheme.actual} radius={[3, 3, 0, 0]} maxBarSize={64} />
               </BarChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           ) : (
-            <div className="pr-chart-empty">No history yet — trends appear after the first snapshot loads.</div>
+            <ToolEmptyState title="No history yet" detail="Trends appear after the first snapshot loads." />
           )}
-        </div>
-        <div className="pr-chart">
-          <h3>Weekly Closes <span className="pr-chart-unit">(count)</span></h3>
+        </ToolChart>
+        <ToolChart title="Weekly closes" description="Count">
           {trendData.length ? (
-            <ResponsiveContainer width="100%" height={230}>
+            <ChartContainer width="100%" height={230}>
               <BarChart data={trendData} margin={{ top: 8, right: 16, bottom: 0, left: -4 }} barCategoryGap="30%">
-                <defs>
-                  <linearGradient id="prCloseGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#5C8A47" />
-                    <stop offset="100%" stopColor="#436434" />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#eef1f6" vertical={false} />
-                <XAxis dataKey="snapshot_week" tick={{ fontSize: 11, fill: '#666' }} axisLine={{ stroke: '#ddd' }} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#666' }} axisLine={false} tickLine={false} width={44} allowDecimals={false} />
-                <Tooltip cursor={{ fill: 'rgba(46,158,91,0.08)' }} formatter={(v) => [Number(v), 'Closes']} />
-                <Bar dataKey="conversions_count" name="Closes" fill="url(#prCloseGrad)" radius={[4, 4, 0, 0]} maxBarSize={64} />
+                <CartesianGrid stroke={chartTheme.grid} vertical={false} />
+                <XAxis dataKey="snapshot_week" tick={{ fontSize: 11, fill: chartTheme.axis }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: chartTheme.axis }} axisLine={false} tickLine={false} width={44} allowDecimals={false} />
+                <ChartTooltip cursor={{ fill: 'rgba(67,100,52,0.05)' }} contentStyle={chartTheme.tooltip} formatter={(v) => [Number(v), 'Closes']} />
+                <Bar dataKey="conversions_count" name="Closes" fill={chartTheme.positive} radius={[3, 3, 0, 0]} maxBarSize={64} />
               </BarChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           ) : (
-            <div className="pr-chart-empty">No history yet — weekly closes appear after the first snapshot loads.</div>
+            <ToolEmptyState title="No history yet" detail="Weekly closes appear after the first snapshot loads." />
           )}
-        </div>
+        </ToolChart>
       </section>
 
       {/* Week-over-week progress */}
@@ -914,7 +884,7 @@ export default function PipelineReview() {
       </section>
 
         {/* Focus list grouped by channel */}
-        <main className="pr-list">
+        <div className="pr-list">
           <div className="pr-list-head">
             <span>{filteredTotals.count} prospects · {fmtMoney(filteredTotals.paum)} PAUM</span>
             <div className="pr-sort">
@@ -1140,10 +1110,10 @@ export default function PipelineReview() {
               )}
             </section>
           )}
-        </main>
+        </div>
         </div>
       </div>
-    </div>
+    </ToolPage>
   );
 }
 

@@ -1,0 +1,191 @@
+/* Shared desktop shell for Flask-native Allworth tools (Jarvis + Data Catalog). */
+:root {
+  --aw-static-indigo: #173d67;
+  --aw-static-night: #0c2e4e;
+  --aw-static-cerulean: #3e71b7;
+  --aw-static-evergreen: #436434;
+  --aw-static-gold: #a99c6c;
+  --aw-static-feather: #f3f4f4;
+  --aw-static-ice: #edf2f7;
+  --aw-static-line: #e6e6e6;
+  --aw-static-ink: #171717;
+  --aw-static-muted: #595959;
+  --aw-static-subtle: #828282;
+  --aw-static-rail: 252px;
+}
+
+body.aw-static-tool {
+  min-width: 1120px;
+  background: var(--aw-static-feather);
+  color: var(--aw-static-ink);
+  font-family: "Lato", "Segoe UI", Arial, sans-serif;
+}
+
+body.aw-static-tool .app {
+  grid-template-columns: var(--aw-static-rail) minmax(0, 1fr);
+  background: var(--aw-static-feather);
+}
+
+body.aw-static-tool .sidebar,
+body.aw-static-tool .rail {
+  border-right: 1px solid rgba(23, 61, 103, .13);
+  background: var(--aw-static-ice);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+body.aw-static-tool .sidebar-brand,
+body.aw-static-tool .brand {
+  min-height: 58px;
+  border-bottom-color: rgba(23, 61, 103, .14);
+}
+
+body.aw-static-tool .sidebar-brand img,
+body.aw-static-tool .brand-logo {
+  height: 34px;
+  max-width: 178px;
+  object-fit: contain;
+}
+
+body.aw-static-tool .btn,
+body.aw-static-tool input,
+body.aw-static-tool select,
+body.aw-static-tool textarea {
+  border-radius: 6px;
+  box-shadow: none;
+  font-family: inherit;
+}
+
+body.aw-static-tool .btn-primary,
+body.aw-static-tool .chip.active,
+body.aw-static-tool .tab.active {
+  border-color: var(--aw-static-indigo);
+}
+
+body.aw-static-tool .btn-primary,
+body.aw-static-tool .chip.active {
+  background: var(--aw-static-indigo);
+}
+
+body.aw-static-tool .aw-static-header {
+  min-height: 136px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 34px 36px 24px;
+  border-bottom: 1px solid rgba(23, 61, 103, .18);
+}
+
+body.aw-static-tool .aw-static-header__eyebrow {
+  margin: 0 0 6px;
+  color: var(--aw-static-cerulean);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+body.aw-static-tool .aw-static-header h1 {
+  margin: 0;
+  color: var(--aw-static-night);
+  font: 600 38px/1.06 "Playfair Display", Georgia, serif;
+  letter-spacing: -.025em;
+}
+
+body.aw-static-tool .aw-static-header p:last-child {
+  max-width: 760px;
+  margin: 8px 0 0;
+  color: var(--aw-static-muted);
+  font-size: 13px;
+}
+
+/* Jarvis keeps its search-led information architecture, with quieter material. */
+body.aw-static-tool--jarvis .bg { display: none; }
+body.aw-static-tool--jarvis .sidebar { padding: 12px; }
+body.aw-static-tool--jarvis .sidebar-brand { padding: 6px 6px 14px; }
+body.aw-static-tool--jarvis .sidebar-brand .chip {
+  border-color: rgba(23, 61, 103, .18);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--aw-static-indigo);
+  box-shadow: none;
+}
+body.aw-static-tool--jarvis .sidebar-brand .chip .dot { background: var(--aw-static-cerulean); box-shadow: none; }
+body.aw-static-tool--jarvis .main { background: var(--aw-static-feather); }
+body.aw-static-tool--jarvis .hero-mark img { height: 48px; }
+body.aw-static-tool--jarvis .hero-mark p { color: var(--aw-static-muted); }
+body.aw-static-tool--jarvis .search-wrap {
+  border-color: rgba(23, 61, 103, .18);
+  border-radius: 6px !important;
+  background: #fff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: 0 1px 3px rgba(12, 46, 78, .08);
+}
+body.aw-static-tool--jarvis .search-wrap:focus-within {
+  border-color: var(--aw-static-cerulean);
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(62, 113, 183, .12);
+}
+body.aw-static-tool--jarvis .chip {
+  border-color: rgba(23, 61, 103, .14);
+  border-radius: 999px;
+  background: #fff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+body.aw-static-tool--jarvis .doc-body,
+body.aw-static-tool--jarvis .result-card,
+body.aw-static-tool--jarvis .history-item,
+body.aw-static-tool--jarvis .drawer {
+  border-color: rgba(23, 61, 103, .14);
+  border-radius: 6px;
+  background: #fff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+body.aw-static-tool--jarvis .result-card:hover {
+  transform: none;
+  border-color: var(--aw-static-cerulean);
+  background: #fff;
+  box-shadow: none;
+}
+body.aw-static-tool--jarvis .content-inner { max-width: 980px; }
+body.aw-static-tool--jarvis .doc-header h1 {
+  color: var(--aw-static-night);
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 600;
+}
+
+/* Catalog gets the same rail/header vocabulary while preserving its split-pane workflow. */
+body.aw-static-tool--catalog .rail { width: auto; padding: 12px; gap: 13px; }
+body.aw-static-tool--catalog .brand { padding: 6px 6px 14px; }
+body.aw-static-tool--catalog .brand-chip {
+  border-color: rgba(23, 61, 103, .18);
+  background: #fff;
+  color: var(--aw-static-indigo);
+}
+body.aw-static-tool--catalog .main { background: var(--aw-static-feather); }
+body.aw-static-tool--catalog .tabs {
+  gap: 8px;
+  padding: 0 36px;
+  border-bottom: 1px solid var(--aw-static-line);
+  background: var(--aw-static-feather);
+}
+body.aw-static-tool--catalog .tab { padding: 13px 10px 11px; color: var(--aw-static-muted); }
+body.aw-static-tool--catalog .tab.active { color: var(--aw-static-indigo); border-bottom-color: var(--aw-static-indigo); }
+body.aw-static-tool--catalog .view { padding: 24px 36px 36px; }
+body.aw-static-tool--catalog .card,
+body.aw-static-tool--catalog .detail,
+body.aw-static-tool--catalog .metric-item,
+body.aw-static-tool--catalog .mermaid-wrap {
+  border-color: rgba(23, 61, 103, .14);
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: none;
+}
+body.aw-static-tool--catalog .card:hover,
+body.aw-static-tool--catalog .metric-item:hover { transform: none; border-color: var(--aw-static-cerulean); }

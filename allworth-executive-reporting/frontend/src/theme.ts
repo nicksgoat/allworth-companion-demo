@@ -49,11 +49,30 @@ export const chartPalette = [
   colors.chartLightGray,
 ];
 
+export const chartTheme = {
+  grid: colors.hairline,
+  axis: colors.inkTertiary,
+  actual: colors.chartNightBlue,
+  comparison: colors.chartSky,
+  positive: colors.chartEvergreen,
+  neutral: colors.chartGold,
+  warning: colors.chartPumpkin,
+  prior: colors.chartLightGray,
+  tooltip: {
+    border: `1px solid rgba(23, 61, 103, 0.16)`,
+    borderRadius: 6,
+    backgroundColor: 'rgba(255,255,255,0.98)',
+    boxShadow: '0 6px 18px rgba(12,46,78,0.10)',
+    fontFamily: "'Lato', sans-serif",
+    fontSize: 12,
+  },
+};
+
 // ─── Card Surface ───────────────────────────────────────────────────────────────
 
 export const cardStyle = {
   backgroundColor: colors.surfaceCard,
-  borderRadius: 12,
+  borderRadius: 6,
   border: `1px solid ${colors.hairline}`,
   boxShadow: 'none',
 };
@@ -112,7 +131,7 @@ export const muiTheme = createTheme({
     overline:  { fontFamily: "'Lato', sans-serif", fontWeight: 700, letterSpacing: 0.6 },
   },
 
-  shape: { borderRadius: 10 },
+  shape: { borderRadius: 6 },
 
   components: {
     MuiCard: {
@@ -127,7 +146,7 @@ export const muiTheme = createTheme({
     },
     MuiButton: {
       styleOverrides: {
-        root: { borderRadius: 8, textTransform: 'none', fontWeight: 700 },
+        root: { borderRadius: 6, textTransform: 'none', fontWeight: 700 },
         contained: {
           backgroundColor: colors.allworthNavy,
           '&:hover': { backgroundColor: colors.chartNightBlue },
@@ -185,7 +204,7 @@ export const muiTheme = createTheme({
     },
     MuiAlert: {
       styleOverrides: {
-        root: { borderRadius: 10, fontFamily: "'Lato', sans-serif" },
+        root: { borderRadius: 6, fontFamily: "'Lato', sans-serif" },
       },
     },
     MuiChip: {

@@ -13,13 +13,13 @@
   --er-feather: #F3F4F4;
   --er-pale: #E6E6E6;
   --er-med-gray: #828282;
-  --er-red: #C8102E;
+  --er-red: var(--er-pumpkin);
 
   --er-serif: 'Playfair Display', Georgia, serif;
   --er-sans: 'Lato', 'Segoe UI', system-ui, -apple-system, sans-serif;
 
   font-family: var(--er-sans);
-  color: #1a1a1a;
+  color: #171717;
   background: var(--er-ice);
   min-height: 100vh;
   padding: 1.5rem 2rem 4rem;
@@ -40,7 +40,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  background: linear-gradient(135deg, var(--er-night), var(--er-indigo));
+  background: var(--er-night);
   border-radius: 12px;
   padding: 1.1rem 1.4rem;
   margin-bottom: 1.25rem;
@@ -174,13 +174,13 @@
   flex-direction: column;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #0f172a;
+  color: #171717;
   line-height: 1.2;
 }
 .er-switch-note {
   font-size: 0.7rem;
   font-weight: 400;
-  color: #64748b;
+  color: #595959;
 }
 
 /* ── KPI cards ──────────────────────────────────────────────────────── */
@@ -273,7 +273,7 @@
   padding: 0.45rem 0.65rem;
   border-bottom: 1px solid var(--er-pale);
 }
-.er-table tbody tr:nth-child(even) { background: #fafbfc; }
+.er-table tbody tr:nth-child(even) { background: #F3F4F4; }
 .er-strong { font-weight: 600; color: var(--er-indigo); }
 .er-table td.muted { color: var(--er-med-gray); }
 .er-table td.pos { color: var(--er-evergreen); font-weight: 700; }
@@ -326,9 +326,10 @@
 .er-hl-watch .er-hl-list li::before { background: var(--er-gold); }
 
 .er-actions {
-  background: linear-gradient(135deg, var(--er-night), var(--er-indigo));
-  color: #fff;
-  border-radius: 12px;
+  background: var(--aw-surface, #fff);
+  color: var(--aw-ink, #171717);
+  border: 1px solid rgba(23, 61, 103, .15);
+  border-radius: var(--aw-radius-sm, 6px);
   padding: 1.1rem 1.4rem;
 }
 .er-actions-title {
@@ -336,7 +337,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.7px;
-  color: var(--er-gold);
+  color: var(--er-cerulean);
   margin-bottom: 0.7rem;
 }
 .er-actions ol { margin: 0; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.5rem; }

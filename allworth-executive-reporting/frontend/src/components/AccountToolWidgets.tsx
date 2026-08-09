@@ -1,19 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
+import { Bar, BarChart, XAxis, YAxis } from 'recharts';
 import { InboxProvider, useInbox } from '../brief/store';
+import { ChartContainer, ChartTooltip } from './ui/chart';
 import { demoMetrics } from '../data/demoMetrics';
 import { fetchKpiMetrics } from '../services/api';
 import { crmApi } from '../services/crm';
 import type { CrmClient } from '../services/crm';
 import type { KpiDataset, KpiEntry } from '../types/kpi';
+import { chartTheme } from '../theme';
 import './AccountToolWidgets.css';
 
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
-type WidgetKey = 'performance' | 'crm' | 'fee_calculator' | 'pipeline_review' | 'brief' | 'avantos';
+export type AccountWidgetKey = 'performance' | 'crm' | 'fee_calculator' | 'pipeline_review' | 'brief' | 'avantos';
 
 interface AccountToolWidgetsProps {
-  enabled: Record<WidgetKey, boolean>;
+  enabled: Record<AccountWidgetKey, boolean>;
   accountLabel: string;
 }
 
@@ -91,7 +94,15 @@ function PerformanceWidget() {
             <span>Actual</span>
             <strong>{formatMetric(entry.actual, entry)}</strong>
           </div>
-          <div className="performance-track" aria-label={`${Math.round(progress)} percent of plan`}><span style={{ width: `${progress}%` }} /></div>
+          <ChartContainer className="account-widget-progress" height={18} aria-label={`${Math.round(progress)} percent of plan`}>
+            <BarChart data={[{ metric, progress, remaining: 100 - progress }]} layout="vertical" margin={{ top: 3, right: 0, bottom: 3, left: 0 }}>
+              <XAxis type="number" domain={[0, 100]} hide />
+              <YAxis type="category" dataKey="metric" hide />
+              <ChartTooltip formatter={(value, name) => [`${Number(value).toFixed(1)}%`, String(name)]} />
+              <Bar dataKey="progress" name="Of plan" stackId="plan" fill={chartTheme.comparison} radius={[4, 0, 0, 4]} isAnimationActive={false} />
+              <Bar dataKey="remaining" name="Remaining" stackId="plan" fill={chartTheme.grid} radius={[0, 4, 4, 0]} isAnimationActive={false} />
+            </BarChart>
+          </ChartContainer>
           <div className="performance-comparison">
             <div><span>Plan to date</span><strong>{formatMetric(plan, entry)}</strong></div>
             <div><span>Prior year to date</span><strong>{formatMetric(priorYear, entry)}</strong></div>
@@ -283,7 +294,8 @@ function PipelineWidget() {
   const toggleWorked = (id: string) => {
     setWorked((current) => {
       const next = new Set(current);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       try { localStorage.setItem('home-pipeline-worked', JSON.stringify([...next])); } catch { /* local state still works */ }
       return next;
     });

@@ -33,15 +33,15 @@
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #00205c;
+  color: #173D67;
   text-decoration: none;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(0, 32, 92, 0.08);
-  border: 1px solid rgba(0, 32, 92, 0.14);
+  background: rgba(23, 61, 103, 0.08);
+  border: 1px solid rgba(23, 61, 103, 0.14);
   transition: background 0.15s ease;
 }
-.perf-home:hover { background: rgba(0, 32, 92, 0.14); }
+.perf-home:hover { background: rgba(23, 61, 103, 0.14); }
 .perf-kicker {
   text-transform: uppercase;
   letter-spacing: 0.14em;
@@ -55,7 +55,7 @@
   color: var(--aw-night, #0c2e4e);
   letter-spacing: -0.02em;
 }
-.perf-tagline { margin: 4px 0 0; color: #6b7280; font-size: 14px; max-width: 62ch; }
+.perf-tagline { margin: 4px 0 0; color: #595959; font-size: 14px; max-width: 62ch; }
 .perf-hero-right {
   gap: 12px;
   flex-wrap: wrap;

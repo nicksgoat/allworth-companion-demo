@@ -63,6 +63,10 @@ class PlanningStore:
     def __init__(self):
         self._lock = RLock()
         self.facts: dict[UUID, Facts] = {}
+        self._external_ids: dict[str, dict[str, set[UUID]]] = {
+            "crm_lead_id": {}, "source_id": {}, "household_avhhid": {},
+            "advisor_id": {},
+        }
         self.versions: dict[UUID, list[tuple[UUID, dict]]] = {}
         self.scenarios: dict[UUID, ScenarioRecord] = {}
         self.audit: list[dict] = []
@@ -85,7 +89,10 @@ class PlanningStore:
                 if attempt == attempts:
                     raise
                 time.sleep(2 * attempt)
-        for row in households: self.facts[UUID(row.id)] = Facts.model_validate(row.facts)
+        for row in households:
+            facts = Facts.model_validate(row.facts)
+            self.facts[UUID(row.id)] = facts
+            self._index_facts(facts)
         for row in versions: self.versions.setdefault(UUID(row.household_id), []).append((UUID(row.id), row.snapshot))
         for row in scenarios:
             self.scenarios[UUID(row.id)] = ScenarioRecord(UUID(row.id), UUID(row.household_id), row.name,
@@ -98,8 +105,65 @@ class PlanningStore:
         with self._lock:
             return [{"id": str(hid), "name": facts.name,
                      "people": len(facts.people), "accounts": len(facts.accounts),
-                     "source": facts.metadata.get("source", "planning")}
+                     "source": facts.metadata.get("source", "planning"),
+                     "source_id": facts.metadata.get("source_id"),
+                     "avhhid": facts.metadata.get("household_avhhid"),
+                     "advisor_id": facts.metadata.get("advisor_id"),
+                     "crm_lead_id": facts.metadata.get("crm_lead_id")}
                     for hid, facts in self.facts.items()]
+
+    def _index_facts(self, facts: Facts) -> None:
+        for field, values in self._external_ids.items():
+            value = str(facts.metadata.get(field) or "").strip()
+            if value:
+                values.setdefault(value, set()).add(facts.household_id)
+
+    def _unindex_household(self, household_id: UUID) -> None:
+        for values in self._external_ids.values():
+            for value in list(values):
+                values[value].discard(household_id)
+                if not values[value]:
+                    values.pop(value)
+
+    def find_facts(self, *, planning_id: UUID | None = None,
+                   crm_lead_id: str | None = None, source_id: str | None = None,
+                   avhhid: str | None = None) -> Facts | None:
+        """Resolve a household by exact canonical identifiers in constant time.
+
+        When more than one identifier is supplied they must point to the same
+        household. Duplicate external identifiers are rejected rather than
+        silently selecting an arbitrary same-name or same-source record.
+        """
+        with self._lock:
+            if planning_id is not None:
+                facts = self.facts.get(planning_id)
+                if facts is None:
+                    return None
+                candidates = {planning_id}
+            else:
+                candidates: set[UUID] | None = None
+            lookups = {
+                "crm_lead_id": crm_lead_id,
+                "source_id": source_id,
+                "household_avhhid": avhhid,
+            }
+            for field, raw_value in lookups.items():
+                value = str(raw_value or "").strip()
+                if not value:
+                    continue
+                matches = set(self._external_ids[field].get(value, set()))
+                candidates = matches if candidates is None else candidates & matches
+            if not candidates:
+                return None
+            if len(candidates) > 1:
+                raise ValueError("external household identifier is not unique")
+            return self.facts[next(iter(candidates))].model_copy(deep=True)
+
+    def facts_for_advisor(self, advisor_id: str) -> list[Facts]:
+        """Return an advisor's planning households using the maintained index."""
+        with self._lock:
+            household_ids = self._external_ids["advisor_id"].get(str(advisor_id).strip(), set())
+            return [self.facts[household_id].model_copy(deep=True) for household_id in household_ids]
 
     def create_household(self, payload: dict, actor: str = "system") -> tuple[Facts, list[ScenarioRecord]]:
         facts = Facts.model_validate(payload)
@@ -107,6 +171,7 @@ class PlanningStore:
             if facts.household_id in self.facts:
                 raise ValueError("household already exists")
             self.facts[facts.household_id] = facts
+            self._index_facts(facts)
             version = uuid4()
             self.versions[facts.household_id] = [(version, facts.model_dump(mode="json"))]
             current = ScenarioRecord(uuid4(), facts.household_id, "Current Plan", version)
@@ -129,7 +194,9 @@ class PlanningStore:
         with self._lock:
             old = self.get_facts(household_id).model_dump(mode="json")
             updated = Facts.model_validate(apply_patch(old, operations))
+            self._unindex_household(household_id)
             self.facts[household_id] = updated
+            self._index_facts(updated)
             if self.persistence: self.persistence.save_household(str(household_id), updated.name, updated.model_dump(mode="json"))
             self._audit(actor, "patch", household_id, old, updated.model_dump(mode="json"), operations)
             return updated
@@ -141,7 +208,9 @@ class PlanningStore:
             old = self.get_facts(household_id).model_dump(mode="json")
             updated = facts.model_copy(deep=True)
             updated.household_id = household_id
+            self._unindex_household(household_id)
             self.facts[household_id] = updated
+            self._index_facts(updated)
             if self.persistence: self.persistence.save_household(str(household_id), updated.name, updated.model_dump(mode="json"))
             self._audit(actor, action, household_id, old, updated.model_dump(mode="json"))
             return updated
@@ -233,6 +302,7 @@ class PlanningStore:
             for scenario_id in scenario_ids: self.scenarios.pop(scenario_id, None)
             self.versions.pop(household_id, None)
             for record_id in portal_ids: self.portal.pop(record_id, None)
+            self._unindex_household(household_id)
             self.facts.pop(household_id, None)
             if self.persistence: self.persistence.delete_household(str(household_id))
             return {"facts": 1, "facts_versions": version_count,

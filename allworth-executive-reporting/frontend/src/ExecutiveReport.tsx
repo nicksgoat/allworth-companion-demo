@@ -1,12 +1,13 @@
 // src/ExecutiveReport.tsx
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell,
   ErrorBar, LabelList,
 } from 'recharts';
-import SideNav from './components/SideNav';
+import { ChartContainer, ChartLegend, ChartTooltip } from './components/ui/chart';
+import { ToolPage } from './components/ToolPage';
+import { chartTheme } from './theme';
 import './ExecutiveReport.css';
-import allworthLogo from './assets/allworth-logo-white.png';
 
 // ─── Types (match backend/executive_report payload) ──────────────────────────
 
@@ -173,10 +174,10 @@ const fmtSignedPct = (v: number | null | undefined): string =>
   v == null ? 'n/a' : `${v >= 0 ? '+' : ''}${(v * 100).toFixed(1)}%`;
 
 const CHANNEL_COLORS: Record<string, string> = {
-  'Advisor Driven': '#173D67',
-  CRP: '#3E71B7',
-  'Media Driven': '#289FDA',
-  'Paid Leads': '#A99C6C',
+  'Advisor Driven': chartTheme.actual,
+  CRP: chartTheme.comparison,
+  'Media Driven': chartTheme.comparison,
+  'Paid Leads': chartTheme.neutral,
 };
 
 // Render the AI summary: bold **headers** become styled section labels.
@@ -324,7 +325,7 @@ export default function ExecutiveReport() {
         labelY = y - ((remaining + errHigh) / actual) * height - 8;
       }
       return (
-        <text x={x + width / 2} y={labelY} textAnchor="middle" fontSize={11} fontWeight={600} fill="#0C2E4E">
+        <text x={x + width / 2} y={labelY} textAnchor="middle" fontSize={11} fontWeight={600} fill={chartTheme.actual}>
           {fmtMoney(row.total as number)}
         </text>
       );
@@ -366,20 +367,13 @@ export default function ExecutiveReport() {
   }, [flows, kpis]);
 
   return (
-    <div className="er-root has-sidenav">
-      <SideNav />
-
-      <header className="er-header">
-        <div className="er-header-brand">
-          <img className="er-logo" src={allworthLogo} alt="Allworth Financial" />
-          <div className="er-header-titles">
-            <h1>Executive Report</h1>
-            <p className="er-sub">
-              {ncnm ? `Company flows & NCNM forecast · ${ncnm.period_label}` : 'Company flows & NCNM forecast'}
-            </p>
-          </div>
-        </div>
-        <div className="er-header-actions">
+    <ToolPage
+      eyebrow="Executive analytics"
+      title="Executive Report"
+      description={ncnm ? `Company flows and NCNM forecast · ${ncnm.period_label}` : 'Company flows and NCNM forecast'}
+      width="full"
+      className="er-root"
+      actions={<>
           {data && (
             <span className="er-generated">
               Refreshed {new Date(data.generated_at).toLocaleString()}
@@ -388,8 +382,8 @@ export default function ExecutiveReport() {
           <button className="er-btn" onClick={refresh} disabled={loading || refreshing}>
             {refreshing ? 'Refreshing…' : 'Refresh data'}
           </button>
-        </div>
-      </header>
+      </>}
+    >
 
       {error && <div className="er-error">Error: {error}</div>}
 
@@ -398,7 +392,7 @@ export default function ExecutiveReport() {
       )}
 
       {data && ncnm && flows && kpis && (
-        <main className="er-main">
+        <div className="er-main">
           {hasRecruiting && (
             <div className="er-flow-toggle">
               <label className="er-switch">
@@ -423,7 +417,7 @@ export default function ExecutiveReport() {
           {/* KPI hero cards */}
           <section className="er-kpi-grid">
             {aum && (
-              <div className="er-kpi" style={{ borderTopColor: '#173D67' }}>
+              <div className="er-kpi" style={{ borderTopColor: chartTheme.actual }}>
                 <p className="er-kpi-label">BoP AUM</p>
                 <p className="er-kpi-value">{fmtMoney(aum.bop_aum)}</p>
                 <p className={`er-kpi-sub ${(aum.aum_growth_pct ?? 0) >= 0 ? 'pos' : 'neg'}`}>
@@ -432,7 +426,7 @@ export default function ExecutiveReport() {
               </div>
             )}
             {aum && (
-              <div className="er-kpi" style={{ borderTopColor: '#3E71B7' }}>
+              <div className="er-kpi" style={{ borderTopColor: chartTheme.comparison }}>
                 <p className="er-kpi-label">Net Flows YTD</p>
                 <p className="er-kpi-value">{fmtMoney(aum.net_flows_current)}</p>
                 <p className={`er-kpi-sub ${(aum.net_flows_yoy_pct ?? 0) >= 0 ? 'pos' : 'neg'}`}>
@@ -440,14 +434,14 @@ export default function ExecutiveReport() {
                 </p>
               </div>
             )}
-            <div className="er-kpi" style={{ borderTopColor: '#173D67' }}>
+            <div className="er-kpi" style={{ borderTopColor: chartTheme.actual }}>
               <p className="er-kpi-label">EoM NCNM Projection{fullFirm ? ' · Full Firm' : ''}</p>
               <p className="er-kpi-value">{fmtMoney(eomProjectionAdj)}</p>
               <p className="er-kpi-sub">
                 Range {fmtMoney(confLowAdj)} – {fmtMoney(confHighAdj)}
               </p>
             </div>
-            <div className="er-kpi" style={{ borderTopColor: '#3E71B7' }}>
+            <div className="er-kpi" style={{ borderTopColor: chartTheme.comparison }}>
               <p className="er-kpi-label">MTD NCNM Actual{fullFirm ? ' · Full Firm' : ' · Modeled'}</p>
               <p className="er-kpi-value">{fmtMoney(mtdActualAdj)}</p>
               <p className="er-kpi-sub">
@@ -456,14 +450,14 @@ export default function ExecutiveReport() {
                   : `Remaining expected ${fmtMoney(ncnm.remaining_expected)}`}
               </p>
             </div>
-            <div className="er-kpi" style={{ borderTopColor: '#A99C6C' }}>
+            <div className="er-kpi" style={{ borderTopColor: chartTheme.neutral }}>
               <p className="er-kpi-label">YTD Appointments</p>
               <p className="er-kpi-value">{fmtInt(kpis.appts_current)}</p>
               <p className={`er-kpi-sub ${(kpis.appts_yoy_pct ?? 0) >= 0 ? 'pos' : 'neg'}`}>
                 {fmtSignedPct(kpis.appts_yoy_pct)} vs {kpis.prior_year}
               </p>
             </div>
-            <div className="er-kpi" style={{ borderTopColor: '#289FDA' }}>
+            <div className="er-kpi" style={{ borderTopColor: chartTheme.comparison }}>
               <p className="er-kpi-label">YTD Appointment PAUM</p>
               <p className="er-kpi-value">{fmtMoney(kpis.appt_paum_current)}</p>
               <p className={`er-kpi-sub ${(kpis.appt_paum_yoy_pct ?? 0) >= 0 ? 'pos' : 'neg'}`}>
@@ -479,21 +473,21 @@ export default function ExecutiveReport() {
                 NCNM — Trailing Actuals + Current-Month Projection
                 <span className="er-panel-total"> · EoM {fmtMoney(eomProjectionAdj)} ({fmtMoney(confLowAdj)}–{fmtMoney(confHighAdj)}){fullFirm ? ' · full firm' : ''}</span>
               </h2>
-              <ResponsiveContainer width="100%" height={280}>
+              <ChartContainer width="100%" height={280}>
                 <BarChart data={forecastActualData} margin={{ top: 12, right: 16, left: 8, bottom: 8 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <CartesianGrid stroke={chartTheme.grid} />
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis domain={[0, forecastYMax || 'auto']} tickFormatter={(v) => fmtMoney(v as number)} tick={{ fontSize: 11 }} width={64} />
-                  <Tooltip formatter={(v, n) => [fmtMoney(v as number), n as string]} />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="actual" name="Actual NCNM" stackId="ncnm" fill="#173D67" radius={[0, 0, 0, 0]}>
+                  <ChartTooltip contentStyle={chartTheme.tooltip} formatter={(v, n) => [fmtMoney(v as number), n as string]} />
+                  <ChartLegend wrapperStyle={{ fontSize: 12 }} />
+                  <Bar dataKey="actual" name="Actual NCNM" stackId="ncnm" fill={chartTheme.actual} radius={[0, 0, 0, 0]}>
                     <LabelList content={renderBarTotal} />
                   </Bar>
-                  <Bar dataKey="remaining" name="Forecast (remaining)" stackId="ncnm" fill="#A99C6C" radius={[4, 4, 0, 0]}>
-                    <ErrorBar dataKey="err" width={6} strokeWidth={1.5} stroke="#0C2E4E" direction="y" />
+                  <Bar dataKey="remaining" name="Forecast (remaining)" stackId="ncnm" fill={chartTheme.neutral} radius={[3, 3, 0, 0]}>
+                    <ErrorBar dataKey="err" width={6} strokeWidth={1.5} stroke={chartTheme.actual} direction="y" />
                   </Bar>
                 </BarChart>
-              </ResponsiveContainer>
+              </ChartContainer>
               <p className="er-chart-note">
                 Bars show completed monthly NCNM. The final bar is the current month: booked
                 month-to-date ({fmtMoney(mtdActualAdj)}) plus forecast remainder
@@ -523,19 +517,19 @@ export default function ExecutiveReport() {
 
             <div className="er-panel">
               <h2>Projected NCNM by Channel</h2>
-              <ResponsiveContainer width="100%" height={220}>
+              <ChartContainer width="100%" height={220}>
                 <BarChart data={channelChartData} margin={{ top: 8, right: 12, left: 0, bottom: 8 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <CartesianGrid stroke={chartTheme.grid} />
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis tickFormatter={(v) => fmtMoney(v as number)} tick={{ fontSize: 11 }} width={64} />
-                  <Tooltip formatter={(v) => fmtMoney(v as number)} />
+                  <ChartTooltip contentStyle={chartTheme.tooltip} formatter={(v) => fmtMoney(v as number)} />
                   <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                     {channelChartData.map((d) => (
-                      <Cell key={d.name} fill={CHANNEL_COLORS[d.name] ?? '#173D67'} />
+                      <Cell key={d.name} fill={CHANNEL_COLORS[d.name] ?? chartTheme.actual} />
                     ))}
                   </Bar>
                 </BarChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </div>
           </section>
 
@@ -543,32 +537,33 @@ export default function ExecutiveReport() {
           {advisorClosesData.length > 0 && (
             <section className="er-panel">
               <h2>Closes This Month by Advisor — PAUM &amp; NCNM</h2>
-              <ResponsiveContainer width="100%" height={Math.max(200, advisorClosesData.length * 52)}>
+              <ChartContainer width="100%" height={Math.max(200, advisorClosesData.length * 52)}>
                 <BarChart
                   data={advisorClosesData}
                   layout="vertical"
                   margin={{ top: 8, right: 80, left: 12, bottom: 8 }}
                   barGap={2}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" horizontal={false} />
+                  <CartesianGrid stroke={chartTheme.grid} horizontal={false} />
                   <XAxis type="number" tickFormatter={(v) => fmtMoney(v as number)} tick={{ fontSize: 11 }} />
                   <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={130} interval={0} />
-                  <Tooltip
+                  <ChartTooltip
+                    contentStyle={chartTheme.tooltip}
                     formatter={(v, n) => [fmtMoney(v as number), n]}
                     labelFormatter={(label, payload) => {
                       const p = payload?.[0]?.payload as { clients?: number } | undefined;
                       return p?.clients != null ? `${label} · ${p.clients} new client${p.clients === 1 ? '' : 's'}` : String(label);
                     }}
                   />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="paum" name="Closed PAUM" fill="#173D67" radius={[0, 4, 4, 0]}>
-                    <LabelList dataKey="paum" position="right" formatter={(v) => fmtMoney(v as number)} style={{ fontSize: 11, fill: '#1a1a1a' }} />
+                  <ChartLegend wrapperStyle={{ fontSize: 12 }} />
+                  <Bar dataKey="paum" name="Closed PAUM" fill={chartTheme.actual} radius={[0, 3, 3, 0]}>
+                    <LabelList dataKey="paum" position="right" formatter={(v) => fmtMoney(v as number)} style={{ fontSize: 11, fill: chartTheme.actual }} />
                   </Bar>
-                  <Bar dataKey="ncnm" name="NCNM (all to date)" fill="#289FDA" radius={[0, 4, 4, 0]}>
-                    <LabelList dataKey="ncnm" position="right" formatter={(v) => fmtMoney(v as number)} style={{ fontSize: 11, fill: '#289FDA' }} />
+                  <Bar dataKey="ncnm" name="NCNM (all to date)" fill={chartTheme.comparison} radius={[0, 3, 3, 0]}>
+                    <LabelList dataKey="ncnm" position="right" formatter={(v) => fmtMoney(v as number)} style={{ fontSize: 11, fill: chartTheme.comparison }} />
                   </Bar>
                 </BarChart>
-              </ResponsiveContainer>
+              </ChartContainer>
               <p className="er-chart-note">
                 Ranked by new-client PAUM closed month-to-date. NCNM is the total net-new-client
                 money booked to date for those same households.
@@ -635,7 +630,7 @@ export default function ExecutiveReport() {
               <tbody>
                 {ncnm.by_channel.map((c) => (
                   <tr key={c.channel}>
-                    <td style={{ color: CHANNEL_COLORS[c.channel] ?? '#173D67', fontWeight: 600 }}>{c.channel}</td>
+                    <td style={{ color: CHANNEL_COLORS[c.channel] ?? chartTheme.actual, fontWeight: 600 }}>{c.channel}</td>
                     <td className="num">{fmtMoney(c.projection)}</td>
                     <td className="num muted">{fmtMoney(c.p25)}</td>
                     <td className="num muted">{fmtMoney(c.p75)}</td>
@@ -657,17 +652,17 @@ export default function ExecutiveReport() {
           {a2cChartData.length > 0 && (
             <section className="er-panel">
               <h2>Appt-to-Client Rate by Channel — {kpis.prior_year} vs {kpis.current_year}</h2>
-              <ResponsiveContainer width="100%" height={260}>
+              <ChartContainer width="100%" height={260}>
                 <BarChart data={a2cChartData} margin={{ top: 8, right: 12, left: 0, bottom: 8 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <CartesianGrid stroke={chartTheme.grid} />
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis tickFormatter={(v) => `${v}%`} tick={{ fontSize: 11 }} width={44} />
-                  <Tooltip formatter={(v) => `${v}%`} />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="prior" name={`${kpis.prior_year}`} fill="#93b5d6" radius={[3, 3, 0, 0]} />
-                  <Bar dataKey="current" name={`${kpis.current_year}`} fill="#173D67" radius={[3, 3, 0, 0]} />
+                  <ChartTooltip contentStyle={chartTheme.tooltip} formatter={(v) => `${v}%`} />
+                  <ChartLegend wrapperStyle={{ fontSize: 12 }} />
+                  <Bar dataKey="prior" name={`${kpis.prior_year}`} fill={chartTheme.prior} radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="current" name={`${kpis.current_year}`} fill={chartTheme.actual} radius={[3, 3, 0, 0]} />
                 </BarChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </section>
           )}
 
@@ -825,8 +820,8 @@ export default function ExecutiveReport() {
             Allworth Financial · Growth Analytics · Data as of {ncnm.as_of}. NCNM is a probabilistic
             forecast; warehouse data refreshes daily.
           </footer>
-        </main>
+        </div>
       )}
-    </div>
+    </ToolPage>
   );
 }

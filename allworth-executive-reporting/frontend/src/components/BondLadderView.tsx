@@ -27,7 +27,7 @@ const FITCH_COLORS: Record<string, string> = {
   'BBB+': '#F57F17', BBB: '#F57F17', 'BBB-': '#F9A825',
   'BB+': '#E65100', BB: '#E65100', 'BB-': '#EF6C00',
   'B+': '#B71C1C', B: '#B71C1C', 'B-': '#C62828',
-  NR: '#757575', 'N/R': '#757575',
+  NR: '#828282', 'N/R': '#828282',
 };
 const ratingColor = (r: string | null) => FITCH_COLORS[r ?? ''] ?? '#9E9E9E';
 
@@ -106,7 +106,8 @@ export default function BondLadderView() {
   const toggleAlert = (key: 'downgraded30' | 'matures60') => {
     setAlertFilters(prev => {
       const next = new Set(prev);
-      next.has(key) ? next.delete(key) : next.add(key);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
   };

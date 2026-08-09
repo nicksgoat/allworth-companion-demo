@@ -87,7 +87,8 @@ def apply_actuals(plan_facts: Facts, fresh_facts: Facts,
     updated.liabilities = [x.model_copy(deep=True) for x in fresh_facts.liabilities]
     metadata = dict(updated.metadata)
     fresh_meta = fresh_facts.metadata
-    for key in ("provenance", "data_quality_warnings", "monte_carlo_inputs"):
+    for key in ("provenance", "data_quality_warnings", "monte_carlo_inputs",
+                "household_avhhid", "advisor_id", "crm_lead_id"):
         if key in fresh_meta:
             metadata[key] = fresh_meta[key]
     if synced_at:

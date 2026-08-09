@@ -29,6 +29,7 @@ import time
 from typing import Any
 
 from flask import Blueprint, jsonify, request
+from crm.connection import get_db_connection
 
 bp = Blueprint("crm", __name__)
 
@@ -98,35 +99,7 @@ def _s(value: Any) -> str:
 
 # ─── DB + cache ──────────────────────────────────────────────────────────────
 
-_conn_holder: dict[str, Any] = {"conn": None}
-
-
-def _get_db_connection():
-    """Dedicated read connection for the CRM (same auth config as app.py).
-
-    The app-wide shared connection is also used by analytics/KPI endpoints;
-    pyodbc connections don't support concurrent cursors, so sharing it makes
-    parallel CRM page loads fail with "Connection is busy". Reuses the nfbc
-    connection-string builder; callers are serialized by ``_serialized``.
-    """
-    import pyodbc
-
-    from nfbc.synapse_nfbc import _build_conn_str
-
-    conn = _conn_holder["conn"]
-    if conn is not None:
-        try:
-            cur = conn.cursor()
-            cur.execute("SELECT 1")
-            cur.close()
-            return conn
-        except Exception:
-            _conn_holder["conn"] = None
-
-    conn = pyodbc.connect(_build_conn_str(), timeout=60)
-    conn.timeout = 60
-    _conn_holder["conn"] = conn
-    return conn
+_get_db_connection = get_db_connection
 
 
 _cache: dict[str, tuple[float, Any]] = {}

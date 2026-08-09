@@ -8,9 +8,9 @@ This file gives Claude the same working context as GitHub Copilot.
 It is the single source of truth for this repo and covers:
 
 - The architecture (React + TypeScript SPA in `frontend/`, Flask API in `backend/`).
-- The tool registry (`backend/home/tools.yaml`) and where navigation lives
-  (`SideNav.tsx` + `Home.tsx`), and how tool `id`s gate access.
-- The checklist for adding a new user-facing tool/page.
+- The canonical tool manifest (`tool-manifest.json`) that drives navigation,
+  home widgets, assignment presets, and access keys.
+- The manifest-driven checklist for adding a new user-facing tool/page.
 - The rule that **Home hub cards must always mirror the SideNav rail**.
 - Access enforcement (`ADMIN_ENFORCEMENT`) and bootstrap-owner safety.
 - The **standard development workflow** (branch from `dev` → local preview →
@@ -43,10 +43,9 @@ Optimize for a codebase that is easy to navigate and safe to change. Favor
   naming, and style of the nearest similar file (e.g. model a new tool page on
   `Repcodes.tsx`, a new blueprint on the existing `try/except` registration in
   `app.py`).
-- **Keep the parallel structures in sync.** A tool's `id`, its `SideNav` rail
-  link, its `Home` hub card, its `tools.yaml` entry, its `_TOOL_ROUTES` mapping
-  for App Usage logging (`backend/app.py`), and its demo entries must all
-  agree — change them together (see the checklist in the Copilot instructions).
+- **Keep consumers on the manifest.** A tool's identity, route, navigation,
+  assignment eligibility, and widget definition belong in `tool-manifest.json`;
+  consumers derive from it rather than maintaining parallel catalogs.
 - **Consistent naming.** Lowercase-slug tool `id`s, `PascalCase` components,
   `camelCase` functions/vars, page-scoped CSS classes (`.t2-*` glass theme).
 - **Predictable file placement.** New React pages under `frontend/src/`, shared

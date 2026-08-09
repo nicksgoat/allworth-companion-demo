@@ -3,7 +3,8 @@ import {
   Alert, Box, Button, Card, CardContent, CircularProgress, FormControl, InputLabel,
   MenuItem, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography,
 } from '@mui/material';
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { ChartContainer, ChartLegend, ChartTooltip } from '../components/ui/chart';
 import { planningApi, type LifecyclePlan } from '../services/planningApi';
 import { Kpi, chartColors, money, pct } from './shared';
 
@@ -72,30 +73,30 @@ export default function LifecycleTab({ scenario, onError }: { scenario: string; 
     <Card><CardContent>
       <Typography variant="h6">Recommended glide path</Typography>
       <Typography color="text.secondary" sx={{ mb: 2 }}>Equity allocation declines as human capital converts to financial wealth (Idzorek–Kaplan lifecycle model).</Typography>
-      <ResponsiveContainer width="100%" height={320}>
+      <ChartContainer width="100%" height={320}>
         <AreaChart data={glide} stackOffset="expand">
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="age" /><YAxis tickFormatter={v => pct(v)} />
-          <Tooltip formatter={(value: unknown) => `${Number(value).toFixed(1)}%`} /><Legend />
+          <ChartTooltip formatter={(value: unknown) => `${Number(value).toFixed(1)}%`} /><ChartLegend />
           <Area dataKey="Domestic stock" stackId="1" stroke={chartColors.nightBlue} fill={chartColors.nightBlue} />
           <Area dataKey="Global stock" stackId="1" stroke={chartColors.sky} fill={chartColors.sky} />
           <Area dataKey="Bonds & cash" stackId="1" stroke={chartColors.gold} fill={chartColors.gold} />
         </AreaChart>
-      </ResponsiveContainer>
+      </ChartContainer>
     </CardContent></Card>
     <Card sx={{ mt: 2.5 }}><CardContent>
       <Typography variant="h6">Sustainable consumption path</Typography>
       <Typography color="text.secondary" sx={{ mb: 2 }}>Essential spending, discretionary consumption, and the annuitized floor by age.</Typography>
-      <ResponsiveContainer width="100%" height={300}>
+      <ChartContainer width="100%" height={300}>
         <BarChart data={consumption}>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="age" /><YAxis tickFormatter={v => money(v, true)} />
-          <Tooltip formatter={v => money(v)} /><Legend />
+          <ChartTooltip formatter={v => money(v)} /><ChartLegend />
           <Bar dataKey="Essential" stackId="c" fill={chartColors.nightBlue} />
           <Bar dataKey="Discretionary" stackId="c" fill={chartColors.evergreen} />
           <Bar dataKey="Annuity floor" stackId="c" fill={chartColors.gold} />
         </BarChart>
-      </ResponsiveContainer>
+      </ChartContainer>
     </CardContent></Card>
     <Card sx={{ mt: 2.5 }}><CardContent>
       <Typography variant="h6">Sensitivity analysis</Typography>

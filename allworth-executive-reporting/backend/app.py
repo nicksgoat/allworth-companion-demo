@@ -8,6 +8,7 @@ from threading import Lock
 import time
 import os
 from pathlib import Path
+from tool_manifest import analytics_routes
 
 # Load .env file for local development (ignored if file doesn't exist)
 try:
@@ -117,6 +118,14 @@ try:
     print("🔐 Admin console blueprint registered at /api/admin")
 except Exception as _admin_e:  # pragma: no cover - defensive
     print(f"⚠️  Admin blueprint unavailable: {type(_admin_e).__name__}: {_admin_e}")
+
+# Workspace — assignment-aware identity and exact cross-tool household context.
+try:
+    from workspace.routes import bp as workspace_bp
+    app.register_blueprint(workspace_bp, url_prefix="/api/workspace")
+    print("🧭 Connected workspace blueprint registered at /api/workspace")
+except Exception as _workspace_e:  # pragma: no cover - defensive
+    print(f"⚠️  Workspace blueprint unavailable: {type(_workspace_e).__name__}: {_workspace_e}")
 
 # SFP2 notebook reference index — builds once at app startup. Annotates the
 # /api/sfp2/diff response with the notebooks that reference each column so the
@@ -1712,35 +1721,10 @@ def track_page_view():
 #
 # Every user-facing route MUST have an entry here so App Usage attributes its
 # page views to the right tool; unmapped paths fall through to ('other',
-# 'Other'). The tool id should match the tool's `id` in home/tools.yaml and the
+# 'Other'). The tool id should match the tool's `id` in tool-manifest.json and the
 # <ToolGuard toolId=...> on its React route. When you add a new tool/report,
 # add its route here as part of the tool checklist (see copilot-instructions.md).
-_TOOL_ROUTES = [
-    ('/reporting/kpi', 'performance', 'Performance by Channel'),
-    ('/reporting', 'performance', 'Performance by Channel'),
-    ('/jarvis', 'jarvis', 'Jarvis Encyclopedia'),
-    ('/nfbc', 'nfbc', 'NFBC Adjustments'),
-    ('/fee-calculator', 'fee_calculator', 'Fee Calculator'),
-    ('/pipeline-review', 'pipeline_review', 'Pipeline Review'),
-    ('/crm', 'crm', 'CRM'),
-    ('/brief', 'brief', 'Executive Brief'),
-    ('/planning', 'financial_planning', 'Financial Planning'),
-    ('/avantos', 'avantos', 'Avantos'),
-    ('/rebalancer', 'rebalancer', 'Mock Rebalancer'),
-    ('/catalog', 'data_catalog', 'Data Catalog'),
-    ('/app-usage', 'admin', 'App Usage'),
-    ('/admin', 'admin', 'Admin'),
-    ('/tamarac', 'pipeline_logging', 'Tamarac Pipeline'),
-    ('/refresh_log', 'pipeline_logging', 'Refresh Log'),
-    ('/refresh-log', 'pipeline_logging', 'Refresh Log'),
-    ('/sfp2', 'sfp2', 'Salesforce Column Updater'),
-    ('/repcodes', 'repcodes', 'Rep Codes'),
-    ('/bond-analyzer', 'bond_analyzer', 'Bond Analyzer'),
-    ('/advisor-mailer', 'advisor_mailer', 'Advisor Mailer'),
-    ('/embed', 'performance', 'Performance by Channel'),
-    ('/home', 'home', 'Home'),
-    ('/', 'home', 'Home'),
-]
+_TOOL_ROUTES = analytics_routes()
 
 
 def _page_to_tool(page):

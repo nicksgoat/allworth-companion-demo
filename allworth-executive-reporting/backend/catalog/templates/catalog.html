@@ -6,8 +6,9 @@
 <title>Data Catalog — Allworth tho Warehouse</title>
 <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2300205C'/><g fill='none' stroke='%23fff' stroke-width='1.6'><ellipse cx='16' cy='9' rx='9' ry='3.4'/><path d='M7 9v14c0 1.9 4 3.4 9 3.4s9-1.5 9-3.4V9'/><path d='M7 16c0 1.9 4 3.4 9 3.4s9-1.5 9-3.4'/></g></svg>">
 <link rel="stylesheet" href="{{ base_url }}/static/styles.css?v={{ asset_version }}">
+<link rel="stylesheet" href="/jarvis/static/allworth-workspace.css?v={{ asset_version }}">
 </head>
-<body>
+<body class="aw-static-tool aw-static-tool--catalog">
 <div class="app">
   <!-- ── Sidebar ─────────────────────────────────────────── -->
   <aside class="rail">
@@ -54,6 +55,11 @@
 
   <!-- ── Main ────────────────────────────────────────────── -->
   <main class="main">
+    <header class="aw-static-header">
+      <p class="aw-static-header__eyebrow">Data operations</p>
+      <h1>Data Catalog</h1>
+      <p>Search warehouse tables, columns, lineage, source systems, and business definitions.</p>
+    </header>
     <nav class="tabs">
       <button class="tab active" data-view="columns">Columns</button>
       <button class="tab" data-view="tables">Tables</button>

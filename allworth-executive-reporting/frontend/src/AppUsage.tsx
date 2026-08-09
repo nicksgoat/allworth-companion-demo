@@ -7,13 +7,16 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from 'react';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import './Tamarac2.css';
 import './AppUsage.css';
-import SideNav from './components/SideNav';
+import { ChartContainer, ChartTooltip } from './components/ui/chart';
+import { ToolPage } from './components/ToolPage';
 import TimezonePicker from './components/TimezonePicker';
 import { analyticsApi, type UsageResponse } from './services/analytics';
 import { adminApi, type AdminGroup } from './services/admin';
 import { getTzIana, useTimezone, type TzKey } from './services/timezone';
+import { chartTheme } from './theme';
 
 const DAY_PRESETS = [7, 30, 90, 365];
 
@@ -139,14 +142,6 @@ export default function AppUsage() {
   const details = data?.details ?? [];
   const summary = data?.summary;
 
-  const maxToolViews = useMemo(
-    () => byTool.reduce((m, t) => Math.max(m, t.views), 0),
-    [byTool]
-  );
-  const maxUserViews = useMemo(
-    () => byUser.reduce((m, u) => Math.max(m, u.views), 0),
-    [byUser]
-  );
   const maxDaily = useMemo(
     () => daily.reduce((m, d) => Math.max(m, d.views), 0),
     [daily]
@@ -244,21 +239,13 @@ export default function AppUsage() {
   const userFilterActive = emails.length > 0 || groupIds.length > 0;
 
   return (
-    <div className="t2-page has-sidenav">
-      <SideNav />
-      <div className="t2-shell usage-console">
-        <header className="usage-hero">
-          <div className="usage-hero-left">
-            <div className="usage-kicker-row">
-              <span className="usage-kicker">Admin · Analytics</span>
-            </div>
-            <div className="usage-title"><h1>App Usage</h1></div>
-            <p className="usage-tagline">
-              Page-view traffic per tool. Filter by time window and by user or
-              group to focus on (or exclude) specific people.
-            </p>
-          </div>
-        </header>
+    <ToolPage
+      eyebrow="Admin · Analytics"
+      title="App Usage"
+      description="Inspect page-view traffic by tool, time window, user, or group."
+      width="full"
+      className="t2-page usage-console"
+    >
 
         {/* ── filters ──────────────────────────────────────────────────── */}
         <section className="usage-filters">
@@ -368,25 +355,26 @@ export default function AppUsage() {
                 {byTool.length === 0 ? (
                   <div className="usage-empty">No traffic in this window.</div>
                 ) : (
-                  <div className="usage-bars">
-                    {byTool.map((t) => (
-                      <div
-                        className="usage-bar-row"
-                        key={t.tool_id}
-                        onContextMenu={(e) => openMenu(e, t.tool_id, t.tool)}
-                        title="Right-click to filter"
-                      >
-                        <div className="usage-bar-label">{t.tool}</div>
-                        <div className="usage-bar-track">
-                          <div
-                            className="usage-bar-fill"
-                            style={{ width: `${maxToolViews ? (t.views / maxToolViews) * 100 : 0}%` }}
-                          />
-                        </div>
-                        <div className="usage-bar-value">{numberFmt(t.views)}</div>
-                      </div>
-                    ))}
-                  </div>
+                  <ChartContainer className="usage-ranking-chart" height={Math.max(190, byTool.length * 34)}>
+                    <BarChart data={byTool} layout="vertical" margin={{ top: 4, right: 32, bottom: 4, left: 8 }}>
+                      <CartesianGrid horizontal={false} />
+                      <XAxis type="number" domain={[0, 'dataMax']} allowDecimals={false} tickFormatter={numberFmt} />
+                      <YAxis type="category" dataKey="tool" width={172} tickLine={false} axisLine={false} />
+                      <ChartTooltip formatter={(value) => [numberFmt(Number(value)), 'Views']} />
+                      <Bar
+                        dataKey="views"
+                        name="Views"
+                        fill={chartTheme.actual}
+                        radius={[0, 4, 4, 0]}
+                        minPointSize={2}
+                        isAnimationActive={false}
+                        onContextMenu={(barData, _index, event) => {
+                          const row = barData.payload as (typeof byTool)[number];
+                          openMenu(event, row.tool_id, row.tool);
+                        }}
+                      />
+                    </BarChart>
+                  </ChartContainer>
                 )}
               </section>
 
@@ -398,27 +386,30 @@ export default function AppUsage() {
                 {byUser.length === 0 ? (
                   <div className="usage-empty">No traffic in this window.</div>
                 ) : (
-                  <div className="usage-bars">
-                    {byUser.map((u) => (
-                      <div
-                        className={'usage-bar-row' + (u.user_email ? '' : ' usage-bar-row-static')}
-                        key={u.user_email ?? '(anonymous)'}
-                        onContextMenu={u.user_email ? (e) => openUserMenu(e, u.user_email as string) : undefined}
-                        title={u.user_email ? 'Right-click to filter' : undefined}
-                      >
-                        <div className="usage-bar-label">
-                          {u.user_email ?? <span className="usage-muted">anonymous</span>}
-                        </div>
-                        <div className="usage-bar-track">
-                          <div
-                            className="usage-bar-fill usage-bar-fill-user"
-                            style={{ width: `${maxUserViews ? (u.views / maxUserViews) * 100 : 0}%` }}
-                          />
-                        </div>
-                        <div className="usage-bar-value">{numberFmt(u.views)}</div>
-                      </div>
-                    ))}
-                  </div>
+                  <ChartContainer className="usage-ranking-chart" height={Math.max(190, byUser.length * 34)}>
+                    <BarChart
+                      data={byUser.map((row) => ({ ...row, user: row.user_email ?? 'anonymous' }))}
+                      layout="vertical"
+                      margin={{ top: 4, right: 32, bottom: 4, left: 8 }}
+                    >
+                      <CartesianGrid horizontal={false} />
+                      <XAxis type="number" domain={[0, 'dataMax']} allowDecimals={false} tickFormatter={numberFmt} />
+                      <YAxis type="category" dataKey="user" width={172} tickLine={false} axisLine={false} />
+                      <ChartTooltip formatter={(value) => [numberFmt(Number(value)), 'Views']} />
+                      <Bar
+                        dataKey="views"
+                        name="Views"
+                        fill={chartTheme.comparison}
+                        radius={[0, 4, 4, 0]}
+                        minPointSize={2}
+                        isAnimationActive={false}
+                        onContextMenu={(barData, _index, event) => {
+                          const row = barData.payload as { user_email: string | null };
+                          if (row.user_email) openUserMenu(event, row.user_email);
+                        }}
+                      />
+                    </BarChart>
+                  </ChartContainer>
                 )}
               </section>
             </div>
@@ -432,52 +423,33 @@ export default function AppUsage() {
               {daily.length === 0 ? (
                 <div className="usage-empty">No traffic in this window.</div>
               ) : (
-                <div className="usage-chart">
-                  {/* y-axis: view-count ticks aligned to the plot gridlines */}
-                  <div className="usage-chart-y" aria-hidden="true">
-                    {yTicks.map((v) => (
-                      <span
-                        key={v}
-                        className="usage-chart-y-label"
-                        style={{ bottom: `${(v / yTop) * 100}%` }}
-                      >
-                        {numberFmt(v)}
-                      </span>
-                    ))}
-                  </div>
-                  {/* plot: gridlines behind the daily bars */}
-                  <div className="usage-chart-plot">
-                    {yTicks.map((v) => (
-                      <span
-                        key={v}
-                        className="usage-chart-grid"
-                        style={{ bottom: `${(v / yTop) * 100}%` }}
-                      />
-                    ))}
-                    <div className="usage-trend" role="img" aria-label="Daily views trend">
-                      {daily.map((d) => (
-                        <div key={d.date} className="usage-trend-col">
-                          <div
-                            className="usage-trend-bar"
-                            style={{ height: `${yTop ? Math.max(2, (d.views / yTop) * 100) : 0}%` }}
-                            title={`${formatDayLabel(d.date)}: ${numberFmt(d.views)} views`}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  {/* x-axis: date labels, thinned to avoid crowding */}
-                  <div className="usage-chart-x-spacer" aria-hidden="true" />
-                  <div className="usage-chart-x">
-                    {daily.map((d, i) => (
-                      <div key={d.date} className="usage-chart-x-col">
-                        <span className="usage-chart-x-label">
-                          {i % xLabelStep === 0 ? formatDayLabel(d.date) : ''}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <ChartContainer className="usage-daily-chart" height={240}>
+                  <BarChart data={daily} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={formatDayLabel}
+                      interval={xLabelStep - 1}
+                      minTickGap={16}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      domain={[0, yTop]}
+                      ticks={yTicks}
+                      allowDecimals={false}
+                      tickFormatter={numberFmt}
+                      tickLine={false}
+                      axisLine={false}
+                      width={44}
+                    />
+                    <ChartTooltip
+                      labelFormatter={(label) => formatDayLabel(String(label))}
+                      formatter={(value) => [numberFmt(Number(value)), 'Views']}
+                    />
+                    <Bar dataKey="views" name="Views" fill={chartTheme.warning} radius={[4, 4, 0, 0]} minPointSize={2} isAnimationActive={false} />
+                  </BarChart>
+                </ChartContainer>
               )}
             </section>
 
@@ -521,8 +493,6 @@ export default function AppUsage() {
             </section>
           </>
         )}
-      </div>
-
       {menu && (
         <>
           <div className="usage-menu-overlay" onClick={() => setMenu(null)} onContextMenu={(e) => { e.preventDefault(); setMenu(null); }} />
@@ -567,7 +537,7 @@ export default function AppUsage() {
           </div>
         </>
       )}
-    </div>
+    </ToolPage>
   );
 }
 

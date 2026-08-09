@@ -213,7 +213,7 @@ export default function AccountAnalyzer({
           disabled={loading || parseAccountNumbers(input).length === 0}
           sx={{
             backgroundColor: colors.allworthNavy,
-            '&:hover': { backgroundColor: '#0f2e53' },
+            '&:hover': { backgroundColor: colors.chartNightBlue },
             textTransform: 'none',
             fontWeight: 700,
             px: 3,

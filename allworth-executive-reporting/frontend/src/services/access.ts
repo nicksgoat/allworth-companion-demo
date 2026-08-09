@@ -6,11 +6,13 @@
 // An active "view as" impersonation overlay (written by the Admin page into
 // sessionStorage) always takes precedence over the real signed-in user's
 // access so an admin sees the site EXACTLY as the impersonated user would.
-// Resolution fails OPEN (all access) when the backend lookup errors so a
-// transient hiccup can never hide the whole app.
+// Resolution fails closed when the backend lookup errors so a transient
+// service issue can never become an implicit all-tools grant.
 
 import { useEffect, useState } from 'react';
 import { adminApi } from './admin';
+import type { Assignment } from './admin';
+import type { WorkspaceAdvisor } from './workspace';
 
 export const IMPERSONATION_KEY = 'allworth-impersonation';
 export const IMPERSONATION_EVENT = 'allworth-impersonation-change';
@@ -22,6 +24,8 @@ export interface Impersonation {
   shareTools?: string[];
   /** whether the impersonated user can share every tool. */
   shareAll?: boolean;
+  assignment?: Assignment;
+  advisor?: WorkspaceAdvisor | null;
 }
 
 export interface EffectiveAccess {
@@ -69,11 +73,11 @@ function loadMe(): Promise<EffectiveAccess> {
         return meCache;
       })
       .catch(() => {
-        // Fail open on access, but never fail open on *sharing* (an action).
+        // Fail closed for both viewing and sharing.
         meCache = {
           email: null,
           impersonating: false,
-          all: true,
+          all: false,
           tools: new Set(),
           shareAll: false,
           shareTools: new Set(),

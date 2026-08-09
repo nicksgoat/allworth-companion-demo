@@ -3,8 +3,8 @@
    the t2-* classes. These rules style just the table + its wrapper card. */
 
 .refresh-log-code {
-  background: rgba(0, 32, 92, 0.08);
-  color: #00205C;
+  background: rgba(23, 61, 103, 0.08);
+  color: #173D67;
   padding: 2px 8px;
   border-radius: 6px;
   font-size: 0.85em;
@@ -15,11 +15,11 @@
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
-  color: #4a5468;
+  color: #595959;
   font-size: 13px;
 }
 .refresh-log-meta strong {
-  color: #00205C;
+  color: #173D67;
 }
 
 .refresh-log-table-card {
@@ -33,7 +33,7 @@
 }
 
 .refresh-log-empty {
-  color: #6b7280;
+  color: #595959;
   padding: 2.5rem;
   text-align: center;
   font-size: 14px;
@@ -43,18 +43,18 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
-  color: #1f2937;
+  color: #171717;
 }
 
 .refresh-log-table th {
   text-align: left;
   padding: 12px 14px;
-  background: rgba(0, 32, 92, 0.06);
-  color: #00205C;
+  background: rgba(23, 61, 103, 0.06);
+  color: #173D67;
   font-weight: 600;
   font-size: 12px;
   letter-spacing: 0.02em;
-  border-bottom: 1px solid rgba(0, 32, 92, 0.12);
+  border-bottom: 1px solid rgba(23, 61, 103, 0.12);
   position: sticky;
   top: 0;
   white-space: nowrap;
@@ -63,9 +63,9 @@
 
 .refresh-log-table td {
   padding: 10px 14px;
-  border-bottom: 1px solid rgba(0, 32, 92, 0.06);
+  border-bottom: 1px solid rgba(23, 61, 103, 0.06);
   white-space: nowrap;
-  color: #1f2937;
+  color: #171717;
 }
 
 .refresh-log-table tbody tr:nth-child(even) {
@@ -75,7 +75,7 @@
   background: rgba(255, 255, 255, 0.3);
 }
 .refresh-log-table tbody tr:hover {
-  background: rgba(199, 91, 18, 0.08);
+  background: rgba(210, 109, 55, 0.08);
 }
 
 .refresh-log-th-sortable {
@@ -85,14 +85,14 @@
   transition: background 0.15s ease;
 }
 .refresh-log-th-sortable:hover {
-  background: rgba(199, 91, 18, 0.12);
-  color: #C75B12;
+  background: rgba(210, 109, 55, 0.12);
+  color: #D26D37;
 }
 
 .refresh-log-filter-row th {
   padding: 8px 10px;
   background: rgba(255, 255, 255, 0.5);
-  border-bottom: 1px solid rgba(0, 32, 92, 0.08);
+  border-bottom: 1px solid rgba(23, 61, 103, 0.08);
   position: sticky;
   top: 41px;
   z-index: 1;
@@ -103,19 +103,19 @@
   box-sizing: border-box;
   padding: 6px 10px;
   background: #ffffff;
-  color: #0a0e1a;
-  border: 1px solid rgba(0, 32, 92, 0.18);
+  color: #171717;
+  border: 1px solid rgba(23, 61, 103, 0.18);
   border-radius: 6px;
   font-size: 12px;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .refresh-log-filter-input::placeholder {
-  color: #9ca3af;
+  color: #828282;
 }
 .refresh-log-filter-input:focus {
   outline: none;
-  border-color: #C75B12;
-  box-shadow: 0 0 0 3px rgba(199, 91, 18, 0.18);
+  border-color: #D26D37;
+  box-shadow: 0 0 0 3px rgba(210, 109, 55, 0.18);
 }
 
 .refresh-log-td-error {
@@ -131,7 +131,7 @@
 
 .refresh-log-error-clip,
 .refresh-log-error-full {
-  color: #b91c1c;
+  color: #D26D37;
   font-family: 'JetBrains Mono', 'Consolas', Monaco, monospace;
   font-size: 12px;
   line-height: 1.4;
@@ -158,8 +158,8 @@
   margin-top: 6px;
   padding: 3px 10px;
   background: transparent;
-  color: #C75B12;
-  border: 1px solid rgba(199, 91, 18, 0.4);
+  color: #D26D37;
+  border: 1px solid rgba(210, 109, 55, 0.4);
   border-radius: 999px;
   cursor: pointer;
   font-size: 11px;
@@ -167,6 +167,6 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 .refresh-log-expand-btn:hover {
-  background: rgba(199, 91, 18, 0.1);
-  border-color: #C75B12;
+  background: rgba(210, 109, 55, 0.1);
+  border-color: #D26D37;
 }

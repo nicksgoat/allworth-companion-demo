@@ -43,7 +43,7 @@ AUTH_METHOD = os.getenv("AUTH_METHOD", "ActiveDirectoryInteractive")
 QUERY_TIMEOUT = int(os.getenv("SYNAPSE_QUERY_TIMEOUT", "60"))
 
 
-def _build_conn_str() -> str:
+def build_connection_string() -> str:
     """Build the ODBC connection string from AUTH_METHOD (same logic as app.py)."""
     if AUTH_METHOD == "ServicePrincipal":
         client_id = os.getenv("AZURE_CLIENT_ID")
@@ -81,6 +81,9 @@ def _build_conn_str() -> str:
         f"Unknown AUTH_METHOD: {AUTH_METHOD}. "
         "Use ServicePrincipal, SqlPassword, or ActiveDirectoryInteractive"
     )
+
+
+_build_conn_str = build_connection_string
 
 
 # ── Dedicated connection pool (separate from the dashboard read connection) ──

@@ -5,12 +5,13 @@ endpoints under the shared /api base. All writes reuse the global JWT
 middleware and record the acting user for audit fields.
 
 Endpoints:
-  GET    /api/admin/tools                     available tools (from tools.yaml)
+  GET    /api/admin/tools                     available tools (from tool-manifest.json)
   GET    /api/admin/users                     users + direct/effective access
   POST   /api/admin/users                     add a user by email
   DELETE /api/admin/users/<email>             remove a user
   PUT    /api/admin/users/<email>/tools       set a user's direct tool access
   GET    /api/admin/groups                    groups + members + access
+  GET    /api/admin/assignments               workspace assignments
   POST   /api/admin/groups                    create a group
   DELETE /api/admin/groups/<gid>              delete a group
   PUT    /api/admin/groups/<gid>/tools        set a group's tool access
@@ -46,6 +47,13 @@ def _share_tools_from_body() -> list[str]:
     body = request.get_json(silent=True) or {}
     tools = body.get("share_tools", [])
     return [str(t) for t in tools] if isinstance(tools, list) else []
+
+
+def _assignment_body() -> tuple[str, str, list[str]]:
+    body = request.get_json(silent=True) or {}
+    tools = body.get("home_tool_ids", [])
+    tools = [str(t) for t in tools] if isinstance(tools, list) else []
+    return str(body.get("name", "")), str(body.get("type", "")), tools
 
 
 @bp.get("/health")
@@ -108,6 +116,57 @@ def update_user_tools(email: str):
     except ValueError as e:
         return jsonify({"ok": False, "error": str(e)}), 400
     return jsonify({"ok": True, "user": user})
+
+
+@bp.put("/users/<path:email>/assignment")
+def update_user_assignment(email: str):
+    body = request.get_json(silent=True) or {}
+    try:
+        user = store.set_user_assignment(
+            email,
+            body.get("assignment_id"),
+            body.get("advisor_id_override"),
+        )
+    except ValueError as e:
+        return jsonify({"ok": False, "error": str(e)}), 400
+    return jsonify({"ok": True, "user": user})
+
+
+# ── assignments ─────────────────────────────────────────────────────────────
+
+
+@bp.get("/assignments")
+def get_assignments():
+    return jsonify({"ok": True, "assignments": store.list_assignments()})
+
+
+@bp.post("/assignments")
+def create_assignment():
+    name, assignment_type, tools = _assignment_body()
+    try:
+        assignment = store.add_assignment(name, assignment_type, tools, _actor())
+    except ValueError as e:
+        return jsonify({"ok": False, "error": str(e)}), 400
+    return jsonify({"ok": True, "assignment": assignment}), 201
+
+
+@bp.put("/assignments/<aid>")
+def edit_assignment(aid: str):
+    name, assignment_type, tools = _assignment_body()
+    try:
+        assignment = store.update_assignment(aid, name, assignment_type, tools)
+    except ValueError as e:
+        return jsonify({"ok": False, "error": str(e)}), 400
+    return jsonify({"ok": True, "assignment": assignment})
+
+
+@bp.delete("/assignments/<aid>")
+def delete_assignment(aid: str):
+    try:
+        store.remove_assignment(aid)
+    except ValueError as e:
+        return jsonify({"ok": False, "error": str(e)}), 400
+    return jsonify({"ok": True})
 
 
 # ── groups ───────────────────────────────────────────────────────────────────

@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import './Tamarac2.css';
 import './Admin.css';
 import './Automations.css';
-import SideNav from './components/SideNav';
+import { ToolPage } from './components/ToolPage';
 
 // --- mailer API (same-origin, gated by Easy Auth like every tool) ----------
 interface Rule {
@@ -218,16 +218,13 @@ function EmailAutomations() {
 export default function Automations() {
   const [tab, setTab] = useState<ToolKey>('mailer');
   return (
-    <div className="t2-page has-sidenav">
-      <SideNav />
-      <div className="t2-shell admin-console">
-        <header className="autom-hero">
-          <div>
-            <div className="autom-kicker">Admin · Automations</div>
-            <h1>Automations</h1>
-            <p className="autom-sub">Internal tools and automated workflows. More utilities can live here as tabs.</p>
-          </div>
-        </header>
+    <ToolPage
+      eyebrow="Admin · Automations"
+      title="Automations"
+      description="Configure internal workflow triggers and review automated delivery status."
+      width="wide"
+      className="t2-page admin-console"
+    >
 
         <nav className="autom-tabs" aria-label="Automation tools">
           {TOOLS.map((t) => (
@@ -242,7 +239,6 @@ export default function Automations() {
         </nav>
 
         {tab === 'mailer' ? <EmailAutomations /> : null}
-      </div>
-    </div>
+    </ToolPage>
   );
 }
