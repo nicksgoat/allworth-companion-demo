@@ -48,46 +48,39 @@ const GROUPS: NavGroup[] = [
     ],
   },
   {
-    heading: 'Live tools',
+    heading: 'Daily work',
     links: [
-      { href: '/nfbc', label: 'NFBC Adjustments', matches: ['/nfbc'], toolId: 'nfbc', icon: icon(<><path d="M4 4h16v16H4z" /><path d="M4 9h16" /><path d="M4 14h16" /><path d="M9 4v16" /></>) },
-      { href: '/fee-calculator', label: 'Fee Calculator', matches: ['/fee-calculator'], toolId: 'fee_calculator', icon: icon(<><rect x="4" y="2" width="16" height="20" rx="2" /><path d="M8 6h8" /><path d="M8 10h8" /><path d="M8 14h4" /><path d="M8 18h6" /></>) },
+      { href: '/reporting/kpi', label: 'Performance', matches: ['/reporting/kpi'], toolId: 'performance', icon: icon(<><path d="M3 3v18h18" /><path d="M7 15l3-4 3 3 4-6" /></>) },
       { href: '/pipeline-review', label: 'Pipeline Review', matches: ['/pipeline-review'], toolId: 'pipeline_review', icon: icon(<><path d="M3 3v18h18" /><path d="m7 14 4-4 3 3 5-6" /></>) },
       { href: '/executive-report', label: 'Executive Report', matches: ['/executive-report'], toolId: 'executive_report', icon: icon(<><path d="M3 3v18h18" /><rect x="7" y="11" width="3" height="6" /><rect x="12" y="7" width="3" height="10" /><rect x="17" y="4" width="3" height="13" /></>) },
-      { href: '/file-explorer', label: 'File Explorer', matches: ['/file-explorer'], toolId: 'file_explorer', icon: icon(<><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M12 11v5" /><path d="m9.5 13.5 2.5-2.5 2.5 2.5" /></>) },
-      { href: '/catalog/', label: 'Data Catalog', matches: ['/catalog', '/catalog/'], toolId: 'data_catalog', icon: icon(<><ellipse cx="12" cy="5" rx="8" ry="3" /><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5" /><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" /></>) },
       { href: '/brief', label: 'Executive Brief', matches: ['/brief'], toolId: 'brief', icon: icon(<><path d="M3 6h18v12H3z" /><path d="m3 7 9 6 9-6" /></>) },
-      { href: '/sfp2', label: 'Salesforce Column Updater', matches: ['/sfp2'], toolId: 'sfp2', icon: icon(<><path d="M4 6h16" /><path d="M4 12h16" /><path d="M4 18h10" /><circle cx="18" cy="18" r="2" /></>) },
-      { href: '/repcodes', label: 'Rep Codes', matches: ['/repcodes'], toolId: 'repcodes', icon: icon(<><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18" /><path d="M8 4v16" /></>) },
+      { href: '/fee-calculator', label: 'Fee Calculator', matches: ['/fee-calculator'], toolId: 'fee_calculator', icon: icon(<><rect x="4" y="2" width="16" height="20" rx="2" /><path d="M8 6h8" /><path d="M8 10h8" /><path d="M8 14h4" /><path d="M8 18h6" /></>) },
     ],
   },
   {
-    heading: 'Admin',
+    heading: 'Data & operations',
     links: [
-      { href: '/admin', label: 'Admin', matches: ['/admin'], toolId: 'admin', icon: icon(<><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5z" /><circle cx="12" cy="10" r="2.4" /><path d="M8.5 16a3.7 3.7 0 0 1 7 0" /></>) },
+      { href: '/nfbc', label: 'NFBC Adjustments', matches: ['/nfbc'], toolId: 'nfbc', icon: icon(<><path d="M4 4h16v16H4z" /><path d="M4 9h16" /><path d="M4 14h16" /><path d="M9 4v16" /></>) },
+      { href: '/file-explorer', label: 'File Explorer', matches: ['/file-explorer'], toolId: 'file_explorer', icon: icon(<><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M12 11v5" /><path d="m9.5 13.5 2.5-2.5 2.5 2.5" /></>) },
+      { href: '/catalog/', label: 'Data Catalog', matches: ['/catalog', '/catalog/'], toolId: 'data_catalog', icon: icon(<><ellipse cx="12" cy="5" rx="8" ry="3" /><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5" /><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" /></>) },
+      { href: '/sfp2', label: 'Salesforce Schema', matches: ['/sfp2'], toolId: 'sfp2', icon: icon(<><path d="M4 6h16" /><path d="M4 12h16" /><path d="M4 18h10" /><circle cx="18" cy="18" r="2" /></>) },
+      { href: '/repcodes', label: 'Rep Codes', matches: ['/repcodes'], toolId: 'repcodes', icon: icon(<><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18" /><path d="M8 4v16" /></>) },
+      { href: '/tamarac', label: 'Tamarac Runs', matches: ['/tamarac'], toolId: 'pipeline_logging', icon: icon(<><path d="M4 7h10" /><path d="M4 12h16" /><path d="M4 17h7" /><circle cx="18" cy="7" r="2" /><circle cx="14" cy="17" r="2" /></>) },
+      { href: '/refresh_log', label: 'Refresh Log', matches: ['/refresh_log', '/refresh-log'], toolId: 'pipeline_logging', icon: icon(<><path d="M21 12a9 9 0 1 1-3-6.7" /><path d="M21 3v6h-6" /></>) },
+    ],
+  },
+  {
+    heading: 'Administration',
+    links: [
+      { href: '/admin', label: 'Access Management', matches: ['/admin'], toolId: 'admin', icon: icon(<><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5z" /><circle cx="12" cy="10" r="2.4" /><path d="M8.5 16a3.7 3.7 0 0 1 7 0" /></>) },
       { href: '/app-usage', label: 'App Usage', matches: ['/app-usage'], toolId: 'admin', icon: icon(<><path d="M3 3v18h18" /><rect x="7" y="11" width="3" height="6" rx="1" /><rect x="12" y="7" width="3" height="10" rx="1" /><rect x="17" y="13" width="3" height="4" rx="1" /></>) },
       { href: '/automations', label: 'Automations', matches: ['/automations'], toolId: 'admin', icon: icon(<><path d="M12 2v4" /><path d="m16.2 7.8 2.9-2.9" /><path d="M18 12h4" /><circle cx="12" cy="12" r="4" /><path d="M4.9 4.9 7.8 7.8" /><path d="M2 12h4" /></>) },
-      { href: '/tamarac', label: 'Tamarac', matches: ['/tamarac'], toolId: 'pipeline_logging', icon: icon(<><path d="M4 7h10" /><path d="M4 12h16" /><path d="M4 17h7" /><circle cx="18" cy="7" r="2" /><circle cx="14" cy="17" r="2" /></>) },
-      { href: '/refresh_log', label: 'Full Log', matches: ['/refresh_log', '/refresh-log'], toolId: 'pipeline_logging', icon: icon(<><path d="M21 12a9 9 0 1 1-3-6.7" /><path d="M21 3v6h-6" /></>) },
     ],
   },
 ];
-
-// Reports live under the /reporting/* hierarchy and are surfaced via the
-// "Reporting" drill-in section rather than the top-level tool list. Add new
-// reports here as the section grows.
-const REPORTS: NavLink[] = [
-  { href: '/reporting/kpi', label: 'Performance by Channel', matches: ['/reporting/kpi'], toolId: 'performance', icon: icon(<><rect x="3" y="4" width="18" height="14" rx="2" /><path d="M8 20h8" /><path d="M7 12l3-3 3 3 4-5" /></>) },
-];
-
-const reportingIcon = icon(<><path d="M3 3v18h18" /><path d="M7 15l3-4 3 3 4-6" /></>);
 const chevronRight = (
   <svg className="side-nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6" /></svg>
 );
-const chevronLeft = (
-  <svg className="side-nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-);
-
 const searchIcon = icon(<><circle cx="11" cy="11" r="7" /><path d="m20 20-3.6-3.6" /></>);
 const panelIcon = icon(<><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16" /></>);
 const menuIcon = icon(<><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></>);
@@ -169,14 +162,6 @@ const SideNav = () => {
     }
   })();
 
-  // Two-level nav: the top-level ("hub") view lists the workspace sections and a
-  // "Reporting" drill-in; selecting it swaps the pane to the reports list with a
-  // "Back to hub" button. Defaults to the reporting view when already on a
-  // /reporting/* page so the active report is in context.
-  const [view, setView] = useState<'hub' | 'reporting'>(
-    current.startsWith('/reporting') ? 'reporting' : 'hub'
-  );
-
   const isActive = (link: NavLink) => {
     const matches = link.matches ?? [link.href];
     return matches.some((m) => (m.replace(/\/+$/, '') || '/') === current);
@@ -202,17 +187,11 @@ const SideNav = () => {
     </a>
   );
 
-  const visibleReports = REPORTS.filter(canSee);
-  const hasReporting = visibleReports.length > 0;
-  const reportingActive = current.startsWith('/reporting');
-
   const visibleGroups = GROUPS.map((group) => ({
     ...group,
     links: group.links.filter(canSee),
   })).filter((group) => group.links.length > 0);
 
-  const workspaceGroup = visibleGroups.find((g) => g.heading === 'Workspace');
-  const otherGroups = visibleGroups.filter((g) => g.heading !== 'Workspace');
   const accountEmail = access?.email ?? null;
   const accessLabel = access?.all
     ? 'All tools'
@@ -220,10 +199,7 @@ const SideNav = () => {
 
   const searchResults = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    const entries = [
-      ...GROUPS.flatMap((group) => group.links.map((link) => ({ ...link, group: group.heading }))),
-      ...REPORTS.map((link) => ({ ...link, group: 'Reporting' })),
-    ].filter(canSee);
+    const entries = GROUPS.flatMap((group) => group.links.map((link) => ({ ...link, group: group.heading }))).filter(canSee);
     if (!needle) return entries;
     return entries.filter((entry) => `${entry.label} ${entry.group}`.toLowerCase().includes(needle));
   }, [access, query]);
@@ -268,54 +244,12 @@ const SideNav = () => {
         <kbd>⌘ K</kbd>
       </button>
       <nav className="side-nav-scroll">
-        {view === 'reporting' ? (
-          <>
-            <button
-              type="button"
-              className="side-nav-back"
-              onClick={() => setView('hub')}
-            >
-              {chevronLeft}
-              <span>Back to hub</span>
-            </button>
-            <div className="side-nav-group">
-              <h6>Reporting</h6>
-              {visibleReports.map(renderLink)}
-            </div>
-          </>
-        ) : (
-          <>
-            {workspaceGroup && (
-              <div className="side-nav-group" key={workspaceGroup.heading}>
-                <h6>{workspaceGroup.heading}</h6>
-                {workspaceGroup.links.map(renderLink)}
-              </div>
-            )}
-            {hasReporting && (
-              <div className="side-nav-group">
-                <h6>Reporting</h6>
-                <button
-                  type="button"
-                  className={
-                    'side-nav-item side-nav-drill' + (reportingActive ? ' active' : '')
-                  }
-                  aria-expanded={false}
-                  onClick={() => setView('reporting')}
-                >
-                  {reportingIcon}
-                  <span>Reporting</span>
-                  {chevronRight}
-                </button>
-              </div>
-            )}
-            {otherGroups.map((group) => (
-              <div className="side-nav-group" key={group.heading}>
-                <h6>{group.heading}</h6>
-                {group.links.map(renderLink)}
-              </div>
-            ))}
-          </>
-        )}
+        {visibleGroups.map((group) => (
+          <div className="side-nav-group" key={group.heading}>
+            <h6>{group.heading}</h6>
+            {group.links.map(renderLink)}
+          </div>
+        ))}
       </nav>
       <div
         className="side-nav-account"
