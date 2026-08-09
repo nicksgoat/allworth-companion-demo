@@ -93,6 +93,26 @@ const panelIcon = icon(<><rect x="3" y="4" width="18" height="16" rx="2" /><path
 const menuIcon = icon(<><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></>);
 const closeIcon = icon(<><path d="m6 6 12 12" /><path d="m18 6-12 12" /></>);
 
+function accountName(email: string | null | undefined): string {
+  if (!email) return 'Signed-in user';
+  const local = email.split('@')[0] ?? '';
+  if (local.toLowerCase() === 'demo') return 'Demo user';
+  const words = local.split(/[._-]+/).filter(Boolean).slice(0, 2);
+  if (!words.length) return email;
+  return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
+function accountInitials(email: string | null | undefined): string {
+  const name = accountName(email);
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word.charAt(0))
+    .join('')
+    .toUpperCase();
+}
+
 // ── access resolution ──────────────────────────────────────────────────────
 // Effective access (with "view as" impersonation applied) is resolved by the
 // shared services/access module so the rail, the Home hub, and the route guard
@@ -193,6 +213,10 @@ const SideNav = () => {
 
   const workspaceGroup = visibleGroups.find((g) => g.heading === 'Workspace');
   const otherGroups = visibleGroups.filter((g) => g.heading !== 'Workspace');
+  const accountEmail = access?.email ?? null;
+  const accessLabel = access?.all
+    ? 'All tools'
+    : `${access?.tools.size ?? 0} ${access?.tools.size === 1 ? 'tool' : 'tools'}`;
 
   const searchResults = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -293,6 +317,20 @@ const SideNav = () => {
           </>
         )}
       </nav>
+      <div
+        className="side-nav-account"
+        aria-label={accountEmail ? `Signed in as ${accountEmail}` : 'Signed-in account'}
+        title={collapsed ? `${accountName(accountEmail)} · ${accountEmail ?? accessLabel}` : undefined}
+      >
+        <span className="side-nav-account-avatar" aria-hidden="true">
+          {accountInitials(accountEmail)}
+        </span>
+        <span className="side-nav-account-copy">
+          <strong>{accountName(accountEmail)}</strong>
+          <span>{accountEmail ?? 'Account details unavailable'}</span>
+          <small>{access?.impersonating ? 'Viewing as · ' : ''}{accessLabel}</small>
+        </span>
+      </div>
       <button type="button" className="side-nav-collapse" onClick={toggleCollapsed} aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}>
         {panelIcon}
         <span>{collapsed ? 'Expand' : 'Collapse'}</span>

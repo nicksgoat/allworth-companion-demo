@@ -25,6 +25,10 @@ export interface Impersonation {
 }
 
 export interface EffectiveAccess {
+  /** Email for the signed-in user, or the active "view as" account. */
+  email: string | null;
+  /** True while an administrator is viewing the workspace as another user. */
+  impersonating: boolean;
   /** true when the user can open every tool (all-access or enforcement off). */
   all: boolean;
   /** effective tool ids the user can open (ignored when `all` is true). */
@@ -55,6 +59,8 @@ function loadMe(): Promise<EffectiveAccess> {
       .getMe()
       .then((m) => {
         meCache = {
+          email: m.email,
+          impersonating: false,
           all: m.all_access,
           tools: new Set(m.effective_tools),
           shareAll: !!m.can_share_all,
@@ -64,7 +70,14 @@ function loadMe(): Promise<EffectiveAccess> {
       })
       .catch(() => {
         // Fail open on access, but never fail open on *sharing* (an action).
-        meCache = { all: true, tools: new Set(), shareAll: false, shareTools: new Set() };
+        meCache = {
+          email: null,
+          impersonating: false,
+          all: true,
+          tools: new Set(),
+          shareAll: false,
+          shareTools: new Set(),
+        };
         return meCache;
       });
   }
@@ -101,6 +114,8 @@ export function useEffectiveAccess(): EffectiveAccess | null {
   // share affordance exactly as that user would experience it.
   if (imp)
     return {
+      email: imp.email,
+      impersonating: true,
       all: false,
       tools: new Set(imp.tools),
       shareAll: !!imp.shareAll,

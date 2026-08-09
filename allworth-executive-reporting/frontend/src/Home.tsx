@@ -329,6 +329,40 @@ const cardSummary: Record<string, string> = {
   refresh_log: 'Review complete refresh and transformation history.',
 };
 
+const ACCOUNT_WIDGET_PRIORITY = [
+  'performance',
+  'executive_report',
+  'pipeline_review',
+  'brief',
+];
+
+function accountName(email: string | null | undefined): string {
+  if (!email) return 'this account';
+  const local = email.split('@')[0] ?? '';
+  if (local.toLowerCase() === 'demo') return 'Demo user';
+  const words = local.split(/[._-]+/).filter(Boolean).slice(0, 2);
+  if (!words.length) return email;
+  return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
+function AccountToolWidget({ card }: { card: HubCard }) {
+  return (
+    <a className="hub-tool-widget" href={card.href}>
+      <div className="hub-tool-widget-head">
+        <span className="hub-tool-widget-rule" aria-hidden="true" />
+        <span className="hub-card-icon">{card.icon}</span>
+        <span className="hub-tool-widget-kicker">{card.kicker}</span>
+      </div>
+      <h3>{card.title}</h3>
+      <p>{cardSummary[card.id] ?? card.desc}</p>
+      <span className="hub-tool-widget-action">
+        Open tool
+        {arrow}
+      </span>
+    </a>
+  );
+}
+
 function Card({ card }: { card: HubCard }) {
   const disabled = !card.href;
   const body = (
@@ -404,6 +438,14 @@ export default function Home() {
   );
   const availableCount = visibleSections.flatMap((section) => section.cards).filter((card) => card.href).length;
   const resultCount = availableSections.reduce((total, section) => total + section.cards.length, 0);
+  const accountWidgets = useMemo(() => {
+    const available = visibleSections.flatMap((section) => section.cards).filter((card) => card.href);
+    const preferred = ACCOUNT_WIDGET_PRIORITY
+      .map((id) => available.find((card) => card.id === id))
+      .filter((card): card is HubCard => Boolean(card));
+    const remainder = available.filter((card) => !preferred.some((item) => item.id === card.id));
+    return [...preferred, ...remainder].slice(0, 4);
+  }, [visibleSections]);
 
   return (
     <div className="home-hub has-sidenav">
@@ -428,6 +470,23 @@ export default function Home() {
             </div>
             <p className="hub-availability">{query ? `${resultCount} matching ${resultCount === 1 ? 'tool' : 'tools'}` : `${availableCount} tools available to you`}</p>
           </header>
+
+          {!query && accountWidgets.length > 0 && (
+            <section className="hub-account-widgets" aria-labelledby="hub-account-tools-title">
+              <div className="hub-account-widgets-head">
+                <div>
+                  <p className="hub-account-label">Account dashboard</p>
+                  <h2 id="hub-account-tools-title">Your tools</h2>
+                </div>
+                <p>
+                  {accountName(access?.email)} · {access?.all ? 'all tools enabled' : `${availableCount} enabled`}
+                </p>
+              </div>
+              <div className="hub-account-widget-grid">
+                {accountWidgets.map((card) => <AccountToolWidget key={card.id} card={card} />)}
+              </div>
+            </section>
+          )}
 
           {availableSections.map((section) => (
               <div key={section.heading}>
